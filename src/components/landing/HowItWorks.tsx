@@ -153,8 +153,8 @@ export function HowItWorks() {
                   </div>
                 </div>
 
-                <div className="font-mono text-xs text-yellow/60 tracking-[0.2em] mb-2">
-                  {step.number}
+                <div className="font-mono text-xs tracking-[0.2em] mb-2">
+                  <span className="yellow-label">{step.number}</span>
                 </div>
 
                 <h3 className="font-sans font-black text-[var(--fg)] text-2xl mb-3">
