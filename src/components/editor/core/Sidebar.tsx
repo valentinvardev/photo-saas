@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useEditorStore } from "~/lib/editor/store";
 import { deviceContentRef } from "~/lib/editor/deviceRef";
 import { ColorPalettePanel } from "~/components/editor/panels/ColorPalettePanel";
@@ -299,7 +300,9 @@ function ThreeDotMenu({ sectionId: _id, isOpen, onOpen, onClose, onScrollTo }: {
   }
 
   return (
-    <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)" }}>
+    /* No transform on this wrapper — transform creates a fixed-position containing
+       block which would trap the portal-rendered popup */
+    <div style={{ position: "absolute", right: 6, top: 0, bottom: 0, display: "flex", alignItems: "center" }}>
       <button
         ref={btnRef}
         onClick={handleToggle}
@@ -314,26 +317,27 @@ function ThreeDotMenu({ sectionId: _id, isOpen, onOpen, onClose, onScrollTo }: {
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <>
+          {/* Backdrop — closes menu on outside click */}
           <div
-            style={{ position: "fixed", inset: 0, zIndex: 190 }}
+            style={{ position: "fixed", inset: 0, zIndex: 9998 }}
             onClick={(e) => { e.stopPropagation(); onClose(); }}
           />
+          {/* Popup — portalled to body so no stacking context can hide it */}
           <div
             style={{
-              position: "fixed", top: pos.top, right: pos.right, zIndex: 200,
+              position: "fixed", top: pos.top, right: pos.right, zIndex: 9999,
               background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 6,
               minWidth: 140, overflow: "hidden", boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
             }}
           >
             <MenuItem label="Scroll to" onClick={() => { onScrollTo(); onClose(); }} />
-            <MenuItem label="Rename" onClick={onClose} disabled />
-            <MenuItem label="Duplicate" onClick={onClose} disabled />
             <div style={{ height: 1, background: "#222", margin: "2px 0" }} />
             <MenuItem label="Delete" onClick={onClose} disabled danger />
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );
