@@ -97,11 +97,11 @@ function PortfolioCard({ p, onOpen }: { p: Portfolio; onOpen: () => void }) {
 
   return (
     <div
-      className="group rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-[var(--fg-muted)] transition-all duration-200 cursor-pointer"
+      className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-[var(--fg-muted)] transition-all duration-200 cursor-pointer"
       onClick={onOpen}
     >
       {/* Cover */}
-      <div className="relative aspect-video overflow-hidden bg-[var(--bg-subtle)]">
+      <div className="relative h-28 overflow-hidden bg-[var(--bg-subtle)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`https://picsum.photos/seed/${p.seed}/600/338?grayscale`}
@@ -167,32 +167,29 @@ function PortfolioCard({ p, onOpen }: { p: Portfolio; onOpen: () => void }) {
       </div>
 
       {/* Card body */}
-      <div className="p-4">
-        <div className="mb-1">
-          <h3 className="font-sans font-bold text-[var(--fg)] text-sm truncate">{p.name}</h3>
-          <a
-            href={`https://${p.customDomain ?? `${p.slug}.frame.co`}`}
-            onClick={(e) => e.stopPropagation()}
-            className="font-mono text-[11px] text-[var(--fg-muted)] hover:text-yellow transition-colors truncate block"
-            target="_blank" rel="noopener noreferrer"
-          >
-            {p.customDomain ?? `${p.slug}.frame.co`}
-          </a>
-        </div>
-
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--border)]">
-          <div>
-            <div className="font-mono text-[10px] text-[var(--fg-muted)]">Visits (7d)</div>
-            <div className="font-sans font-bold text-sm text-[var(--fg)]">{p.visits.toLocaleString()}</div>
+      <div className="p-3">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="min-w-0">
+            <h3 className="font-sans font-bold text-[var(--fg)] text-xs truncate">{p.name}</h3>
+            <a
+              href={`https://${p.customDomain ?? `${p.slug}.frame.co`}`}
+              onClick={(e) => e.stopPropagation()}
+              className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-yellow transition-colors truncate block"
+              target="_blank" rel="noopener noreferrer"
+            >
+              {p.customDomain ?? `${p.slug}.frame.co`}
+            </a>
           </div>
           <Sparkline data={p.weeklyViews} />
-          <div className="text-right">
-            <div className="font-mono text-[10px] text-[var(--fg-muted)]">Pages</div>
-            <div className="font-sans font-bold text-sm text-[var(--fg)]">{p.pages}</div>
-          </div>
         </div>
 
-        <div className="mt-3 font-mono text-[10px] text-[var(--fg-muted)]">Updated {p.updatedAt}</div>
+        <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-[9px] text-[var(--fg-muted)]">{p.visits.toLocaleString()} visits</span>
+            <span className="font-mono text-[9px] text-[var(--fg-muted)]">{p.pages}p</span>
+          </div>
+          <div className="font-mono text-[9px] text-[var(--fg-muted)]">{p.updatedAt}</div>
+        </div>
       </div>
     </div>
   );
@@ -630,7 +627,7 @@ export default function PortfolioPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {MOCK_PORTFOLIOS.map((p) => (
             <PortfolioCard key={p.id} p={p} onOpen={() => setSelectedId(p.id)} />
           ))}

@@ -105,8 +105,8 @@ function NavItem({ label, href, icon: Icon, soon }: { label: string; href: strin
       href={href}
       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group
         ${active
-          ? "bg-yellow/10 text-[var(--fg)] border-l-2 border-yellow pl-[10px]"
-          : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] border-l-2 border-transparent pl-[10px]"
+          ? "bg-yellow/10 text-[var(--fg)]"
+          : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"
         }`}
     >
       <span className={active ? "text-yellow" : "text-[var(--fg-muted)] group-hover:text-[var(--fg)]"}>
