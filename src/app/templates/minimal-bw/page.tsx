@@ -165,7 +165,7 @@ function WorkPhoto({ w }: { w: typeof WORKS[0]; aspect?: string }) {
 
   return (
     <div
-      style={{ position: "relative", overflow: "hidden", cursor: "pointer" }}
+      style={{ position: "relative", overflow: "hidden", cursor: "pointer", width: "100%", height: "100%" }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -406,42 +406,35 @@ export default function MinimalBWTemplate() {
       <section id="work" style={{ padding: "7rem 7vw" }}>
         <Label index="01" text="Selected Work" />
 
-        {/* Asymmetric grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gridTemplateRows: "auto",
-            gap: "3px",
-            background: "#d8d8d8",
-          }}
-        >
-          {/* Row 1: large left (spans 2 rows), 2 stacked right */}
-          <div style={{ gridRow: "span 2", aspectRatio: "3/4" }}>
-            <WorkPhoto w={WORKS[0]!} />
-          </div>
-          <div style={{ aspectRatio: "4/3" }}>
-            <WorkPhoto w={WORKS[1]!} />
-          </div>
-          <div style={{ aspectRatio: "4/3" }}>
-            <WorkPhoto w={WORKS[2]!} />
-          </div>
+        {/* Asymmetric grid — row-based for reliable sizing */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
 
-          {/* Row 2 continues */}
-          <div style={{ aspectRatio: "4/3" }}>
+          {/* Row 1: tall left + two stacked right */}
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "3px", height: "520px" }}>
+            <WorkPhoto w={WORKS[0]!} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+              <div style={{ flex: 1 }}><WorkPhoto w={WORKS[1]!} /></div>
+              <div style={{ flex: 1 }}><WorkPhoto w={WORKS[2]!} /></div>
+            </div>
             <WorkPhoto w={WORKS[3]!} />
           </div>
-          <div style={{ aspectRatio: "4/3" }}>
-            <WorkPhoto w={WORKS[4]!} />
-          </div>
 
-          {/* Row 3: 2 normal, 1 large */}
-          <div style={{ aspectRatio: "4/5" }}>
+          {/* Row 2: three equal */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "3px", height: "340px" }}>
+            <WorkPhoto w={WORKS[4]!} />
             <WorkPhoto w={WORKS[5]!} />
-          </div>
-          <div style={{ gridColumn: "span 2", aspectRatio: "16/7" }}>
             <WorkPhoto w={WORKS[6]!} />
           </div>
+
+          {/* Row 3: wide left + narrow right */}
+          <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: "3px", height: "400px" }}>
+            <WorkPhoto w={WORKS[7]!} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+              <div style={{ flex: 3 }}><WorkPhoto w={WORKS[0]!} /></div>
+              <div style={{ flex: 2 }}><WorkPhoto w={WORKS[3]!} /></div>
+            </div>
+          </div>
+
         </div>
 
         {/* See all link */}
