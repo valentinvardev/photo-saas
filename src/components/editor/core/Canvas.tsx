@@ -48,33 +48,62 @@ function DeviceScreen({
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Mobile frame  — iPhone Dynamic Island style
+   Mobile frame  — iPhone 15 Pro (titanium, Dynamic Island)
 ───────────────────────────────────────────────────────────────────────── */
 function MobileFrame({ contentRef }: { contentRef: React.RefObject<HTMLDivElement | null> }) {
+  const BUTTON_COLOR = "linear-gradient(180deg,#323232 0%,#282828 50%,#2e2e2e 100%)";
   return (
-    <div
-      style={{
-        width:        393,
-        background:   "#111",
-        borderRadius: 50,
-        padding:      "0 9px",
-        boxShadow:    "0 40px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.06)",
-        flexShrink:   0,
-      }}
-    >
-      {/* Dynamic Island */}
-      <div style={{ height: 44, display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <div style={{ width: 126, height: 34, background: "#000", borderRadius: 20 }} />
-      </div>
+    <div style={{ position: "relative", flexShrink: 0, padding: "0 4px" }}>
+      {/* Left buttons — Action (top), Volume Up, Volume Down */}
+      <div style={{ position: "absolute", left: 0, top: 106, width: 4, height: 30, background: BUTTON_COLOR, borderRadius: "3px 0 0 3px", boxShadow: "-1px 0 2px rgba(0,0,0,0.6)" }} />
+      <div style={{ position: "absolute", left: 0, top: 156, width: 4, height: 56, background: BUTTON_COLOR, borderRadius: "3px 0 0 3px", boxShadow: "-1px 0 2px rgba(0,0,0,0.6)" }} />
+      <div style={{ position: "absolute", left: 0, top: 224, width: 4, height: 56, background: BUTTON_COLOR, borderRadius: "3px 0 0 3px", boxShadow: "-1px 0 2px rgba(0,0,0,0.6)" }} />
+      {/* Right button — Power / Side */}
+      <div style={{ position: "absolute", right: 0, top: 180, width: 4, height: 90, background: BUTTON_COLOR, borderRadius: "0 3px 3px 0", boxShadow: "1px 0 2px rgba(0,0,0,0.6)" }} />
 
-      {/* Screen */}
-      <DeviceScreen refEl={contentRef} height={CONTENT_H.mobile} width={375} radius={4}>
-        <EditableTemplate viewport="mobile" />
-      </DeviceScreen>
+      {/* Phone body */}
+      <div
+        style={{
+          width:        393,
+          background:   "linear-gradient(145deg, #2c2c2e 0%, #1c1c1e 40%, #242426 100%)",
+          borderRadius: 56,
+          padding:      "0 9px",
+          boxShadow: [
+            "0 60px 120px rgba(0,0,0,0.85)",
+            "0 20px 40px rgba(0,0,0,0.5)",
+            "inset 0 0 0 0.5px rgba(255,255,255,0.14)",
+            "inset 0 1px 0 rgba(255,255,255,0.08)",
+            "inset 0 -1px 0 rgba(0,0,0,0.4)",
+          ].join(", "),
+        }}
+      >
+        {/* Top bar — Dynamic Island area */}
+        <div style={{ height: 50, display: "flex", justifyContent: "center", alignItems: "center", position: "relative" }}>
+          {/* Speaker grille top */}
+          <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%) translateX(-52px)", width: 22, height: 4, background: "#111", borderRadius: 2, opacity: 0.6 }} />
+          {/* Dynamic Island */}
+          <div style={{
+            width: 124, height: 36,
+            background: "#000",
+            borderRadius: 20,
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 2px rgba(0,0,0,0.8)",
+            display: "flex", alignItems: "center", justifyContent: "flex-end",
+            paddingRight: 11, gap: 6,
+          }}>
+            {/* Camera ring */}
+            <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#0d0d0d", boxShadow: "0 0 0 1.5px #1a1a1a, inset 0 0 4px rgba(80,130,255,0.18)" }} />
+          </div>
+        </div>
 
-      {/* Home indicator */}
-      <div style={{ height: 36, display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <div style={{ width: 134, height: 5, background: "#333", borderRadius: 3 }} />
+        {/* Screen */}
+        <DeviceScreen refEl={contentRef} height={CONTENT_H.mobile} width={375} radius={14}>
+          <EditableTemplate viewport="mobile" />
+        </DeviceScreen>
+
+        {/* Home bar */}
+        <div style={{ height: 44, display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <div style={{ width: 134, height: 5, background: "rgba(255,255,255,0.22)", borderRadius: 3 }} />
+        </div>
       </div>
     </div>
   );

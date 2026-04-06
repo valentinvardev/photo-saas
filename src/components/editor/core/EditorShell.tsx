@@ -6,12 +6,17 @@ import { loadState } from "~/lib/editor/localStorage";
 import { TopBar } from "./TopBar";
 import { Canvas } from "./Canvas";
 import { Sidebar } from "./Sidebar";
+import { InspectorPanel } from "~/components/editor/panels/InspectorPanel";
 
 // Side-effect: load all @fontsource CSS
 import "~/lib/editor/fonts";
 
 export function EditorShell() {
-  const { updateNode, setPalette, setTypography, palette, typography, selectedSection, hoveredSection } = useEditorStore();
+  const {
+    updateNode, setPalette, setTypography, setLogo,
+    palette, typography, selectedSection, hoveredSection,
+    hiddenSections,
+  } = useEditorStore();
 
   // Hydrate from localStorage on first render
   useEffect(() => {
@@ -22,6 +27,7 @@ export function EditorShell() {
     }
     setPalette(saved.palette);
     if (saved.typography) setTypography(saved.typography);
+    if (saved.logo) setLogo(saved.logo);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -29,17 +35,19 @@ export function EditorShell() {
     <div style={{ display: "flex", flexDirection: "column", height: "100dvh", background: "#0a0a0a" }}>
       <TopBar />
 
-      {/* Main area — sidebar LEFT, canvas RIGHT */}
+      {/* Main area — Sidebar · InspectorPanel (when node selected) · Canvas */}
       <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
         <Sidebar />
+        <InspectorPanel />
         <Canvas />
       </div>
 
       {/*
         Global style injections:
-        1. Palette CSS variables on .canvas-frame
-        2. Template font overrides via --tpl-* variables
-        3. Section hover/selection highlights using the section HTML ids
+        1. Palette + typography CSS variables on .canvas-frame
+        2. Section hover/selection amber outlines
+        3. Hidden sections (display:none)
+        4. Hidden nodes (display:none via data-node-id attribute)
       */}
       <style>{`
         .canvas-frame {
@@ -61,6 +69,8 @@ export function EditorShell() {
           ? `#${selectedSection} { outline: 2px solid rgba(251,191,36,0.8) !important; outline-offset: -2px; }`
           : ""
         }
+
+        ${hiddenSections.map((id) => `#${id} { display: none !important; }`).join("\n")}
       `}</style>
     </div>
   );

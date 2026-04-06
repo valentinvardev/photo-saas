@@ -131,7 +131,7 @@ function scrollToSection(sectionId: string) {
    PAGES TAB
 ═══════════════════════════════════════════════════════════════════════ */
 function PagesTab() {
-  const { selectedSection, setSelectedSection, setHoveredSection, selectNode, selectedId } = useEditorStore();
+  const { selectedSection, setSelectedSection, setHoveredSection, selectNode, selectedId, hiddenSections, hideSection, showSection } = useEditorStore();
   const [expanded, setExpanded] = useState<Set<string>>(new Set(["section-hero"]));
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
 
@@ -167,8 +167,25 @@ function PagesTab() {
 
       {/* Section rows */}
       {SECTIONS.map((section) => {
+        const isHidden   = hiddenSections.includes(section.id);
         const isSelected = selectedSection === section.id;
         const isExpanded = expanded.has(section.id);
+
+        /* Hidden section — show a minimal restore row */
+        if (isHidden) {
+          return (
+            <div key={section.id} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 14px 4px 28px", opacity: 0.45 }}>
+              <span style={{ color: "#444", display: "flex" }}>{section.icon}</span>
+              <span style={{ fontSize: 11, color: "#444", flex: 1, textDecoration: "line-through" }}>{section.label}</span>
+              <button
+                onClick={() => showSection(section.id)}
+                style={{ background: "none", border: "1px solid #2a2a2a", color: "#555", fontSize: 9, padding: "2px 6px", borderRadius: 3, cursor: "pointer", fontFamily: "inherit" }}
+              >
+                Restore
+              </button>
+            </div>
+          );
+        }
 
         return (
           <div key={section.id}>
@@ -227,10 +244,12 @@ function PagesTab() {
               {/* Three-dot menu button (appears on hover via CSS would be complex — use state) */}
               <ThreeDotMenu
                 sectionId={section.id}
+                locked={section.locked}
                 isOpen={menuOpen === section.id}
                 onOpen={() => setMenuOpen(section.id)}
                 onClose={() => setMenuOpen(null)}
                 onScrollTo={() => scrollToSection(section.id)}
+                onDelete={() => { hideSection(section.id); setMenuOpen(null); if (selectedSection === section.id) setSelectedSection(null); }}
               />
             </div>
 
@@ -279,12 +298,14 @@ function PagesTab() {
 }
 
 /* Three-dot context menu */
-function ThreeDotMenu({ sectionId: _id, isOpen, onOpen, onClose, onScrollTo }: {
+function ThreeDotMenu({ sectionId: _id, locked, isOpen, onOpen, onClose, onScrollTo, onDelete }: {
   sectionId: string;
+  locked: boolean;
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
   onScrollTo: () => void;
+  onDelete: () => void;
 }) {
   const btnRef = useRef<HTMLButtonElement>(null);
   const [pos, setPos] = useState({ top: 0, right: 0 });
@@ -334,7 +355,7 @@ function ThreeDotMenu({ sectionId: _id, isOpen, onOpen, onClose, onScrollTo }: {
           >
             <MenuItem label="Scroll to" onClick={() => { onScrollTo(); onClose(); }} />
             <div style={{ height: 1, background: "#222", margin: "2px 0" }} />
-            <MenuItem label="Delete" onClick={onClose} disabled danger />
+            <MenuItem label="Delete" onClick={onDelete} disabled={locked} danger />
           </div>
         </>,
         document.body
@@ -415,7 +436,7 @@ function DesignTab() {
    SETTINGS TAB
 ═══════════════════════════════════════════════════════════════════════ */
 function SettingsTab() {
-  const { nodes: _n, palette: _p } = useEditorStore();
+  const { logo, setLogo } = useEditorStore();
 
   const inputStyle: React.CSSProperties = {
     width: "100%", background: "#0a0a0a", border: "1px solid #1f1f1f",
@@ -427,11 +448,53 @@ function SettingsTab() {
     letterSpacing: "0.1em", display: "block", marginBottom: 5,
   };
 
+  const modeStyle = (active: boolean): React.CSSProperties => ({
+    flex: 1, background: active ? "#1a2a3a" : "#111",
+    border: `1px solid ${active ? "#2563eb" : "#1f1f1f"}`,
+    color: active ? "#93c5fd" : "#555",
+    fontSize: 10, padding: "5px 4px", borderRadius: 3,
+    cursor: "pointer", fontFamily: "inherit", textAlign: "center",
+  });
+
   return (
     <div style={{ padding: "16px 14px", display: "flex", flexDirection: "column", gap: 18 }}>
 
-      {/* Site info */}
+      {/* Logo */}
       <div>
+        <p style={{ color: "#444", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Logo</p>
+
+        {/* Mode selector */}
+        <label style={labelStyle}>Display mode</label>
+        <div style={{ display: "flex", gap: 2, marginBottom: 12 }}>
+          {(["text", "image", "image+text"] as const).map((m) => (
+            <button key={m} style={modeStyle(logo.mode === m)} onClick={() => setLogo({ mode: m })}>
+              {m === "text" ? "Text" : m === "image" ? "Image" : "Both"}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div>
+            <label style={labelStyle}>Logo text</label>
+            <input value={logo.text} onChange={(e) => setLogo({ text: e.target.value })} style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Logo image URL</label>
+            <input value={logo.imageUrl} onChange={(e) => setLogo({ imageUrl: e.target.value })} placeholder="https://..." style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Alt logo (dark bg)</label>
+            <input value={logo.altImageUrl} onChange={(e) => setLogo({ altImageUrl: e.target.value })} placeholder="https://..." style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Favicon URL</label>
+            <input value={logo.faviconUrl} onChange={(e) => setLogo({ faviconUrl: e.target.value })} placeholder="https://..." style={inputStyle} />
+          </div>
+        </div>
+      </div>
+
+      {/* Site info */}
+      <div style={{ borderTop: "1px solid #1a1a1a", paddingTop: 16 }}>
         <p style={{ color: "#444", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Site</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div>

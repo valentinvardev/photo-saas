@@ -1,9 +1,10 @@
-import type { EditorNode, ColorPalette, Typography } from "./types";
+import type { EditorNode, ColorPalette, Typography, LogoSettings } from "./types";
 
 interface PersistedState {
   nodes:      Record<string, EditorNode>;
   palette:    ColorPalette;
   typography: Typography;
+  logo:       LogoSettings;
 }
 
 const KEY = "frame-editor-minimal-bw";

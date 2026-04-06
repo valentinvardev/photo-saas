@@ -39,9 +39,20 @@ function EditableNode({
   style?: React.CSSProperties;
   tag?: "div" | "h1" | "h2" | "h3" | "p" | "span" | "blockquote";
 }) {
-  const { selectedId, editingId, selectNode, setEditing } = useEditorStore();
+  const { selectedId, editingId, selectNode, setEditing, nodes } = useEditorStore();
+  const node     = nodes[id];
   const selected = selectedId === id;
   const editing  = editingId  === id;
+
+  // Node is hidden (deleted by user)
+  if (node?.hidden) return null;
+
+  // Style overrides stored per-node (from InspectorPanel)
+  const overrides: React.CSSProperties = {};
+  if (node?.fontSize)      overrides.fontSize      = node.fontSize;
+  if (node?.fontWeight)    overrides.fontWeight    = node.fontWeight;
+  if (node?.fontStyle)     overrides.fontStyle     = node.fontStyle;
+  if (node?.textAlign)     overrides.textAlign     = node.textAlign;
 
   const El = Tag as "div";
   return (
@@ -52,7 +63,7 @@ function EditableNode({
       data-editing={editing ? "true" : undefined}
       onClick={(e) => { e.stopPropagation(); selectNode(id); }}
       onDoubleClick={(e) => { e.stopPropagation(); selectNode(id); setEditing(id); }}
-      style={{ position: "relative", ...style }}
+      style={{ position: "relative", ...style, ...overrides }}
     >
       {children}
     </El>
@@ -87,8 +98,11 @@ function EditableText({ id, style }: { id: string; style?: React.CSSProperties }
 ═══════════════════════════════════════════ */
 function EditableImage({ id, imgStyle }: { id: string; imgStyle?: React.CSSProperties }) {
   const node = useEditorStore((s) => s.nodes[id]);
+  const style: React.CSSProperties = { ...imgStyle };
+  if (node?.objectFit)     style.objectFit     = node.objectFit;
+  if (node?.objectPosition) style.objectPosition = node.objectPosition;
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={node?.src ?? ""} alt={node?.alt ?? ""} style={imgStyle} />;
+  return <img src={node?.src ?? ""} alt={node?.alt ?? ""} style={style} />;
 }
 
 /* ═══════════════════════════════════════════
@@ -290,8 +304,33 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
 ═══════════════════════════════════════════ */
 function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { logo } = useEditorStore();
   const mono = { fontFamily: "var(--tpl-mono,monospace)" } as const;
   const sans = { fontFamily: "var(--tpl-sans,sans-serif)" } as const;
+
+  // Renders the logo based on Settings mode
+  function LogoMark({ dark = false }: { dark?: boolean }) {
+    const imgSrc = dark && logo.altImageUrl ? logo.altImageUrl : logo.imageUrl;
+    const textEl = (
+      <EditableNode id="nav-logo" tag="span" style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.2em", color: dark ? "var(--ed-bg, #fafafa)" : "var(--ed-fg, #0a0a0a)", textTransform: "uppercase" }}>
+        <EditableText id="nav-logo" />
+      </EditableNode>
+    );
+    if (logo.mode === "image" && imgSrc) {
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img src={imgSrc} alt={logo.text} style={{ height: 28, objectFit: "contain" }} />;
+    }
+    if (logo.mode === "image+text" && imgSrc) {
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imgSrc} alt="" style={{ height: 24, objectFit: "contain" }} />
+          {textEl}
+        </div>
+      );
+    }
+    return textEl;
+  }
 
   const navBase: React.CSSProperties = {
     /* ADAPTER NOTE: was `position: fixed`. Changed to `position: relative` so
@@ -321,9 +360,9 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
             <span style={{ display: "block", width: "14px", height: "1.5px", background: "var(--ed-fg, #0a0a0a)" }} />
             <span style={{ display: "block", width: "20px", height: "1.5px", background: "var(--ed-fg, #0a0a0a)" }} />
           </button>
-          <EditableNode id="nav-logo" tag="span" style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--ed-fg, #0a0a0a)", textTransform: "uppercase", position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
-            <EditableText id="nav-logo" />
-          </EditableNode>
+          <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+            <LogoMark />
+          </div>
           <button onClick={onOpenGallery}
             style={{ ...sans, marginLeft: "auto", fontSize: "10px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "1px solid #0a0a0a", padding: "6px 14px", cursor: "pointer" }}>
             Work
@@ -368,9 +407,7 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
 
   return (
     <nav id="section-nav" style={navBase}>
-      <EditableNode id="nav-logo" tag="span" style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.18em", color: "var(--ed-fg, #0a0a0a)", textTransform: "uppercase" }}>
-        <EditableText id="nav-logo" />
-      </EditableNode>
+      <LogoMark />
       <div style={{ display: "flex", gap: "2.5rem", alignItems: "center", marginLeft: "auto" }}>
         {[
           { label: "Work",    fn: onOpenGallery },

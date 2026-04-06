@@ -2,11 +2,11 @@
 
 import { create } from "zustand";
 import { temporal } from "zundo";
-import type { EditorNode, EditorState, ColorPalette, Typography, Viewport } from "./types";
-import { DEFAULT_PALETTE, DEFAULT_TYPOGRAPHY } from "./types";
+import type { EditorNode, EditorState, ColorPalette, Typography, Viewport, LogoSettings } from "./types";
+import { DEFAULT_PALETTE, DEFAULT_TYPOGRAPHY, DEFAULT_LOGO } from "./types";
 
 const INITIAL_NODES: Record<string, EditorNode> = {
-  "nav-logo":        { id: "nav-logo",        type: "nav-logo",  content: "J·H" },
+  "nav-logo":        { id: "nav-logo",        type: "logo",      content: "J·H" },
   "hero-heading":    { id: "hero-heading",    type: "heading",   content: "James<br/><em>Hollis</em>" },
   "hero-sub":        { id: "hero-sub",        type: "paragraph", content: "Documenting the quiet tension between presence and absence. Work exhibited across North America and Europe." },
   "hero-avail":      { id: "hero-avail",      type: "paragraph", content: "Available for commissions — Q4 2025" },
@@ -21,15 +21,18 @@ const INITIAL_NODES: Record<string, EditorNode> = {
 };
 
 interface EditorStore extends EditorState {
-  selectNode:       (id: string | null) => void;
-  setEditing:       (id: string | null) => void;
-  setViewport:      (v: Viewport) => void;
+  selectNode:         (id: string | null) => void;
+  setEditing:         (id: string | null) => void;
+  setViewport:        (v: Viewport) => void;
   setSelectedSection: (id: string | null) => void;
   setHoveredSection:  (id: string | null) => void;
-  updateNode:       (id: string, patch: Partial<EditorNode>) => void;
-  setPalette:       (patch: Partial<ColorPalette>) => void;
-  setTypography:    (patch: Partial<Typography>) => void;
-  reset:            () => void;
+  updateNode:         (id: string, patch: Partial<EditorNode>) => void;
+  setPalette:         (patch: Partial<ColorPalette>) => void;
+  setTypography:      (patch: Partial<Typography>) => void;
+  setLogo:            (patch: Partial<LogoSettings>) => void;
+  hideSection:        (id: string) => void;
+  showSection:        (id: string) => void;
+  reset:              () => void;
 }
 
 export const useEditorStore = create<EditorStore>()(
@@ -38,11 +41,13 @@ export const useEditorStore = create<EditorStore>()(
       nodes:           INITIAL_NODES,
       palette:         DEFAULT_PALETTE,
       typography:      DEFAULT_TYPOGRAPHY,
+      logo:            DEFAULT_LOGO,
       selectedId:      null,
       editingId:       null,
       viewport:        "desktop",
       selectedSection: null,
       hoveredSection:  null,
+      hiddenSections:  [],
 
       selectNode:    (id) => set({ selectedId: id, editingId: null }),
       setEditing:    (id) => set({ editingId: id }),
@@ -59,12 +64,27 @@ export const useEditorStore = create<EditorStore>()(
       setTypography: (patch) =>
         set((s) => ({ typography: { ...s.typography, ...patch } })),
 
+      setLogo: (patch) =>
+        set((s) => ({ logo: { ...s.logo, ...patch } })),
+
+      hideSection: (id) =>
+        set((s) => ({ hiddenSections: [...s.hiddenSections.filter((x) => x !== id), id] })),
+
+      showSection: (id) =>
+        set((s) => ({ hiddenSections: s.hiddenSections.filter((x) => x !== id) })),
+
       reset: () =>
-        set({ nodes: INITIAL_NODES, palette: DEFAULT_PALETTE, typography: DEFAULT_TYPOGRAPHY, selectedId: null, editingId: null, viewport: "desktop", selectedSection: null }),
+        set({
+          nodes: INITIAL_NODES, palette: DEFAULT_PALETTE, typography: DEFAULT_TYPOGRAPHY,
+          logo: DEFAULT_LOGO, selectedId: null, editingId: null,
+          viewport: "desktop", selectedSection: null, hiddenSections: [],
+        }),
     }),
     {
-      // Only undo nodes + palette + typography — not UI selection state
-      partialize: (s) => ({ nodes: s.nodes, palette: s.palette, typography: s.typography }),
+      partialize: (s) => ({
+        nodes: s.nodes, palette: s.palette, typography: s.typography,
+        logo: s.logo, hiddenSections: s.hiddenSections,
+      }),
     }
   )
 );
