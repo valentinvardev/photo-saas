@@ -1,0 +1,56 @@
+/* Editor-scoped styles — isolated from the dashboard */
+
+.editor-root {
+  --ed-topbar-h: 48px;
+  --ed-sidebar-w: 280px;
+  --ed-canvas-bg: #e5e7eb;
+  --ed-selection: #2563eb;
+}
+
+/* ── Selection ring on editable nodes ─────────────────────────────────── */
+[data-editor-node] {
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+[data-editor-node]:hover::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 1.5px dashed rgba(37, 99, 235, 0.45);
+  border-radius: 3px;
+  pointer-events: none;
+}
+[data-editor-node][data-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 2px solid #2563eb;
+  border-radius: 3px;
+  pointer-events: none;
+}
+[data-editor-node][data-editing="true"]::after {
+  border: 2px solid #7c3aed;
+  border-radius: 3px;
+}
+
+/* ── Tiptap editing inside nodes ──────────────────────────────────────── */
+.tiptap-inline {
+  outline: none;
+  width: 100%;
+}
+.tiptap-inline p {
+  margin: 0;
+}
+
+/* ── Canvas scale wrapper ─────────────────────────────────────────────── */
+.canvas-frame {
+  transform-origin: top center;
+  background: white;
+  box-shadow: 0 4px 40px rgba(0, 0, 0, 0.18);
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────── */
+.editor-canvas-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.editor-canvas-scroll::-webkit-scrollbar-track { background: transparent; }
+.editor-canvas-scroll::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 3px; }

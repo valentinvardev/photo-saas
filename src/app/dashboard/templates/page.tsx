@@ -14,6 +14,7 @@ type Template = {
   category: Category;
   tags: string[];
   href: string | null;
+  editorHref?: string;
   seed: number;
   new?: boolean;
   featured?: boolean;
@@ -28,6 +29,7 @@ const TEMPLATES: Template[] = [
     category: "Minimal",
     tags: ["Black & White", "Portrait", "Documentary"],
     href: "/templates/minimal-bw",
+    editorHref: "/editor/minimal-bw",
     seed: 201,
     new: true,
     featured: true,
@@ -205,9 +207,18 @@ function FeaturedCard({ t }: { t: Template }) {
               >
                 <ArrowIcon /> Preview
               </Link>
-              <button className="btn-primary w-full py-2.5 font-sans text-xs font-semibold flex items-center justify-center gap-2">
-                <CheckIcon /> Use this template
-              </button>
+              {t.editorHref ? (
+                <Link
+                  href={t.editorHref}
+                  className="btn-primary w-full py-2.5 font-sans text-xs font-semibold flex items-center justify-center gap-2"
+                >
+                  <CheckIcon /> Edit this template
+                </Link>
+              ) : (
+                <button className="btn-primary w-full py-2.5 font-sans text-xs font-semibold flex items-center justify-center gap-2">
+                  <CheckIcon /> Use this template
+                </button>
+              )}
             </>
           ) : (
             <button disabled className="w-full py-2.5 border border-[var(--border)] text-[var(--fg-muted)] font-sans text-xs font-medium flex items-center justify-center gap-2 cursor-not-allowed opacity-50">
