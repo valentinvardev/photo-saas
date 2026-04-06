@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const quotes = [
   {
@@ -101,10 +101,8 @@ function ImagePanel() {
 
 /* ── Auth form ── */
 export default function LoginPage() {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
 
   return (
     <div className="min-h-screen flex bg-[var(--bg)]">
@@ -120,54 +118,21 @@ export default function LoginPage() {
           </div>
 
           {/* Heading */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={mode}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.25 }}
-            >
-              <h1 className="font-sans font-black text-[var(--fg)] text-3xl mb-1">
-                {mode === "signin" ? "Welcome back." : "Start for free."}
-              </h1>
-              <p className="font-serif text-[var(--fg-muted)] text-base mb-8">
-                {mode === "signin"
-                  ? "Sign in to your FRAME account."
-                  : "Create your FRAME account today."}
-              </p>
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <h1 className="font-sans font-black text-[var(--fg)] text-3xl mb-1">
+              Welcome back.
+            </h1>
+            <p className="font-serif text-[var(--fg-muted)] text-base mb-8">
+              Sign in to your FRAME account.
+            </p>
+          </motion.div>
 
           {/* Form */}
-          <form
-            className="space-y-4"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <AnimatePresence>
-              {mode === "signup" && (
-                <motion.div
-                  key="name-field"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="overflow-hidden"
-                >
-                  <label className="block font-mono text-[11px] text-[var(--fg-muted)] tracking-widest uppercase mb-1.5">
-                    Full name
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Sofia Chen"
-                    className="w-full rounded-xl px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors duration-200"
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
+          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
             <div>
               <label className="block font-mono text-[11px] text-[var(--fg-muted)] tracking-widest uppercase mb-1.5">
                 Email
@@ -186,14 +151,12 @@ export default function LoginPage() {
                 <label className="block font-mono text-[11px] text-[var(--fg-muted)] tracking-widest uppercase">
                   Password
                 </label>
-                {mode === "signin" && (
-                  <Link
-                    href="/forgot-password"
-                    className="font-mono text-[11px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
-                  >
-                    Forgot?
-                  </Link>
-                )}
+                <Link
+                  href="/forgot-password"
+                  className="font-mono text-[11px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                >
+                  Forgot?
+                </Link>
               </div>
               <input
                 type="password"
@@ -208,7 +171,7 @@ export default function LoginPage() {
               type="submit"
               className="btn-primary w-full rounded-xl py-3.5 font-sans font-bold text-sm mt-2"
             >
-              {mode === "signin" ? "Sign in" : "Create account"}
+              Sign in
             </button>
           </form>
 
@@ -247,49 +210,16 @@ export default function LoginPage() {
             Continue with Google
           </button>
 
-          {/* Toggle mode */}
+          {/* Sign up link */}
           <p className="mt-8 text-center font-sans text-sm text-[var(--fg-muted)]">
-            {mode === "signin" ? (
-              <>
-                No account?{" "}
-                <button
-                  onClick={() => setMode("signup")}
-                  className="font-semibold text-[var(--fg)] hover:text-yellow transition-colors"
-                >
-                  Create one
-                </button>
-              </>
-            ) : (
-              <>
-                Already have an account?{" "}
-                <button
-                  onClick={() => setMode("signin")}
-                  className="font-semibold text-[var(--fg)] hover:text-yellow transition-colors"
-                >
-                  Sign in
-                </button>
-              </>
-            )}
-          </p>
-
-          {/* Terms */}
-          {mode === "signup" && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mt-4 text-center font-mono text-[10px] text-[var(--fg-muted)] leading-relaxed"
+            No account?{" "}
+            <Link
+              href="/register"
+              className="font-semibold text-[var(--fg)] hover:text-yellow transition-colors"
             >
-              By creating an account you agree to our{" "}
-              <Link href="/terms" className="underline hover:text-[var(--fg)] transition-colors">
-                Terms
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy" className="underline hover:text-[var(--fg)] transition-colors">
-                Privacy Policy
-              </Link>
-              .
-            </motion.p>
-          )}
+              Create one
+            </Link>
+          </p>
         </div>
       </div>
     </div>
