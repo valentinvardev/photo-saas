@@ -42,6 +42,16 @@ function ClientsIcon() {
     </svg>
   );
 }
+function TemplatesIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="5" rx="1" />
+      <rect x="14" y="11" width="7" height="9" rx="1" />
+      <rect x="3" y="13" width="7" height="8" rx="1" />
+    </svg>
+  );
+}
 function AnalyticsIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -80,7 +90,8 @@ function MoonIcon() {
 
 const navMain = [
   { label: "Gallery",   href: "/dashboard/gallery",   icon: GalleryIcon },
-  { label: "Portfolio", href: "/dashboard/portfolio",  icon: PortfolioIcon },
+  { label: "Portfolio",  href: "/dashboard/portfolio",  icon: PortfolioIcon },
+  { label: "Templates", href: "/dashboard/templates",  icon: TemplatesIcon },
   { label: "Sales",     href: "/dashboard/sales",      icon: SalesIcon,    soon: true },
   { label: "Clients",   href: "/dashboard/clients",    icon: ClientsIcon,  soon: true },
   { label: "Analytics", href: "/dashboard/analytics",  icon: AnalyticsIcon, soon: true },
