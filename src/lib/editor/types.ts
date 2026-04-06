@@ -6,6 +6,8 @@ export type NodeType =
   | "nav-link"
   | "button";
 
+export type Viewport = "mobile" | "tablet" | "desktop";
+
 export interface EditorNode {
   id: string;
   type: NodeType;
@@ -29,10 +31,11 @@ export interface EditorState {
   palette: ColorPalette;
   selectedId: string | null;
   editingId: string | null;
+  viewport: Viewport;
 }
 
 export const DEFAULT_PALETTE: ColorPalette = {
-  bg: "#ffffff",
+  bg: "#fafafa",
   fg: "#0a0a0a",
   accent: "#0a0a0a",
   muted: "#6b7280",

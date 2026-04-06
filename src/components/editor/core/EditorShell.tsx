@@ -5,54 +5,34 @@ import { useEditorStore } from "~/lib/editor/store";
 import { loadState } from "~/lib/editor/localStorage";
 import { TopBar } from "./TopBar";
 import { Canvas } from "./Canvas";
-import { RightSidebar } from "./RightSidebar";
+import { Sidebar } from "./Sidebar";
 
-// Load fontsource CSS (side-effect imports)
+// Side-effect: load all @fontsource CSS
 import "~/lib/editor/fonts";
 
 export function EditorShell() {
-  const { nodes: _n, palette, reset: _r, updateNode, setPalette } = useEditorStore();
+  const { updateNode, setPalette } = useEditorStore();
 
   // Hydrate from localStorage on first render
   useEffect(() => {
     const saved = loadState();
     if (!saved) return;
-
-    // Restore nodes
     for (const [id, node] of Object.entries(saved.nodes)) {
       updateNode(id, node);
     }
-    // Restore palette
     setPalette(saved.palette);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100dvh",
-        background: "#0a0a0a",
-      }}
-    >
+    <div style={{ display: "flex", flexDirection: "column", height: "100dvh", background: "#0a0a0a" }}>
       <TopBar />
 
-      {/* Main area */}
+      {/* Main area — sidebar LEFT, canvas RIGHT */}
       <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+        <Sidebar />
         <Canvas />
-        <RightSidebar />
       </div>
-
-      {/* Inject palette CSS variables into the canvas */}
-      <style>{`
-        .canvas-frame {
-          --ed-bg: ${palette.bg};
-          --ed-fg: ${palette.fg};
-          --ed-accent: ${palette.accent};
-          --ed-muted: ${palette.muted};
-        }
-      `}</style>
     </div>
   );
 }

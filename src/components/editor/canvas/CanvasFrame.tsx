@@ -1,32 +1,43 @@
 "use client";
 
+import { useEditorStore } from "~/lib/editor/store";
 import { EditableTemplate } from "./EditableTemplate";
 
 interface Props {
   scale: number;
+  width: number;
 }
 
-export function CanvasFrame({ scale }: Props) {
+export function CanvasFrame({ scale, width }: Props) {
+  const { palette, viewport } = useEditorStore();
+
   return (
     <div
       style={{
-        width: 1280,
+        width,
         transformOrigin: "top center",
         transform: `scale(${scale})`,
-        // Collapse extra whitespace caused by scale
-        marginBottom: `calc((${scale} - 1) * 100%)`,
+        // Pull up the space that scale leaves behind
+        marginBottom: `calc((${scale} - 1) * ${width}px)`,
+        flexShrink: 0,
       }}
     >
       <div
         className="canvas-frame"
         style={{
-          width: 1280,
-          background: "var(--ed-bg, #fff)",
-          minHeight: 800,
+          width,
+          background: palette.bg,
+          minHeight: 600,
           position: "relative",
+          /* Inject palette + font variables inline so they cascade into the template */
+          // @ts-expect-error CSS custom properties
+          "--ed-bg":     palette.bg,
+          "--ed-fg":     palette.fg,
+          "--ed-accent": palette.accent,
+          "--ed-muted":  palette.muted,
         }}
       >
-        <EditableTemplate />
+        <EditableTemplate viewport={viewport} />
       </div>
     </div>
   );

@@ -3,23 +3,32 @@
 .editor-root {
   --ed-topbar-h: 48px;
   --ed-sidebar-w: 280px;
-  --ed-canvas-bg: #e5e7eb;
+  --ed-canvas-bg: #1a1a1a;
   --ed-selection: #2563eb;
+}
+
+/* ── Template font variables (map to @fontsource loaded fonts) ─────────── */
+/* These mirror what src/app/templates/layout.tsx injects via next/font    */
+.canvas-frame {
+  --tpl-serif: 'Cormorant Garamond', Georgia, serif;
+  --tpl-sans:  'DM Sans', system-ui, sans-serif;
+  --tpl-mono:  'Space Mono', monospace;
 }
 
 /* ── Selection ring on editable nodes ─────────────────────────────────── */
 [data-editor-node] {
-  position: relative;
   cursor: pointer;
   outline: none;
+  box-sizing: border-box;
 }
 [data-editor-node]:hover::after {
   content: "";
   position: absolute;
   inset: -2px;
-  border: 1.5px dashed rgba(37, 99, 235, 0.45);
+  border: 1.5px dashed rgba(37, 99, 235, 0.5);
   border-radius: 3px;
   pointer-events: none;
+  z-index: 9;
 }
 [data-editor-node][data-selected="true"]::after {
   content: "";
@@ -28,13 +37,19 @@
   border: 2px solid #2563eb;
   border-radius: 3px;
   pointer-events: none;
+  z-index: 9;
 }
 [data-editor-node][data-editing="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
   border: 2px solid #7c3aed;
   border-radius: 3px;
+  pointer-events: none;
+  z-index: 9;
 }
 
-/* ── Tiptap editing inside nodes ──────────────────────────────────────── */
+/* ── Tiptap inline editor ─────────────────────────────────────────────── */
 .tiptap-inline {
   outline: none;
   width: 100%;
@@ -42,15 +57,33 @@
 .tiptap-inline p {
   margin: 0;
 }
+/* Inherit surrounding styles (font, size, color, etc.) */
+.tiptap-inline * {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
 
-/* ── Canvas scale wrapper ─────────────────────────────────────────────── */
+/* ── Canvas frame (the scaled template wrapper) ───────────────────────── */
 .canvas-frame {
   transform-origin: top center;
-  background: white;
-  box-shadow: 0 4px 40px rgba(0, 0, 0, 0.18);
+  background: var(--ed-bg, #fafafa);
+  box-shadow: 0 8px 60px rgba(0, 0, 0, 0.45);
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────────────────── */
 .editor-canvas-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
 .editor-canvas-scroll::-webkit-scrollbar-track { background: transparent; }
-.editor-canvas-scroll::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 3px; }
+.editor-canvas-scroll::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+.editor-canvas-scroll::-webkit-scrollbar-thumb:hover { background: #444; }
+
+/* ── Viewport frame labels ────────────────────────────────────────────── */
+.viewport-label {
+  font-family: monospace;
+  font-size: 10px;
+  color: #444;
+  text-align: center;
+  padding: 8px 0 0;
+  letter-spacing: 0.08em;
+}
