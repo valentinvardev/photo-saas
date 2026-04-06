@@ -18,22 +18,6 @@ function EyeIcon({ off = false }: { off?: boolean }) {
   );
 }
 
-function CheckIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 6L9 17l-5-5" />
-    </svg>
-  );
-}
-
-function XIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 6L6 18M6 6l12 12" />
-    </svg>
-  );
-}
-
 /* ── Validation helpers ── */
 function validateEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -52,20 +36,13 @@ function passwordStrength(v: string): 0 | 1 | 2 | 3 {
 const strengthLabel = ["", "Weak", "Fair", "Strong"] as const;
 const strengthColor = ["", "#ef4444", "#facc15", "#22c55e"] as const;
 
-/* ── Field validation badge ── */
-function FieldStatus({ valid, touched }: { valid: boolean; touched: boolean }) {
-  if (!touched) return null;
-  return (
-    <motion.span
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      className={`absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center ${
-        valid ? "bg-green-500" : "bg-red-500"
-      }`}
-    >
-      {valid ? <CheckIcon /> : <XIcon />}
-    </motion.span>
-  );
+/* ── Border helper ──
+   Green as soon as valid (rewards good input).
+   Red only after blur AND the user actually typed something (no rush). */
+function inputBorder(valid: boolean, touched: boolean, hasContent: boolean) {
+  if (valid) return "border-green-500";
+  if (touched && hasContent) return "border-red-500";
+  return "border-[var(--border)]";
 }
 
 /* ── Inline error message ── */
@@ -76,15 +53,14 @@ function FieldError({ message }: { message: string }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
       transition={{ duration: 0.18 }}
-      className="text-red-400 font-mono text-[10px] mt-1.5 flex items-center gap-1"
+      className="text-red-400 font-mono text-[10px] mt-1.5"
     >
-      <XIcon />
       {message}
     </motion.p>
   );
 }
 
-/* ── Input wrapper ── */
+/* ── Field wrapper ── */
 function Field({
   label,
   children,
@@ -152,32 +128,35 @@ function ImagePanel() {
   );
 }
 
+/* ── Base input classes (without border — applied dynamically) ── */
+const inputBase =
+  "w-full rounded-xl px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors duration-200";
+
 /* ── Page ── */
 export default function RegisterPage() {
-  const [firstName, setFirstName]         = useState("");
-  const [lastName, setLastName]           = useState("");
-  const [username, setUsername]           = useState("");
-  const [email, setEmail]                 = useState("");
-  const [password, setPassword]           = useState("");
-  const [confirm, setConfirm]             = useState("");
-  const [showPassword, setShowPassword]   = useState(false);
-  const [showConfirm, setShowConfirm]     = useState(false);
+  const [firstName, setFirstName]       = useState("");
+  const [lastName, setLastName]         = useState("");
+  const [username, setUsername]         = useState("");
+  const [email, setEmail]               = useState("");
+  const [password, setPassword]         = useState("");
+  const [confirm, setConfirm]           = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm]   = useState(false);
 
-  // touched state — only show errors after user has interacted with a field
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const touch = useCallback((field: string) => {
     setTouched((t) => ({ ...t, [field]: true }));
   }, []);
 
-  // derived validation
-  const firstValid    = firstName.trim().length >= 2;
-  const lastValid     = lastName.trim().length >= 2;
-  const userValid     = validateUsername(username);
-  const emailValid    = validateEmail(email);
-  const strength      = passwordStrength(password);
-  const passValid     = strength >= 1 && password.length >= 8;
-  const confirmValid  = confirm === password && confirm.length > 0;
-  const formValid     = firstValid && lastValid && userValid && emailValid && passValid && confirmValid;
+  /* derived validation */
+  const firstValid   = firstName.trim().length >= 2;
+  const lastValid    = lastName.trim().length >= 2;
+  const userValid    = validateUsername(username);
+  const emailValid   = validateEmail(email);
+  const strength     = passwordStrength(password);
+  const passValid    = strength >= 1 && password.length >= 8;
+  const confirmValid = confirm === password && confirm.length > 0;
+  const formValid    = firstValid && lastValid && userValid && emailValid && passValid && confirmValid;
 
   const usernameError =
     username.length > 0 && username.length < 3
@@ -206,7 +185,6 @@ export default function RegisterPage() {
             </Link>
           </div>
 
-          {/* Heading */}
           <h1 className="font-sans font-black text-[var(--fg)] text-3xl mb-1">
             Create your account.
           </h1>
@@ -216,42 +194,36 @@ export default function RegisterPage() {
 
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
 
-            {/* Name row */}
+            {/* First + Last name */}
             <div className="grid grid-cols-2 gap-3">
               <Field
                 label="First name"
                 error="At least 2 characters"
-                showError={touched.firstName && !firstValid}
+                showError={touched.firstName && !firstValid && firstName.length > 0}
               >
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    onBlur={() => touch("firstName")}
-                    placeholder="Sofia"
-                    className="w-full rounded-xl px-4 py-3 pr-9 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors duration-200"
-                  />
-                  <FieldStatus valid={firstValid} touched={!!touched.firstName} />
-                </div>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  onBlur={() => touch("firstName")}
+                  placeholder="Sofia"
+                  className={`${inputBase} ${inputBorder(firstValid, !!touched.firstName, firstName.length > 0)}`}
+                />
               </Field>
 
               <Field
                 label="Last name"
                 error="At least 2 characters"
-                showError={touched.lastName && !lastValid}
+                showError={touched.lastName && !lastValid && lastName.length > 0}
               >
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    onBlur={() => touch("lastName")}
-                    placeholder="Chen"
-                    className="w-full rounded-xl px-4 py-3 pr-9 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors duration-200"
-                  />
-                  <FieldStatus valid={lastValid} touched={!!touched.lastName} />
-                </div>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  onBlur={() => touch("lastName")}
+                  placeholder="Chen"
+                  className={`${inputBase} ${inputBorder(lastValid, !!touched.lastName, lastName.length > 0)}`}
+                />
               </Field>
             </div>
 
@@ -259,7 +231,7 @@ export default function RegisterPage() {
             <Field
               label="Username"
               error={usernameError}
-              showError={touched.username && !userValid}
+              showError={touched.username && !userValid && username.length > 0}
             >
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-sm text-[var(--fg-muted)] pointer-events-none select-none">
@@ -271,9 +243,8 @@ export default function RegisterPage() {
                   onChange={(e) => setUsername(e.target.value.toLowerCase())}
                   onBlur={() => touch("username")}
                   placeholder="sofia.chen"
-                  className="w-full rounded-xl pl-8 pr-9 py-3 font-mono text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors duration-200"
+                  className={`${inputBase} pl-8 font-mono ${inputBorder(userValid, !!touched.username, username.length > 0)}`}
                 />
-                <FieldStatus valid={userValid} touched={!!touched.username} />
               </div>
             </Field>
 
@@ -281,26 +252,23 @@ export default function RegisterPage() {
             <Field
               label="Email"
               error="Enter a valid email address"
-              showError={touched.email && !emailValid}
+              showError={touched.email && !emailValid && email.length > 0}
             >
-              <div className="relative">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={() => touch("email")}
-                  placeholder="sofia@example.com"
-                  className="w-full rounded-xl px-4 py-3 pr-9 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors duration-200"
-                />
-                <FieldStatus valid={emailValid} touched={!!touched.email} />
-              </div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => touch("email")}
+                placeholder="sofia@example.com"
+                className={`${inputBase} ${inputBorder(emailValid, !!touched.email, email.length > 0)}`}
+              />
             </Field>
 
             {/* Password */}
             <Field
               label="Password"
               error="Minimum 8 characters"
-              showError={touched.password && !passValid}
+              showError={touched.password && !passValid && password.length > 0}
             >
               <div className="relative">
                 <input
@@ -309,18 +277,16 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   onBlur={() => touch("password")}
                   placeholder="••••••••"
-                  className="w-full rounded-xl px-4 py-3 pr-16 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors duration-200"
+                  className={`${inputBase} pr-10 ${inputBorder(passValid, !!touched.password, password.length > 0)}`}
                 />
-                {/* Eye toggle */}
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-9 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
                   tabIndex={-1}
                 >
                   <EyeIcon off={showPassword} />
                 </button>
-                <FieldStatus valid={passValid} touched={!!touched.password} />
               </div>
 
               {/* Strength bar */}
@@ -356,7 +322,7 @@ export default function RegisterPage() {
               </AnimatePresence>
             </Field>
 
-            {/* Confirm password — appears once password has content */}
+            {/* Confirm password — slides in once password has content */}
             <AnimatePresence>
               {password.length > 0 && (
                 <motion.div
@@ -369,11 +335,7 @@ export default function RegisterPage() {
                 >
                   <Field
                     label="Confirm password"
-                    error={
-                      confirm.length > 0 && !confirmValid
-                        ? "Passwords don't match"
-                        : ""
-                    }
+                    error="Passwords don't match"
                     showError={touched.confirm && !confirmValid && confirm.length > 0}
                   >
                     <div className="relative">
@@ -383,18 +345,16 @@ export default function RegisterPage() {
                         onChange={(e) => setConfirm(e.target.value)}
                         onBlur={() => touch("confirm")}
                         placeholder="••••••••"
-                        className="w-full rounded-xl px-4 py-3 pr-16 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors duration-200"
+                        className={`${inputBase} pr-10 ${inputBorder(confirmValid, !!touched.confirm, confirm.length > 0)}`}
                       />
-                      {/* Eye toggle */}
                       <button
                         type="button"
                         onClick={() => setShowConfirm((v) => !v)}
-                        className="absolute right-9 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
                         tabIndex={-1}
                       >
                         <EyeIcon off={showConfirm} />
                       </button>
-                      <FieldStatus valid={confirmValid} touched={!!touched.confirm} />
                     </div>
                   </Field>
                 </motion.div>
@@ -436,15 +396,11 @@ export default function RegisterPage() {
           {/* Sign in link */}
           <p className="mt-8 text-center font-sans text-sm text-[var(--fg-muted)]">
             Already have an account?{" "}
-            <Link
-              href="/login"
-              className="font-semibold text-[var(--fg)] hover:text-yellow transition-colors"
-            >
+            <Link href="/login" className="font-semibold text-[var(--fg)] hover:text-yellow transition-colors">
               Sign in
             </Link>
           </p>
 
-          {/* Terms */}
           <p className="mt-4 text-center font-mono text-[10px] text-[var(--fg-muted)] leading-relaxed">
             By creating an account you agree to our{" "}
             <Link href="/terms" className="underline hover:text-[var(--fg)] transition-colors">Terms</Link>{" "}
