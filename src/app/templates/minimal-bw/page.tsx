@@ -159,13 +159,12 @@ function Label({ index, text }: { index: string; text: string }) {
   );
 }
 
-/* ── Photo with hover overlay ── */
-function WorkPhoto({ w }: { w: typeof WORKS[0]; aspect?: string }) {
+/* ── Photo cell: image always fills the cell via absolute positioning ── */
+function Cell({ w }: { w: typeof WORKS[0] }) {
   const [hovered, setHovered] = useState(false);
-
   return (
     <div
-      style={{ position: "relative", overflow: "hidden", cursor: "pointer", width: "100%", height: "100%" }}
+      style={{ position: "relative", overflow: "hidden", cursor: "pointer", background: "#111" }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -174,15 +173,18 @@ function WorkPhoto({ w }: { w: typeof WORKS[0]; aspect?: string }) {
         src={`https://picsum.photos/seed/${w.seed}/800/1000?grayscale`}
         alt={w.title}
         style={{
+          position: "absolute",
+          inset: 0,
           width: "100%",
           height: "100%",
           objectFit: "cover",
           display: "block",
-          filter: hovered ? "brightness(0.6)" : "brightness(0.92)",
-          transform: hovered ? "scale(1.04)" : "scale(1)",
-          transition: "filter 0.5s ease, transform 0.6s ease",
+          filter: hovered ? "brightness(0.55)" : "brightness(0.88)",
+          transform: hovered ? "scale(1.05)" : "scale(1)",
+          transition: "filter 0.5s ease, transform 0.65s ease",
         }}
       />
+      {/* Hover label */}
       <div
         style={{
           position: "absolute",
@@ -192,30 +194,14 @@ function WorkPhoto({ w }: { w: typeof WORKS[0]; aspect?: string }) {
           justifyContent: "flex-end",
           padding: "1.5rem",
           opacity: hovered ? 1 : 0,
-          transition: "opacity 0.35s ease",
+          transition: "opacity 0.3s ease",
+          pointerEvents: "none",
         }}
       >
-        <span
-          style={{
-            fontFamily: "var(--tpl-mono, monospace)",
-            fontSize: "9px",
-            color: "rgba(255,255,255,0.6)",
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            marginBottom: "0.4rem",
-          }}
-        >
+        <span style={{ fontFamily: "var(--tpl-mono, monospace)", fontSize: "9px", color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "0.35rem" }}>
           {w.cat} · {w.year}
         </span>
-        <span
-          style={{
-            fontFamily: "var(--tpl-serif, serif)",
-            fontStyle: "italic",
-            fontSize: "22px",
-            color: "#fafafa",
-            lineHeight: 1.2,
-          }}
-        >
+        <span style={{ fontFamily: "var(--tpl-serif, serif)", fontStyle: "italic", fontSize: "22px", color: "#fafafa", lineHeight: 1.2 }}>
           {w.title}
         </span>
       </div>
@@ -378,27 +364,18 @@ export default function MinimalBWTemplate() {
           </div>
         </div>
 
-        {/* Right — photos */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateRows: "60% 40%",
-            gap: "3px",
-            background: "#d8d8d8",
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://picsum.photos/seed/201/900/1100?grayscale"
-            alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", filter: "brightness(0.88)" }}
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://picsum.photos/seed/202/900/700?grayscale"
-            alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", filter: "brightness(0.82)" }}
-          />
+        {/* Right — two stacked photos */}
+        <div style={{ display: "grid", gridTemplateRows: "60% 40%", gap: "3px" }}>
+          <div style={{ position: "relative", overflow: "hidden" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://picsum.photos/seed/201/900/1100?grayscale" alt=""
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.88)" }} />
+          </div>
+          <div style={{ position: "relative", overflow: "hidden" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://picsum.photos/seed/202/900/700?grayscale" alt=""
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.82)" }} />
+          </div>
         </div>
       </section>
 
@@ -406,35 +383,41 @@ export default function MinimalBWTemplate() {
       <section id="work" style={{ padding: "7rem 7vw" }}>
         <Label index="01" text="Selected Work" />
 
-        {/* Asymmetric grid — row-based for reliable sizing */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+        {/*
+          Single flat grid — explicit pixel row heights eliminate all sizing ambiguity.
+          Images use position:absolute inset:0 so they always fill regardless of container.
 
-          {/* Row 1: tall left + two stacked right */}
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "3px", height: "520px" }}>
-            <WorkPhoto w={WORKS[0]!} />
-            <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-              <div style={{ flex: 1 }}><WorkPhoto w={WORKS[1]!} /></div>
-              <div style={{ flex: 1 }}><WorkPhoto w={WORKS[2]!} /></div>
-            </div>
-            <WorkPhoto w={WORKS[3]!} />
-          </div>
+          Layout:
+            cols: [2fr] [1fr] [1fr]
+            rows: [280px] [280px] [360px] [320px]
 
-          {/* Row 2: three equal */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "3px", height: "340px" }}>
-            <WorkPhoto w={WORKS[4]!} />
-            <WorkPhoto w={WORKS[5]!} />
-            <WorkPhoto w={WORKS[6]!} />
-          </div>
-
-          {/* Row 3: wide left + narrow right */}
-          <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: "3px", height: "400px" }}>
-            <WorkPhoto w={WORKS[7]!} />
-            <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-              <div style={{ flex: 3 }}><WorkPhoto w={WORKS[0]!} /></div>
-              <div style={{ flex: 2 }}><WorkPhoto w={WORKS[3]!} /></div>
-            </div>
-          </div>
-
+            (r1-r2, c1)  big tall left
+            (r1,    c2)  top mid
+            (r1,    c3)  top right
+            (r2,    c2)  bottom mid
+            (r2,    c3)  bottom right
+            (r3,    c1-c2) wide left panoramic
+            (r3,    c3)  portrait right
+            (r4,    c1)  portrait left
+            (r4,    c2-c3) wide right panoramic
+        */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "2fr 1fr 1fr",
+            gridTemplateRows: "280px 280px 360px 320px",
+            gap: "3px",
+          }}
+        >
+          <div style={{ gridRow: "1 / 3", gridColumn: "1" }}><Cell w={WORKS[0]!} /></div>
+          <div style={{ gridRow: "1",     gridColumn: "2" }}><Cell w={WORKS[1]!} /></div>
+          <div style={{ gridRow: "1",     gridColumn: "3" }}><Cell w={WORKS[2]!} /></div>
+          <div style={{ gridRow: "2",     gridColumn: "2" }}><Cell w={WORKS[3]!} /></div>
+          <div style={{ gridRow: "2",     gridColumn: "3" }}><Cell w={WORKS[4]!} /></div>
+          <div style={{ gridRow: "3",     gridColumn: "1 / 3" }}><Cell w={WORKS[5]!} /></div>
+          <div style={{ gridRow: "3",     gridColumn: "3" }}><Cell w={WORKS[6]!} /></div>
+          <div style={{ gridRow: "4",     gridColumn: "1" }}><Cell w={WORKS[7]!} /></div>
+          <div style={{ gridRow: "4",     gridColumn: "2 / 4" }}><Cell w={WORKS[0]!} /></div>
         </div>
 
         {/* See all link */}
@@ -594,18 +577,14 @@ export default function MinimalBWTemplate() {
 
         {/* Photo + caption */}
         <div style={{ position: "relative" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://picsum.photos/seed/315/700/900?grayscale"
-            alt="James Hollis"
-            style={{
-              width: "100%",
-              aspectRatio: "3/4",
-              objectFit: "cover",
-              display: "block",
-              filter: "brightness(0.88)",
-            }}
-          />
+          <div style={{ position: "relative", overflow: "hidden", aspectRatio: "3/4" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://picsum.photos/seed/315/700/900?grayscale"
+              alt="James Hollis"
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block", filter: "brightness(0.88)" }}
+            />
+          </div>
           {/* Floating caption */}
           <div
             style={{
