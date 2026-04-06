@@ -147,7 +147,7 @@ function Cell({ w, onClick }: { w: Work; onClick?: () => void }) {
         <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em", textTransform: "uppercase" as const, marginBottom: "0.25rem" }}>
           {w.cat} · {w.year}
         </span>
-        <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "#fafafa", lineHeight: 1.2 }}>
+        <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "var(--ed-bg, #fafafa)", lineHeight: 1.2 }}>
           {w.title}
         </span>
       </div>
@@ -252,7 +252,7 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#0a0a0a", display: "flex", flexDirection: "column" }}>
+      <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "var(--ed-fg, #0a0a0a)", display: "flex", flexDirection: "column" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2.5rem", height: "60px", borderBottom: "1px solid rgba(255,255,255,0.08)", flexShrink: 0, gap: "1rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexShrink: 0 }}>
             <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.45)", display: "flex", alignItems: "center", padding: 0 }}>
@@ -264,7 +264,7 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
           <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "2px" }}>
             {cats.map((cat) => (
               <button key={cat} onClick={() => setFilter(cat)}
-                style={{ background: filter === cat ? "#fff" : "rgba(255,255,255,0.06)", border: "1px solid", borderColor: filter === cat ? "#fff" : "rgba(255,255,255,0.1)", color: filter === cat ? "#0a0a0a" : "rgba(255,255,255,0.5)", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "5px 12px", cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap", flexShrink: 0 }}>
+                style={{ background: filter === cat ? "#fff" : "rgba(255,255,255,0.06)", border: "1px solid", borderColor: filter === cat ? "#fff" : "rgba(255,255,255,0.1)", color: filter === cat ? "var(--ed-fg, #0a0a0a)" : "rgba(255,255,255,0.5)", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "5px 12px", cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap", flexShrink: 0 }}>
                 {cat}
               </button>
             ))}
@@ -306,7 +306,7 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
     alignItems: "center",
     height: isMobile ? "56px" : "72px",
     borderBottom: "1px solid #e8e8e8",
-    background: "rgba(250,250,250,0.96)",
+    background: "var(--ed-bg, #fafafa)",
     backdropFilter: "blur(12px)",
     padding: isMobile ? "0 1.25rem" : "0 3rem",
   };
@@ -316,25 +316,25 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
       <>
         <nav id="section-nav" style={navBase}>
           <button onClick={() => setMenuOpen(true)}
-            style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", color: "#0a0a0a", display: "flex", flexDirection: "column", gap: "5px" }}>
-            <span style={{ display: "block", width: "20px", height: "1.5px", background: "#0a0a0a" }} />
-            <span style={{ display: "block", width: "14px", height: "1.5px", background: "#0a0a0a" }} />
-            <span style={{ display: "block", width: "20px", height: "1.5px", background: "#0a0a0a" }} />
+            style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", color: "var(--ed-fg, #0a0a0a)", display: "flex", flexDirection: "column", gap: "5px" }}>
+            <span style={{ display: "block", width: "20px", height: "1.5px", background: "var(--ed-fg, #0a0a0a)" }} />
+            <span style={{ display: "block", width: "14px", height: "1.5px", background: "var(--ed-fg, #0a0a0a)" }} />
+            <span style={{ display: "block", width: "20px", height: "1.5px", background: "var(--ed-fg, #0a0a0a)" }} />
           </button>
-          <EditableNode id="nav-logo" tag="span" style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.2em", color: "#0a0a0a", textTransform: "uppercase", position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+          <EditableNode id="nav-logo" tag="span" style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--ed-fg, #0a0a0a)", textTransform: "uppercase", position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
             <EditableText id="nav-logo" />
           </EditableNode>
           <button onClick={onOpenGallery}
-            style={{ ...sans, marginLeft: "auto", fontSize: "10px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0a0a0a", background: "none", border: "1px solid #0a0a0a", padding: "6px 14px", cursor: "pointer" }}>
+            style={{ ...sans, marginLeft: "auto", fontSize: "10px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "1px solid #0a0a0a", padding: "6px 14px", cursor: "pointer" }}>
             Work
           </button>
         </nav>
         {/* Mobile drawer */}
         <div style={{ position: "fixed", inset: 0, zIndex: 1500, pointerEvents: menuOpen ? "auto" : "none" }}>
           <div onClick={() => setMenuOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", opacity: menuOpen ? 1 : 0, transition: "opacity 0.3s ease", backdropFilter: "blur(4px)" }} />
-          <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: "80%", maxWidth: "320px", background: "#fafafa", transform: menuOpen ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.35s cubic-bezier(0.32,0.72,0,1)", display: "flex", flexDirection: "column" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: "80%", maxWidth: "320px", background: "var(--ed-bg, #fafafa)", transform: menuOpen ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.35s cubic-bezier(0.32,0.72,0,1)", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 1.5rem", height: "56px", borderBottom: "1px solid #e8e8e8" }}>
-              <span style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.2em", color: "#0a0a0a", textTransform: "uppercase" }}>J·H</span>
+              <span style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--ed-fg, #0a0a0a)", textTransform: "uppercase" }}>J·H</span>
               <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#888", padding: "4px" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
               </button>
@@ -347,14 +347,14 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
                 { label: "Contact", action: () => { setMenuOpen(false); document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); } },
               ].map((item, i) => (
                 <button key={item.label} onClick={item.action}
-                  style={{ ...sans, textAlign: "left", background: "none", border: "none", borderBottom: "1px solid #f0f0f0", padding: "1.25rem 0", fontSize: "22px", fontWeight: 300, color: "#0a0a0a", cursor: "pointer",
+                  style={{ ...sans, textAlign: "left", background: "none", border: "none", borderBottom: "1px solid #f0f0f0", padding: "1.25rem 0", fontSize: "22px", fontWeight: 300, color: "var(--ed-fg, #0a0a0a)", cursor: "pointer",
                     fontFamily: i === 0 ? "var(--tpl-serif,serif)" : "var(--tpl-sans,sans-serif)", fontStyle: i === 0 ? "italic" : "normal" }}>
                   {item.label}
                 </button>
               ))}
             </nav>
             <div style={{ padding: "1.5rem", borderTop: "1px solid #e8e8e8" }}>
-              <button style={{ ...sans, width: "100%", padding: "13px", background: "#0a0a0a", color: "#fafafa", border: "none", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>Hire me</button>
+              <button style={{ ...sans, width: "100%", padding: "13px", background: "var(--ed-fg, #0a0a0a)", color: "var(--ed-bg, #fafafa)", border: "none", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>Hire me</button>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "1rem" }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />
                 <span style={{ ...mono, fontSize: "9px", color: "#888", letterSpacing: "0.12em" }}>Available for commissions — Q4 2025</span>
@@ -368,7 +368,7 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
 
   return (
     <nav id="section-nav" style={navBase}>
-      <EditableNode id="nav-logo" tag="span" style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.18em", color: "#0a0a0a", textTransform: "uppercase" }}>
+      <EditableNode id="nav-logo" tag="span" style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.18em", color: "var(--ed-fg, #0a0a0a)", textTransform: "uppercase" }}>
         <EditableText id="nav-logo" />
       </EditableNode>
       <div style={{ display: "flex", gap: "2.5rem", alignItems: "center", marginLeft: "auto" }}>
@@ -379,15 +379,15 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
           { label: "Contact", fn: () => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }) },
         ].map((item) => (
           <button key={item.label} onClick={item.fn}
-            style={{ ...sans, background: "none", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 400, letterSpacing: "0.06em", color: "#0a0a0a", opacity: 0.55, transition: "opacity 0.2s", padding: 0 }}
+            style={{ ...sans, background: "none", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 400, letterSpacing: "0.06em", color: "var(--ed-fg, #0a0a0a)", opacity: 0.55, transition: "opacity 0.2s", padding: 0 }}
             onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
             onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.55"; }}>
             {item.label}
           </button>
         ))}
-        <button style={{ ...sans, fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: "#fafafa", background: "#0a0a0a", padding: "7px 18px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#0a0a0a"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "#0a0a0a"; e.currentTarget.style.color = "#fafafa"; }}>
+        <button style={{ ...sans, fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: "var(--ed-bg, #fafafa)", background: "var(--ed-fg, #0a0a0a)", padding: "7px 18px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}>
           Hire me
         </button>
       </div>
@@ -425,7 +425,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
   return (
     <div
-      style={{ background: "#fafafa", color: "#0a0a0a", minHeight: "100%", fontFamily: "var(--tpl-sans,sans-serif)" }}
+      style={{ background: "var(--ed-bg, #fafafa)", color: "var(--ed-fg, #0a0a0a)", minHeight: "100%", fontFamily: "var(--tpl-sans,sans-serif)" }}
       onClick={() => selectNode(null)}
     >
       {/* SECTION IDS: used by the sidebar Pages tree to scroll-to and highlight sections.
@@ -451,11 +451,11 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
             Documentary &amp; Portrait · New York
           </span>
 
-          <EditableNode id="hero-heading" tag="h1" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "72px" : "clamp(72px,8vw,128px)", lineHeight: 0.92, letterSpacing: "-0.02em", color: "#0a0a0a", margin: "0 0 2rem" }}>
+          <EditableNode id="hero-heading" tag="h1" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "72px" : "clamp(72px,8vw,128px)", lineHeight: 0.92, letterSpacing: "-0.02em", color: "var(--ed-fg, #0a0a0a)", margin: "0 0 2rem" }}>
             <EditableText id="hero-heading" />
           </EditableNode>
 
-          <div style={{ width: "40px", height: "1px", background: "#0a0a0a", margin: "0 0 2rem" }} />
+          <div style={{ width: "40px", height: "1px", background: "var(--ed-fg, #0a0a0a)", margin: "0 0 2rem" }} />
 
           <EditableNode id="hero-sub" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.7, color: "#555", maxWidth: "380px" }}>
             <EditableText id="hero-sub" />
@@ -463,14 +463,14 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
           <div style={{ display: "flex", gap: "0.75rem", marginTop: "2.5rem", flexWrap: "wrap" }}>
             <button onClick={() => setGalleryOpen(true)}
-              style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "#fafafa", background: "#0a0a0a", padding: "12px 24px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#0a0a0a"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#0a0a0a"; e.currentTarget.style.color = "#fafafa"; }}>
+              style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-bg, #fafafa)", background: "var(--ed-fg, #0a0a0a)", padding: "12px 24px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}>
               View work
             </button>
             <a href="#about"
-              style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0a0a0a", padding: "12px 24px", border: "1px solid #ccc", textDecoration: "none", transition: "border-color 0.2s", display: "inline-block" }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#0a0a0a"; }}
+              style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", padding: "12px 24px", border: "1px solid #ccc", textDecoration: "none", transition: "border-color 0.2s", display: "inline-block" }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#ccc"; }}>
               About
             </a>
@@ -541,7 +541,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
         <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "flex-end" }}>
           <button onClick={() => setGalleryOpen(true)}
-            style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#0a0a0a", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", borderBottom: "1px solid #0a0a0a", paddingBottom: "2px" }}
+            style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", borderBottom: "1px solid #0a0a0a", paddingBottom: "2px" }}
             onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.45"; }}
             onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}>
             All projects ({WORKS.length})
@@ -551,9 +551,9 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ════ PULL QUOTE ════ */}
-      <section id="section-quote" style={{ padding: `${isMobile ? "4rem" : "6rem"} ${px}`, background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
+      <section id="section-quote" style={{ padding: `${isMobile ? "4rem" : "6rem"} ${px}`, background: "var(--ed-fg, #0a0a0a)", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
         <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>On practice</span>
-        <EditableNode id="quote-text" tag="blockquote" style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontWeight: 300, fontSize: isMobile ? "clamp(22px,7vw,36px)" : "clamp(28px,3.5vw,52px)", lineHeight: 1.3, color: "#f0f0f0", maxWidth: "900px", textAlign: "center", margin: 0, letterSpacing: "-0.01em" }}>
+        <EditableNode id="quote-text" tag="blockquote" style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontWeight: 300, fontSize: isMobile ? "clamp(22px,7vw,36px)" : "clamp(28px,3.5vw,52px)", lineHeight: 1.3, color: "var(--ed-bg, #f0f0f0)", maxWidth: "900px", textAlign: "center", margin: 0, letterSpacing: "-0.01em" }}>
           <EditableText id="quote-text" />
         </EditableNode>
         <EditableNode id="quote-author" tag="span" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em" }}>
@@ -565,7 +565,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       <section id="about" style={{ padding: `${isMobile ? "4rem" : "7rem"} ${px}`, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "3rem" : "6rem", alignItems: "center" }}>
         <div>
           <Label index="02" text="About" />
-          <EditableNode id="about-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 400, fontSize: isMobile ? "clamp(32px,10vw,48px)" : "clamp(36px,4vw,56px)", lineHeight: 1.1, color: "#0a0a0a", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
+          <EditableNode id="about-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 400, fontSize: isMobile ? "clamp(32px,10vw,48px)" : "clamp(36px,4vw,56px)", lineHeight: 1.1, color: "var(--ed-fg, #0a0a0a)", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
             <EditableText id="about-heading" />
           </EditableNode>
           <EditableNode id="about-body-1" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.8, color: "#4a4a4a", marginBottom: "1.25rem" }}>
@@ -577,7 +577,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           <div style={{ display: "flex", gap: isMobile ? "2rem" : "3rem", paddingTop: "2rem", borderTop: "1px solid #e0e0e0" }}>
             {STATS.map((s) => (
               <div key={s.value}>
-                <div style={{ fontFamily: "var(--tpl-serif,serif)", fontSize: isMobile ? "28px" : "36px", fontWeight: 300, color: "#0a0a0a", lineHeight: 1 }}>{s.value}</div>
+                <div style={{ fontFamily: "var(--tpl-serif,serif)", fontSize: isMobile ? "28px" : "36px", fontWeight: 300, color: "var(--ed-fg, #0a0a0a)", lineHeight: 1 }}>{s.value}</div>
                 <div style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", color: "#888", marginTop: "4px" }}>{s.unit}</div>
               </div>
             ))}
@@ -593,7 +593,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
               imgStyle={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", filter: "brightness(0.9)" }}
             />
           </div>
-          <div style={{ position: "absolute", bottom: "-16px", right: "0", zIndex: 2, background: "#fafafa", padding: "7px 12px", border: "1px solid #e8e8e8" }}>
+          <div style={{ position: "absolute", bottom: "-16px", right: "0", zIndex: 2, background: "var(--ed-bg, #fafafa)", padding: "7px 12px", border: "1px solid #e8e8e8" }}>
             <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase" }}>Brooklyn, NY · 2024</span>
           </div>
         </EditableNode>
@@ -605,7 +605,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : isTablet ? "repeat(3,1fr)" : "repeat(5,1fr)", gap: "1px", background: "#d8d8d8" }}>
           {(isMobile ? PRESS.slice(0, 4) : PRESS).map((p) => (
             <div key={p.name} style={{ background: "#f2f2f0", padding: isMobile ? "1.25rem" : "2rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-              <span style={{ fontFamily: "var(--tpl-serif,serif)", fontSize: isMobile ? "15px" : "18px", fontWeight: 400, color: "#0a0a0a", lineHeight: 1.2 }}>{p.name}</span>
+              <span style={{ fontFamily: "var(--tpl-serif,serif)", fontSize: isMobile ? "15px" : "18px", fontWeight: 400, color: "var(--ed-fg, #0a0a0a)", lineHeight: 1.2 }}>{p.name}</span>
               <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "#aaa", letterSpacing: "0.15em" }}>{p.year}</span>
             </div>
           ))}
@@ -616,7 +616,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       <section id="contact" style={{ padding: `${isMobile ? "4rem" : "8rem"} ${px}`, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "3rem" : "6rem", alignItems: "start" }}>
         <div>
           <Label index="04" text="Contact" />
-          <EditableNode id="contact-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "clamp(36px,11vw,56px)" : "clamp(40px,5vw,72px)", lineHeight: 1.05, color: "#0a0a0a", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
+          <EditableNode id="contact-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "clamp(36px,11vw,56px)" : "clamp(40px,5vw,72px)", lineHeight: 1.05, color: "var(--ed-fg, #0a0a0a)", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
             <EditableText id="contact-heading" />
           </EditableNode>
           <EditableNode id="contact-body" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "14px", lineHeight: 1.7, color: "#666", marginBottom: "2rem" }}>
@@ -640,23 +640,23 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
             {["First name", "Last name"].map((ph) => (
               <input key={ph} placeholder={ph}
-                style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "#0a0a0a", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "#0a0a0a"; }}
+                style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
                 onBlur={(e)  => { e.currentTarget.style.borderColor = "#d8d8d8"; }} />
             ))}
           </div>
           <input type="email" placeholder="Email address"
-            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "#0a0a0a", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = "#0a0a0a"; }}
+            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
             onBlur={(e)  => { e.currentTarget.style.borderColor = "#d8d8d8"; }} />
           <textarea placeholder="Tell me about your project..." rows={5}
-            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "#0a0a0a", outline: "none", resize: "vertical", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = "#0a0a0a"; }}
+            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", resize: "vertical", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
             onBlur={(e)  => { e.currentTarget.style.borderColor = "#d8d8d8"; }} />
           <button type="submit"
-            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "#fafafa", background: "#0a0a0a", border: "1px solid #0a0a0a", padding: "13px", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#0a0a0a"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "#0a0a0a"; e.currentTarget.style.color = "#fafafa"; }}>
+            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-bg, #fafafa)", background: "var(--ed-fg, #0a0a0a)", border: "1px solid #0a0a0a", padding: "13px", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}>
             Send message
           </button>
         </form>
@@ -664,7 +664,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
       {/* ════ FOOTER ════ */}
       <footer id="section-footer" style={{ padding: `2rem ${px}`, borderTop: "1px solid #e0e0e0", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? "1.25rem" : "2rem", justifyContent: "space-between" }}>
-        <EditableNode id="nav-logo" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.2em", color: "#0a0a0a", textTransform: "uppercase" }}>
+        <EditableNode id="nav-logo" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--ed-fg, #0a0a0a)", textTransform: "uppercase" }}>
           <EditableText id="nav-logo" />
         </EditableNode>
         {!isMobile && <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#bbb", letterSpacing: "0.12em" }}>© 2025 James Hollis Photography</span>}
@@ -677,7 +677,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           ].map((s) => (
             <a key={s.label} href={s.href} aria-label={s.label}
               style={{ color: "#aaa", textDecoration: "none", display: "flex", alignItems: "center", transition: "color 0.2s" }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "#0a0a0a"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.color = "#aaa"; }}>
               {s.icon}
             </a>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import { deviceContentRef } from "~/lib/editor/deviceRef";
 import { ColorPalettePanel } from "~/components/editor/panels/ColorPalettePanel";
@@ -285,10 +285,24 @@ function ThreeDotMenu({ sectionId: _id, isOpen, onOpen, onClose, onScrollTo }: {
   onClose: () => void;
   onScrollTo: () => void;
 }) {
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = useState({ top: 0, right: 0 });
+
+  function handleToggle(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (isOpen) { onClose(); return; }
+    if (btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setPos({ top: r.bottom + 4, right: window.innerWidth - r.right });
+    }
+    onOpen();
+  }
+
   return (
     <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)" }}>
       <button
-        onClick={(e) => { e.stopPropagation(); isOpen ? onClose() : onOpen(); }}
+        ref={btnRef}
+        onClick={handleToggle}
         style={{
           background: "none", border: "none", cursor: "pointer", color: "#444",
           padding: "2px 4px", borderRadius: 3, display: "flex", alignItems: "center",
@@ -303,12 +317,12 @@ function ThreeDotMenu({ sectionId: _id, isOpen, onOpen, onClose, onScrollTo }: {
       {isOpen && (
         <>
           <div
-            style={{ position: "fixed", inset: 0, zIndex: 90 }}
+            style={{ position: "fixed", inset: 0, zIndex: 190 }}
             onClick={(e) => { e.stopPropagation(); onClose(); }}
           />
           <div
             style={{
-              position: "absolute", right: 0, top: "calc(100% + 2px)", zIndex: 100,
+              position: "fixed", top: pos.top, right: pos.right, zIndex: 200,
               background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 6,
               minWidth: 140, overflow: "hidden", boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
             }}
