@@ -457,7 +457,7 @@ export default function GalleryPage() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={`https://picsum.photos/seed/${file.seed}/80/80?grayscale`} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
                   ) : (
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-[8px] font-mono font-black" style={typeColor(file.type)}>.{file.type.toUpperCase()}</div>
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-[8px] font-mono font-black" style={{ backgroundColor: typeColor(file.type).bg, color: typeColor(file.type).text }}>.{file.type.toUpperCase()}</div>
                   )}
                   <div className="min-w-0">
                     <div className="font-sans text-sm text-[var(--fg)] truncate">{file.name}</div>
