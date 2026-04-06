@@ -6,14 +6,23 @@ How to take a FRAME portfolio template and make it editable in the website build
 
 ## Overview
 
-The FRAME builder works by running a **forked copy** of a template inside a scaled canvas.
-The fork (`EditableTemplate.tsx`) is identical to the source template **except** for the
-adaptations described in this guide. The source template (`page.tsx`) is never modified —
-it remains the live preview the user sees at `/templates/<name>`.
+The FRAME builder works by running a **forked copy** of a template inside a **device frame** rendered in the editor canvas. The fork (`EditableTemplate.tsx`) is identical to the source template **except** for the adaptations described in this guide. The source template (`page.tsx`) is never modified — it remains the live preview at `/templates/<name>`.
 
 ```
-src/app/templates/<name>/page.tsx          ← source template (read-only)
-src/components/editor/canvas/EditableTemplate.tsx  ← adapted fork for editor
+src/app/templates/<name>/page.tsx                    ← source template (read-only)
+src/components/editor/canvas/EditableTemplate.tsx    ← adapted fork for editor
+```
+
+The editor architecture:
+
+```
+EditorShell
+├── TopBar          (undo/redo, viewport toggle, save, preview)
+├── Sidebar         (Pages tree · Design · Settings)
+└── Canvas
+    └── DeviceFrame (iPhone / iPad / Browser chrome)
+        └── DeviceScreen (overflow-y:auto, fixed height = "screen")
+            └── EditableTemplate (the forked template)
 ```
 
 ---
@@ -22,10 +31,9 @@ src/components/editor/canvas/EditableTemplate.tsx  ← adapted fork for editor
 
 ### 1. Copy the source template
 
-Copy `src/app/templates/<name>/page.tsx` verbatim into
-`src/components/editor/canvas/EditableTemplate.tsx`.
+Copy `src/app/templates/<name>/page.tsx` verbatim into `src/components/editor/canvas/EditableTemplate.tsx`.
 
-Rename the default export to a named export:
+Rename the default export to a named export that accepts a `viewport` prop:
 
 ```tsx
 // Before
@@ -35,104 +43,115 @@ export default function MinimalBWTemplate() { ... }
 export function EditableTemplate({ viewport }: { viewport: Viewport }) { ... }
 ```
 
----
-
-### 2. Replace `useBreakpoint()` with the `viewport` prop
-
-The source template reads `window.innerWidth` via `useBreakpoint()`. Inside the
-builder the template lives in a scaled container, so the real window width is
-irrelevant — the editor viewport toggle drives the responsive layout instead.
-
-```tsx
-// REMOVE
-import { useBreakpoint } from "...";
-const { isMobile, isTablet, isDesktop } = useBreakpoint();
-
-// ADD — derive from the prop instead
-const isMobile  = viewport === "mobile";
-const isTablet  = viewport === "tablet";
-const isDesktop = viewport === "desktop";
-```
-
-Import the `Viewport` type from the store:
-
+Import the type:
 ```tsx
 import type { Viewport } from "~/lib/editor/types";
 ```
 
 ---
 
+### 2. Replace `useBreakpoint()` with the `viewport` prop
+
+The source template reads `window.innerWidth`. Inside the editor the template lives inside a device frame container — the real window width is irrelevant. The editor's viewport toggle drives the responsive layout instead.
+
+```tsx
+// REMOVE
+const { isMobile, isTablet, isDesktop } = useBreakpoint();
+
+// ADD
+const isMobile  = viewport === "mobile";
+const isTablet  = viewport === "tablet";
+const isDesktop = viewport === "desktop";
+```
+
+---
+
 ### 3. Fix `position: fixed` on the nav
 
-Fixed elements escape the scaled canvas and overlap the editor chrome.
-Change the nav to `position: relative`.
-
-Also remove the hero's `paddingTop` compensation (it was only there to push
-content below the fixed nav):
+Fixed elements escape the scaled/framed canvas. Change the nav to `position: relative`:
 
 ```tsx
 // Before
 <nav style={{ position: "fixed", top: 0, left: 0, right: 0, ... }}>
-<section style={{ paddingTop: "72px", ... }}>
+<section style={{ paddingTop: "72px", ... }}>   {/* compensation for fixed nav */}
 
 // After
-<nav style={{ position: "relative", ... }}>   {/* no fixed! */}
-<section style={{ paddingTop: 0, ... }}>
+<nav id="section-nav" style={{ position: "relative", ... }}>
+<section id="section-hero" style={{ paddingTop: 0, ... }}>
 ```
 
-> **Why keep position: fixed for Lightbox / GalleryModal?**
-> Modals use `position: fixed` intentionally — they overlay the whole editor
-> to demonstrate the interaction. This is acceptable preview behaviour.
+> **Keep `position: fixed` for Lightbox / GalleryModal.** Modals use `position: fixed` intentionally — they overlay the whole editor to demonstrate the interaction. This is acceptable preview behaviour.
 
 ---
 
-### 4. Connect the editor store
+### 4. Add section ids to every top-level block
 
-Import the store at the top of the file:
+The Pages tree in the sidebar uses these ids to:
+- Scroll the device screen to the right section
+- Highlight the section on the canvas (amber outline)
+
+Assign an `id` to every top-level section element, following this naming convention:
+
+| HTML element | Recommended id | Notes |
+|---|---|---|
+| `<nav>` | `section-nav` | add to both mobile and desktop renders |
+| Hero `<section>` | `section-hero` | |
+| Work `<section>` | `work` | kept as-is — also used by nav drawer links |
+| Quote `<section>` | `section-quote` | |
+| About `<section>` | `about` | also used by nav drawer links |
+| Press `<section>` | `press` | also used by nav drawer links |
+| Contact `<section>` | `contact` | also used by nav drawer links |
+| `<footer>` | `section-footer` | |
+
+Example:
+```tsx
+<nav id="section-nav" style={{ position: "relative", ... }}>
+<section id="section-hero" style={{ ... }}>
+<section id="section-quote" style={{ ... }}>
+<footer id="section-footer" style={{ ... }}>
+```
+
+---
+
+### 5. Connect the editor store
 
 ```tsx
 import { useEditorStore } from "~/lib/editor/store";
-```
 
-At the start of `EditableTemplate`, pull in `selectNode` to deselect nodes
-when the user clicks the template background:
+export function EditableTemplate({ viewport }: { viewport: Viewport }) {
+  const { selectNode } = useEditorStore();
 
-```tsx
-const { selectNode } = useEditorStore();
-// On the root <div>:
-<div onClick={() => selectNode(null)}>
+  return (
+    <div onClick={() => selectNode(null)}>  {/* deselect on background click */}
+      ...
+    </div>
+  );
+}
 ```
 
 ---
 
-### 5. Add editable node primitives
+### 6. Add editable node primitives
 
-Copy these three small components into the file (they are the only editor-specific
-code in the fork):
+Copy these three small components into the file (they are the only editor-specific code in the fork):
 
 ```tsx
-function EditableNode({ id, children, style, tag: Tag = "div" }) { ... }
+function EditableNode({ id, children, style, tag = "div" }) { ... }
 function EditableText({ id, style }) { ... }
 function EditableImage({ id, imgStyle }) { ... }
 ```
 
-`EditableNode` renders a wrapper with `data-editor-node`, selection/editing
-data attributes, and click/double-click handlers that update the store.
+`EditableNode` renders a wrapper with `data-editor-node`, selection/editing data attributes, and click/double-click handlers.
 
-`EditableText` renders stored HTML via `dangerouslySetInnerHTML` and
-switches to an inline Tiptap editor on double-click.
+`EditableText` renders stored HTML and switches to inline Tiptap on double-click.
 
-`EditableImage` reads `src` and `alt` from the store node.
-
-See `src/components/editor/canvas/EditableTemplate.tsx` for the full implementations.
+`EditableImage` reads `src` / `alt` from the store node.
 
 ---
 
-### 6. Wrap editable elements
+### 7. Wrap editable elements
 
-Replace raw JSX elements with the primitives above.
-
-**Text example:**
+**Text:**
 ```tsx
 // Before
 <h1 style={{ fontFamily: "var(--tpl-serif)", ... }}>
@@ -145,11 +164,10 @@ Replace raw JSX elements with the primitives above.
 </EditableNode>
 ```
 
-**Image example:**
+**Image:**
 ```tsx
 // Before
-<img src="https://picsum.photos/seed/1084/600/750?grayscale" alt="James Hollis"
-  style={{ position: "absolute", inset: 0, ... }} />
+<img src="https://..." alt="James Hollis" style={{ position: "absolute", inset: 0, ... }} />
 
 // After
 <EditableNode id="about-image" style={{ position: "relative" }}>
@@ -157,48 +175,58 @@ Replace raw JSX elements with the primitives above.
 </EditableNode>
 ```
 
-> **Rule:** only wrap elements that a non-technical user would want to change
-> (headings, body text, key images). Leave decorative elements, stats arrays,
-> press lists, and photo-grid cells as static JSX.
+**Rule:** only wrap elements that a designer would want to change — headings, body text, key photos. Leave decorative elements, stats arrays, press lists, photo-grid cells, and form fields as static JSX.
 
 ---
 
-### 7. Register nodes in the store
+### 8. Register nodes in the store
 
-Add a default value for every `id` you used above in
-`src/lib/editor/store.ts` inside `INITIAL_NODES`:
+Add a default value for every `id` used above in `src/lib/editor/store.ts` inside `INITIAL_NODES`:
 
 ```ts
 const INITIAL_NODES: Record<string, EditorNode> = {
-  "hero-heading": {
-    id: "hero-heading",
-    type: "heading",
-    content: "James<br/><em>Hollis</em>",
-  },
-  "about-image": {
-    id: "about-image",
-    type: "image",
-    src: "https://picsum.photos/seed/1084/600/750?grayscale",
-    alt: "James Hollis",
-  },
+  "hero-heading": { id: "hero-heading", type: "heading", content: "James<br/><em>Hollis</em>" },
+  "about-image":  { id: "about-image",  type: "image",   src: "https://...", alt: "James Hollis" },
   // ...
 };
 ```
 
-Also add each node to the `EmptyState` layer list in `Sidebar.tsx` so users
-can click-to-select from the panel without needing to find the element visually.
+---
+
+### 9. Register sections in the Sidebar Pages tree
+
+Add each section to the `SECTIONS` array in `src/components/editor/core/Sidebar.tsx`:
+
+```ts
+const SECTIONS: SectionDef[] = [
+  {
+    id: "section-nav",   // must match the HTML id added in step 4
+    label: "Navigation",
+    icon: <NavIcon />,
+    locked: true,        // true → lock/delete disabled (header/footer)
+    elements: [          // editable nodes within this section
+      { nodeId: "nav-logo", label: "Logo text", type: "text" },
+    ],
+  },
+  // ...
+];
+```
+
+Clicking a section in the tree:
+1. Sets `selectedSection` in the store (amber highlight on canvas)
+2. Scrolls the device screen to that section
+3. Expands the section to show its editable elements
+
+Clicking an element node in the tree selects it in the store (blue ring on canvas), same as clicking directly on the canvas.
 
 ---
 
-### 8. Load fonts in the editor layout
+### 10. Load fonts in the editor layout
 
-The template uses CSS variables like `--tpl-serif`, `--tpl-sans`, `--tpl-mono`
-which are injected by `src/app/templates/<name>/layout.tsx` via `next/font`.
-
-Load the **same** fonts with the **same** variable names in the editor layout
-(`src/app/editor/<name>/layout.tsx`) so the canvas inherits them:
+The template uses CSS variables `--tpl-serif`, `--tpl-sans`, `--tpl-mono`. Load the **same** fonts in the editor layout with the **same** variable names:
 
 ```tsx
+// src/app/editor/<name>/layout.tsx
 import { Cormorant_Garamond, DM_Sans, Space_Mono } from "next/font/google";
 
 const cormorant = Cormorant_Garamond({ subsets: ["latin"], variable: "--tpl-serif", ... });
@@ -214,48 +242,47 @@ export default function EditorLayout({ children }) {
 }
 ```
 
-The `.canvas-frame` class in `editor.css` also defines these as fallbacks so
-the font stacks resolve correctly even before the `next/font` stylesheet loads.
+`EditorShell` also injects a `<style>` tag that overrides `--tpl-*` in real time when the user changes the typography from the Design panel:
+
+```jsx
+<style>{`
+  .canvas-frame {
+    --tpl-serif: ${typography.serif};
+    --tpl-sans:  ${typography.sans};
+    --tpl-mono:  ${typography.mono};
+  }
+`}</style>
+```
 
 ---
 
-### 9. Add the editor route
+### 11. Add the editor route
 
 ```
 src/app/editor/<name>/layout.tsx   ← loads fonts + editor.css
 src/app/editor/<name>/page.tsx     ← dynamically imports EditorShell
 ```
 
-The `page.tsx` is always the same boilerplate:
+`page.tsx` is always the same boilerplate:
 
 ```tsx
 "use client";
 import dynamic from "next/dynamic";
-
 const EditorShell = dynamic(
   () => import("~/components/editor/core/EditorShell").then((m) => m.EditorShell),
   { ssr: false }
 );
-
-export default function EditorPage() {
-  return <EditorShell />;
-}
+export default function EditorPage() { return <EditorShell />; }
 ```
 
 ---
 
-### 10. Add the Edit button in the dashboard
+### 12. Add the Edit button in the dashboard
 
-In `src/app/dashboard/templates/page.tsx`, set `editorHref` on the template
-object and it will appear automatically on the FeaturedCard:
+In `src/app/dashboard/templates/page.tsx`, add `editorHref` to the template object:
 
 ```ts
-{
-  id: "my-template",
-  href: "/templates/my-template",
-  editorHref: "/editor/my-template",   // ← this line
-  ...
-}
+{ id: "my-template", href: "/templates/my-template", editorHref: "/editor/my-template", ... }
 ```
 
 ---
@@ -263,52 +290,76 @@ object and it will appear automatically on the FeaturedCard:
 ## Checklist
 
 - [ ] `EditableTemplate.tsx` created (forked from `page.tsx`)
-- [ ] Default export → named `EditableTemplate({ viewport })`
-- [ ] `useBreakpoint()` removed, `viewport` prop used instead
+- [ ] Export renamed to `EditableTemplate({ viewport })`
+- [ ] `useBreakpoint()` removed; `viewport` prop used instead
 - [ ] Nav changed from `position: fixed` → `position: relative`
 - [ ] Hero `paddingTop` set to `0`
+- [ ] All top-level sections have unique `id` attributes (step 4 convention)
+- [ ] `<nav>` in both mobile and desktop branches has `id="section-nav"`
 - [ ] All editable elements wrapped with `<EditableNode>` / `<EditableText>` / `<EditableImage>`
-- [ ] Each node id registered in `INITIAL_NODES` in `store.ts`
-- [ ] Each node id listed in `EmptyState` layer list in `Sidebar.tsx`
-- [ ] Editor layout created, loads template fonts with correct CSS variable names
+- [ ] Every node id registered in `INITIAL_NODES` in `store.ts`
+- [ ] Every section registered in `SECTIONS` in `Sidebar.tsx`
+- [ ] Editor layout loads template fonts with matching CSS variable names
 - [ ] Editor route `page.tsx` created
 - [ ] `editorHref` set in dashboard templates list
 
 ---
 
-## What can be made editable
+## Device frames & constrained scroll
 
-| Element type | Node type | How to edit |
-|---|---|---|
-| Headings (`h1`, `h2`) | `"heading"` | Click to select, double-click for Tiptap |
-| Body paragraphs | `"paragraph"` | Click to select, double-click for Tiptap |
-| Nav logo / taglines | `"nav-logo"` | Click to select, double-click for Tiptap |
-| Portrait / hero photos | `"image"` | Click to select, paste URL in sidebar |
-| Quotes | `"paragraph"` | Click to select, double-click for Tiptap |
+The canvas renders one of three device frames based on the viewport toggle:
 
-**Do NOT wrap** with `EditableNode`:
-- Photo grid cells (they have their own click behaviour — opening the gallery)
-- Stats/numbers (array-driven, edit in code)
-- Press publication names (array-driven)
-- Nav links (functional — change them in code)
-- Form fields (functional)
+| Viewport | Frame | Content size | Device label |
+|---|---|---|---|
+| `desktop` | Browser chrome (traffic lights, URL bar) | full width × 660px | Desktop · 1280px |
+| `tablet` | iPad Air style (dark bezels, camera dot, home bar) | 768px × 756px | iPad Air · 820×1180 |
+| `mobile` | iPhone Dynamic Island style (rounded, pill notch) | 375px × 660px | iPhone 15 Pro · 393×852 |
+
+The content area inside each frame has `overflow-y: auto` — the template scrolls **inside** the device, not the editor canvas. The canvas itself only scrolls if the device frame is taller than the available editor area (rare on normal monitors).
+
+When adapting a new template, no changes to Canvas.tsx are needed — the device frame always renders `<EditableTemplate viewport={viewport} />`.
+
+---
+
+## Sidebar — Pages tree
+
+The Pages tab displays a one-level-deep structure: one page (Home) containing sections. This matches the single-page nature of portfolio templates. For future multi-page support, each page would be a sibling of Home.
+
+**Section row interactions:**
+- **Click** → scroll-to + amber highlight on canvas + expand elements
+- **Three-dot menu → Scroll to** → scroll-to without selecting
+- **Three-dot menu → Rename / Duplicate / Delete** → disabled in template mode (template integrity constraint)
+
+**Element row interactions:**
+- **Click** → select element (blue ring on canvas) + scroll-to parent section
+
+**Hover** in the sidebar → amber dashed outline on the corresponding canvas section (bidirectional awareness).
 
 ---
 
 ## CSS variable conventions
 
-| Variable | Purpose |
+| Variable | Role |
 |---|---|
-| `--tpl-serif` | Template's serif typeface |
-| `--tpl-sans` | Template's sans-serif typeface |
-| `--tpl-mono` | Template's monospace typeface |
-| `--ed-bg` | Palette: background colour |
-| `--ed-fg` | Palette: primary text colour |
-| `--ed-accent` | Palette: accent / button colour |
-| `--ed-muted` | Palette: secondary text colour |
+| `--tpl-serif` | Template serif typeface (headings) |
+| `--tpl-sans`  | Template sans-serif typeface (body) |
+| `--tpl-mono`  | Template monospace typeface (labels, captions) |
+| `--ed-bg`     | Palette background |
+| `--ed-fg`     | Palette primary text |
+| `--ed-accent` | Palette accent / button |
+| `--ed-muted`  | Palette secondary text |
 
-The `--ed-*` variables are injected by `CanvasFrame.tsx` via inline style on the
-`.canvas-frame` element and can be overridden from the Colors panel in the sidebar.
+All injected on `.canvas-frame` by `EditorShell`'s `<style>` tag. Override hardcoded hex values in the fork by replacing them with `var(--ed-*)` or `var(--tpl-*)` references if you want them to be palette/typography-controlled.
 
-If a template uses hardcoded hex values that you want the palette to control,
-replace them with the corresponding `var(--ed-*)` reference.
+---
+
+## What NOT to wrap with EditableNode
+
+| Element | Why |
+|---|---|
+| Photo grid cells | Have their own click (opens gallery) |
+| Stats / numbers | Array-driven; edit in code |
+| Press publications | Array-driven |
+| Nav links | Functional; edit in code |
+| Form fields | Functional |
+| Decorative lines / dividers | Not user-content |

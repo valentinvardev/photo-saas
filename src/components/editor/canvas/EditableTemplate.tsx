@@ -314,7 +314,7 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
   if (isMobile) {
     return (
       <>
-        <nav style={navBase}>
+        <nav id="section-nav" style={navBase}>
           <button onClick={() => setMenuOpen(true)}
             style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", color: "#0a0a0a", display: "flex", flexDirection: "column", gap: "5px" }}>
             <span style={{ display: "block", width: "20px", height: "1.5px", background: "#0a0a0a" }} />
@@ -367,7 +367,7 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
   }
 
   return (
-    <nav style={navBase}>
+    <nav id="section-nav" style={navBase}>
       <EditableNode id="nav-logo" tag="span" style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.18em", color: "#0a0a0a", textTransform: "uppercase" }}>
         <EditableText id="nav-logo" />
       </EditableNode>
@@ -428,17 +428,23 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       style={{ background: "#fafafa", color: "#0a0a0a", minHeight: "100%", fontFamily: "var(--tpl-sans,sans-serif)" }}
       onClick={() => selectNode(null)}
     >
+      {/* SECTION IDS: used by the sidebar Pages tree to scroll-to and highlight sections.
+          nav-section, hero-section, work (existing), section-quote,
+          about (existing), press (existing), contact (existing), footer-section */}
       <Nav onOpenGallery={() => setGalleryOpen(true)} isMobile={isMobile} />
 
       {/* ════ HERO ════ */}
-      <section style={{
-        minHeight: "92vh",
-        display: "grid",
-        gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
-        /* ADAPTER NOTE: paddingTop was `isMobile ? "56px" : "72px"` to compensate
-           for the fixed nav. With position:relative nav it's now 0. */
-        paddingTop: 0,
-      }}>
+      <section
+        id="section-hero"
+        style={{
+          minHeight: "92vh",
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+          /* ADAPTER NOTE: paddingTop was `isMobile ? "56px" : "72px"` to compensate
+             for the fixed nav. With position:relative nav it's now 0. */
+          paddingTop: 0,
+        }}
+      >
         {/* Left — text */}
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: isMobile ? "3rem 1.5rem 2.5rem" : isTablet ? "4rem 3rem 4rem 5vw" : "5rem 5rem 5rem 7vw" }}>
           <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", letterSpacing: "0.25em", color: "#999", textTransform: "uppercase", marginBottom: "2rem" }}>
@@ -545,7 +551,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ════ PULL QUOTE ════ */}
-      <section style={{ padding: `${isMobile ? "4rem" : "6rem"} ${px}`, background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
+      <section id="section-quote" style={{ padding: `${isMobile ? "4rem" : "6rem"} ${px}`, background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
         <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>On practice</span>
         <EditableNode id="quote-text" tag="blockquote" style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontWeight: 300, fontSize: isMobile ? "clamp(22px,7vw,36px)" : "clamp(28px,3.5vw,52px)", lineHeight: 1.3, color: "#f0f0f0", maxWidth: "900px", textAlign: "center", margin: 0, letterSpacing: "-0.01em" }}>
           <EditableText id="quote-text" />
@@ -657,7 +663,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ════ FOOTER ════ */}
-      <footer style={{ padding: `2rem ${px}`, borderTop: "1px solid #e0e0e0", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? "1.25rem" : "2rem", justifyContent: "space-between" }}>
+      <footer id="section-footer" style={{ padding: `2rem ${px}`, borderTop: "1px solid #e0e0e0", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? "1.25rem" : "2rem", justifyContent: "space-between" }}>
         <EditableNode id="nav-logo" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.2em", color: "#0a0a0a", textTransform: "uppercase" }}>
           <EditableText id="nav-logo" />
         </EditableNode>

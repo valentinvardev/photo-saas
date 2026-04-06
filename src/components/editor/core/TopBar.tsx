@@ -67,7 +67,7 @@ const VIEWPORT_LABELS: Record<Viewport, string> = {
 };
 
 export function TopBar() {
-  const { nodes, palette, reset, viewport, setViewport } = useEditorStore();
+  const { nodes, palette, typography, reset, viewport, setViewport } = useEditorStore();
   const { undo, redo, pastStates, futureStates } = useStore(useEditorStore.temporal);
 
   const canUndo = pastStates.length > 0;
@@ -167,7 +167,7 @@ export function TopBar() {
 
       {/* Save */}
       <button
-        onClick={() => saveState({ nodes, palette })}
+        onClick={() => saveState({ nodes, palette, typography })}
         style={{ background: "#facc15", border: "none", cursor: "pointer", color: "#111", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}
       >
         <SaveIcon /> Save

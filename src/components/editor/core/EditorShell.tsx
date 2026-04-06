@@ -11,7 +11,7 @@ import { Sidebar } from "./Sidebar";
 import "~/lib/editor/fonts";
 
 export function EditorShell() {
-  const { updateNode, setPalette } = useEditorStore();
+  const { updateNode, setPalette, setTypography, palette, typography, selectedSection, hoveredSection } = useEditorStore();
 
   // Hydrate from localStorage on first render
   useEffect(() => {
@@ -21,6 +21,7 @@ export function EditorShell() {
       updateNode(id, node);
     }
     setPalette(saved.palette);
+    if (saved.typography) setTypography(saved.typography);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -33,6 +34,34 @@ export function EditorShell() {
         <Sidebar />
         <Canvas />
       </div>
+
+      {/*
+        Global style injections:
+        1. Palette CSS variables on .canvas-frame
+        2. Template font overrides via --tpl-* variables
+        3. Section hover/selection highlights using the section HTML ids
+      */}
+      <style>{`
+        .canvas-frame {
+          --ed-bg:     ${palette.bg};
+          --ed-fg:     ${palette.fg};
+          --ed-accent: ${palette.accent};
+          --ed-muted:  ${palette.muted};
+          --tpl-serif: ${typography.serif};
+          --tpl-sans:  ${typography.sans};
+          --tpl-mono:  ${typography.mono};
+        }
+
+        ${hoveredSection && hoveredSection !== selectedSection
+          ? `#${hoveredSection} { outline: 1.5px dashed rgba(251,191,36,0.45) !important; outline-offset: -1px; }`
+          : ""
+        }
+
+        ${selectedSection
+          ? `#${selectedSection} { outline: 2px solid rgba(251,191,36,0.8) !important; outline-offset: -2px; }`
+          : ""
+        }
+      `}</style>
     </div>
   );
 }
