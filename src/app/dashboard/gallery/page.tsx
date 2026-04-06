@@ -385,7 +385,6 @@ export default function GalleryPage() {
                   className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer"
                   style={{
                     background: typeColor(file.type).bg,
-                    ring: selected.has(file.id) ? "2px solid #fad502" : undefined,
                     boxShadow: selected.has(file.id) ? "0 0 0 2px #fad502" : "none",
                   }}
                   onClick={() => {
