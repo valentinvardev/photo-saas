@@ -20,8 +20,9 @@ function FontPicker({
   value: string;
   onChange: (stack: string) => void;
 }) {
-  const options = FONT_OPTIONS.filter((f) => f.category === category);
-  const active  = options.find((f) => value.includes(f.value));
+  const options  = FONT_OPTIONS.filter((f) => f.category === category);
+  const featured = options.filter((f) => f.featured);
+  const active   = options.find((f) => value.includes(f.value));
 
   return (
     <div style={{ marginBottom: 14 }}>
@@ -83,9 +84,9 @@ function FontPicker({
         </svg>
       </div>
 
-      {/* Font grid options */}
+      {/* Font grid options — featured only */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, marginTop: 6 }}>
-        {options.map((f) => (
+        {featured.map((f) => (
           <button
             key={f.value}
             onClick={() => onChange(f.stack)}

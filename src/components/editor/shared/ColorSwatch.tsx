@@ -38,7 +38,7 @@ export function ColorSwatch({ label, value, onChange }: Props) {
           style={{
             position: "absolute",
             right: 0,
-            bottom: "calc(100% + 6px)",
+            top: "calc(100% + 6px)",
             zIndex: 100,
             background: "#1a1a1a",
             border: "1px solid #333",

@@ -69,7 +69,6 @@
 .canvas-frame {
   transform-origin: top center;
   background: var(--ed-bg, #fafafa);
-  box-shadow: 0 8px 60px rgba(0, 0, 0, 0.45);
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────────────────── */

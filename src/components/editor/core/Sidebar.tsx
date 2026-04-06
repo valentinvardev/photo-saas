@@ -507,7 +507,7 @@ export function Sidebar() {
     >
       {/* Tab bar */}
       <div style={{ display: "flex", borderBottom: "1px solid #1a1a1a", flexShrink: 0 }}>
-        <button style={tabStyle(tab === "pages")}    onClick={() => setTab("pages")}>Pages</button>
+        <button style={tabStyle(tab === "pages")}    onClick={() => setTab("pages")}>Page</button>
         <button style={tabStyle(tab === "design")}   onClick={() => setTab("design")}>Design</button>
         <button style={tabStyle(tab === "settings")} onClick={() => setTab("settings")}>Settings</button>
       </div>

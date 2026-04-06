@@ -40,7 +40,9 @@ function DeviceScreen({
         flexShrink:   0,
       }}
     >
-      {children}
+      <div className="canvas-frame" style={{ minHeight: "100%" }}>
+        {children}
+      </div>
     </div>
   );
 }
