@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
 
 /* ── Types ── */
 type Folder = { id: string; name: string; count: number; seed: number };
@@ -50,32 +50,6 @@ function typeColor(type: string) {
   return                      { bg: "rgba(74,158,255,0.12)",  text: "#4a9eff" };
 }
 
-/* ── Drag ghost factory ── */
-function buildDragGhost(names: string[]) {
-  const el = document.createElement("div");
-  el.style.cssText = [
-    "position:fixed;top:-9999px;left:-9999px",
-    "background:#1a1a1a;border:1px solid #333",
-    "padding:8px 12px;border-radius:10px",
-    "font-family:monospace;font-size:11px;color:#fff",
-    "max-width:220px;pointer-events:none;z-index:99999",
-    "box-shadow:0 8px 24px rgba(0,0,0,0.6)",
-  ].join(";");
-  names.slice(0, 4).forEach((n) => {
-    const row = document.createElement("div");
-    row.style.cssText = "padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
-    row.textContent = n;
-    el.appendChild(row);
-  });
-  if (names.length > 4) {
-    const more = document.createElement("div");
-    more.style.cssText = "color:#666;padding-top:4px;border-top:1px solid #333;margin-top:4px;";
-    more.textContent = `+${names.length - 4} more`;
-    el.appendChild(more);
-  }
-  return el;
-}
-
 /* ── Icons ── */
 const I = {
   Upload:   () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
@@ -109,6 +83,138 @@ function RenameInput({ value, onDone, onClick }: { value: string; onDone: (v: st
       className="bg-black/60 text-white font-sans text-xs font-bold px-1 border border-yellow outline-none max-w-[120px] rounded"
       style={{ width: `${Math.max(val.length, 6)}ch` }}
     />
+  );
+}
+
+/* ── Drag overlay: wind-blown mini thumbnails ── */
+const MINI_SIZE = 52;
+
+// Each slot has its own spring physics (stiffness/damping) and static cursor offset
+const SLOT_CFGS = [
+  { stiffness: 520, damping: 32, dx:   0, dy:   0 },
+  { stiffness: 190, damping: 20, dx: -24, dy:  18 },
+  { stiffness: 300, damping: 38, dx:  22, dy: -16 },
+  { stiffness: 140, damping: 17, dx:  -6, dy:  28 },
+] as const;
+
+function DragOverlay({
+  seeds,
+  count,
+  flyTarget,
+  cursorXMV,
+  cursorYMV,
+}: {
+  seeds: number[];
+  count: number;
+  flyTarget: { x: number; y: number } | null;
+  cursorXMV: MotionValue<number>;
+  cursorYMV: MotionValue<number>;
+}) {
+  // All springs at top level — no hooks in loops
+  const sx0 = useSpring(cursorXMV, { stiffness: SLOT_CFGS[0].stiffness, damping: SLOT_CFGS[0].damping });
+  const sy0 = useSpring(cursorYMV, { stiffness: SLOT_CFGS[0].stiffness, damping: SLOT_CFGS[0].damping });
+  const sx1 = useSpring(cursorXMV, { stiffness: SLOT_CFGS[1].stiffness, damping: SLOT_CFGS[1].damping });
+  const sy1 = useSpring(cursorYMV, { stiffness: SLOT_CFGS[1].stiffness, damping: SLOT_CFGS[1].damping });
+  const sx2 = useSpring(cursorXMV, { stiffness: SLOT_CFGS[2].stiffness, damping: SLOT_CFGS[2].damping });
+  const sy2 = useSpring(cursorYMV, { stiffness: SLOT_CFGS[2].stiffness, damping: SLOT_CFGS[2].damping });
+  const sx3 = useSpring(cursorXMV, { stiffness: SLOT_CFGS[3].stiffness, damping: SLOT_CFGS[3].damping });
+  const sy3 = useSpring(cursorYMV, { stiffness: SLOT_CFGS[3].stiffness, damping: SLOT_CFGS[3].damping });
+
+  // Derived x/y positions with per-slot offset (center image on cursor + wind offset)
+  const half = MINI_SIZE / 2;
+  const x0 = useTransform(sx0, v => v + SLOT_CFGS[0].dx - half);
+  const y0 = useTransform(sy0, v => v + SLOT_CFGS[0].dy - half);
+  const x1 = useTransform(sx1, v => v + SLOT_CFGS[1].dx - half);
+  const y1 = useTransform(sy1, v => v + SLOT_CFGS[1].dy - half);
+  const x2 = useTransform(sx2, v => v + SLOT_CFGS[2].dx - half);
+  const y2 = useTransform(sy2, v => v + SLOT_CFGS[2].dy - half);
+  const x3 = useTransform(sx3, v => v + SLOT_CFGS[3].dx - half);
+  const y3 = useTransform(sy3, v => v + SLOT_CFGS[3].dy - half);
+
+  // When fly target is set, redirect the cursor motion values so springs chase the folder center
+  useEffect(() => {
+    if (!flyTarget) return;
+    cursorXMV.set(flyTarget.x);
+    cursorYMV.set(flyTarget.y);
+  }, [flyTarget, cursorXMV, cursorYMV]);
+
+  const slots = [
+    { x: x0, y: y0, seed: seeds[0] },
+    { x: x1, y: y1, seed: seeds[1] },
+    { x: x2, y: y2, seed: seeds[2] },
+    { x: x3, y: y3, seed: seeds[3] },
+  ];
+
+  const isFly = !!flyTarget;
+
+  return (
+    <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 9999 }}>
+      {slots.map((slot, i) => {
+        if (!slot.seed) return null;
+        return (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, scale: 0.4 }}
+            animate={isFly ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+            transition={isFly
+              ? { duration: 0.45, delay: i * 0.04, ease: "easeIn" }
+              : { duration: 0.2, delay: i * 0.05, ease: "easeOut" }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              x: slot.x,
+              y: slot.y,
+              width: MINI_SIZE,
+              height: MINI_SIZE,
+              borderRadius: 8,
+              overflow: "hidden",
+              boxShadow: "0 8px 28px rgba(0,0,0,0.55)",
+              border: "1.5px solid rgba(255,255,255,0.18)",
+              // Stagger z-index so first image is on top
+              zIndex: 4 - i,
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`https://picsum.photos/seed/${slot.seed}/100/100?grayscale`}
+              alt=""
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+          </motion.div>
+        );
+      })}
+
+      {/* Count badge on the lead image */}
+      {count > 1 && seeds[0] && !isFly && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.15, delay: 0.1 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            x: useTransform(sx0, v => v + SLOT_CFGS[0].dx - half + MINI_SIZE - 10),
+            y: useTransform(sy0, v => v + SLOT_CFGS[0].dy - half - 8),
+            background: "#fad502",
+            color: "#111",
+            borderRadius: "50%",
+            width: 18,
+            height: 18,
+            fontSize: 9,
+            fontFamily: "monospace",
+            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 10,
+          }}
+        >
+          {count}
+        </motion.div>
+      )}
+    </div>
   );
 }
 
@@ -211,6 +317,17 @@ export default function GalleryPage() {
   /* Drop-highlight for folder tiles */
   const [dropTarget, setDropTarget] = useState<string | null>(null);
 
+  /* ── Platform drag overlay state ── */
+  const [dragState, setDragState] = useState<{ seeds: number[]; count: number } | null>(null);
+  const [flyTarget, setFlyTarget] = useState<{ x: number; y: number } | null>(null);
+
+  // Shared motion values for cursor position (updated via dragover, no React renders)
+  const cursorXMV = useMotionValue(-9999);
+  const cursorYMV = useMotionValue(-9999);
+
+  // Refs to folder DOM elements so we can get their center on drop
+  const folderRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
   const fileInputRef   = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
@@ -231,32 +348,90 @@ export default function GalleryPage() {
     setEditFolderId(null);
   };
 
-  /* External file drop (from OS) */
-  const onExtDragEnter  = useCallback((e: React.DragEvent) => { e.preventDefault(); setExtDragCount((n) => n + 1); }, []);
-  const onExtDragLeave  = useCallback(() => setExtDragCount((n) => n - 1), []);
-  const onExtDragOver   = (e: React.DragEvent) => e.preventDefault();
-  const onExtDrop       = useCallback((e: React.DragEvent) => { e.preventDefault(); setExtDragCount(0); }, []);
+  /* ── External file drag (from OS) — only trigger for real file drags, not platform drags ── */
+  const onExtDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const types = Array.from(e.dataTransfer.types);
+    // Only show upload overlay for OS files, not for internal platform drags
+    if (types.includes("Files") && !types.includes("application/frame-files")) {
+      setExtDragCount((n) => n + 1);
+    }
+  }, []);
 
-  /* HTML5 drag-start on a file tile */
+  const onExtDragLeave = useCallback((e: React.DragEvent) => {
+    const types = Array.from(e.dataTransfer.types);
+    if (types.includes("Files") && !types.includes("application/frame-files")) {
+      setExtDragCount((n) => Math.max(0, n - 1));
+    }
+  }, []);
+
+  const onExtDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setExtDragCount(0);
+  }, []);
+
+  /* Track cursor position during platform drags via dragover */
+  const onMainDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    const types = Array.from(e.dataTransfer.types);
+    if (types.includes("application/frame-files")) {
+      cursorXMV.set(e.clientX);
+      cursorYMV.set(e.clientY);
+    }
+  };
+
+  /* HTML5 drag-start on a file tile — suppress native ghost, activate overlay */
   const onFileDragStart = (e: React.DragEvent, file: GFile) => {
     const ids   = selected.has(file.id) ? [...selected] : [file.id];
-    const names = MOCK_FILES.filter((f) => ids.includes(f.id)).map((f) => f.name);
+    const files = MOCK_FILES.filter((f) => ids.includes(f.id));
+    const seeds = files.slice(0, 4).map((f) => f.seed);
+
     e.dataTransfer.setData("application/frame-files", JSON.stringify(ids));
     e.dataTransfer.effectAllowed = "move";
-    const ghost = buildDragGhost(names);
-    document.body.appendChild(ghost);
-    e.dataTransfer.setDragImage(ghost, 16, 16);
-    setTimeout(() => document.body.removeChild(ghost), 0);
+
+    // Suppress native browser drag ghost with a transparent 1×1 canvas
+    const ghost = document.createElement("canvas");
+    ghost.width = 1; ghost.height = 1;
+    e.dataTransfer.setDragImage(ghost, 0, 0);
+
+    // Initialise cursor at the tile's center so mini images start from there
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    cursorXMV.set(rect.left + rect.width / 2);
+    cursorYMV.set(rect.top + rect.height / 2);
+
+    setFlyTarget(null);
+    setDragState({ seeds, count: ids.length });
+  };
+
+  /* Drag end — user dropped somewhere that's not a folder, or cancelled */
+  const onFileDragEnd = () => {
+    // Small delay so fly animation can finish if drop fired just before dragend
+    setTimeout(() => {
+      setDragState(null);
+      setFlyTarget(null);
+    }, 500);
   };
 
   /* Drop onto a folder tile */
-  const onFolderDrop = (e: React.DragEvent, folderName: string) => {
+  const onFolderDrop = (e: React.DragEvent, folderName: string, folderId: string) => {
     e.preventDefault(); e.stopPropagation();
     setDropTarget(null);
     const raw = e.dataTransfer.getData("application/frame-files");
     if (!raw) return;
-    const ids: string[] = JSON.parse(raw) as string[];
-    console.log("Move", ids, "→", folderName); /* TODO: tRPC */
+
+    console.log("Move", JSON.parse(raw) as string[], "→", folderName); /* TODO: tRPC */
+
+    // Trigger fly-into-folder animation
+    const el = folderRefs.current[folderId];
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      setFlyTarget({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+    }
+    // Clear after animation
+    setTimeout(() => {
+      setDragState(null);
+      setFlyTarget(null);
+    }, 700);
   };
 
   const activeFolderObj = folders.find((f) => f.name === activeFolder);
@@ -275,7 +450,13 @@ export default function GalleryPage() {
   );
 
   return (
-    <div className="min-h-full" onDragEnter={onExtDragEnter} onDragLeave={onExtDragLeave} onDrop={onExtDrop} onDragOver={onExtDragOver}>
+    <div
+      className="min-h-full"
+      onDragEnter={onExtDragEnter}
+      onDragLeave={onExtDragLeave}
+      onDrop={onExtDrop}
+      onDragOver={onMainDragOver}
+    >
       {/* Hidden file inputs */}
       <input ref={fileInputRef} type="file" multiple accept="image/*,.raw,.tiff,.dng" className="hidden" />
       <input ref={folderInputRef} type="file" className="hidden" {...({ webkitdirectory: "", directory: "" } as Record<string, string>)} />
@@ -381,13 +562,22 @@ export default function GalleryPage() {
 
           {/* Folder tiles (All view only) */}
           {showFolders && !search && folders.map((folder) => (
-            <div key={folder.id}
+            <div
+              key={folder.id}
+              ref={(el) => { folderRefs.current[folder.id] = el; }}
               className="relative aspect-square overflow-hidden cursor-pointer group bg-[var(--bg-subtle)]"
               style={{ boxShadow: dropTarget === folder.name ? "inset 0 0 0 3px #fad502" : "none" }}
               onClick={() => { if (editFolderId !== folder.id) { setActiveFolder(folder.name); clearSel(); } }}
-              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDropTarget(folder.name); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (Array.from(e.dataTransfer.types).includes("application/frame-files")) {
+                  cursorXMV.set(e.clientX);
+                  cursorYMV.set(e.clientY);
+                  setDropTarget(folder.name);
+                }
+              }}
               onDragLeave={() => setDropTarget(null)}
-              onDrop={(e) => onFolderDrop(e, folder.name)}
+              onDrop={(e) => onFolderDrop(e, folder.name, folder.id)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={`https://picsum.photos/seed/${folder.seed}/300/300?grayscale`} alt="" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 opacity-50" />
@@ -418,6 +608,7 @@ export default function GalleryPage() {
             <div key={file.id}
               draggable
               onDragStart={(e) => onFileDragStart(e, file)}
+              onDragEnd={onFileDragEnd}
               className="relative aspect-square overflow-hidden cursor-pointer group bg-[var(--bg-subtle)]"
               style={{ boxShadow: selected.has(file.id) ? "inset 0 0 0 2px #fad502" : "none" }}
               onClick={() => { if (selected.size > 0) toggleSel(file.id); else setPreviewFile(file); }}
@@ -475,12 +666,20 @@ export default function GalleryPage() {
             {/* Folder rows (All view) */}
             {showFolders && !search && folders.map((folder) => (
               <div key={folder.id}
+                ref={(el) => { folderRefs.current[folder.id] = el; }}
                 className="grid grid-cols-[auto_auto_1fr_auto_auto_auto] items-center gap-3 px-3 py-2.5 border-b border-[var(--border)] hover:bg-[var(--bg-subtle)] cursor-pointer transition-colors"
                 style={{ boxShadow: dropTarget === folder.name ? "inset 0 0 0 2px #fad502" : "none" }}
                 onClick={() => { if (editFolderId !== folder.id) { setActiveFolder(folder.name); clearSel(); } }}
-                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDropTarget(folder.name); }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  if (Array.from(e.dataTransfer.types).includes("application/frame-files")) {
+                    cursorXMV.set(e.clientX);
+                    cursorYMV.set(e.clientY);
+                    setDropTarget(folder.name);
+                  }
+                }}
                 onDragLeave={() => setDropTarget(null)}
-                onDrop={(e) => onFolderDrop(e, folder.name)}
+                onDrop={(e) => onFolderDrop(e, folder.name, folder.id)}
               >
                 <div className="w-4" />
                 <div className="w-7 h-7 flex items-center justify-center text-yellow">
@@ -493,8 +692,7 @@ export default function GalleryPage() {
                     <>
                       <span className="font-sans text-xs text-[var(--fg)] truncate">{folder.name}</span>
                       <button
-                        className="p-0.5 rounded text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-card)] transition-colors opacity-0 group-hover:opacity-100"
-                        style={{ opacity: undefined }}
+                        className="p-0.5 rounded text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-card)] transition-colors"
                         onClick={(e) => { e.stopPropagation(); setEditFolderId(folder.id); }}
                       >
                         <I.Pencil />
@@ -514,6 +712,7 @@ export default function GalleryPage() {
               <div key={file.id}
                 draggable
                 onDragStart={(e) => onFileDragStart(e, file)}
+                onDragEnd={onFileDragEnd}
                 className={`grid grid-cols-[auto_auto_1fr_auto_auto_auto] items-center gap-3 px-3 py-2 border-b border-[var(--border)] last:border-0 hover:bg-[var(--bg-subtle)] cursor-pointer transition-colors group ${selected.has(file.id) ? "bg-yellow/5" : ""}`}
                 onClick={() => setPreviewFile(file)}
               >
@@ -558,7 +757,7 @@ export default function GalleryPage() {
         )}
       </AnimatePresence>
 
-      {/* External drag overlay */}
+      {/* External drag overlay (OS files only) */}
       <AnimatePresence>
         {extDragCount > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -573,6 +772,17 @@ export default function GalleryPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Platform drag overlay — wind-blown mini thumbnails */}
+      {dragState && (
+        <DragOverlay
+          seeds={dragState.seeds}
+          count={dragState.count}
+          flyTarget={flyTarget}
+          cursorXMV={cursorXMV}
+          cursorYMV={cursorYMV}
+        />
+      )}
 
       {/* Lightbox */}
       <AnimatePresence>
