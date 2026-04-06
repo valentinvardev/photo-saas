@@ -139,7 +139,7 @@ function ImageModal({ file, onClose }: { file: typeof MOCK_FILES[0]; onClose: ()
           // eslint-disable-next-line @next/next/no-img-element
           <img src={`https://picsum.photos/seed/${file.seed}/1200/800?grayscale`} alt={file.name} className="w-full h-auto max-h-[80vh] object-contain" />
         ) : (
-          <div className="w-full h-64 flex flex-col items-center justify-center bg-[var(--bg-card)]" style={typeColor(file.type)}>
+          <div className="w-full h-64 flex flex-col items-center justify-center" style={{ backgroundColor: typeColor(file.type).bg }}>
             <div className="text-4xl font-mono font-black mb-2" style={{ color: typeColor(file.type).text }}>.{file.type.toUpperCase()}</div>
             <div className="font-sans text-sm text-[var(--fg-muted)]">Preview not available for RAW/TIFF</div>
           </div>
