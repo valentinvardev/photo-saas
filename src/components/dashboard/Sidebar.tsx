@@ -52,6 +52,15 @@ function TemplatesIcon() {
     </svg>
   );
 }
+function LinksIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4"  width="18" height="4" rx="2" />
+      <rect x="3" y="10" width="18" height="4" rx="2" />
+      <rect x="3" y="16" width="18" height="4" rx="2" />
+    </svg>
+  );
+}
 function AnalyticsIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -92,6 +101,7 @@ const navMain = [
   { label: "Gallery",   href: "/dashboard/gallery",   icon: GalleryIcon },
   { label: "Portfolio",  href: "/dashboard/portfolio",  icon: PortfolioIcon },
   { label: "Templates", href: "/dashboard/templates",  icon: TemplatesIcon },
+  { label: "Links",     href: "/dashboard/links",      icon: LinksIcon },
   { label: "Sales",     href: "/dashboard/sales",      icon: SalesIcon,    soon: true },
   { label: "Clients",   href: "/dashboard/clients",    icon: ClientsIcon,  soon: true },
   { label: "Analytics", href: "/dashboard/analytics",  icon: AnalyticsIcon, soon: true },
