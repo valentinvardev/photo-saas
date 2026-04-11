@@ -82,6 +82,61 @@ export default function SettingsPage() {
       {/* ── ACCOUNT ── */}
       {tab === "Account" && (
         <>
+          <Section title="Your identity" description="How you appear in the community chat and across the platform.">
+            <div className="px-6 py-5 flex flex-col gap-4">
+              {/* Avatar row */}
+              <div className="flex items-center gap-4">
+                <div className="relative group w-14 h-14 shrink-0">
+                  <div className="w-14 h-14 rounded-full bg-yellow flex items-center justify-center ring-2 ring-[var(--border)]">
+                    <span className="font-sans font-black text-[#111] text-xl">S</span>
+                  </div>
+                  <button className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" /><circle cx="12" cy="13" r="4" />
+                    </svg>
+                  </button>
+                </div>
+                <div>
+                  <p className="font-sans text-sm font-medium text-[var(--fg)]">Profile photo</p>
+                  <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">JPG, PNG or WebP · max 4 MB</p>
+                  <button className="mt-2 font-sans text-xs font-semibold bg-yellow text-[#111] px-3 py-1.5 rounded-lg hover:bg-yellow-dark transition-colors">
+                    Upload photo
+                  </button>
+                </div>
+              </div>
+
+              {/* Name row */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-sans text-xs font-semibold text-[var(--fg-secondary)] mb-1.5">First name</label>
+                  <input className={`${inputCls} w-full`} defaultValue="Sofia" />
+                </div>
+                <div>
+                  <label className="block font-sans text-xs font-semibold text-[var(--fg-secondary)] mb-1.5">Last name</label>
+                  <input className={`${inputCls} w-full`} defaultValue="Chen" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-sans text-xs font-semibold text-[var(--fg-secondary)] mb-1.5">Username</label>
+                <div className="flex items-center gap-0">
+                  <span className="font-mono text-sm text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-r-0 border-[var(--border)] px-3 py-2 rounded-l-lg select-none">@</span>
+                  <input className={`${inputCls} w-full rounded-l-none`} defaultValue="sofia.chen" />
+                </div>
+                <p className="mt-1.5 font-sans text-[11px] text-[var(--fg-muted)]">Shown in the community chat and on your public portfolio URL.</p>
+              </div>
+
+              <div>
+                <label className="block font-sans text-xs font-semibold text-[var(--fg-secondary)] mb-1.5">Bio</label>
+                <textarea
+                  className={`${inputCls} w-full resize-none`}
+                  rows={2}
+                  defaultValue="Documentary and portrait photographer based in New York."
+                />
+              </div>
+            </div>
+          </Section>
+
           <Section title="Email address">
             <div className="px-6 py-4 flex flex-col gap-3">
               <input className={`${inputCls} w-full`} defaultValue="sofia@example.com" type="email" />

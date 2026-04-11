@@ -224,8 +224,17 @@ function ProfileDropdown({ onClose }: { onClose: () => void }) {
   );
 }
 
+/* ── Chat icon ──────────────────────────────────────────── */
+function ChatIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+    </svg>
+  );
+}
+
 /* ── Main header ────────────────────────────────────────── */
-export function DashboardHeader({ onMenuClick }: { onMenuClick?: () => void }) {
+export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenuClick?: () => void; onChatClick?: () => void; chatOpen?: boolean }) {
   const pathname = usePathname();
   const { theme } = useTheme();
 
@@ -297,6 +306,17 @@ export function DashboardHeader({ onMenuClick }: { onMenuClick?: () => void }) {
           Withdraw
         </button>
       </div>
+
+      {/* Chat */}
+      <button
+        onClick={onChatClick}
+        className={`relative p-2 rounded-lg transition-colors ${chatOpen ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
+        aria-label="Community chat"
+      >
+        <ChatIcon />
+        {/* online dot */}
+        <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full ring-2 ring-[var(--bg-card)]" />
+      </button>
 
       {/* Notifications */}
       <div ref={notifRef} className="relative">
