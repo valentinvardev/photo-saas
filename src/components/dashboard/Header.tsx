@@ -81,13 +81,50 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard/profile":   "Profile",
 };
 
+/* ── Notification icons ─────────────────────────────────── */
+function NotifIconSale() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+    </svg>
+  );
+}
+function NotifIconView() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+function NotifIconExport() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+}
+function NotifIconStar() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
+}
+function NotifIconStorage() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+    </svg>
+  );
+}
+
 /* ── Notifications data ─────────────────────────────────── */
 const NOTIFICATIONS = [
-  { id: 1, icon: "💰", title: "New sale",            body: "Portrait session license — $120.00", time: "2m ago",  unread: true  },
-  { id: 2, icon: "👁️", title: "Portfolio viewed",     body: "Someone from Berlin viewed your work", time: "1h ago",  unread: true  },
-  { id: 3, icon: "📦", title: "Export ready",         body: "Wedding_final — 47 photos zipped",    time: "3h ago",  unread: false },
-  { id: 4, icon: "⭐", title: "Review received",      body: "5 stars — \"Absolutely stunning!\"",  time: "1d ago",  unread: false },
-  { id: 5, icon: "🔔", title: "Storage at 48%",       body: "2.4 TB of 5 TB used",                 time: "2d ago",  unread: false },
+  { id: 1, Icon: NotifIconSale,    title: "New sale",          body: "Portrait session license — $120.00",  time: "2m ago",  unread: true  },
+  { id: 2, Icon: NotifIconView,    title: "Portfolio viewed",  body: "Someone from Berlin viewed your work", time: "1h ago",  unread: true  },
+  { id: 3, Icon: NotifIconExport,  title: "Export ready",      body: "Wedding_final — 47 photos zipped",    time: "3h ago",  unread: false },
+  { id: 4, Icon: NotifIconStar,    title: "Review received",   body: "5 stars — \"Absolutely stunning!\"",  time: "1d ago",  unread: false },
+  { id: 5, Icon: NotifIconStorage, title: "Storage at 48%",    body: "2.4 TB of 5 TB used",                 time: "2d ago",  unread: false },
 ];
 
 /* ── Notification panel ─────────────────────────────────── */
@@ -107,9 +144,11 @@ function NotificationPanel({ onClose }: { onClose: () => void }) {
           <button
             key={n.id}
             onClick={onClose}
-            className="w-full flex gap-3 px-4 py-3 text-left hover:bg-[var(--bg-subtle)] transition-colors"
+            className="w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-[var(--bg-subtle)] transition-colors"
           >
-            <span className="text-base leading-none mt-0.5 shrink-0">{n.icon}</span>
+            <span className="shrink-0 mt-0.5 w-7 h-7 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)]">
+              <n.Icon />
+            </span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-sans text-xs font-semibold text-[var(--fg)]">{n.title}</span>
