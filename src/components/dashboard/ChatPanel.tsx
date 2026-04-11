@@ -245,12 +245,14 @@ function Avatar({ initials, color, size = 28 }: { initials: string; color: strin
 const STATUS_COLOR: Record<Member["status"], string> = { online: "#22c55e", away: "#f59e0b", offline: "#6b7280" };
 const STATUS_LABEL: Record<Member["status"], string> = { online: "Online", away: "Away", offline: "Offline" };
 
-function StatusDot({ status, ring = true }: { status: Member["status"]; ring?: boolean }) {
+/* Border gives the "cutout" effect — no box-shadow so there's no double ring */
+function StatusDot({ status }: { status: Member["status"] }) {
   return (
     <span style={{
-      width: 8, height: 8, borderRadius: "50%", background: STATUS_COLOR[status],
-      flexShrink: 0, display: "inline-block",
-      boxShadow: ring ? `0 0 0 2px var(--bg-card)` : "none",
+      width: 10, height: 10, borderRadius: "50%",
+      background: STATUS_COLOR[status],
+      display: "block",
+      border: "2px solid var(--bg-card)",
     }} />
   );
 }
@@ -412,6 +414,39 @@ function MessageContent({ msg, onExternalLink }: { msg: Message; onExternalLink:
 }
 
 /* ═══════════════════════════════════════════
+   FOLLOW BUTTON + MESSAGE ICON
+═══════════════════════════════════════════ */
+function MessageBtnIcon() {
+  return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>;
+}
+
+function FollowButton() {
+  const [following, setFollowing] = useState(false);
+  return (
+    <button
+      onClick={() => setFollowing((p) => !p)}
+      className={`flex items-center justify-center gap-1.5 flex-1 font-sans text-xs font-semibold py-2 rounded-xl transition-all ${
+        following
+          ? "bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-red-500 hover:border-red-500/30"
+          : "bg-yellow text-[#111] hover:bg-yellow-dark"
+      }`}
+    >
+      {following ? (
+        <>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Following
+        </>
+      ) : (
+        <>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Follow
+        </>
+      )}
+    </button>
+  );
+}
+
+/* ═══════════════════════════════════════════
    PROFILE VIEW
 ═══════════════════════════════════════════ */
 function ProfileView({ member, onBack, onExternalLink }: { member: Member; onBack: () => void; onExternalLink: (url: string) => void }) {
@@ -432,9 +467,10 @@ function ProfileView({ member, onBack, onExternalLink }: { member: Member; onBac
       <div className="px-4 py-5 flex flex-col gap-5">
         {/* Avatar + identity */}
         <div className="flex flex-col items-center text-center gap-3">
-          <div className="relative">
+          <div className="relative inline-flex">
             <Avatar initials={member.initials} color={member.color} size={64} />
-            <span className="absolute -bottom-0.5 -right-0.5 ring-2 ring-[var(--bg-card)] rounded-full">
+            {/* Dot sits at the bottom-right of the circle, no double ring */}
+            <span className="absolute bottom-0 right-0 rounded-full">
               <StatusDot status={member.status} />
             </span>
           </div>
@@ -447,6 +483,16 @@ function ProfileView({ member, onBack, onExternalLink }: { member: Member; onBac
             </div>
           </div>
         </div>
+
+        {/* Action buttons — only for other members */}
+        {member.role !== "You" && (
+          <div className="flex gap-2">
+            <FollowButton />
+            <button className="flex items-center justify-center gap-1.5 flex-1 font-sans text-xs font-semibold border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] py-2 rounded-xl transition-colors">
+              <MessageBtnIcon /> Message
+            </button>
+          </div>
+        )}
 
         {/* Meta */}
         <div className="flex flex-col gap-1.5">
@@ -521,9 +567,9 @@ function MemberList({ onViewProfile }: { onViewProfile: (m: Member) => void }) {
                 onClick={() => onViewProfile(m)}
                 className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors w-full text-left"
               >
-                <div className="relative shrink-0">
+                <div className="relative shrink-0 inline-flex">
                   <Avatar initials={m.initials} color={m.color} size={30} />
-                  <span className="absolute -bottom-0.5 -right-0.5 ring-2 ring-[var(--bg-card)] rounded-full">
+                  <span className="absolute bottom-0 right-0 rounded-full">
                     <StatusDot status={m.status} />
                   </span>
                 </div>

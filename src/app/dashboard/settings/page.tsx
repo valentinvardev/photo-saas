@@ -358,35 +358,77 @@ export default function SettingsPage() {
 
       {/* ── INTEGRATIONS ── */}
       {tab === "Integrations" && (
-        <Section title="Connected apps">
-          {[
-            { name: "Google Drive",   icon: "🗂️", desc: "Sync and backup photos automatically.",  connected: true  },
-            { name: "Lightroom",      icon: "🌅", desc: "Import edited photos directly from LR.",  connected: true  },
-            { name: "Instagram",      icon: "📸", desc: "Cross-post portfolio images.",             connected: false },
-            { name: "Stripe",         icon: "💳", desc: "Process payments and withdrawals.",        connected: true  },
-            { name: "Dropbox",        icon: "📦", desc: "Alternative cloud backup.",                connected: false },
-            { name: "Mailchimp",      icon: "📧", desc: "Email marketing for client newsletters.", connected: false },
-          ].map((app) => (
-            <Row key={app.name} label={app.name} hint={app.desc}>
-              <div className="flex items-center gap-3">
-                {app.connected && (
-                  <span className="font-sans text-[10px] text-green-500 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full">
-                    Connected
-                  </span>
-                )}
-                <button
-                  className={`font-sans text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
-                    app.connected
-                      ? "text-red-500 border-red-500/20 hover:bg-red-500/10"
-                      : "text-[var(--fg-muted)] border-[var(--border)] hover:text-[var(--fg)]"
-                  }`}
-                >
-                  {app.connected ? "Disconnect" : "Connect"}
-                </button>
+        <>
+          {/* MercadoPago — featured payment connect */}
+          <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-[var(--border)] flex items-center justify-between">
+              <div>
+                <h2 className="font-sans text-sm font-semibold text-[var(--fg)]">MercadoPago</h2>
+                <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">Accept payments in Latin America — cards, wallets, Pix and more.</p>
               </div>
-            </Row>
-          ))}
-        </Section>
+              {/* MP logo wordmark using brand colors */}
+              <div className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#009ee3]/10 border border-[#009ee3]/20">
+                <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="16" fill="#009ee3"/>
+                  <path d="M8 16c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                  <circle cx="16" cy="16" r="3" fill="white"/>
+                </svg>
+                <span className="font-sans font-bold text-[11px] text-[#009ee3]">MercadoPago</span>
+              </div>
+            </div>
+            <div className="px-6 py-5 flex flex-col gap-4">
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: "Cards", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+                  { label: "Pix",   icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> },
+                  { label: "Wallet",icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3h-8l-4 4h16l-4-4z"/><circle cx="17" cy="13" r="1"/></svg> },
+                ].map((f) => (
+                  <div key={f.label} className="flex flex-col items-center gap-1.5 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg py-3 text-[var(--fg-muted)]">
+                    {f.icon}
+                    <span className="font-sans text-[11px]">{f.label}</span>
+                  </div>
+                ))}
+              </div>
+              <button className="w-full font-sans text-sm font-semibold py-2.5 rounded-xl transition-all bg-[#009ee3] hover:bg-[#0088cc] text-white flex items-center justify-center gap-2">
+                <svg width="15" height="15" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="white" fillOpacity="0.2"/><path d="M8 16c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="white" strokeWidth="2.5" strokeLinecap="round"/><circle cx="16" cy="16" r="3" fill="white"/></svg>
+                Connect MercadoPago
+              </button>
+              <p className="font-sans text-[11px] text-[var(--fg-muted)] text-center">
+                You'll be redirected to MercadoPago to authorize the connection. No card details are stored on FRAME.
+              </p>
+            </div>
+          </div>
+
+          <Section title="Connected apps">
+            {[
+              { name: "Google Drive", desc: "Sync and backup photos automatically.",  connected: true  },
+              { name: "Lightroom",    desc: "Import edited photos directly from LR.",  connected: true  },
+              { name: "Instagram",    desc: "Cross-post portfolio images.",             connected: false },
+              { name: "Stripe",       desc: "Process payments and withdrawals.",        connected: true  },
+              { name: "Dropbox",      desc: "Alternative cloud backup.",                connected: false },
+              { name: "Mailchimp",    desc: "Email marketing for client newsletters.", connected: false },
+            ].map((app) => (
+              <Row key={app.name} label={app.name} hint={app.desc}>
+                <div className="flex items-center gap-3">
+                  {app.connected && (
+                    <span className="font-sans text-[10px] text-green-500 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full">
+                      Connected
+                    </span>
+                  )}
+                  <button
+                    className={`font-sans text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
+                      app.connected
+                        ? "text-red-500 border-red-500/20 hover:bg-red-500/10"
+                        : "text-[var(--fg-muted)] border-[var(--border)] hover:text-[var(--fg)]"
+                    }`}
+                  >
+                    {app.connected ? "Disconnect" : "Connect"}
+                  </button>
+                </div>
+              </Row>
+            ))}
+          </Section>
+        </>
       )}
 
       {/* Save row — not shown on Billing or Integrations */}
