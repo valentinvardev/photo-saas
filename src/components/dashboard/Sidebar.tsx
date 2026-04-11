@@ -97,6 +97,14 @@ const navMain = [
   { label: "Analytics", href: "/dashboard/analytics",  icon: AnalyticsIcon, soon: true },
 ];
 
+function ProfileIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
 function NavItem({ label, href, icon: Icon, soon }: { label: string; href: string; icon: () => React.ReactNode; soon?: boolean }) {
   const pathname = usePathname();
   const active = pathname.startsWith(href);
@@ -129,7 +137,6 @@ function NavItem({ label, href, icon: Icon, soon }: { label: string; href: strin
 }
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
-  const { theme, toggle } = useTheme();
 
   return (
     <div className="flex flex-col h-full bg-[var(--bg-card)] border-r border-[var(--border)]">
@@ -159,10 +166,11 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
       {/* Bottom */}
       <div className="px-2 py-3 border-t border-[var(--border)] space-y-0.5">
+        <NavItem label="Profile"  href="/dashboard/profile"  icon={ProfileIcon} />
         <NavItem label="Settings" href="/dashboard/settings" icon={SettingsIcon} />
 
-        {/* User + theme */}
-        <div className="flex items-center gap-2 px-3 py-2.5 mt-1">
+        {/* User row */}
+        <Link href="/dashboard/profile" className="flex items-center gap-2 px-3 py-2.5 mt-1 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors group">
           <div className="w-7 h-7 rounded-full bg-yellow flex items-center justify-center shrink-0">
             <span className="font-sans font-black text-[#111] text-[10px]">S</span>
           </div>
@@ -170,14 +178,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
             <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">Sofia Chen</div>
             <div className="font-mono text-[10px] text-[var(--fg-muted)] truncate">sofia@example.com</div>
           </div>
-          <button
-            onClick={toggle}
-            className="shrink-0 w-7 h-7 flex items-center justify-center rounded-md text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-          </button>
-        </div>
+        </Link>
       </div>
     </div>
   );
