@@ -77,8 +77,33 @@ function MobileFrame({ contentRef }: { contentRef: React.RefObject<HTMLDivElemen
           ].join(", "),
         }}
       >
-        {/* Top bar — Dynamic Island area */}
+        {/* Top bar — Status bar + Dynamic Island */}
         <div style={{ height: 50, display: "flex", justifyContent: "center", alignItems: "center", position: "relative" }}>
+          {/* Status bar — left: time */}
+          <span style={{
+            position: "absolute", left: 22, top: "50%", transform: "translateY(-50%)",
+            fontFamily: "'SF Pro Display', -apple-system, monospace",
+            fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.88)",
+            letterSpacing: "-0.03em", lineHeight: 1,
+          }}>9:41</span>
+
+          {/* Status bar — right: WiFi + Battery */}
+          <div style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: 5 }}>
+            {/* WiFi */}
+            <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+              <path d="M7.5 10a1 1 0 100-2 1 1 0 000 2z" fill="rgba(255,255,255,0.85)"/>
+              <path d="M4.8 7.6a3.8 3.8 0 015.4 0" stroke="rgba(255,255,255,0.85)" strokeWidth="1.3" strokeLinecap="round"/>
+              <path d="M2.4 5.2a6.5 6.5 0 0110.2 0" stroke="rgba(255,255,255,0.85)" strokeWidth="1.3" strokeLinecap="round"/>
+              <path d="M0 2.8A10 10 0 0115 2.8" stroke="rgba(255,255,255,0.85)" strokeWidth="1.3" strokeLinecap="round"/>
+            </svg>
+            {/* Battery */}
+            <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+              <rect x="0.5" y="0.5" width="18" height="10" rx="2.5" stroke="rgba(255,255,255,0.6)" strokeWidth="1"/>
+              <rect x="2" y="2" width="13" height="7" rx="1.5" fill="rgba(255,255,255,0.88)"/>
+              <path d="M19.5 3.5v4c.8-.3 1.5-1 1.5-2s-.7-1.7-1.5-2z" fill="rgba(255,255,255,0.55)"/>
+            </svg>
+          </div>
+
           {/* Speaker grille top */}
           <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%) translateX(-52px)", width: 22, height: 4, background: "#111", borderRadius: 2, opacity: 0.6 }} />
           {/* Dynamic Island */}

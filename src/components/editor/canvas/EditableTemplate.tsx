@@ -123,19 +123,6 @@ const WORKS = [
   { id: 12, seed: 167, title: "Anonymous",         year: "2024", cat: "Portrait",    w: 4000, h: 5000 },
 ];
 
-const STATS = [
-  { value: "14",   unit: "Years"    },
-  { value: "280+", unit: "Projects" },
-  { value: "9",    unit: "Cities"   },
-];
-
-const PRESS = [
-  { name: "The New Yorker", year: "2023" },
-  { name: "Aperture",       year: "2022" },
-  { name: "Foam Magazine",  year: "2022" },
-  { name: "Zeit Magazin",   year: "2021" },
-  { name: "LensCulture",    year: "2020" },
-];
 
 type Work = typeof WORKS[0];
 
@@ -521,27 +508,21 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           </div>
         </div>
 
-        {/* Right — stacked photos (hidden on mobile) */}
+        {/* Right — stacked photos (desktop/tablet editable, mobile single) */}
         {!isMobile && (
           <div style={{ display: "grid", gridTemplateRows: "60% 40%", gap: "3px" }}>
-            <div style={{ position: "relative", overflow: "hidden" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://picsum.photos/seed/201/900/1100?grayscale" alt=""
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.88)" }} />
-            </div>
-            <div style={{ position: "relative", overflow: "hidden" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://picsum.photos/seed/202/900/700?grayscale" alt=""
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.82)" }} />
-            </div>
+            <EditableNode id="hero-image-1" style={{ overflow: "hidden" }}>
+              <EditableImage id="hero-image-1" imgStyle={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.88)" }} />
+            </EditableNode>
+            <EditableNode id="hero-image-2" style={{ overflow: "hidden" }}>
+              <EditableImage id="hero-image-2" imgStyle={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.82)" }} />
+            </EditableNode>
           </div>
         )}
         {isMobile && (
-          <div style={{ position: "relative", overflow: "hidden", height: "50vw", minHeight: "220px" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://picsum.photos/seed/201/900/600?grayscale" alt=""
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.88)" }} />
-          </div>
+          <EditableNode id="hero-image-1" style={{ overflow: "hidden", height: "50vw", minHeight: "220px" }}>
+            <EditableImage id="hero-image-1" imgStyle={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.88)" }} />
+          </EditableNode>
         )}
       </section>
 
@@ -612,10 +593,14 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
             <EditableText id="about-body-2" />
           </EditableNode>
           <div style={{ display: "flex", gap: isMobile ? "2rem" : "3rem", paddingTop: "2rem", borderTop: "1px solid #e0e0e0" }}>
-            {STATS.map((s) => (
-              <div key={s.value}>
-                <div style={{ fontFamily: "var(--tpl-serif,serif)", fontSize: isMobile ? "28px" : "36px", fontWeight: 300, color: "var(--ed-fg, #0a0a0a)", lineHeight: 1 }}>{s.value}</div>
-                <div style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", color: "#888", marginTop: "4px" }}>{s.unit}</div>
+            {([["stat-1-value","stat-1-label"],["stat-2-value","stat-2-label"],["stat-3-value","stat-3-label"]] as const).map(([vId, lId]) => (
+              <div key={vId}>
+                <EditableNode id={vId} style={{ fontFamily: "var(--tpl-serif,serif)", fontSize: isMobile ? "28px" : "36px", fontWeight: 300, color: "var(--ed-fg, #0a0a0a)", lineHeight: 1 }}>
+                  <EditableText id={vId} />
+                </EditableNode>
+                <EditableNode id={lId} style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", color: "#888", marginTop: "4px" }}>
+                  <EditableText id={lId} />
+                </EditableNode>
               </div>
             ))}
           </div>
@@ -631,7 +616,9 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
             />
           </div>
           <div style={{ position: "absolute", bottom: "-16px", right: "0", zIndex: 2, background: "var(--ed-bg, #fafafa)", padding: "7px 12px", border: "1px solid #e8e8e8" }}>
-            <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase" }}>Brooklyn, NY · 2024</span>
+            <EditableNode id="about-caption" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase" }}>
+              <EditableText id="about-caption" />
+            </EditableNode>
           </div>
         </EditableNode>
       </section>
@@ -640,12 +627,19 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       <section id="press" style={{ padding: `${isMobile ? "3.5rem" : "5rem"} ${px}`, background: "#f2f2f0", borderTop: "1px solid #e0e0e0" }}>
         <Label index="03" text="Press &amp; Features" />
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : isTablet ? "repeat(3,1fr)" : "repeat(5,1fr)", gap: "1px", background: "#d8d8d8" }}>
-          {(isMobile ? PRESS.slice(0, 4) : PRESS).map((p) => (
-            <div key={p.name} style={{ background: "#f2f2f0", padding: isMobile ? "1.25rem" : "2rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-              <span style={{ fontFamily: "var(--tpl-serif,serif)", fontSize: isMobile ? "15px" : "18px", fontWeight: 400, color: "var(--ed-fg, #0a0a0a)", lineHeight: 1.2 }}>{p.name}</span>
-              <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "#aaa", letterSpacing: "0.15em" }}>{p.year}</span>
-            </div>
-          ))}
+          {(["press-1","press-2","press-3","press-4","press-5"] as const).map((id, i) => {
+            if (isMobile && i >= 4) return null;
+            return (
+              <div key={id} style={{ background: "var(--ed-bg, #f2f2f0)", padding: isMobile ? "1.25rem" : "2rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                <EditableNode id={id} style={{ fontFamily: "var(--tpl-serif,serif)", fontSize: isMobile ? "15px" : "18px", fontWeight: 400, color: "var(--ed-fg, #0a0a0a)", lineHeight: 1.2 }}>
+                  <EditableText id={id} />
+                </EditableNode>
+                <EditableNode id={`${id}-year`} style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "#aaa", letterSpacing: "0.15em" }}>
+                  <EditableText id={`${id}-year`} />
+                </EditableNode>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -704,7 +698,11 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
         <EditableNode id="nav-logo" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--ed-fg, #0a0a0a)", textTransform: "uppercase" }}>
           <EditableText id="nav-logo" />
         </EditableNode>
-        {!isMobile && <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#bbb", letterSpacing: "0.12em" }}>© 2025 James Hollis Photography</span>}
+        {!isMobile && (
+          <EditableNode id="footer-copyright" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#bbb", letterSpacing: "0.12em" }}>
+            <EditableText id="footer-copyright" />
+          </EditableNode>
+        )}
         <div style={{ display: "flex", gap: "1.25rem", alignItems: "center" }}>
           {[
             { label: "Instagram", href: "#", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/></svg> },
@@ -720,7 +718,11 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
             </a>
           ))}
         </div>
-        {isMobile && <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#bbb", letterSpacing: "0.1em" }}>© 2025 James Hollis Photography</span>}
+        {isMobile && (
+          <EditableNode id="footer-copyright" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#bbb", letterSpacing: "0.1em" }}>
+            <EditableText id="footer-copyright" />
+          </EditableNode>
+        )}
       </footer>
 
       {galleryOpen && <GalleryModal onClose={() => setGalleryOpen(false)} />}

@@ -62,14 +62,16 @@ function ImageNodeIcon() {
 const SECTIONS: SectionDef[] = [
   {
     id: "section-nav", label: "Navigation", icon: <NavIcon />, locked: true,
-    elements: [{ nodeId: "nav-logo", label: "Logo text", type: "text" }],
+    elements: [{ nodeId: "nav-logo", label: "Logo", type: "text" }],
   },
   {
     id: "section-hero", label: "Hero", icon: <HeroIcon />, locked: false,
     elements: [
-      { nodeId: "hero-heading", label: "Heading",      type: "text" },
-      { nodeId: "hero-sub",     label: "Subtitle",     type: "text" },
-      { nodeId: "hero-avail",   label: "Availability", type: "text" },
+      { nodeId: "hero-heading",  label: "Heading",       type: "text"  },
+      { nodeId: "hero-sub",      label: "Subtitle",      type: "text"  },
+      { nodeId: "hero-avail",    label: "Availability",  type: "text"  },
+      { nodeId: "hero-image-1",  label: "Main image",    type: "image" },
+      { nodeId: "hero-image-2",  label: "Second image",  type: "image" },
     ],
   },
   {
@@ -86,15 +88,33 @@ const SECTIONS: SectionDef[] = [
   {
     id: "about", label: "About", icon: <UserIcon />, locked: false,
     elements: [
-      { nodeId: "about-heading", label: "Heading",     type: "text"  },
-      { nodeId: "about-body-1",  label: "Paragraph 1", type: "text"  },
-      { nodeId: "about-body-2",  label: "Paragraph 2", type: "text"  },
-      { nodeId: "about-image",   label: "Portrait",    type: "image" },
+      { nodeId: "about-heading",  label: "Heading",     type: "text"  },
+      { nodeId: "about-body-1",   label: "Paragraph 1", type: "text"  },
+      { nodeId: "about-body-2",   label: "Paragraph 2", type: "text"  },
+      { nodeId: "stat-1-value",   label: "Stat 1 — val", type: "text" },
+      { nodeId: "stat-1-label",   label: "Stat 1 — lbl", type: "text" },
+      { nodeId: "stat-2-value",   label: "Stat 2 — val", type: "text" },
+      { nodeId: "stat-2-label",   label: "Stat 2 — lbl", type: "text" },
+      { nodeId: "stat-3-value",   label: "Stat 3 — val", type: "text" },
+      { nodeId: "stat-3-label",   label: "Stat 3 — lbl", type: "text" },
+      { nodeId: "about-image",    label: "Portrait",    type: "image" },
+      { nodeId: "about-caption",  label: "Caption",     type: "text"  },
     ],
   },
   {
     id: "press", label: "Press", icon: <PaperIcon />, locked: false,
-    elements: [],
+    elements: [
+      { nodeId: "press-1",      label: "Publication 1", type: "text" },
+      { nodeId: "press-1-year", label: "Year 1",        type: "text" },
+      { nodeId: "press-2",      label: "Publication 2", type: "text" },
+      { nodeId: "press-2-year", label: "Year 2",        type: "text" },
+      { nodeId: "press-3",      label: "Publication 3", type: "text" },
+      { nodeId: "press-3-year", label: "Year 3",        type: "text" },
+      { nodeId: "press-4",      label: "Publication 4", type: "text" },
+      { nodeId: "press-4-year", label: "Year 4",        type: "text" },
+      { nodeId: "press-5",      label: "Publication 5", type: "text" },
+      { nodeId: "press-5-year", label: "Year 5",        type: "text" },
+    ],
   },
   {
     id: "contact", label: "Contact", icon: <MailIcon />, locked: false,
@@ -105,7 +125,10 @@ const SECTIONS: SectionDef[] = [
   },
   {
     id: "section-footer", label: "Footer", icon: <FooterIcon />, locked: true,
-    elements: [{ nodeId: "nav-logo", label: "Logo text", type: "text" }],
+    elements: [
+      { nodeId: "nav-logo",          label: "Logo",      type: "text" },
+      { nodeId: "footer-copyright",  label: "Copyright", type: "text" },
+    ],
   },
 ];
 
