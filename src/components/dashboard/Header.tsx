@@ -300,6 +300,11 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
 
       {/* Balance chip */}
       <div className="hidden sm:flex items-center gap-1.5 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg px-3 py-1.5 cursor-default select-none">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v1m0 8v1"/>
+          <path d="M15.2 9.8a3.2 3.2 0 00-3.2-1.8c-1.8 0-3 1-3 2.5s1.2 2.5 3 2.5 3 1 3 2.5-1.2 2.5-3 2.5a3.2 3.2 0 01-3.2-1.8"/>
+        </svg>
         <span className="text-[11px] text-[var(--fg-muted)] font-sans">Balance</span>
         <span className="font-mono text-xs font-semibold text-[var(--fg)]">{balance}</span>
         <button className="ml-1 text-[10px] font-sans font-semibold text-yellow hover:text-yellow-dark transition-colors">

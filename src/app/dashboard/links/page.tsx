@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 
 /* ══════════════════════════════════════════════════════════════════════════
    TYPES
@@ -14,162 +14,169 @@ interface LinkItem {
   enabled: boolean;
 }
 
-type BgType = "solid" | "gradient" | "image";
-type BtnShape = "square" | "rounded" | "pill";
+type BgType     = "solid" | "gradient" | "image";
+type BtnShape   = "square" | "rounded" | "pill";
 type BtnVariant = "filled" | "outline" | "glass";
 
 interface PageConfig {
-  displayName: string;
-  bio: string;
-  avatarBg: string;
+  displayName:   string;
+  bio:           string;
+  avatarBg:      string;
   avatarInitial: string;
-  bgType: BgType;
-  bgColor: string;
-  bgGradFrom: string;
-  bgGradTo: string;
-  bgGradAngle: number;
-  bgImageUrl: string;
-  btnShape: BtnShape;
-  btnVariant: BtnVariant;
-  btnBg: string;
-  btnText: string;
-  btnBorder: string;
-  fontFamily: string;
-  textColor: string;
-  subColor: string;
+  bgType:        BgType;
+  bgColor:       string;
+  bgGradFrom:    string;
+  bgGradTo:      string;
+  bgGradAngle:   number;
+  bgImageUrl:    string;
+  btnShape:      BtnShape;
+  btnVariant:    BtnVariant;
+  btnBg:         string;
+  btnText:       string;
+  btnBorder:     string;
+  fontFamily:    string;
+  fontWeight:    string;
+  textColor:     string;
+  subColor:      string;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
    CONSTANTS
 ══════════════════════════════════════════════════════════════════════════ */
 
-const FONTS = [
-  { label: "Inter",            value: "Inter, sans-serif" },
-  { label: "DM Sans",          value: "'DM Sans', sans-serif" },
-  { label: "Poppins",          value: "Poppins, sans-serif" },
-  { label: "Raleway",          value: "Raleway, sans-serif" },
-  { label: "Playfair Display", value: "'Playfair Display', serif" },
-  { label: "Lora",             value: "Lora, serif" },
-  { label: "Space Mono",       value: "'Space Mono', monospace" },
-  { label: "Bebas Neue",       value: "'Bebas Neue', cursive" },
+/* Each entry: label shown in UI, CSS font-family value, Google Fonts API name */
+const FONTS: { label: string; value: string; gfName: string }[] = [
+  { label: "Inter",              value: "Inter, sans-serif",                  gfName: "Inter" },
+  { label: "DM Sans",            value: "'DM Sans', sans-serif",              gfName: "DM Sans" },
+  { label: "Poppins",            value: "Poppins, sans-serif",                gfName: "Poppins" },
+  { label: "Outfit",             value: "Outfit, sans-serif",                 gfName: "Outfit" },
+  { label: "Nunito",             value: "Nunito, sans-serif",                 gfName: "Nunito" },
+  { label: "Montserrat",         value: "Montserrat, sans-serif",             gfName: "Montserrat" },
+  { label: "Work Sans",          value: "'Work Sans', sans-serif",            gfName: "Work Sans" },
+  { label: "Josefin Sans",       value: "'Josefin Sans', sans-serif",         gfName: "Josefin Sans" },
+  { label: "Raleway",            value: "Raleway, sans-serif",                gfName: "Raleway" },
+  { label: "Playfair Display",   value: "'Playfair Display', serif",          gfName: "Playfair Display" },
+  { label: "Cormorant Garamond", value: "'Cormorant Garamond', serif",        gfName: "Cormorant Garamond" },
+  { label: "Lora",               value: "Lora, serif",                        gfName: "Lora" },
+  { label: "Cinzel",             value: "Cinzel, serif",                      gfName: "Cinzel" },
+  { label: "Space Mono",         value: "'Space Mono', monospace",            gfName: "Space Mono" },
+  { label: "Source Code Pro",    value: "'Source Code Pro', monospace",       gfName: "Source Code Pro" },
+  { label: "Bebas Neue",         value: "'Bebas Neue', sans-serif",           gfName: "Bebas Neue" },
 ];
 
-type ThemePreset = {
-  name: string;
-  previewBg: string;
-  config: Partial<PageConfig>;
-};
+const FONT_WEIGHTS: { label: string; value: string }[] = [
+  { label: "Light",      value: "300" },
+  { label: "Regular",    value: "400" },
+  { label: "Medium",     value: "500" },
+  { label: "Semibold",   value: "600" },
+  { label: "Bold",       value: "700" },
+  { label: "Extrabold",  value: "800" },
+];
+
+type ThemePreset = { name: string; previewBg: string; config: Partial<PageConfig> };
 
 const THEMES: ThemePreset[] = [
   {
-    name: "Dark",
-    previewBg: "#111111",
-    config: {
-      bgType: "solid", bgColor: "#111111",
-      btnShape: "rounded", btnVariant: "outline",
+    name: "Dark", previewBg: "#111111",
+    config: { bgType: "solid", bgColor: "#111111", btnShape: "rounded", btnVariant: "outline",
       btnBg: "#111111", btnText: "#ffffff", btnBorder: "#ffffff",
-      textColor: "#ffffff", subColor: "#999999", fontFamily: "Inter, sans-serif",
-    },
+      textColor: "#ffffff", subColor: "#999999", fontFamily: "Inter, sans-serif", fontWeight: "400" },
   },
   {
-    name: "Light",
-    previewBg: "#f8f8f8",
-    config: {
-      bgType: "solid", bgColor: "#f8f8f8",
-      btnShape: "pill", btnVariant: "filled",
+    name: "Light", previewBg: "#f8f8f8",
+    config: { bgType: "solid", bgColor: "#f8f8f8", btnShape: "pill", btnVariant: "filled",
       btnBg: "#111111", btnText: "#ffffff", btnBorder: "#111111",
-      textColor: "#111111", subColor: "#666666", fontFamily: "Inter, sans-serif",
-    },
+      textColor: "#111111", subColor: "#666666", fontFamily: "Inter, sans-serif", fontWeight: "400" },
   },
   {
-    name: "Sunset",
-    previewBg: "linear-gradient(135deg,#f5a623,#d0021b)",
-    config: {
-      bgType: "gradient", bgGradFrom: "#f5a623", bgGradTo: "#d0021b", bgGradAngle: 135,
-      btnShape: "pill", btnVariant: "glass",
-      btnBg: "#f5a623", btnText: "#ffffff", btnBorder: "rgba(255,255,255,0.4)",
-      textColor: "#ffffff", subColor: "rgba(255,255,255,0.75)", fontFamily: "Raleway, sans-serif",
-    },
+    name: "Sunset", previewBg: "linear-gradient(135deg,#f5a623,#d0021b)",
+    config: { bgType: "gradient", bgGradFrom: "#f5a623", bgGradTo: "#d0021b", bgGradAngle: 135,
+      btnShape: "pill", btnVariant: "glass", btnBg: "#f5a623", btnText: "#ffffff", btnBorder: "rgba(255,255,255,0.4)",
+      textColor: "#ffffff", subColor: "rgba(255,255,255,0.75)", fontFamily: "Raleway, sans-serif", fontWeight: "600" },
   },
   {
-    name: "Ocean",
-    previewBg: "linear-gradient(160deg,#0f2027,#2980b9)",
-    config: {
-      bgType: "gradient", bgGradFrom: "#0f2027", bgGradTo: "#2980b9", bgGradAngle: 160,
-      btnShape: "rounded", btnVariant: "glass",
-      btnBg: "#2980b9", btnText: "#ffffff", btnBorder: "rgba(255,255,255,0.3)",
-      textColor: "#ffffff", subColor: "rgba(255,255,255,0.65)", fontFamily: "'DM Sans', sans-serif",
-    },
+    name: "Ocean", previewBg: "linear-gradient(160deg,#0f2027,#2980b9)",
+    config: { bgType: "gradient", bgGradFrom: "#0f2027", bgGradTo: "#2980b9", bgGradAngle: 160,
+      btnShape: "rounded", btnVariant: "glass", btnBg: "#2980b9", btnText: "#ffffff", btnBorder: "rgba(255,255,255,0.3)",
+      textColor: "#ffffff", subColor: "rgba(255,255,255,0.65)", fontFamily: "'DM Sans', sans-serif", fontWeight: "500" },
   },
   {
-    name: "Rose",
-    previewBg: "linear-gradient(135deg,#fce4ec,#f48fb1)",
-    config: {
-      bgType: "gradient", bgGradFrom: "#fce4ec", bgGradTo: "#f48fb1", bgGradAngle: 135,
-      btnShape: "pill", btnVariant: "filled",
-      btnBg: "#e91e63", btnText: "#ffffff", btnBorder: "#e91e63",
-      textColor: "#880e4f", subColor: "#ad1457", fontFamily: "Lora, serif",
-    },
+    name: "Rose", previewBg: "linear-gradient(135deg,#fce4ec,#f48fb1)",
+    config: { bgType: "gradient", bgGradFrom: "#fce4ec", bgGradTo: "#f48fb1", bgGradAngle: 135,
+      btnShape: "pill", btnVariant: "filled", btnBg: "#e91e63", btnText: "#ffffff", btnBorder: "#e91e63",
+      textColor: "#880e4f", subColor: "#ad1457", fontFamily: "Lora, serif", fontWeight: "400" },
   },
   {
-    name: "Forest",
-    previewBg: "#1a2e1a",
-    config: {
-      bgType: "solid", bgColor: "#1a2e1a",
-      btnShape: "square", btnVariant: "filled",
+    name: "Forest", previewBg: "#1a2e1a",
+    config: { bgType: "solid", bgColor: "#1a2e1a", btnShape: "square", btnVariant: "filled",
       btnBg: "#2d5a2d", btnText: "#e8f5e9", btnBorder: "#4caf50",
-      textColor: "#e8f5e9", subColor: "#a5d6a7", fontFamily: "Lora, serif",
-    },
+      textColor: "#e8f5e9", subColor: "#a5d6a7", fontFamily: "Lora, serif", fontWeight: "400" },
   },
   {
-    name: "Midnight",
-    previewBg: "linear-gradient(180deg,#0a0a1a,#1a1a3e)",
-    config: {
-      bgType: "gradient", bgGradFrom: "#0a0a1a", bgGradTo: "#1a1a3e", bgGradAngle: 180,
-      btnShape: "pill", btnVariant: "filled",
-      btnBg: "#7c3aed", btnText: "#ffffff", btnBorder: "#7c3aed",
-      textColor: "#ffffff", subColor: "#a78bfa", fontFamily: "Poppins, sans-serif",
-    },
+    name: "Midnight", previewBg: "linear-gradient(180deg,#0a0a1a,#1a1a3e)",
+    config: { bgType: "gradient", bgGradFrom: "#0a0a1a", bgGradTo: "#1a1a3e", bgGradAngle: 180,
+      btnShape: "pill", btnVariant: "filled", btnBg: "#7c3aed", btnText: "#ffffff", btnBorder: "#7c3aed",
+      textColor: "#ffffff", subColor: "#a78bfa", fontFamily: "Poppins, sans-serif", fontWeight: "600" },
   },
   {
-    name: "Sand",
-    previewBg: "#fafaf9",
-    config: {
-      bgType: "solid", bgColor: "#fafaf9",
-      btnShape: "rounded", btnVariant: "outline",
+    name: "Sand", previewBg: "#fafaf9",
+    config: { bgType: "solid", bgColor: "#fafaf9", btnShape: "rounded", btnVariant: "outline",
       btnBg: "#fafaf9", btnText: "#292524", btnBorder: "#d6d3d1",
-      textColor: "#292524", subColor: "#78716c", fontFamily: "Poppins, sans-serif",
-    },
+      textColor: "#292524", subColor: "#78716c", fontFamily: "Poppins, sans-serif", fontWeight: "400" },
   },
 ];
 
 const DEFAULT_LINKS: LinkItem[] = [
-  { id: "1", type: "link",    title: "Portfolio website",  url: "https://sofia.frame.so",              enabled: true  },
-  { id: "2", type: "link",    title: "Instagram",          url: "https://instagram.com/sofiachenphoto", enabled: true  },
-  { id: "3", type: "link",    title: "Book a session",     url: "https://sofia.frame.so/book",          enabled: true  },
-  { id: "4", type: "link",    title: "Print shop",         url: "https://sofia.frame.so/prints",        enabled: false },
+  { id: "1", type: "link",    title: "Portfolio website",  url: "https://sofia.frame.so",               enabled: true  },
+  { id: "2", type: "link",    title: "Instagram",          url: "https://instagram.com/sofiachenphoto",  enabled: true  },
+  { id: "3", type: "link",    title: "Book a session",     url: "https://sofia.frame.so/book",           enabled: true  },
+  { id: "4", type: "link",    title: "Print shop",         url: "https://sofia.frame.so/prints",         enabled: false },
 ];
 
 const DEFAULT_CONFIG: PageConfig = {
-  displayName:  "Sofia Chen",
-  bio:          "Fine art & portrait photographer · Buenos Aires",
-  avatarBg:     "#fad502",
+  displayName:   "Sofia Chen",
+  bio:           "Fine art & portrait photographer · Buenos Aires",
+  avatarBg:      "#fad502",
   avatarInitial: "S",
-  bgType:       "solid",
-  bgColor:      "#111111",
-  bgGradFrom:   "#111111",
-  bgGradTo:     "#333333",
-  bgGradAngle:  135,
-  bgImageUrl:   "",
-  btnShape:     "rounded",
-  btnVariant:   "outline",
-  btnBg:        "#111111",
-  btnText:      "#ffffff",
-  btnBorder:    "#ffffff",
-  fontFamily:   "Inter, sans-serif",
-  textColor:    "#ffffff",
-  subColor:     "#999999",
+  bgType:        "solid",
+  bgColor:       "#111111",
+  bgGradFrom:    "#111111",
+  bgGradTo:      "#333333",
+  bgGradAngle:   135,
+  bgImageUrl:    "",
+  btnShape:      "rounded",
+  btnVariant:    "outline",
+  btnBg:         "#111111",
+  btnText:       "#ffffff",
+  btnBorder:     "#ffffff",
+  fontFamily:    "Inter, sans-serif",
+  fontWeight:    "400",
+  textColor:     "#ffffff",
+  subColor:      "#999999",
 };
+
+/* ══════════════════════════════════════════════════════════════════════════
+   GOOGLE FONT LOADER
+   Injects a <link> into <head> for the currently selected font.
+══════════════════════════════════════════════════════════════════════════ */
+
+function GoogleFontLoader({ fontFamily }: { fontFamily: string }) {
+  useEffect(() => {
+    const entry = FONTS.find((f) => f.value === fontFamily);
+    if (!entry) return;
+
+    const id = `gf-${entry.gfName.replace(/\s/g, "-").toLowerCase()}`;
+    if (document.getElementById(id)) return;
+
+    const link = document.createElement("link");
+    link.id   = id;
+    link.rel  = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${entry.gfName.replace(/ /g, "+")}:wght@300;400;500;600;700;800&display=swap`;
+    document.head.appendChild(link);
+  }, [fontFamily]);
+
+  return null;
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    ICONS
@@ -178,9 +185,9 @@ const DEFAULT_CONFIG: PageConfig = {
 function DragDots() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-      <circle cx="5" cy="4"  r="1.5"/><circle cx="11" cy="4"  r="1.5"/>
-      <circle cx="5" cy="8"  r="1.5"/><circle cx="11" cy="8"  r="1.5"/>
-      <circle cx="5" cy="12" r="1.5"/><circle cx="11" cy="12" r="1.5"/>
+      <circle cx="5" cy="4"  r="1.4"/><circle cx="11" cy="4"  r="1.4"/>
+      <circle cx="5" cy="8"  r="1.4"/><circle cx="11" cy="8"  r="1.4"/>
+      <circle cx="5" cy="12" r="1.4"/><circle cx="11" cy="12" r="1.4"/>
     </svg>
   );
 }
@@ -247,23 +254,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ColorRow({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function ColorRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div className="flex items-center gap-2">
       <span className="font-sans text-xs text-[var(--fg-muted)] flex-1 truncate">{label}</span>
       <label className="flex items-center gap-1.5 border border-[var(--border)] rounded-lg px-2 py-1 cursor-pointer hover:border-[var(--fg-muted)] transition-colors">
-        <span
-          className="w-4 h-4 rounded shrink-0 border border-black/10"
-          style={{ background: value }}
-        />
+        <span className="w-4 h-4 rounded shrink-0 border border-black/10" style={{ background: value }} />
         <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="sr-only" />
         <span className="font-mono text-[11px] text-[var(--fg)] w-14 select-none">{value}</span>
       </label>
@@ -271,6 +267,8 @@ function ColorRow({
   );
 }
 
+/* Fixed toggle: w-9 (36px) container, w-4 (16px) ball.
+   Unchecked: ball at x=2px. Checked: 36-16-2=18px → translate-x-[18px] */
 function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void }) {
   return (
     <button
@@ -278,13 +276,13 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
       role="switch"
       aria-checked={checked}
       onClick={onChange}
-      className={`relative w-8 h-[18px] rounded-full transition-colors shrink-0 ${
-        checked ? "bg-yellow" : "bg-[var(--bg-subtle)]"
+      className={`relative w-9 h-5 rounded-full transition-colors shrink-0 ${
+        checked ? "bg-yellow" : "bg-[var(--bg-subtle)] border border-[var(--border)]"
       }`}
     >
       <span
-        className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform ${
-          checked ? "translate-x-[18px]" : "translate-x-[2px]"
+        className={`absolute top-[2px] w-4 h-4 rounded-full shadow transition-transform duration-150 ${
+          checked ? "bg-[#111] translate-x-[18px]" : "bg-[var(--fg-muted)] translate-x-[2px]"
         }`}
       />
     </button>
@@ -292,7 +290,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   LINKS TAB
+   LINKS TAB  –  with real HTML5 drag-and-drop
 ══════════════════════════════════════════════════════════════════════════ */
 
 function LinksTab({
@@ -302,45 +300,75 @@ function LinksTab({
   links: LinkItem[];
   setLinks: React.Dispatch<React.SetStateAction<LinkItem[]>>;
 }) {
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId,  setEditingId]  = useState<string | null>(null);
+  const [dragId,     setDragId]     = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const dragSide    = useRef<"top" | "bottom">("bottom");
 
+  /* ── mutations ── */
   const addLink = () => {
     const id = `lnk-${Date.now()}`;
-    setLinks((prev) => [...prev, { id, type: "link", title: "New link", url: "https://", enabled: true }]);
+    setLinks((p) => [...p, { id, type: "link", title: "New link", url: "https://", enabled: true }]);
     setEditingId(id);
   };
+  const addDivider = () =>
+    setLinks((p) => [...p, { id: `div-${Date.now()}`, type: "divider", title: "Section", url: "", enabled: true }]);
+  const remove = (id: string) => setLinks((p) => p.filter((l) => l.id !== id));
+  const toggle = (id: string) => setLinks((p) => p.map((l) => (l.id === id ? { ...l, enabled: !l.enabled } : l)));
+  const update = (id: string, field: "title" | "url", val: string) =>
+    setLinks((p) => p.map((l) => (l.id === id ? { ...l, [field]: val } : l)));
+  const moveUp = (idx: number) =>
+    setLinks((p) => {
+      if (idx === 0) return p;
+      const a = [...p];
+      const t = a[idx - 1]!; a[idx - 1] = a[idx]!; a[idx] = t;
+      return a;
+    });
+  const moveDown = (idx: number) =>
+    setLinks((p) => {
+      if (idx >= p.length - 1) return p;
+      const a = [...p];
+      const t = a[idx]!; a[idx] = a[idx + 1]!; a[idx + 1] = t;
+      return a;
+    });
 
-  const addDivider = () => {
-    setLinks((prev) => [
-      ...prev,
-      { id: `div-${Date.now()}`, type: "divider", title: "Section", url: "", enabled: true },
-    ]);
+  /* ── drag handlers ── */
+  const onDragStart = (e: React.DragEvent, id: string) => {
+    setDragId(id);
+    e.dataTransfer.effectAllowed = "move";
+    // ghost image transparency
+    const el = e.currentTarget as HTMLElement;
+    e.dataTransfer.setDragImage(el, el.offsetWidth / 2, 20);
   };
 
-  const remove  = (id: string) => setLinks((prev) => prev.filter((l) => l.id !== id));
-  const toggle  = (id: string) => setLinks((prev) => prev.map((l) => (l.id === id ? { ...l, enabled: !l.enabled } : l)));
-  const update  = (id: string, field: "title" | "url", val: string) =>
-    setLinks((prev) => prev.map((l) => (l.id === id ? { ...l, [field]: val } : l)));
+  const onDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    // determine side
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    dragSide.current = e.clientY < rect.top + rect.height / 2 ? "top" : "bottom";
+    setDragOverId(id);
+  };
 
-  const moveUp = (idx: number) =>
-    setLinks((prev) => {
-      if (idx === 0) return prev;
-      const a = [...prev];
-      const tmp = a[idx - 1]!;
-      a[idx - 1] = a[idx]!;
-      a[idx] = tmp;
+  const onDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (!dragId || dragId === targetId) { reset(); return; }
+    setLinks((p) => {
+      const from = p.findIndex((l) => l.id === dragId);
+      const to   = p.findIndex((l) => l.id === targetId);
+      if (from === -1 || to === -1) return p;
+      const a = [...p];
+      const [item] = a.splice(from, 1);
+      const insertAt = dragSide.current === "top"
+        ? (to > from ? to - 1 : to)
+        : (to < from ? to + 1 : to);
+      a.splice(insertAt, 0, item!);
       return a;
     });
+    reset();
+  };
 
-  const moveDown = (idx: number) =>
-    setLinks((prev) => {
-      if (idx >= prev.length - 1) return prev;
-      const a = [...prev];
-      const tmp = a[idx]!;
-      a[idx] = a[idx + 1]!;
-      a[idx + 1] = tmp;
-      return a;
-    });
+  const reset = () => { setDragId(null); setDragOverId(null); };
 
   return (
     <div className="flex flex-col gap-3">
@@ -361,85 +389,95 @@ function LinksTab({
       </div>
 
       {/* Items */}
-      <div className="flex flex-col gap-2">
-        {links.map((link, idx) => (
-          <div
-            key={link.id}
-            className={`rounded-xl border border-[var(--border)] bg-[var(--bg)] transition-opacity ${
-              !link.enabled ? "opacity-50" : ""
-            }`}
-          >
-            {link.type === "divider" ? (
-              /* ── Divider row ── */
-              <div className="flex items-center gap-2 px-3 py-2.5">
-                <span className="text-[var(--fg-muted)] cursor-grab shrink-0"><DragDots /></span>
-                <input
-                  value={link.title}
-                  onChange={(e) => update(link.id, "title", e.target.value)}
-                  className="flex-1 min-w-0 font-sans text-xs text-[var(--fg-muted)] italic bg-transparent outline-none"
-                  placeholder="Section label"
-                />
-                <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => moveUp(idx)}   className="p-0.5 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"><ChevUp /></button>
-                  <button onClick={() => moveDown(idx)} className="p-0.5 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"><ChevDown /></button>
-                  <button onClick={() => remove(link.id)} className="p-0.5 text-[var(--fg-muted)] hover:text-red-400 transition-colors"><TrashIcon /></button>
-                </div>
-              </div>
-            ) : (
-              /* ── Link row ── */
-              <div className="px-3 py-2.5">
-                <div className="flex items-start gap-2">
-                  <span className="text-[var(--fg-muted)] cursor-grab shrink-0 mt-1"><DragDots /></span>
+      <div className="flex flex-col gap-1.5">
+        {links.map((link, idx) => {
+          const isDragging  = dragId     === link.id;
+          const isDragOver  = dragOverId === link.id && dragId !== link.id;
 
-                  <div className="flex-1 min-w-0">
-                    {editingId === link.id ? (
-                      <div className="flex flex-col gap-1.5">
-                        <input
-                          autoFocus
-                          value={link.title}
-                          onChange={(e) => update(link.id, "title", e.target.value)}
-                          className="w-full font-sans text-sm font-medium text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                          placeholder="Link title"
-                        />
-                        <input
-                          value={link.url}
-                          onChange={(e) => update(link.id, "url", e.target.value)}
-                          className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                          placeholder="https://"
-                        />
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="self-start font-sans text-xs text-yellow hover:opacity-80 transition-opacity"
-                        >
-                          Done
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setEditingId(link.id)}
-                        className="text-left w-full group"
-                      >
-                        <div className="font-sans text-sm font-medium text-[var(--fg)] group-hover:text-yellow transition-colors leading-tight truncate">
-                          {link.title || "Untitled"}
-                        </div>
-                        <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 truncate">
-                          {link.url || "No URL set"}
-                        </div>
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-1 shrink-0 mt-0.5">
-                    <Toggle checked={link.enabled} onChange={() => toggle(link.id)} />
-                    <button onClick={() => moveUp(idx)}   className="p-0.5 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"><ChevUp /></button>
-                    <button onClick={() => moveDown(idx)} className="p-0.5 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"><ChevDown /></button>
+          return (
+            <div
+              key={link.id}
+              draggable
+              onDragStart={(e) => onDragStart(e, link.id)}
+              onDragOver={(e)  => onDragOver(e, link.id)}
+              onDrop={(e)      => onDrop(e, link.id)}
+              onDragEnd={reset}
+              className={[
+                "rounded-xl border bg-[var(--bg)] transition-all select-none",
+                isDragging ? "opacity-40 scale-[0.98]" : "opacity-100",
+                isDragOver
+                  ? "border-yellow shadow-[0_0_0_1px_var(--color-yellow)]"
+                  : "border-[var(--border)]",
+                !link.enabled && !isDragging ? "opacity-50" : "",
+              ].join(" ")}
+            >
+              {link.type === "divider" ? (
+                <div className="flex items-center gap-2 px-3 py-2.5">
+                  <span className="text-[var(--fg-muted)] cursor-grab active:cursor-grabbing shrink-0"><DragDots /></span>
+                  <input
+                    value={link.title}
+                    onChange={(e) => update(link.id, "title", e.target.value)}
+                    className="flex-1 min-w-0 font-sans text-xs text-[var(--fg-muted)] italic bg-transparent outline-none"
+                    placeholder="Section label"
+                  />
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => moveUp(idx)}     className="p-0.5 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"><ChevUp /></button>
+                    <button onClick={() => moveDown(idx)}   className="p-0.5 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"><ChevDown /></button>
                     <button onClick={() => remove(link.id)} className="p-0.5 text-[var(--fg-muted)] hover:text-red-400 transition-colors"><TrashIcon /></button>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              ) : (
+                <div className="px-3 py-2.5">
+                  <div className="flex items-start gap-2">
+                    <span className="text-[var(--fg-muted)] cursor-grab active:cursor-grabbing shrink-0 mt-1"><DragDots /></span>
+
+                    <div className="flex-1 min-w-0">
+                      {editingId === link.id ? (
+                        <div className="flex flex-col gap-1.5">
+                          <input
+                            autoFocus
+                            value={link.title}
+                            onChange={(e) => update(link.id, "title", e.target.value)}
+                            className="w-full font-sans text-sm font-medium text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                            placeholder="Link title"
+                          />
+                          <input
+                            value={link.url}
+                            onChange={(e) => update(link.id, "url", e.target.value)}
+                            className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                            placeholder="https://"
+                          />
+                          <button
+                            onClick={() => setEditingId(null)}
+                            className="self-start font-sans text-xs text-yellow hover:opacity-80 transition-opacity"
+                          >
+                            Done
+                          </button>
+                        </div>
+                      ) : (
+                        <button onClick={() => setEditingId(link.id)} className="text-left w-full group">
+                          <div className="font-sans text-sm font-medium text-[var(--fg)] group-hover:text-yellow transition-colors leading-tight truncate">
+                            {link.title || "Untitled"}
+                          </div>
+                          <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 truncate">
+                            {link.url || "No URL set"}
+                          </div>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0 mt-0.5">
+                      <Toggle checked={link.enabled} onChange={() => toggle(link.id)} />
+                      <button onClick={() => moveUp(idx)}     className="p-0.5 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"><ChevUp /></button>
+                      <button onClick={() => moveDown(idx)}   className="p-0.5 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"><ChevDown /></button>
+                      <button onClick={() => remove(link.id)} className="p-0.5 text-[var(--fg-muted)] hover:text-red-400 transition-colors"><TrashIcon /></button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {links.length === 0 && (
@@ -455,13 +493,7 @@ function LinksTab({
    APPEARANCE TAB
 ══════════════════════════════════════════════════════════════════════════ */
 
-function AppearanceTab({
-  config,
-  setConfig,
-}: {
-  config: PageConfig;
-  setConfig: React.Dispatch<React.SetStateAction<PageConfig>>;
-}) {
+function AppearanceTab({ config, setConfig }: { config: PageConfig; setConfig: React.Dispatch<React.SetStateAction<PageConfig>> }) {
   const set = useCallback(
     <K extends keyof PageConfig>(key: K, value: PageConfig[K]) =>
       setConfig((prev) => ({ ...prev, [key]: value })),
@@ -476,7 +508,6 @@ function AppearanceTab({
         <SectionLabel>Profile</SectionLabel>
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
-            {/* Avatar preview */}
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 font-sans font-black text-xl text-[#111] border-2 border-[var(--border)]"
               style={{ background: config.avatarBg }}
@@ -518,7 +549,6 @@ function AppearanceTab({
       {/* ── Background ── */}
       <div>
         <SectionLabel>Background</SectionLabel>
-        {/* Type tabs */}
         <div className="flex gap-0.5 p-1 bg-[var(--bg-subtle)] rounded-xl mb-3">
           {(["solid", "gradient", "image"] as BgType[]).map((t) => (
             <button
@@ -538,7 +568,6 @@ function AppearanceTab({
         {config.bgType === "solid" && (
           <ColorRow label="Color" value={config.bgColor} onChange={(v) => set("bgColor", v)} />
         )}
-
         {config.bgType === "gradient" && (
           <div className="flex flex-col gap-2">
             <ColorRow label="From" value={config.bgGradFrom} onChange={(v) => set("bgGradFrom", v)} />
@@ -553,12 +582,11 @@ function AppearanceTab({
               <span className="font-mono text-xs text-[var(--fg)] w-8 text-right">{config.bgGradAngle}°</span>
             </div>
             <div
-              className="h-7 rounded-lg mt-0.5"
+              className="h-7 rounded-lg"
               style={{ background: `linear-gradient(${config.bgGradAngle}deg, ${config.bgGradFrom}, ${config.bgGradTo})` }}
             />
           </div>
         )}
-
         {config.bgType === "image" && (
           <div>
             <span className="font-sans text-xs text-[var(--fg-muted)] block mb-1">Image URL</span>
@@ -572,7 +600,7 @@ function AppearanceTab({
         )}
       </div>
 
-      {/* ── Button Style ── */}
+      {/* ── Buttons ── */}
       <div>
         <SectionLabel>Buttons</SectionLabel>
         <div className="flex flex-col gap-3">
@@ -582,8 +610,8 @@ function AppearanceTab({
             <div className="flex gap-2">
               {(
                 [
-                  { value: "square",  label: "Square",  br: "6px" },
-                  { value: "rounded", label: "Rounded", br: "12px" },
+                  { value: "square",  label: "Square",  br: "0px"    },
+                  { value: "rounded", label: "Rounded", br: "12px"   },
                   { value: "pill",    label: "Pill",    br: "9999px" },
                 ] as { value: BtnShape; label: string; br: string }[]
               ).map((opt) => (
@@ -602,7 +630,6 @@ function AppearanceTab({
               ))}
             </div>
           </div>
-
           {/* Variant */}
           <div>
             <span className="font-sans text-xs text-[var(--fg-muted)] block mb-2">Style</span>
@@ -641,17 +668,38 @@ function AppearanceTab({
       {/* ── Typography ── */}
       <div>
         <SectionLabel>Typography</SectionLabel>
-        <div>
-          <span className="font-sans text-xs text-[var(--fg-muted)] block mb-1.5">Font family</span>
-          <select
-            value={config.fontFamily}
-            onChange={(e) => set("fontFamily", e.target.value)}
-            className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-3 py-2 outline-none border border-[var(--border)] focus:border-yellow transition-colors cursor-pointer"
-          >
-            {FONTS.map((f) => (
-              <option key={f.value} value={f.value}>{f.label}</option>
-            ))}
-          </select>
+        <div className="flex flex-col gap-2.5">
+          <div>
+            <span className="font-sans text-xs text-[var(--fg-muted)] block mb-1.5">Font family</span>
+            <select
+              value={config.fontFamily}
+              onChange={(e) => set("fontFamily", e.target.value)}
+              className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-3 py-2 outline-none border border-[var(--border)] focus:border-yellow transition-colors cursor-pointer"
+            >
+              {FONTS.map((f) => (
+                <option key={f.value} value={f.value}>{f.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <span className="font-sans text-xs text-[var(--fg-muted)] block mb-1.5">Font weight</span>
+            <div className="grid grid-cols-3 gap-1.5">
+              {FONT_WEIGHTS.map((w) => (
+                <button
+                  key={w.value}
+                  onClick={() => set("fontWeight", w.value)}
+                  className={`py-1.5 rounded-lg border font-sans text-xs transition-all ${
+                    config.fontWeight === w.value
+                      ? "border-yellow bg-yellow/10 text-[var(--fg)]"
+                      : "border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)]"
+                  }`}
+                  style={{ fontWeight: w.value }}
+                >
+                  {w.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -694,56 +742,54 @@ function getBgStyle(c: PageConfig): React.CSSProperties {
 }
 
 function getBtnStyle(c: PageConfig): React.CSSProperties {
+  /* square = 0, rounded = 14px, pill = 9999px */
   const radius =
     c.btnShape === "pill"    ? "9999px" :
-    c.btnShape === "rounded" ? "14px"   : "6px";
+    c.btnShape === "rounded" ? "14px"   : "0px";
 
   if (c.btnVariant === "outline")
     return { borderRadius: radius, background: "transparent", color: c.btnText, border: `1.5px solid ${c.btnBorder}` };
   if (c.btnVariant === "glass")
-    return { borderRadius: radius, background: "rgba(255,255,255,0.15)", backdropFilter: "blur(10px)", color: c.btnText, border: "1px solid rgba(255,255,255,0.25)" };
-  // filled
+    return { borderRadius: radius, background: "rgba(255,255,255,0.15)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", color: c.btnText, border: "1px solid rgba(255,255,255,0.25)" };
   return { borderRadius: radius, background: c.btnBg, color: c.btnText, border: "none" };
 }
 
 function LinkTreeView({ links, config }: { links: LinkItem[]; config: PageConfig }) {
-  const enabledLinks = links.filter((l) => l.enabled);
-  const btnStyle     = getBtnStyle(config);
+  const enabled  = links.filter((l) => l.enabled);
+  const btnStyle = getBtnStyle(config);
 
   return (
-    <div className="w-full h-full overflow-y-auto" style={{ ...getBgStyle(config), fontFamily: config.fontFamily }}>
+    <div
+      className="w-full h-full overflow-y-auto"
+      style={{ ...getBgStyle(config), fontFamily: config.fontFamily }}
+    >
       <div className="flex flex-col items-center px-5 pt-10 pb-12 gap-4">
         {/* Avatar */}
         <div
-          className="w-16 h-16 rounded-full flex items-center justify-center font-black text-2xl shrink-0"
-          style={{ background: config.avatarBg, color: "#111111" }}
+          className="w-16 h-16 rounded-full flex items-center justify-center shrink-0"
+          style={{ background: config.avatarBg, color: "#111111", fontFamily: config.fontFamily, fontWeight: "800", fontSize: "1.5rem" }}
         >
           {config.avatarInitial}
         </div>
-
         {/* Name + bio */}
         <div className="text-center">
-          <div className="font-bold text-[15px] leading-tight" style={{ color: config.textColor }}>
+          <div style={{ color: config.textColor, fontWeight: config.fontWeight, fontSize: "15px", lineHeight: 1.3 }}>
             {config.displayName}
           </div>
           {config.bio && (
-            <div className="text-[11px] mt-1 leading-relaxed" style={{ color: config.subColor }}>
+            <div style={{ color: config.subColor, fontSize: "11px", marginTop: "4px", lineHeight: 1.5 }}>
               {config.bio}
             </div>
           )}
         </div>
-
         {/* Links */}
         <div className="w-full flex flex-col gap-2.5 mt-1">
-          {enabledLinks.map((link) =>
+          {enabled.map((link) =>
             link.type === "divider" ? (
               <div key={link.id} className="flex items-center gap-2 py-0.5">
                 <div className="flex-1 h-px" style={{ background: `${config.subColor}40` }} />
                 {link.title && (
-                  <span
-                    className="text-[9px] font-semibold uppercase tracking-widest px-1"
-                    style={{ color: config.subColor }}
-                  >
+                  <span style={{ color: config.subColor, fontSize: "9px", fontWeight: "600", letterSpacing: "0.1em", textTransform: "uppercase" }}>
                     {link.title}
                   </span>
                 )}
@@ -752,20 +798,16 @@ function LinkTreeView({ links, config }: { links: LinkItem[]; config: PageConfig
             ) : (
               <div
                 key={link.id}
-                className="w-full py-3 px-4 text-center text-[12px] font-semibold"
-                style={btnStyle}
+                className="w-full py-3 px-4 text-center"
+                style={{ ...btnStyle, fontSize: "12px", fontWeight: config.fontWeight }}
               >
                 {link.title}
               </div>
             )
           )}
         </div>
-
         {/* Watermark */}
-        <div
-          className="mt-4 font-sans font-black text-[9px] tracking-widest"
-          style={{ color: `${config.subColor}60` }}
-        >
+        <div style={{ marginTop: "16px", fontFamily: "Inter, sans-serif", fontWeight: 900, fontSize: "9px", letterSpacing: "0.15em", color: `${config.subColor}60` }}>
           FRAME
         </div>
       </div>
@@ -776,21 +818,15 @@ function LinkTreeView({ links, config }: { links: LinkItem[]; config: PageConfig
 function PhoneShell({ links, config }: { links: LinkItem[]; config: PageConfig }) {
   return (
     <div className="relative" style={{ width: 280, height: 568 }}>
-      {/* Outer shell */}
-      <div
-        className="absolute inset-0 rounded-[40px] shadow-2xl"
-        style={{ background: "linear-gradient(145deg, #2a2a2a, #1a1a1a)" }}
-      />
-      {/* Inner screen bezel */}
+      <div className="absolute inset-0 rounded-[40px] shadow-2xl" style={{ background: "linear-gradient(145deg,#2a2a2a,#1a1a1a)" }} />
       <div className="absolute inset-[5px] rounded-[36px] bg-black overflow-hidden">
         {/* Status bar */}
         <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-5 pt-3 pb-1 pointer-events-none">
-          <span className="font-mono text-[9px] font-bold text-white/80">9:41</span>
-          {/* Dynamic island */}
-          <div className="w-20 h-5 bg-black rounded-full" />
+          <span style={{ fontFamily: "monospace", fontSize: "9px", fontWeight: "bold", color: "rgba(255,255,255,0.8)" }}>9:41</span>
+          <div style={{ width: 80, height: 20, background: "#000", borderRadius: 9999 }} />
           <div className="flex items-center gap-1">
-            <svg width="11" height="8" viewBox="0 0 24 18" fill="white" opacity={0.8}>
-              <path d="M1 1c6.1-1.3 15.9-1.3 22 0M5 6.5c3.9-.9 10.1-.9 14 0M9 12c2-.5 6-.5 8 0" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+            <svg width="11" height="8" viewBox="0 0 24 18" fill="none">
+              <path d="M1 1c6.1-1.3 15.9-1.3 22 0M5 6.5c3.9-.9 10.1-.9 14 0M9 12c2-.5 6-.5 8 0" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity={0.8}/>
             </svg>
             <svg width="18" height="9" viewBox="0 0 26 12" fill="none">
               <rect x="1" y="1" width="20" height="10" rx="2.5" stroke="white" strokeWidth="1.5" opacity={0.8}/>
@@ -799,17 +835,15 @@ function PhoneShell({ links, config }: { links: LinkItem[]; config: PageConfig }
             </svg>
           </div>
         </div>
-        {/* Content fills from top */}
         <div className="absolute inset-0">
           <LinkTreeView links={links} config={config} />
         </div>
       </div>
-      {/* Volume buttons */}
-      <div className="absolute left-[-3.5px] top-[100px] w-[3.5px] h-8  rounded-l-sm" style={{ background: "#333" }} />
-      <div className="absolute left-[-3.5px] top-[144px] w-[3.5px] h-10 rounded-l-sm" style={{ background: "#333" }} />
-      <div className="absolute left-[-3.5px] top-[196px] w-[3.5px] h-10 rounded-l-sm" style={{ background: "#333" }} />
-      {/* Power button */}
-      <div className="absolute right-[-3.5px] top-[148px] w-[3.5px] h-14 rounded-r-sm" style={{ background: "#333" }} />
+      {/* Buttons */}
+      <div className="absolute rounded-l-sm" style={{ left: -3.5, top: 100, width: 3.5, height: 32, background: "#333" }} />
+      <div className="absolute rounded-l-sm" style={{ left: -3.5, top: 144, width: 3.5, height: 40, background: "#333" }} />
+      <div className="absolute rounded-l-sm" style={{ left: -3.5, top: 196, width: 3.5, height: 40, background: "#333" }} />
+      <div className="absolute rounded-r-sm" style={{ right: -3.5, top: 148, width: 3.5, height: 56, background: "#333" }} />
     </div>
   );
 }
@@ -833,80 +867,78 @@ export default function LinksPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <>
+      {/* Load selected Google Font */}
+      <GoogleFontLoader fontFamily={config.fontFamily} />
 
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
-        <div>
-          <h1 className="font-sans font-bold text-lg text-[var(--fg)] leading-tight">Link Page</h1>
-          <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">{publicUrl}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={copyUrl}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-xs font-sans text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
-          >
-            <CopyIcon />
-            {copied ? "Copied!" : "Copy link"}
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-xs font-sans text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
-            <ExternalIcon /> Open
-          </button>
-          <button className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-yellow text-[#111] text-xs font-sans font-semibold hover:opacity-90 transition-opacity">
-            Save changes
-          </button>
-        </div>
-      </div>
-
-      {/* ── Body ── */}
-      <div className="flex flex-1 min-h-0 overflow-hidden">
-
-        {/* Left panel */}
-        <div className="w-80 shrink-0 flex flex-col border-r border-[var(--border)] bg-[var(--bg-card)]">
-          {/* Tab bar */}
-          <div className="flex border-b border-[var(--border)] shrink-0">
-            {(["links", "appearance"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-3 font-sans text-sm capitalize transition-all border-b-2 ${
-                  activeTab === tab
-                    ? "border-yellow text-[var(--fg)] font-semibold"
-                    : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
+      <div className="flex flex-col h-full">
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
+          <div>
+            <h1 className="font-sans font-bold text-lg text-[var(--fg)] leading-tight">Link Page</h1>
+            <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">{publicUrl}</p>
           </div>
-
-          {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {activeTab === "links" ? (
-              <LinksTab links={links} setLinks={setLinks} />
-            ) : (
-              <AppearanceTab config={config} setConfig={setConfig} />
-            )}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={copyUrl}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-xs font-sans text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+            >
+              <CopyIcon />
+              {copied ? "Copied!" : "Copy link"}
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-xs font-sans text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
+              <ExternalIcon /> Open
+            </button>
+            <button className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-yellow text-[#111] text-xs font-sans font-semibold hover:opacity-90 transition-opacity">
+              Save changes
+            </button>
           </div>
         </div>
 
-        {/* Preview pane */}
-        <div className="flex-1 flex items-center justify-center overflow-auto bg-[var(--bg)] relative">
-          {/* Dot grid */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-60"
-            style={{
-              backgroundImage: "radial-gradient(circle, var(--border) 1px, transparent 1px)",
-              backgroundSize: "24px 24px",
-            }}
-          />
-          <div className="relative z-10 py-12">
-            <PhoneShell links={links} config={config} />
-            {/* URL label below phone */}
-            <p className="text-center font-mono text-[11px] text-[var(--fg-muted)] mt-5">{publicUrl}</p>
+        {/* ── Body ── */}
+        <div className="flex flex-1 min-h-0 overflow-hidden">
+          {/* Left panel */}
+          <div className="w-80 shrink-0 flex flex-col border-r border-[var(--border)] bg-[var(--bg-card)]">
+            <div className="flex border-b border-[var(--border)] shrink-0">
+              {(["links", "appearance"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`flex-1 py-3 font-sans text-sm capitalize transition-all border-b-2 ${
+                    activeTab === tab
+                      ? "border-yellow text-[var(--fg)] font-semibold"
+                      : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1 overflow-y-auto p-4">
+              {activeTab === "links" ? (
+                <LinksTab links={links} setLinks={setLinks} />
+              ) : (
+                <AppearanceTab config={config} setConfig={setConfig} />
+              )}
+            </div>
+          </div>
+
+          {/* Preview pane */}
+          <div className="flex-1 flex items-center justify-center overflow-auto bg-[var(--bg)] relative">
+            <div
+              className="absolute inset-0 pointer-events-none opacity-60"
+              style={{
+                backgroundImage: "radial-gradient(circle, var(--border) 1px, transparent 1px)",
+                backgroundSize: "24px 24px",
+              }}
+            />
+            <div className="relative z-10 py-12">
+              <PhoneShell links={links} config={config} />
+              <p className="text-center font-mono text-[11px] text-[var(--fg-muted)] mt-5">{publicUrl}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
