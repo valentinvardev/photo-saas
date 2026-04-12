@@ -247,87 +247,13 @@ function LockIcon() {
    PORTFOLIO CARDS
 ══════════════════════════════════════════════════════════════════════════ */
 
-function FeaturedPortfolioCard({ t }: { t: PortfolioTemplate }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}
-      className="border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden grid grid-cols-[5fr_3fr]"
-    >
-      <div className="relative overflow-hidden group" style={{ minHeight: "340px" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`https://picsum.photos/seed/${t.seed}/1200/800?grayscale`} alt={t.name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          style={{ filter: "brightness(0.85)" }} />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/30">
-          {t.href && (
-            <Link href={t.href} target="_blank"
-              className="flex items-center gap-2 px-5 py-2.5 bg-white text-[#111] font-sans text-xs font-semibold hover:bg-yellow transition-colors">
-              <ArrowIcon /> Live preview
-            </Link>
-          )}
-        </div>
-        {t.new && <div className="absolute top-4 left-4 bg-yellow text-[#111] font-mono text-[9px] font-bold px-2 py-1 tracking-widest uppercase">New</div>}
-        <div className="absolute top-0 left-0 right-0 flex items-center gap-1.5 px-3 py-2 bg-black/50 backdrop-blur-sm">
-          <div className="w-2 h-2 rounded-full bg-white/20" /><div className="w-2 h-2 rounded-full bg-white/20" /><div className="w-2 h-2 rounded-full bg-white/20" />
-          <div className="flex-1 mx-3 h-4 bg-white/10 rounded-sm flex items-center px-2">
-            <span className="font-mono text-[8px] text-white/40">jameshollis.frame.co</span>
-          </div>
-        </div>
-      </div>
-      <div className="p-7 flex flex-col justify-between border-l border-[var(--border)]">
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest">{t.category}</span>
-          </div>
-          <h2 className="font-sans font-black text-[var(--fg)] text-xl mb-2">{t.name}</h2>
-          <p className="font-sans text-xs font-light text-[var(--fg-muted)] leading-relaxed mb-5">{t.description}</p>
-          <div className="flex flex-wrap gap-1.5 mb-6">
-            {t.tags.map((tag) => <span key={tag} className="font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-2 py-1">{tag}</span>)}
-          </div>
-          <div className="border-t border-[var(--border)] pt-4 space-y-2">
-            <p className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-wider mb-2.5">Typography</p>
-            {[{ role: "Serif", name: t.fonts.serif }, { role: "Sans", name: t.fonts.sans }, { role: "Mono", name: t.fonts.mono }].map((f) => (
-              <div key={f.role} className="flex items-baseline justify-between gap-3">
-                <span className="font-mono text-[9px] text-[var(--fg-muted)] w-8">{f.role}</span>
-                <span className="font-sans text-[11px] text-[var(--fg)] flex-1">{f.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="space-y-2 mt-6">
-          {t.href ? (
-            <>
-              <Link href={t.href} target="_blank"
-                className="flex items-center justify-center gap-2 w-full py-2.5 border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--fg)] font-sans text-xs font-medium hover:border-[var(--fg-muted)] transition-colors">
-                <ArrowIcon /> Preview
-              </Link>
-              {t.editorHref ? (
-                <Link href={t.editorHref}
-                  className="btn-primary w-full py-2.5 font-sans text-xs font-semibold flex items-center justify-center gap-2">
-                  <CheckIcon /> Edit this template
-                </Link>
-              ) : (
-                <button className="btn-primary w-full py-2.5 font-sans text-xs font-semibold flex items-center justify-center gap-2">
-                  <CheckIcon /> Use this template
-                </button>
-              )}
-            </>
-          ) : (
-            <button disabled className="w-full py-2.5 border border-[var(--border)] text-[var(--fg-muted)] font-sans text-xs font-medium flex items-center justify-center gap-2 cursor-not-allowed opacity-50">
-              <LockIcon /> Coming soon
-            </button>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-function PortfolioCard({ t, index }: { t: PortfolioTemplate; index: number }) {
+function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: number; featured?: boolean }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.05 }}
-      className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden flex flex-col"
+      className={`group overflow-hidden flex flex-col bg-[var(--bg-card)] transition-all ${
+        featured ? "border-2 border-yellow" : "border border-[var(--border)] hover:border-[var(--fg-muted)]"
+      }`}
     >
       <div className="relative overflow-hidden" style={{ aspectRatio: "16/10" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -357,7 +283,10 @@ function PortfolioCard({ t, index }: { t: PortfolioTemplate; index: number }) {
             <h3 className="font-sans font-bold text-[var(--fg)] text-sm">{t.name}</h3>
             <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-wider">{t.category}</span>
           </div>
-          {!t.href && <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0"><LockIcon /> Soon</span>}
+          {featured
+            ? <span className="font-mono text-[9px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 shrink-0">In use</span>
+            : !t.href && <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0"><LockIcon /> Soon</span>
+          }
         </div>
         <p className="font-sans text-[11px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{t.description}</p>
         <div className="flex flex-wrap gap-1 pt-1">
@@ -562,9 +491,6 @@ export default function TemplatesPage() {
     ? PORTFOLIO_TEMPLATES
     : PORTFOLIO_TEMPLATES.filter((t) => t.category === portfolioFilter);
 
-  const featuredPortfolio = filteredPortfolio.find((t) => t.featured);
-  const restPortfolio     = filteredPortfolio.filter((t) => !t.featured);
-
   return (
     <div className="min-h-full">
       {/* Header */}
@@ -635,22 +561,14 @@ export default function TemplatesPage() {
 
           {/* ── Portfolio ── */}
           {productType === "portfolio" && (
-            <motion.div key="portfolio" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-6">
-              {featuredPortfolio && <FeaturedPortfolioCard t={featuredPortfolio} />}
-              {restPortfolio.length > 0 && (
-                <div>
-                  {featuredPortfolio && (
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-wider">More templates</span>
-                      <div className="flex-1 h-px bg-[var(--border)]" />
-                    </div>
-                  )}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {restPortfolio.map((t, i) => <PortfolioCard key={t.id} t={t} index={i} />)}
-                  </div>
+            <motion.div key="portfolio" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+              {filteredPortfolio.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {filteredPortfolio.map((t, i) => (
+                    <PortfolioCard key={t.id} t={t} index={i} featured={!!t.featured} />
+                  ))}
                 </div>
-              )}
-              {filteredPortfolio.length === 0 && (
+              ) : (
                 <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
                   <span className="font-sans text-sm text-[var(--fg-muted)]">No templates in this category yet.</span>
                   <button onClick={() => setPortfolioFilter("All")} className="font-mono text-[10px] text-yellow hover:text-[var(--fg)] transition-colors uppercase tracking-wider">See all →</button>
