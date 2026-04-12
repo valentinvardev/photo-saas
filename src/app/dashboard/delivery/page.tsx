@@ -90,11 +90,11 @@ const DEFAULT_PAGE: Omit<DeliveryPage, "id" | "title" | "client" | "createdAt"> 
   template: "minimal", layout: "grid", welcomeMessage: "", showUpsellBanner: true,
 };
 
-const TEMPLATES: { id: TemplateName; label: string; desc: string; accent: string }[] = [
-  { id: "minimal",   label: "Minimal",   desc: "Clean white, generous whitespace",  accent: "#f5f5f5" },
-  { id: "vogue",     label: "Vogue",     desc: "High-contrast editorial black",      accent: "#111111" },
-  { id: "cinematic", label: "Cinematic", desc: "Dark dramatic with film tones",      accent: "#1a1209" },
-  { id: "editorial", label: "Editorial", desc: "Magazine-style with bold type",      accent: "#f0ede8" },
+const TEMPLATES: { id: TemplateName; label: string; desc: string; accent: string; fg: string; sub: string }[] = [
+  { id: "minimal",   label: "Minimal",   desc: "Clean white space, serif typography, subtle grid",   accent: "#f5f5f5", fg: "#111111", sub: "#888888" },
+  { id: "vogue",     label: "Vogue",     desc: "High-contrast black, bold editorial headlines",       accent: "#111111", fg: "#ffffff", sub: "#666666" },
+  { id: "cinematic", label: "Cinematic", desc: "Dark dramatic tones, full-bleed film aesthetic",      accent: "#1a1209", fg: "#e8dcc8", sub: "#7a6a50" },
+  { id: "editorial", label: "Editorial", desc: "Magazine layout, oversized type, neutral palette",    accent: "#f0ede8", fg: "#1a1a1a", sub: "#7a7065" },
 ];
 
 const STATUS_META: Record<DeliveryStatus, { dot: string; text: string; label: string }> = {
@@ -434,7 +434,121 @@ function MonetizationSection({ page, set }: { page: DeliveryPage; set: <K extend
   );
 }
 
+function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; onSelect: (t: TemplateName) => void; onClose: () => void }) {
+  const [preview, setPreview] = useState<TemplateName>(current);
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [onClose]);
+
+  const chosen = TEMPLATES.find((t) => t.id === preview)!;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.97, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 28 }}
+        className="w-full max-w-3xl flex flex-col rounded-2xl bg-[var(--bg)] border border-[var(--border)] shadow-2xl overflow-hidden"
+        style={{ maxHeight: "85vh" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
+          <div>
+            <h3 className="font-sans font-black text-[var(--fg)] text-sm">Choose template</h3>
+            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">Select a visual style for your delivery page</p>
+          </div>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex flex-1 min-h-0 overflow-hidden">
+          {/* Left — template list */}
+          <div className="w-56 shrink-0 border-r border-[var(--border)] overflow-y-auto p-3 space-y-1">
+            {TEMPLATES.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setPreview(t.id)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
+                  preview === t.id ? "bg-yellow/10 text-[var(--fg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"
+                }`}
+              >
+                <div className="w-8 h-8 rounded-lg shrink-0 border border-[var(--border)]" style={{ background: t.accent }} />
+                <div className="min-w-0">
+                  <div className={`font-sans text-xs font-semibold truncate ${preview === t.id ? "text-[var(--fg)]" : ""}`}>{t.label}</div>
+                  {preview === t.id && <div className="font-mono text-[9px] text-yellow mt-0.5">Selected</div>}
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Right — large preview */}
+          <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            {/* Mock delivery page preview */}
+            <div className="flex-1 overflow-hidden" style={{ background: chosen.accent }}>
+              {/* Nav bar */}
+              <div className="flex items-center justify-between px-8 py-4" style={{ borderBottom: `1px solid ${chosen.fg}18` }}>
+                <span style={{ fontFamily: "serif", fontSize: 14, fontWeight: 900, color: chosen.fg, letterSpacing: "0.12em", textTransform: "uppercase" }}>FRAME</span>
+                <div className="flex items-center gap-4">
+                  <span style={{ fontFamily: "monospace", fontSize: 10, color: chosen.sub }}>Gallery</span>
+                  <span style={{ fontFamily: "monospace", fontSize: 10, color: chosen.sub }}>Info</span>
+                  <div style={{ width: 70, height: 26, borderRadius: 4, border: `1px solid ${chosen.fg}40`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ fontFamily: "sans-serif", fontSize: 9, fontWeight: 700, color: chosen.fg }}>Download</span>
+                  </div>
+                </div>
+              </div>
+              {/* Hero */}
+              <div className="px-8 py-6">
+                <div style={{ fontFamily: "serif", fontSize: 28, fontWeight: 900, color: chosen.fg, lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: 8 }}>
+                  Sarah &amp; James
+                </div>
+                <div style={{ fontFamily: "monospace", fontSize: 10, color: chosen.sub, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 24 }}>
+                  Wedding · April 2026 · 247 photos
+                </div>
+                {/* Photo grid preview */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                  {[401,402,403,404,405,406,407,408].map((seed) => (
+                    <div key={seed} style={{ aspectRatio: "1", overflow: "hidden", borderRadius: chosen.id === "minimal" || chosen.id === "editorial" ? 4 : 0 }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`https://picsum.photos/seed/${seed}/200/200?grayscale`} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Footer CTA */}
+            <div className="px-6 py-4 border-t border-[var(--border)] flex items-center justify-between shrink-0">
+              <div>
+                <div className="font-sans font-bold text-[var(--fg)] text-sm">{chosen.label}</div>
+                <div className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">{chosen.desc}</div>
+              </div>
+              <button
+                onClick={() => { onSelect(preview); onClose(); }}
+                className="px-5 py-2 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:opacity-90 transition-opacity"
+              >
+                Use this template
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function AestheticSection({ page, set }: { page: DeliveryPage; set: <K extends keyof DeliveryPage>(k: K, v: DeliveryPage[K]) => void }) {
+  const [showTemplates, setShowTemplates] = useState(false);
+  const current = TEMPLATES.find((t) => t.id === page.template)!;
+
   return (
     <Accordion title="Look & Feel" icon={
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -445,23 +559,26 @@ function AestheticSection({ page, set }: { page: DeliveryPage; set: <K extends k
       {/* Template */}
       <div>
         <SectionLabel>Template</SectionLabel>
-        <div className="grid grid-cols-2 gap-2">
-          {TEMPLATES.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => set("template", t.id)}
-              className={`rounded-xl border-2 overflow-hidden text-left transition-all ${
-                page.template === t.id ? "border-yellow" : "border-[var(--border)] hover:border-[var(--fg-muted)]"
-              }`}
-            >
-              <div className="h-14 w-full" style={{ background: t.accent }} />
-              <div className="px-2 py-2">
-                <div className="font-sans text-xs font-semibold text-[var(--fg)]">{t.label}</div>
-                <div className="font-sans text-[10px] text-[var(--fg-muted)] mt-0.5 leading-tight">{t.desc}</div>
-              </div>
-            </button>
-          ))}
-        </div>
+        <button
+          onClick={() => setShowTemplates(true)}
+          className="w-full flex items-center gap-3 px-3 py-2.5 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors rounded-lg"
+        >
+          <div className="w-8 h-8 rounded-lg shrink-0 border border-[var(--border)]" style={{ background: current.accent }} />
+          <div className="flex-1 text-left min-w-0">
+            <div className="font-sans text-sm font-semibold text-[var(--fg)]">{current.label}</div>
+            <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{current.desc}</div>
+          </div>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <AnimatePresence>
+          {showTemplates && (
+            <TemplateModal
+              current={page.template}
+              onSelect={(t) => set("template", t)}
+              onClose={() => setShowTemplates(false)}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Layout */}
@@ -779,7 +896,7 @@ function Builder({ page: initial, onBack, onSave }: { page: DeliveryPage; onBack
       {/* Split layout */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Left: Controls */}
-        <div className="w-80 shrink-0 flex flex-col border-r border-[var(--border)] bg-[var(--bg-card)] overflow-y-auto">
+        <div className="w-[420px] shrink-0 flex flex-col border-r border-[var(--border)] bg-[var(--bg-card)] overflow-y-auto">
           <div className="p-4 space-y-3">
             {/* Page info */}
             <div className="space-y-2">
