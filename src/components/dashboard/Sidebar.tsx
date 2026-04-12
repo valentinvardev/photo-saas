@@ -156,6 +156,7 @@ function NavItem({ label, href, icon: Icon, soon }: { label: string; href: strin
 }
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
+  const { theme, toggle } = useTheme();
 
   return (
     <div className="flex flex-col h-full bg-[var(--bg-card)] border-r border-[var(--border)]">
@@ -187,6 +188,17 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       <div className="px-2 py-3 border-t border-[var(--border)] space-y-0.5">
         <NavItem label="Profile"  href="/dashboard/profile"  icon={ProfileIcon} />
         <NavItem label="Settings" href="/dashboard/settings" icon={SettingsIcon} />
+
+        {/* Theme toggle */}
+        <div className="flex items-center gap-1 px-3 py-2">
+          <span className="font-sans text-xs text-[var(--fg-muted)] flex-1">Theme</span>
+          <button
+            onClick={toggle}
+            className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+          >
+            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+          </button>
+        </div>
 
         {/* User row */}
         <Link href="/dashboard/profile" className="flex items-center gap-2 px-3 py-2.5 mt-1 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors group">
