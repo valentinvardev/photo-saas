@@ -587,9 +587,403 @@ function NewPortfolioModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   DOMAINS TAB
+══════════════════════════════════════════════════════════════════════════ */
+
+interface DomainItem {
+  id: string;
+  domain: string;
+  status: "active" | "pending" | "expiring";
+  expiresAt: string;
+  assignment: { type: "portfolio" | "links"; name: string; path: string } | null;
+}
+
+const TLDS: { ext: string; price: string; popular?: true }[] = [
+  { ext: ".com",         price: "14.99", popular: true  },
+  { ext: ".co",          price: "29.99", popular: true  },
+  { ext: ".net",         price: "11.99"                  },
+  { ext: ".io",          price: "49.99"                  },
+  { ext: ".photography", price: "39.99"                  },
+  { ext: ".studio",      price: "24.99"                  },
+  { ext: ".art",         price: "19.99"                  },
+  { ext: ".design",      price: "34.99"                  },
+];
+
+/* Deterministic pseudo-random availability (75% available) */
+function isDomainAvailable(full: string) {
+  let h = 5381;
+  for (let i = 0; i < full.length; i++) h = (h * 33) ^ full.charCodeAt(i);
+  return (h & 3) !== 0;
+}
+
+const STATUS_COLORS = {
+  active:   { dot: "bg-green-400",  text: "text-green-400",  label: "Active"         },
+  pending:  { dot: "bg-yellow",     text: "text-yellow",     label: "Pending DNS"    },
+  expiring: { dot: "bg-orange-400", text: "text-orange-400", label: "Expiring soon"  },
+} as const;
+
+const INITIAL_DOMAINS: DomainItem[] = [
+  {
+    id: "d1",
+    domain: "sofiachenphoto.com",
+    status: "active",
+    expiresAt: "Jan 12, 2027",
+    assignment: { type: "portfolio", name: "Sofia Chen Photography", path: "/" },
+  },
+  {
+    id: "d2",
+    domain: "urbanframes.co",
+    status: "active",
+    expiresAt: "Mar 5, 2027",
+    assignment: null,
+  },
+  {
+    id: "d3",
+    domain: "sofiachenphoto.photography",
+    status: "expiring",
+    expiresAt: "Apr 30, 2026",
+    assignment: { type: "links", name: "Link Page", path: "/" },
+  },
+];
+
+/* Assignable targets */
+const ASSIGN_TARGETS = [
+  ...MOCK_PORTFOLIOS.map((p) => ({ type: "portfolio" as const, name: p.name, path: "/" })),
+  { type: "links" as const, name: "Link Page",       path: "/"       },
+  { type: "links" as const, name: "Link Page /book", path: "/book"   },
+];
+
+function DomainsTab() {
+  const [query,       setQuery]       = useState("");
+  const [domains,     setDomains]     = useState<DomainItem[]>(INITIAL_DOMAINS);
+  const [assigningId, setAssigningId] = useState<string | null>(null);
+  const [buying,      setBuying]      = useState<string | null>(null);  // domain being bought
+
+  const trimmed = query.trim().replace(/^https?:\/\//, "").replace(/\..+$/, "").toLowerCase();
+
+  const suggestions = trimmed.length >= 2
+    ? TLDS.map((t) => {
+        const full = trimmed + t.ext;
+        return { full, ext: t.ext, price: t.price, available: isDomainAvailable(full), popular: t.popular };
+      })
+    : [];
+
+  const buy = (full: string, price: string) => {
+    setBuying(full);
+    setTimeout(() => {
+      setDomains((prev) => [
+        ...prev,
+        { id: `d-${Date.now()}`, domain: full, status: "pending", expiresAt: "Apr 12, 2027", assignment: null },
+      ]);
+      setBuying(null);
+      setQuery("");
+    }, 1400);
+  };
+
+  const assign = (domainId: string, target: typeof ASSIGN_TARGETS[number] | null) => {
+    setDomains((prev) =>
+      prev.map((d) =>
+        d.id === domainId
+          ? { ...d, assignment: target ? { type: target.type, name: target.name, path: target.path } : null }
+          : d,
+      ),
+    );
+    setAssigningId(null);
+  };
+
+  const removeDomain = (id: string) => setDomains((prev) => prev.filter((d) => d.id !== id));
+
+  return (
+    <div className="space-y-6">
+      {/* ── Search ── */}
+      <div>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] pointer-events-none">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </span>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search for a domain… e.g. sofiachenphoto"
+            className="w-full pl-10 pr-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] rounded-xl focus:outline-none focus:border-yellow transition-colors"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery("")}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* ── Suggestions ── */}
+        <AnimatePresence>
+          {suggestions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.15 }}
+              className="mt-2 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden divide-y divide-[var(--border)]"
+            >
+              {suggestions.map((s) => (
+                <div key={s.ext} className="flex items-center gap-3 px-4 py-3">
+                  {/* Domain */}
+                  <div className="flex-1 min-w-0 flex items-center gap-2">
+                    <span className="font-mono text-sm text-[var(--fg)] truncate">{s.full}</span>
+                    {s.popular && (
+                      <span className="shrink-0 font-mono text-[9px] bg-yellow/15 text-yellow px-1.5 py-0.5 rounded-full">Popular</span>
+                    )}
+                  </div>
+                  {/* Availability */}
+                  {s.available ? (
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <span className="font-mono text-xs text-[var(--fg-muted)]">${s.price}/yr</span>
+                      <button
+                        onClick={() => buy(s.full, s.price)}
+                        disabled={buying === s.full}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow text-[#111] text-xs font-sans font-bold hover:opacity-90 transition-opacity disabled:opacity-60"
+                      >
+                        {buying === s.full ? (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="animate-spin">
+                            <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeOpacity="0.3"/>
+                            <path d="M21 12a9 9 0 00-9-9"/>
+                          </svg>
+                        ) : (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <path d="M16 10a4 4 0 01-8 0"/>
+                          </svg>
+                        )}
+                        {buying === s.full ? "Buying…" : "Buy"}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
+                      <span className="font-mono text-xs text-[var(--fg-muted)]">Taken</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* ── Owned domains ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-sans font-semibold text-sm text-[var(--fg)]">Your domains</h3>
+          <span className="font-mono text-[11px] text-[var(--fg-muted)]">{domains.length} domain{domains.length !== 1 ? "s" : ""}</span>
+        </div>
+
+        {domains.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-14 rounded-xl border border-dashed border-[var(--border)] text-center">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[var(--fg-muted)] mb-3">
+              <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+            </svg>
+            <p className="font-sans text-sm font-medium text-[var(--fg)] mb-1">No domains yet</p>
+            <p className="font-sans text-xs text-[var(--fg-muted)]">Search above to find and buy your domain</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {domains.map((d) => {
+              const sc = STATUS_COLORS[d.status];
+              const isAssigning = assigningId === d.id;
+
+              return (
+                <motion.div
+                  key={d.id}
+                  layout
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden"
+                >
+                  {/* ── Domain row ── */}
+                  <div className="flex items-center gap-3 px-4 py-3.5">
+                    {/* Globe icon */}
+                    <div className="w-8 h-8 rounded-lg bg-[var(--bg-subtle)] flex items-center justify-center shrink-0 text-[var(--fg-muted)]">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+                        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+                      </svg>
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono text-sm font-semibold text-[var(--fg)] truncate">{d.domain}</span>
+                        <span className={`inline-flex items-center gap-1 font-mono text-[10px] ${sc.text}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
+                          {sc.label}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                        <span className="font-mono text-[10px] text-[var(--fg-muted)]">Expires {d.expiresAt}</span>
+                        {d.assignment ? (
+                          <span className="font-sans text-[10px] text-[var(--fg-muted)]">
+                            Assigned to <span className="text-yellow">{d.assignment.name}</span>
+                            {d.assignment.path !== "/" && <span className="text-[var(--fg-muted)]">{d.assignment.path}</span>}
+                          </span>
+                        ) : (
+                          <span className="font-sans text-[10px] text-[var(--fg-muted)] italic">Not assigned</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {/* Assign / Connect */}
+                      <button
+                        onClick={() => setAssigningId(isAssigning ? null : d.id)}
+                        title="Assign to portfolio or link page"
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-sans font-medium transition-all ${
+                          isAssigning
+                            ? "border-yellow bg-yellow/10 text-yellow"
+                            : "border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)]"
+                        }`}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                          <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+                        </svg>
+                        Assign
+                      </button>
+                      {/* DNS settings */}
+                      <button
+                        title="DNS settings"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="2"/>
+                          <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+                        </svg>
+                      </button>
+                      {/* Remove */}
+                      <button
+                        onClick={() => removeDomain(d.id)}
+                        title="Remove domain"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--border)] text-[var(--fg-muted)] hover:text-red-400 hover:border-red-400/30 transition-colors"
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ── Assign panel (accordion) ── */}
+                  <AnimatePresence>
+                    {isAssigning && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.18 }}
+                        className="overflow-hidden border-t border-[var(--border)]"
+                      >
+                        <div className="px-4 py-3 bg-[var(--bg-subtle)]">
+                          <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] mb-2.5">Assign domain to</p>
+                          <div className="flex flex-col gap-1">
+                            {/* Portfolios group */}
+                            <p className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mt-1 mb-1 px-1">Portfolios</p>
+                            {ASSIGN_TARGETS.filter((t) => t.type === "portfolio").map((t) => (
+                              <button
+                                key={t.name + t.path}
+                                onClick={() => assign(d.id, t)}
+                                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors ${
+                                  d.assignment?.name === t.name
+                                    ? "bg-yellow/10 text-yellow"
+                                    : "hover:bg-[var(--bg-card)] text-[var(--fg)]"
+                                }`}
+                              >
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-[var(--fg-muted)]">
+                                  <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+                                  <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+                                </svg>
+                                <span className="font-sans text-xs flex-1 truncate">{t.name}</span>
+                                {d.assignment?.name === t.name && (
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-yellow shrink-0">
+                                    <path d="M20 6L9 17l-5-5"/>
+                                  </svg>
+                                )}
+                              </button>
+                            ))}
+
+                            {/* Link page group */}
+                            <p className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mt-2 mb-1 px-1">Link pages</p>
+                            {ASSIGN_TARGETS.filter((t) => t.type === "links").map((t) => (
+                              <button
+                                key={t.name + t.path}
+                                onClick={() => assign(d.id, t)}
+                                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors ${
+                                  d.assignment?.name === t.name && d.assignment?.path === t.path
+                                    ? "bg-yellow/10 text-yellow"
+                                    : "hover:bg-[var(--bg-card)] text-[var(--fg)]"
+                                }`}
+                              >
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-[var(--fg-muted)]">
+                                  <rect x="3" y="4" width="18" height="4" rx="2"/><rect x="3" y="10" width="18" height="4" rx="2"/><rect x="3" y="16" width="18" height="4" rx="2"/>
+                                </svg>
+                                <span className="font-sans text-xs flex-1 truncate">{t.name}{t.path !== "/" && <span className="text-[var(--fg-muted)]"> → {t.path}</span>}</span>
+                                {d.assignment?.name === t.name && d.assignment?.path === t.path && (
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-yellow shrink-0">
+                                    <path d="M20 6L9 17l-5-5"/>
+                                  </svg>
+                                )}
+                              </button>
+                            ))}
+
+                            {/* Unassign */}
+                            {d.assignment && (
+                              <button
+                                onClick={() => assign(d.id, null)}
+                                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-left hover:bg-[var(--bg-card)] transition-colors mt-1"
+                              >
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-red-400">
+                                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                                <span className="font-sans text-xs text-red-400">Remove assignment</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Info callout */}
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 flex items-start gap-3">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0 mt-0.5">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <p className="font-sans text-xs text-[var(--fg-muted)] leading-relaxed">
+          Domains are renewed annually. After purchasing, DNS propagation can take up to 48 hours. You can assign one domain to any portfolio or link page, and add additional routes (e.g. <span className="font-mono text-[var(--fg)]">/links</span>) to the same domain.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /* ── Main page ── */
 export default function PortfolioPage() {
-  const [selectedId, setSelectedId]     = useState<string | null>(null);
+  const [section,      setSection]      = useState<"portfolios" | "domains">("portfolios");
+  const [selectedId,   setSelectedId]   = useState<string | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
 
   const selectedPortfolio = MOCK_PORTFOLIOS.find((p) => p.id === selectedId) ?? null;
@@ -598,8 +992,8 @@ export default function PortfolioPage() {
 
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      {/* ── Header ── */}
+      <div className="flex items-start justify-between mb-5 gap-4 flex-wrap">
         <div>
           <h1 className="font-sans font-black text-[var(--fg)] text-xl">Portfolio</h1>
           <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">
@@ -607,43 +1001,67 @@ export default function PortfolioPage() {
             {drafts > 0 && <> · <span>{drafts} draft{drafts > 1 ? "s" : ""}</span></>}
           </p>
         </div>
-        <button
-          onClick={() => setShowNewModal(true)}
-          className="btn-primary flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-sans font-bold text-sm"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-          New portfolio
-        </button>
+        {section === "portfolios" && (
+          <button
+            onClick={() => setShowNewModal(true)}
+            className="btn-primary flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-sans font-bold text-sm"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            New portfolio
+          </button>
+        )}
       </div>
 
-      {/* Grid */}
-      {MOCK_PORTFOLIOS.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[var(--bg-subtle)] flex items-center justify-center mb-4 text-[var(--fg-muted)]">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></svg>
-          </div>
-          <p className="font-sans font-semibold text-[var(--fg)] mb-1">No portfolios yet</p>
-          <p className="font-serif text-sm text-[var(--fg-muted)] mb-5">Create your first portfolio website</p>
-          <button onClick={() => setShowNewModal(true)} className="btn-primary px-5 py-2.5 rounded-xl font-sans font-bold text-sm">
-            Create portfolio
+      {/* ── Section tabs ── */}
+      <div className="flex gap-0 border-b border-[var(--border)] mb-6">
+        {(["portfolios", "domains"] as const).map((s) => (
+          <button
+            key={s}
+            onClick={() => setSection(s)}
+            className={`px-4 py-2.5 font-sans text-sm font-medium border-b-2 capitalize transition-colors -mb-px ${
+              section === s
+                ? "border-yellow text-[var(--fg)]"
+                : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"
+            }`}
+          >
+            {s}
           </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {MOCK_PORTFOLIOS.map((p) => (
-            <PortfolioCard key={p.id} p={p} onOpen={() => setSelectedId(p.id)} />
-          ))}
-        </div>
+        ))}
+      </div>
+
+      {/* ── Portfolios section ── */}
+      {section === "portfolios" && (
+        MOCK_PORTFOLIOS.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-32 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-[var(--bg-subtle)] flex items-center justify-center mb-4 text-[var(--fg-muted)]">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+            </div>
+            <p className="font-sans font-semibold text-[var(--fg)] mb-1">No portfolios yet</p>
+            <p className="font-serif text-sm text-[var(--fg-muted)] mb-5">Create your first portfolio website</p>
+            <button onClick={() => setShowNewModal(true)} className="btn-primary px-5 py-2.5 rounded-xl font-sans font-bold text-sm">
+              Create portfolio
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {MOCK_PORTFOLIOS.map((p) => (
+              <PortfolioCard key={p.id} p={p} onOpen={() => setSelectedId(p.id)} />
+            ))}
+          </div>
+        )
       )}
 
-      {/* Portfolio detail modal */}
+      {/* ── Domains section ── */}
+      {section === "domains" && <DomainsTab />}
+
+      {/* Modals */}
       <AnimatePresence>
         {selectedPortfolio && (
           <PortfolioModal p={selectedPortfolio} onClose={() => setSelectedId(null)} />
         )}
       </AnimatePresence>
-
-      {/* New portfolio modal */}
       <AnimatePresence>
         {showNewModal && <NewPortfolioModal onClose={() => setShowNewModal(false)} />}
       </AnimatePresence>
