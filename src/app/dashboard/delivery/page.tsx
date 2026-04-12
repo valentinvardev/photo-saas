@@ -824,54 +824,55 @@ function DeliveryCard({ page, onEdit }: { page: DeliveryPage; onEdit: () => void
     : 0;
 
   return (
-    <div className="group cursor-pointer" onClick={onEdit}>
-      {/* Cover image — no card chrome, just the image */}
-      <div className="relative rounded-2xl overflow-hidden bg-[var(--bg-subtle)]" style={{ aspectRatio: "3/2" }}>
+    <div
+      className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-[var(--fg-muted)] transition-all duration-200 cursor-pointer"
+      onClick={onEdit}
+    >
+      {/* Cover — fixed height, no border-radius (inherits from parent) */}
+      <div className="relative h-36 overflow-hidden bg-[var(--bg-subtle)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`https://picsum.photos/seed/${page.coverSeed}/800/600?grayscale`} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+        <img src={`https://picsum.photos/seed/${page.coverSeed}/600/300?grayscale`} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 
-        {/* Top badges */}
-        <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2">
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-black/50 backdrop-blur-sm ${sm.text}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${sm.dot}`} />
-            {sm.label}
-          </div>
-          <div className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-[10px] font-mono text-white/80 capitalize">
-            {page.mode === "selection" ? `Pick ${page.selectionLimit}` : page.mode}
-          </div>
+        {/* Status */}
+        <div className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-mono bg-black/40 backdrop-blur-sm ${sm.text}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${sm.dot}`} />
+          {sm.label}
         </div>
 
-        {/* Client name overlaid at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-3.5 pt-8">
-          <div className="font-sans font-black text-white text-sm leading-tight">{page.client}</div>
-          <div className="font-mono text-[10px] text-white/55 mt-0.5">{page.title}</div>
+        {/* Mode */}
+        <div className="absolute top-2.5 right-2.5 px-2 py-1 rounded-md bg-black/40 backdrop-blur-sm text-[10px] font-mono text-white/70 capitalize">
+          {page.mode === "selection" ? `Pick ${page.selectionLimit}` : page.mode}
         </div>
       </div>
 
-      {/* Minimal text row below image — no background */}
-      <div className="flex items-center gap-3 px-1 pt-2.5">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <span className="font-mono text-[11px] text-[var(--fg-muted)]">{page.photoCount} photos</span>
-          <span className="font-mono text-[11px] text-[var(--fg-muted)]">{page.views} views</span>
-          {discount > 0 && <span className="font-mono text-[10px] text-green-400">−{discount}%</span>}
-          {page.passwordEnabled && (
-            <span title="Password protected" className="text-[var(--fg-muted)]">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-            </span>
-          )}
-          {page.watermark && (
-            <span title="Watermarked" className="text-[var(--fg-muted)]">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </span>
-          )}
+      {/* Body */}
+      <div className="p-3">
+        {/* Client + title */}
+        <div className="mb-2">
+          <div className="font-sans font-bold text-[var(--fg)] text-xs truncate">{page.client}</div>
+          <div className="font-mono text-[10px] text-[var(--fg-muted)] truncate mt-0.5">{page.title}</div>
         </div>
-        <button
-          onClick={(e) => { e.stopPropagation(); onEdit(); }}
-          className="font-sans text-xs font-bold text-yellow hover:opacity-70 transition-opacity shrink-0"
-        >
-          Edit
-        </button>
+
+        {/* Stats row */}
+        <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
+          <div className="flex items-center gap-2.5">
+            <span className="font-mono text-[9px] text-[var(--fg-muted)]">{page.photoCount} photos</span>
+            <span className="font-mono text-[9px] text-[var(--fg-muted)]">{page.views} views</span>
+            {discount > 0 && <span className="font-mono text-[9px] text-green-400">−{discount}%</span>}
+          </div>
+          <div className="flex items-center gap-1.5 text-[var(--fg-muted)]">
+            {page.passwordEnabled && (
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            )}
+            {page.watermark && (
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            )}
+            {page.proofingEnabled && (
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1016,7 +1017,7 @@ export default function DeliveryPagesPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {pages.map((p) => (
             <DeliveryCard key={p.id} page={p} onEdit={() => setEditingPage(p)} />
           ))}
