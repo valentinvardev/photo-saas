@@ -276,14 +276,33 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
       role="switch"
       aria-checked={checked}
       onClick={onChange}
-      className={`relative w-9 h-5 rounded-full transition-colors shrink-0 ${
-        checked ? "bg-yellow" : "bg-[var(--bg-subtle)] border border-[var(--border)]"
-      }`}
+      style={{
+        position:        "relative",
+        display:         "inline-flex",
+        flexShrink:      0,
+        width:           36,
+        height:          20,
+        borderRadius:    9999,
+        border:          checked ? "none" : "1px solid var(--border)",
+        padding:         0,
+        cursor:          "pointer",
+        backgroundColor: checked ? "#fad502" : "var(--bg-subtle)",
+        transition:      "background-color 150ms",
+      }}
     >
       <span
-        className={`absolute top-[2px] w-4 h-4 rounded-full shadow transition-transform duration-150 ${
-          checked ? "bg-[#111] translate-x-[18px]" : "bg-[var(--fg-muted)] translate-x-[2px]"
-        }`}
+        style={{
+          position:        "absolute",
+          top:             2,
+          left:            checked ? 18 : 2,
+          width:           16,
+          height:          16,
+          borderRadius:    "50%",
+          backgroundColor: checked ? "#111111" : "var(--fg-muted)",
+          boxShadow:       "0 1px 3px rgba(0,0,0,0.25)",
+          transition:      "left 150ms, background-color 150ms",
+          pointerEvents:   "none",
+        }}
       />
     </button>
   );
