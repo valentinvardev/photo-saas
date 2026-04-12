@@ -18,6 +18,7 @@ interface DeliveryPage {
   client:           string;
   status:           DeliveryStatus;
   photoCount:       number;
+  photoSeeds:       number[];   // photos added to this delivery
   coverSeed:        number;
   views:            number;
   lastViewed:       string | null;
@@ -47,12 +48,13 @@ interface DeliveryPage {
    MOCK DATA
 ══════════════════════════════════════════════════════════════════════════ */
 
-const SEED_PHOTOS = [301,302,303,304,305,306,307,308,309,310,311,312];
+// All photos in the photographer's general gallery (mock)
+const ALL_GALLERY_SEEDS = Array.from({ length: 48 }, (_, i) => i + 10);
 
 const INITIAL_PAGES: DeliveryPage[] = [
   {
     id: "dp1", title: "Wedding Gallery", client: "Sarah & James",
-    status: "active", photoCount: 247, coverSeed: 401,
+    status: "active", photoCount: 247, photoSeeds: [10,11,12,13,14,15,16,17,18,19,20,21], coverSeed: 401,
     views: 12, lastViewed: "2 hours ago", createdAt: "Apr 2, 2026", expiresAt: "May 2, 2026",
     passwordEnabled: true,  password: "sarah2026", whitelistEnabled: false, whitelist: [],
     mode: "selection", selectionLimit: 30, pricePerPhoto: 0, priceFullGallery: 0,
@@ -61,7 +63,7 @@ const INITIAL_PAGES: DeliveryPage[] = [
   },
   {
     id: "dp2", title: "Commercial Shoot", client: "Nike Brand",
-    status: "draft", photoCount: 84, coverSeed: 402,
+    status: "draft", photoCount: 84, photoSeeds: [22,23,24,25,26,27,28,29], coverSeed: 402,
     views: 0, lastViewed: null, createdAt: "Apr 8, 2026", expiresAt: null,
     passwordEnabled: false, password: "", whitelistEnabled: true, whitelist: ["brand@nike.com", "creative@nike.com"],
     mode: "gift", selectionLimit: 0, pricePerPhoto: 0, priceFullGallery: 0,
@@ -70,7 +72,7 @@ const INITIAL_PAGES: DeliveryPage[] = [
   },
   {
     id: "dp3", title: "Portrait Session", client: "Emma K.",
-    status: "expired", photoCount: 48, coverSeed: 403,
+    status: "expired", photoCount: 48, photoSeeds: [30,31,32,33,34,35], coverSeed: 403,
     views: 34, lastViewed: "3 days ago", createdAt: "Mar 1, 2026", expiresAt: "Apr 1, 2026",
     passwordEnabled: false, password: "", whitelistEnabled: false, whitelist: [],
     mode: "direct", selectionLimit: 0, pricePerPhoto: 12, priceFullGallery: 399,
@@ -80,7 +82,7 @@ const INITIAL_PAGES: DeliveryPage[] = [
 ];
 
 const DEFAULT_PAGE: Omit<DeliveryPage, "id" | "title" | "client" | "createdAt"> = {
-  status: "draft", photoCount: 0, coverSeed: 404,
+  status: "draft", photoCount: 0, photoSeeds: [], coverSeed: 404,
   views: 0, lastViewed: null, expiresAt: null,
   passwordEnabled: false, password: "", whitelistEnabled: false, whitelist: [],
   mode: "gift", selectionLimit: 20, pricePerPhoto: 15, priceFullGallery: 299,
@@ -514,7 +516,8 @@ const TEMPLATE_STYLES: Record<TemplateName, { bg: string; fg: string; muted: str
 
 function GalleryPreview({ page, viewport }: { page: DeliveryPage; viewport: "mobile" | "desktop" }) {
   const ts = TEMPLATE_STYLES[page.template];
-  const photos = SEED_PHOTOS.slice(0, Math.min(page.photoCount || 12, 12));
+  const allSeeds = page.photoSeeds.length > 0 ? page.photoSeeds : ALL_GALLERY_SEEDS.slice(0, 12);
+  const photos = allSeeds.slice(0, 12);
   const isMobile = viewport === "mobile";
 
   const heights = [110, 80, 140, 100, 120, 90, 130, 85, 115, 95, 125, 100];
@@ -582,7 +585,7 @@ function GalleryPreview({ page, viewport }: { page: DeliveryPage; viewport: "mob
       <div style={{ padding: isMobile ? "8px 8px" : "12px 12px", flex: 1 }}>
         {page.layout === "masonry" ? (
           <div style={{ columns: isMobile ? 2 : 3, gap: 6 }}>
-            {photos.map((seed, i) => (
+            {photos.map((seed: number, i: number) => (
               <div key={seed} style={{ breakInside: "avoid", marginBottom: 6, position: "relative" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -610,7 +613,7 @@ function GalleryPreview({ page, viewport }: { page: DeliveryPage; viewport: "mob
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: `repeat(${isMobile ? 2 : 3}, 1fr)`, gap: 6 }}>
-            {photos.map((seed, i) => (
+            {photos.map((seed: number, i: number) => (
               <div key={seed} style={{ position: "relative", aspectRatio: "1", overflow: "hidden", borderRadius: 4 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`https://picsum.photos/seed/${seed}/300/300?grayscale`} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
@@ -817,10 +820,182 @@ function Builder({ page: initial, onBack, onSave }: { page: DeliveryPage; onBack
    DELIVERY PAGE CARD (list view)
 ══════════════════════════════════════════════════════════════════════════ */
 
-function DeliveryCard({ page, onEdit }: { page: DeliveryPage; onEdit: () => void }) {
+/* ══════════════════════════════════════════════════════════════════════════
+   GALLERY MODAL
+══════════════════════════════════════════════════════════════════════════ */
+
+function GalleryModal({
+  page,
+  onSave,
+  onClose,
+}: {
+  page: DeliveryPage;
+  onSave: (seeds: number[]) => void;
+  onClose: () => void;
+}) {
+  const [selected, setSelected] = useState<Set<number>>(new Set(page.photoSeeds));
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [onClose]);
+
+  const toggle = (seed: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(seed)) next.delete(seed); else next.add(seed);
+      return next;
+    });
+  };
+
+  const remove = (seed: number) => {
+    setSelected((prev) => { const next = new Set(prev); next.delete(seed); return next; });
+  };
+
+  const handleSave = () => {
+    onSave(Array.from(selected));
+    onClose();
+  };
+
+  const clientPhotos = ALL_GALLERY_SEEDS.filter((s) => selected.has(s));
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.97, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 28 }}
+        className="w-full max-w-5xl h-[80vh] flex flex-col rounded-2xl bg-[var(--bg)] border border-[var(--border)] shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
+          <div>
+            <h3 className="font-sans font-black text-[var(--fg)] text-sm">Gallery</h3>
+            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">{page.client} · {page.title}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[11px] text-[var(--fg-muted)]">{selected.size} selected</span>
+            <button
+              onClick={handleSave}
+              className="px-4 py-1.5 rounded-lg bg-yellow text-[#111] font-sans font-bold text-xs hover:opacity-90 transition-opacity"
+            >
+              Save
+            </button>
+            <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Body — two panels */}
+        <div className="flex flex-1 min-h-0">
+
+          {/* LEFT — general gallery */}
+          <div className="flex-1 flex flex-col border-r border-[var(--border)] min-w-0">
+            <div className="px-4 py-2.5 border-b border-[var(--border)] shrink-0">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
+                Your Gallery · {ALL_GALLERY_SEEDS.length} photos
+              </span>
+            </div>
+            <div className="flex-1 overflow-y-auto p-3">
+              <div className="grid grid-cols-5 gap-1.5">
+                {ALL_GALLERY_SEEDS.map((seed) => {
+                  const inDelivery = selected.has(seed);
+                  return (
+                    <button
+                      key={seed}
+                      onClick={() => toggle(seed)}
+                      className="relative aspect-square overflow-hidden bg-[var(--bg-subtle)] group/photo focus:outline-none"
+                      style={{ outline: inDelivery ? "2px solid #fad502" : "none", outlineOffset: -2 }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`https://picsum.photos/seed/${seed}/160/160?grayscale`}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                      {inDelivery && (
+                        <div className="absolute inset-0 bg-yellow/20 flex items-center justify-center">
+                          <div className="w-5 h-5 rounded-full bg-yellow flex items-center justify-center">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          </div>
+                        </div>
+                      )}
+                      {!inDelivery && (
+                        <div className="absolute inset-0 bg-black/0 group-hover/photo:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover/photo:opacity-100">
+                          <div className="w-5 h-5 rounded-full bg-white/20 border border-white/50 flex items-center justify-center">
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT — client delivery gallery */}
+          <div className="flex-1 flex flex-col min-w-0">
+            <div className="px-4 py-2.5 border-b border-[var(--border)] shrink-0">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
+                Client Gallery · {selected.size} photos
+              </span>
+            </div>
+            <div className="flex-1 overflow-y-auto p-3">
+              {clientPhotos.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center gap-2 text-[var(--fg-muted)]">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  <p className="font-sans text-xs">Click photos on the left to add them</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-1.5">
+                  {clientPhotos.map((seed) => (
+                    <button
+                      key={seed}
+                      onClick={() => remove(seed)}
+                      className="relative aspect-square overflow-hidden bg-[var(--bg-subtle)] group/photo focus:outline-none"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`https://picsum.photos/seed/${seed}/160/160?grayscale`}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover/photo:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover/photo:opacity-100">
+                        <div className="w-5 h-5 rounded-full bg-red-500/80 flex items-center justify-center">
+                          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DELIVERY CARD
+══════════════════════════════════════════════════════════════════════════ */
+
+function DeliveryCard({ page, onEdit, onGallery }: { page: DeliveryPage; onEdit: () => void; onGallery: () => void }) {
   const sm = STATUS_META[page.status];
+  const photoCount = page.photoSeeds.length || page.photoCount;
   const discount = page.pricePerPhoto > 0 && page.priceFullGallery > 0
-    ? Math.round((1 - page.priceFullGallery / (page.pricePerPhoto * page.photoCount)) * 100)
+    ? Math.round((1 - page.priceFullGallery / (page.pricePerPhoto * photoCount)) * 100)
     : 0;
 
   return (
@@ -857,7 +1032,14 @@ function DeliveryCard({ page, onEdit }: { page: DeliveryPage; onEdit: () => void
         {/* Stats row */}
         <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-[9px] text-[var(--fg-muted)]">{page.photoCount} photos</span>
+            {/* Gallery button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); onGallery(); }}
+              className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] hover:text-yellow transition-colors"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              {photoCount} photos
+            </button>
             <span className="font-mono text-[9px] text-[var(--fg-muted)]">{page.views} views</span>
             {discount > 0 && <span className="font-mono text-[9px] text-green-400">−{discount}%</span>}
           </div>
@@ -947,9 +1129,10 @@ function NewPageModal({ onCreate, onClose }: { onCreate: (title: string, client:
 ══════════════════════════════════════════════════════════════════════════ */
 
 export default function DeliveryPagesPage() {
-  const [pages,       setPages]       = useState<DeliveryPage[]>(INITIAL_PAGES);
-  const [editingPage, setEditingPage] = useState<DeliveryPage | null>(null);
-  const [showNew,     setShowNew]     = useState(false);
+  const [pages,        setPages]        = useState<DeliveryPage[]>(INITIAL_PAGES);
+  const [editingPage,  setEditingPage]  = useState<DeliveryPage | null>(null);
+  const [galleryPage,  setGalleryPage]  = useState<DeliveryPage | null>(null);
+  const [showNew,      setShowNew]      = useState(false);
 
   const createPage = (title: string, client: string) => {
     const p: DeliveryPage = {
@@ -1019,12 +1202,19 @@ export default function DeliveryPagesPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {pages.map((p) => (
-            <DeliveryCard key={p.id} page={p} onEdit={() => setEditingPage(p)} />
+            <DeliveryCard key={p.id} page={p} onEdit={() => setEditingPage(p)} onGallery={() => setGalleryPage(p)} />
           ))}
         </div>
       )}
 
       <AnimatePresence>
+        {galleryPage && (
+          <GalleryModal
+            page={galleryPage}
+            onSave={(seeds) => setPages((prev) => prev.map((p) => p.id === galleryPage.id ? { ...p, photoSeeds: seeds, photoCount: seeds.length } : p))}
+            onClose={() => setGalleryPage(null)}
+          />
+        )}
         {showNew && <NewPageModal onCreate={createPage} onClose={() => setShowNew(false)} />}
       </AnimatePresence>
     </div>
