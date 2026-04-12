@@ -733,6 +733,7 @@ function PreviewFrame({ page }: { page: DeliveryPage }) {
 
 function Builder({ page: initial, onBack, onSave }: { page: DeliveryPage; onBack: () => void; onSave: (p: DeliveryPage) => void }) {
   const [page, setPage] = useState<DeliveryPage>(initial);
+  const [showGallery, setShowGallery] = useState(false);
 
   const set = useCallback(<K extends keyof DeliveryPage>(key: K, value: DeliveryPage[K]) =>
     setPage((prev) => ({ ...prev, [key]: value })), []);
@@ -791,13 +792,19 @@ function Builder({ page: initial, onBack, onSave }: { page: DeliveryPage; onBack
                 />
               </div>
               <div>
-                <label className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] block mb-1">Photo count</label>
-                <input
-                  type="number" min={1} value={page.photoCount || ""}
-                  onChange={(e) => set("photoCount", Number(e.target.value))}
-                  className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors"
-                  placeholder="e.g. 247"
-                />
+                <label className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] block mb-1">Deliverable Gallery</label>
+                <button
+                  onClick={() => setShowGallery(true)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors rounded-lg group"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  <span className="font-sans text-sm text-[var(--fg)] flex-1 text-left">
+                    {page.photoSeeds.length > 0 ? `${page.photoSeeds.length} photos selected` : "Select photos"}
+                  </span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
               </div>
             </div>
 
@@ -812,6 +819,19 @@ function Builder({ page: initial, onBack, onSave }: { page: DeliveryPage; onBack
           <PreviewFrame page={page} />
         </div>
       </div>
+
+      <AnimatePresence>
+        {showGallery && (
+          <GalleryModal
+            page={page}
+            onSave={(seeds) => {
+              set("photoSeeds", seeds);
+              set("photoCount", seeds.length);
+            }}
+            onClose={() => setShowGallery(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -991,7 +1011,7 @@ function GalleryModal({
    DELIVERY CARD
 ══════════════════════════════════════════════════════════════════════════ */
 
-function DeliveryCard({ page, onEdit, onGallery }: { page: DeliveryPage; onEdit: () => void; onGallery: () => void }) {
+function DeliveryCard({ page, onEdit }: { page: DeliveryPage; onEdit: () => void }) {
   const sm = STATUS_META[page.status];
   const photoCount = page.photoSeeds.length || page.photoCount;
   const discount = page.pricePerPhoto > 0 && page.priceFullGallery > 0
@@ -1032,14 +1052,7 @@ function DeliveryCard({ page, onEdit, onGallery }: { page: DeliveryPage; onEdit:
         {/* Stats row */}
         <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
           <div className="flex items-center gap-2.5">
-            {/* Gallery button */}
-            <button
-              onClick={(e) => { e.stopPropagation(); onGallery(); }}
-              className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] hover:text-yellow transition-colors"
-            >
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              {photoCount} photos
-            </button>
+            <span className="font-mono text-[9px] text-[var(--fg-muted)]">{photoCount} photos</span>
             <span className="font-mono text-[9px] text-[var(--fg-muted)]">{page.views} views</span>
             {discount > 0 && <span className="font-mono text-[9px] text-green-400">−{discount}%</span>}
           </div>
@@ -1129,10 +1142,9 @@ function NewPageModal({ onCreate, onClose }: { onCreate: (title: string, client:
 ══════════════════════════════════════════════════════════════════════════ */
 
 export default function DeliveryPagesPage() {
-  const [pages,        setPages]        = useState<DeliveryPage[]>(INITIAL_PAGES);
-  const [editingPage,  setEditingPage]  = useState<DeliveryPage | null>(null);
-  const [galleryPage,  setGalleryPage]  = useState<DeliveryPage | null>(null);
-  const [showNew,      setShowNew]      = useState(false);
+  const [pages,       setPages]       = useState<DeliveryPage[]>(INITIAL_PAGES);
+  const [editingPage, setEditingPage] = useState<DeliveryPage | null>(null);
+  const [showNew,     setShowNew]     = useState(false);
 
   const createPage = (title: string, client: string) => {
     const p: DeliveryPage = {
@@ -1202,19 +1214,12 @@ export default function DeliveryPagesPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {pages.map((p) => (
-            <DeliveryCard key={p.id} page={p} onEdit={() => setEditingPage(p)} onGallery={() => setGalleryPage(p)} />
+            <DeliveryCard key={p.id} page={p} onEdit={() => setEditingPage(p)} />
           ))}
         </div>
       )}
 
       <AnimatePresence>
-        {galleryPage && (
-          <GalleryModal
-            page={galleryPage}
-            onSave={(seeds) => setPages((prev) => prev.map((p) => p.id === galleryPage.id ? { ...p, photoSeeds: seeds, photoCount: seeds.length } : p))}
-            onClose={() => setGalleryPage(null)}
-          />
-        )}
         {showNew && <NewPageModal onCreate={createPage} onClose={() => setShowNew(false)} />}
       </AnimatePresence>
     </div>
