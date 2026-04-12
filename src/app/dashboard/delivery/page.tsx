@@ -824,9 +824,9 @@ function DeliveryCard({ page, onEdit }: { page: DeliveryPage; onEdit: () => void
     : 0;
 
   return (
-    <div className="group rounded-2xl overflow-hidden bg-[var(--bg-card)] cursor-pointer hover:shadow-lg transition-shadow duration-300" onClick={onEdit}>
-      {/* Cover — tall aspect ratio */}
-      <div className="relative overflow-hidden bg-[var(--bg-subtle)]" style={{ aspectRatio: "4/3" }}>
+    <div className="group cursor-pointer" onClick={onEdit}>
+      {/* Cover image — no card chrome, just the image */}
+      <div className="relative rounded-2xl overflow-hidden bg-[var(--bg-subtle)]" style={{ aspectRatio: "3/2" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={`https://picsum.photos/seed/${page.coverSeed}/800/600?grayscale`} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -842,52 +842,36 @@ function DeliveryCard({ page, onEdit }: { page: DeliveryPage; onEdit: () => void
           </div>
         </div>
 
-        {/* Bottom info */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-8">
-          <div className="font-sans font-black text-white text-base leading-tight">{page.client}</div>
-          <div className="font-mono text-[11px] text-white/55 mt-0.5">{page.title}</div>
+        {/* Client name overlaid at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-3.5 pt-8">
+          <div className="font-sans font-black text-white text-sm leading-tight">{page.client}</div>
+          <div className="font-mono text-[10px] text-white/55 mt-0.5">{page.title}</div>
         </div>
       </div>
 
-      {/* Body */}
-      <div className="px-4 py-3.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-[11px] text-[var(--fg-muted)]">{page.photoCount} photos</span>
-            <span className="font-mono text-[11px] text-[var(--fg-muted)]">{page.views} views</span>
-          </div>
-          {discount > 0 && <span className="font-mono text-[10px] text-green-400">−{discount}% bundle</span>}
+      {/* Minimal text row below image — no background */}
+      <div className="flex items-center gap-3 px-1 pt-2.5">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <span className="font-mono text-[11px] text-[var(--fg-muted)]">{page.photoCount} photos</span>
+          <span className="font-mono text-[11px] text-[var(--fg-muted)]">{page.views} views</span>
+          {discount > 0 && <span className="font-mono text-[10px] text-green-400">−{discount}%</span>}
+          {page.passwordEnabled && (
+            <span title="Password protected" className="text-[var(--fg-muted)]">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </span>
+          )}
+          {page.watermark && (
+            <span title="Watermarked" className="text-[var(--fg-muted)]">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+          )}
         </div>
-
-        <div className="flex items-center gap-2 mt-3">
-          {/* Feature icons */}
-          <div className="flex items-center gap-1.5 flex-1">
-            {page.passwordEnabled && (
-              <span title="Password protected" className="text-[var(--fg-muted)]">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              </span>
-            )}
-            {page.watermark && (
-              <span title="Watermarked" className="text-[var(--fg-muted)]">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </span>
-            )}
-            {page.proofingEnabled && (
-              <span title="Proofing enabled" className="text-[var(--fg-muted)]">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-              </span>
-            )}
-            {page.expiresAt && (
-              <span className="font-mono text-[10px] text-[var(--fg-muted)]">exp. {page.expiresAt}</span>
-            )}
-          </div>
-          <button
-            onClick={(e) => { e.stopPropagation(); onEdit(); }}
-            className="font-sans text-xs font-bold text-yellow hover:opacity-70 transition-opacity"
-          >
-            Edit
-          </button>
-        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onEdit(); }}
+          className="font-sans text-xs font-bold text-yellow hover:opacity-70 transition-opacity shrink-0"
+        >
+          Edit
+        </button>
       </div>
     </div>
   );
