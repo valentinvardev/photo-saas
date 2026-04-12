@@ -152,10 +152,10 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function Accordion({ title, icon, children, defaultOpen = false }: { title: string; icon: React.ReactNode; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border border-[var(--border)] rounded-xl overflow-hidden">
+    <div className="rounded-xl overflow-hidden bg-[var(--bg-card)]">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-2.5 px-4 py-3 bg-[var(--bg-subtle)] hover:bg-[var(--bg)] transition-colors text-left"
+        className="w-full flex items-center gap-2.5 px-4 py-3 hover:bg-[var(--bg-subtle)] transition-colors text-left"
       >
         <span className="text-[var(--fg-muted)]">{icon}</span>
         <span className="font-sans font-semibold text-sm text-[var(--fg)] flex-1">{title}</span>
@@ -167,7 +167,7 @@ function Accordion({ title, icon, children, defaultOpen = false }: { title: stri
             initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }}
             transition={{ duration: 0.18 }} className="overflow-hidden"
           >
-            <div className="px-4 py-4 space-y-4 border-t border-[var(--border)]">
+            <div className="px-4 py-4 space-y-4">
               {children}
             </div>
           </motion.div>
