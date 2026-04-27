@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 
 const SERIF = "var(--atelier-serif), 'Cormorant Garamond', 'Playfair Display', Georgia, serif";
 const SANS  = "var(--atelier-sans), Inter, -apple-system, sans-serif";
@@ -34,39 +34,127 @@ export default function AtelierPage() {
   return <AtelierGallery />;
 }
 
+/* Stagger variants for the hero entrance — start after curtain begins lifting */
+const EASE_OUT = [0.2, 0.8, 0.2, 1] as const;
+
+const heroContainer: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.18, delayChildren: 1.5 } },
+};
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.85, ease: EASE_OUT } },
+};
+const drawLine: Variants = {
+  hidden: { scaleY: 0, opacity: 0 },
+  show:   { scaleY: 1, opacity: 1, transition: { duration: 0.7, ease: EASE_OUT } },
+};
+
 function AtelierGallery() {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [curtainUp, setCurtainUp]     = useState(false);
+
+  // Curtain stays for 1.8s, then lifts
+  useEffect(() => {
+    const t = setTimeout(() => setCurtainUp(true), 1800);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <main style={{ background: "#fafaf8", color: "#0a0a0a", fontFamily: SANS, minHeight: "100vh" }}>
 
+      {/* ── Reception curtain ───────────────────────────────── */}
+      <AnimatePresence>
+        {!curtainUp && (
+          <motion.div
+            key="curtain"
+            initial={{ y: 0 }}
+            exit={{ y: "-101%" }}
+            transition={{ duration: 1.2, ease: [0.7, 0, 0.2, 1] }}
+            style={{
+              position: "fixed", inset: 0, zIndex: 1000,
+              background: "#0a0a0a", color: "#fafaf8",
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center",
+            }}
+          >
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.15 }}
+              style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 28 }}
+            >
+              Welcome
+            </motion.p>
+            <motion.h2
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.0, delay: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+              style={{ fontFamily: SERIF, fontSize: "clamp(56px, 9vw, 100px)", fontWeight: 300, letterSpacing: "-0.025em", lineHeight: 1, margin: 0, color: "#fafaf8", textAlign: "center" }}
+            >
+              Sarah <span style={{ fontStyle: "italic", fontWeight: 400, color: "rgba(255,255,255,0.7)" }}>&amp;</span> James
+            </motion.h2>
+            <motion.div
+              initial={{ scaleX: 0, opacity: 0 }}
+              animate={{ scaleX: 1, opacity: 1 }}
+              transition={{ duration: 0.9, delay: 0.85, ease: [0.2, 0.8, 0.2, 1] }}
+              style={{ width: 80, height: 1, background: "rgba(255,255,255,0.4)", margin: "32px 0 24px", transformOrigin: "center" }}
+            />
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 1.0 }}
+              style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, color: "rgba(255,255,255,0.65)", fontWeight: 300 }}
+            >
+              Your gallery is ready.
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── Top nav ─────────────────────────────────────────── */}
-      <Topbar />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 1.8 }}
+      >
+        <Topbar />
+      </motion.div>
 
       {/* ── Hero ────────────────────────────────────────────── */}
-      <header style={{ padding: "140px 48px 80px", textAlign: "center", maxWidth: 980, margin: "0 auto" }}>
-        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 36 }}>
+      <motion.header
+        variants={heroContainer}
+        initial="hidden"
+        animate="show"
+        style={{ padding: "140px 48px 80px", textAlign: "center", maxWidth: 980, margin: "0 auto" }}
+      >
+        <motion.p variants={fadeUp} style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 36 }}>
           A celebration in motion · 247 photographs
-        </p>
-        <h1 style={{
+        </motion.p>
+        <motion.h1 variants={fadeUp} style={{
           fontFamily: SERIF, fontSize: "clamp(72px, 12vw, 152px)",
           fontWeight: 300, lineHeight: 0.92, letterSpacing: "-0.035em",
           margin: 0, marginBottom: 20, color: "#0a0a0a",
         }}>
           Sarah <span style={{ fontStyle: "italic", fontWeight: 400, color: "#3a3a3a" }}>&amp;</span> James
-        </h1>
-        <p style={{
+        </motion.h1>
+        <motion.p variants={fadeUp} style={{
           fontFamily: SERIF, fontSize: "clamp(20px, 2.4vw, 28px)",
           fontStyle: "italic", color: "#4a4742", lineHeight: 1.4,
           fontWeight: 300, maxWidth: 640, margin: "0 auto",
         }}>
           A weekend in the gardens of Buenos Aires, captured at the slowest pace.
-        </p>
-        <div style={{ width: 1, height: 48, background: "#0a0a0a", margin: "72px auto 0" }} />
-      </header>
+        </motion.p>
+        <motion.div variants={drawLine} style={{ width: 1, height: 48, background: "#0a0a0a", margin: "72px auto 0", transformOrigin: "top" }} />
+      </motion.header>
 
       {/* ── Hero photo ──────────────────────────────────────── */}
-      <section style={{ padding: "0 48px 96px", maxWidth: 1480, margin: "0 auto" }}>
+      <motion.section
+        initial={{ opacity: 0, scale: 0.97, y: 24 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 1.1, delay: 2.6, ease: [0.2, 0.8, 0.2, 1] }}
+        style={{ padding: "0 48px 96px", maxWidth: 1480, margin: "0 auto" }}
+      >
         <div style={{ aspectRatio: "16/9", overflow: "hidden", background: "#000", boxShadow: "0 30px 80px -20px rgba(0,0,0,0.25)" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -83,7 +171,7 @@ function AtelierGallery() {
             April 14, 2026
           </p>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── Section divider ─────────────────────────────────── */}
       <section style={{
