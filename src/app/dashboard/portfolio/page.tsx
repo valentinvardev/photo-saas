@@ -587,28 +587,7 @@ function NewPortfolioModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   DOMAINS TAB
-══════════════════════════════════════════════════════════════════════════ */
-
-interface DomainItem {
-  id: string;
-  domain: string;
-  status: "active" | "pending" | "expiring";
-  expiresAt: string;
-  assignment: { type: "portfolio" | "links"; name: string; path: string } | null;
-}
-
-const TLDS: { ext: string; price: string; popular?: true }[] = [
-  { ext: ".com",         price: "14.99", popular: true  },
-  { ext: ".co",          price: "29.99", popular: true  },
-  { ext: ".net",         price: "11.99"                  },
-  { ext: ".io",          price: "49.99"                  },
-  { ext: ".photography", price: "39.99"                  },
-  { ext: ".studio",      price: "24.99"                  },
-  { ext: ".art",         price: "19.99"                  },
-  { ext: ".design",      price: "34.99"                  },
-];
+/* ── Main page ── */
 
 /* Deterministic pseudo-random availability (75% available) */
 function isDomainAvailable(full: string) {
@@ -980,9 +959,7 @@ function DomainsTab() {
   );
 }
 
-/* ── Main page ── */
 export default function PortfolioPage() {
-  const [section,      setSection]      = useState<"portfolios" | "domains">("portfolios");
   const [selectedId,   setSelectedId]   = useState<string | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
 
@@ -993,7 +970,7 @@ export default function PortfolioPage() {
   return (
     <div className="p-6">
       {/* ── Header ── */}
-      <div className="flex items-start justify-between mb-5 gap-4 flex-wrap">
+      <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="font-sans font-black text-[var(--fg)] text-xl">Portfolio</h1>
           <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">
@@ -1001,60 +978,36 @@ export default function PortfolioPage() {
             {drafts > 0 && <> · <span>{drafts} draft{drafts > 1 ? "s" : ""}</span></>}
           </p>
         </div>
-        {section === "portfolios" && (
-          <button
-            onClick={() => setShowNewModal(true)}
-            className="btn-primary flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-sans font-bold text-sm"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            New portfolio
-          </button>
-        )}
+        <button
+          onClick={() => setShowNewModal(true)}
+          className="btn-primary flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-sans font-bold text-sm"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          New portfolio
+        </button>
       </div>
 
-      {/* ── Section tabs ── */}
-      <div className="flex gap-0 border-b border-[var(--border)] mb-6">
-        {(["portfolios", "domains"] as const).map((s) => (
-          <button
-            key={s}
-            onClick={() => setSection(s)}
-            className={`px-4 py-2.5 font-sans text-sm font-medium border-b-2 capitalize transition-colors -mb-px ${
-              section === s
-                ? "border-yellow text-[var(--fg)]"
-                : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"
-            }`}
-          >
-            {s}
+      {/* ── Grid ── */}
+      {MOCK_PORTFOLIOS.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-32 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--bg-subtle)] flex items-center justify-center mb-4 text-[var(--fg-muted)]">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          </div>
+          <p className="font-sans font-semibold text-[var(--fg)] mb-1">No portfolios yet</p>
+          <p className="font-serif text-sm text-[var(--fg-muted)] mb-5">Create your first portfolio website</p>
+          <button onClick={() => setShowNewModal(true)} className="btn-primary px-5 py-2.5 rounded-xl font-sans font-bold text-sm">
+            Create portfolio
           </button>
-        ))}
-      </div>
-
-      {/* ── Portfolios section ── */}
-      {section === "portfolios" && (
-        MOCK_PORTFOLIOS.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[var(--bg-subtle)] flex items-center justify-center mb-4 text-[var(--fg-muted)]">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-            </div>
-            <p className="font-sans font-semibold text-[var(--fg)] mb-1">No portfolios yet</p>
-            <p className="font-serif text-sm text-[var(--fg-muted)] mb-5">Create your first portfolio website</p>
-            <button onClick={() => setShowNewModal(true)} className="btn-primary px-5 py-2.5 rounded-xl font-sans font-bold text-sm">
-              Create portfolio
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {MOCK_PORTFOLIOS.map((p) => (
-              <PortfolioCard key={p.id} p={p} onOpen={() => setSelectedId(p.id)} />
-            ))}
-          </div>
-        )
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {MOCK_PORTFOLIOS.map((p) => (
+            <PortfolioCard key={p.id} p={p} onOpen={() => setSelectedId(p.id)} />
+          ))}
+        </div>
       )}
-
-      {/* ── Domains section ── */}
-      {section === "domains" && <DomainsTab />}
 
       {/* Modals */}
       <AnimatePresence>
