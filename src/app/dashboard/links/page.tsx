@@ -471,14 +471,23 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function ColorRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const inputRef = useRef<HTMLInputElement>(null);
   return (
     <div className="flex items-center gap-2">
       <span className="font-sans text-xs text-[var(--fg-muted)] flex-1 truncate">{label}</span>
-      <label className="flex items-center gap-1.5 border border-[var(--border)] rounded-lg px-2 py-1 cursor-pointer hover:border-[var(--fg-muted)] transition-colors">
-        <span className="w-4 h-4 rounded shrink-0 border border-black/10" style={{ background: value }} />
-        <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="sr-only" />
+      <div className="flex items-center gap-1.5 border border-[var(--border)] rounded-lg px-2 py-1 hover:border-[var(--fg-muted)] transition-colors cursor-pointer" onClick={() => inputRef.current?.click()}>
+        <div className="relative w-4 h-4 shrink-0">
+          <div className="w-4 h-4 rounded border border-black/10" style={{ background: value }} />
+          <input
+            ref={inputRef}
+            type="color"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            style={{ position: "absolute", top: 0, left: 0, width: 1, height: 1, opacity: 0, border: "none", padding: 0, cursor: "pointer" }}
+          />
+        </div>
         <span className="font-mono text-[11px] text-[var(--fg)] w-14 select-none">{value}</span>
-      </label>
+      </div>
     </div>
   );
 }
