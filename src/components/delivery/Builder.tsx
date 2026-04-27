@@ -427,45 +427,11 @@ function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; 
    TAB CONTENT
 ══════════════════════════════════════════════════════════════════════════ */
 
-type TabId = "page" | "design" | "access" | "monetize";
+type TabId = "page" | "access" | "monetize";
 
 type Setter = <K extends keyof DeliveryPage>(k: K, v: DeliveryPage[K]) => void;
 
 function PageTab({ page, set, onOpenGallery }: { page: DeliveryPage; set: Setter; onOpenGallery: () => void }) {
-  return (
-    <div className="space-y-6">
-      <Section title="Page info">
-        <div>
-          <FieldLabel>Title</FieldLabel>
-          <input value={page.title} onChange={(e) => set("title", e.target.value)}
-            className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors" />
-        </div>
-        <div>
-          <FieldLabel>Client</FieldLabel>
-          <input value={page.client} onChange={(e) => set("client", e.target.value)}
-            className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors" />
-        </div>
-      </Section>
-
-      <Section title="Photos">
-        <FieldLabel>Deliverable gallery</FieldLabel>
-        <button onClick={onOpenGallery}
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors rounded-lg"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0">
-            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-          </svg>
-          <span className="font-sans text-sm text-[var(--fg)] flex-1 text-left">
-            {page.photoSeeds.length > 0 ? `${page.photoSeeds.length} photos selected` : "Select photos"}
-          </span>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </Section>
-    </div>
-  );
-}
-
-function DesignTab({ page, set }: { page: DeliveryPage; set: Setter }) {
   const [showTemplates, setShowTemplates] = useState(false);
   const current = TEMPLATES.find((t) => t.id === page.template)!;
 
@@ -483,25 +449,52 @@ function DesignTab({ page, set }: { page: DeliveryPage; set: Setter }) {
 
   return (
     <div className="space-y-6">
-      <Section title="Template">
-        <button onClick={() => setShowTemplates(true)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors rounded-lg"
-        >
-          <div className="w-8 h-8 rounded-lg shrink-0 border border-[var(--border)]" style={{ background: current.accent }} />
-          <div className="flex-1 text-left min-w-0">
-            <div className="font-sans text-sm font-semibold text-[var(--fg)]">{current.label}</div>
-            <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{current.desc}</div>
-          </div>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <AnimatePresence>
-          {showTemplates && (
-            <TemplateModal current={page.template} onSelect={(t) => set("template", t)} onClose={() => setShowTemplates(false)} />
-          )}
-        </AnimatePresence>
+      <Section title="Page info">
+        <div>
+          <FieldLabel>Title</FieldLabel>
+          <input value={page.title} onChange={(e) => set("title", e.target.value)}
+            className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors" />
+        </div>
+        <div>
+          <FieldLabel>Client</FieldLabel>
+          <input value={page.client} onChange={(e) => set("client", e.target.value)}
+            className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors" />
+        </div>
+        <div>
+          <FieldLabel>Deliverable gallery</FieldLabel>
+          <button onClick={onOpenGallery}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors rounded-lg"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span className="font-sans text-sm text-[var(--fg)] flex-1 text-left">
+              {page.photoSeeds.length > 0 ? `${page.photoSeeds.length} photos selected` : "Select photos"}
+            </span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
       </Section>
 
-      <Section title="Branding">
+      <Section title="Design">
+        <div>
+          <FieldLabel>Template</FieldLabel>
+          <button onClick={() => setShowTemplates(true)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors rounded-lg"
+          >
+            <div className="w-8 h-8 rounded-lg shrink-0 border border-[var(--border)]" style={{ background: current.accent }} />
+            <div className="flex-1 text-left min-w-0">
+              <div className="font-sans text-sm font-semibold text-[var(--fg)]">{current.label}</div>
+              <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{current.desc}</div>
+            </div>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <AnimatePresence>
+            {showTemplates && (
+              <TemplateModal current={page.template} onSelect={(t) => set("template", t)} onClose={() => setShowTemplates(false)} />
+            )}
+          </AnimatePresence>
+        </div>
         <div>
           <FieldLabel>Cover image</FieldLabel>
           <ImageButton value={page.coverUrl} onChange={(u) => set("coverUrl", u)} placeholder="Use template default" />
@@ -536,9 +529,6 @@ function DesignTab({ page, set }: { page: DeliveryPage; set: Setter }) {
             )}
           </div>
         </div>
-      </Section>
-
-      <Section title="Style">
         <div>
           <div className="flex items-center justify-between mb-2">
             <FieldLabel>Custom colors</FieldLabel>
@@ -565,9 +555,6 @@ function DesignTab({ page, set }: { page: DeliveryPage; set: Setter }) {
             ))}
           </select>
         </div>
-      </Section>
-
-      <Section title="Layout">
         <div>
           <FieldLabel>Photo layout</FieldLabel>
           <div className="flex gap-2">
@@ -806,7 +793,6 @@ function MonetizeTab({ page, set }: { page: DeliveryPage; set: Setter }) {
 
 const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "page",     label: "Page",     icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> },
-  { id: "design",   label: "Design",   icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg> },
   { id: "access",   label: "Access",   icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> },
   { id: "monetize", label: "Monetize", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
 ];
@@ -818,7 +804,7 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
   const hydrated = useDeliveryStore((s) => s.hydrated);
 
   const [page, setPage] = useState<DeliveryPage | null>(storePage ?? null);
-  const [tab, setTab] = useState<TabId>("design");
+  const [tab, setTab] = useState<TabId>("page");
   const [showGallery, setShowGallery] = useState(false);
   const [dirty, setDirty] = useState(false);
 
@@ -918,7 +904,6 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
           {/* Tab content */}
           <div className="flex-1 overflow-y-auto p-4">
             {tab === "page"     && <PageTab     page={page} set={set} onOpenGallery={() => setShowGallery(true)} />}
-            {tab === "design"   && <DesignTab   page={page} set={set} />}
             {tab === "access"   && <AccessTab   page={page} set={set} />}
             {tab === "monetize" && <MonetizeTab page={page} set={set} />}
           </div>
