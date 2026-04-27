@@ -85,60 +85,355 @@ function SearchResult({ domain, available, price }: { domain: string; available:
   );
 }
 
-/* ─── page card for the dashboard ─── */
-function PageCard({ label, url, status, icon, editHref }: {
-  label: string; url: string; status: "live" | "draft"; icon: React.ReactNode; editHref: string;
+/* ─── manage modal ─── */
+type PageId = "portfolio" | "links" | "delivery";
+
+function ManageModal({ pageId, url, onClose }: { pageId: PageId; url: string; onClose: () => void }) {
+  const [published, setPublished] = useState(true);
+  const [seoIndex,  setSeoIndex]  = useState(true);
+  const [pwProtect, setPwProtect] = useState(false);
+  const [seoTitle,  setSeoTitle]  = useState("");
+  const [seoDesc,   setSeoDesc]   = useState("");
+
+  const titles: Record<PageId, string> = {
+    portfolio: "Portfolio settings",
+    links:     "Links page settings",
+    delivery:  "Delivery settings",
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      {/* backdrop */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+
+      {/* panel */}
+      <div className="relative w-full max-w-lg bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+
+        {/* header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
+          <div>
+            <h2 className="font-sans text-sm font-semibold text-[var(--fg)]">{titles[pageId]}</h2>
+            <p className="font-mono text-[11px] text-[var(--fg-muted)] mt-0.5">{url}</p>
+          </div>
+          <button onClick={onClose} className="text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors p-1 rounded-lg hover:bg-[var(--bg-subtle)]">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        {/* scrollable body */}
+        <div className="overflow-y-auto flex-1">
+
+          {/* visibility */}
+          <div className="px-6 py-4 border-b border-[var(--border-subtle)]">
+            <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider mb-3">Visibility</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-sans text-sm font-medium text-[var(--fg)]">Published</p>
+                <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">
+                  {published ? "Publicly accessible at your domain." : "Hidden — only you can see it."}
+                </p>
+              </div>
+              <button
+                onClick={() => setPublished(p => !p)}
+                className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${published ? "bg-yellow" : "bg-[var(--border)]"}`}
+                role="switch" aria-checked={published}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${published ? "translate-x-4" : ""}`} />
+              </button>
+            </div>
+          </div>
+
+          {/* page-specific sections */}
+          {pageId === "portfolio" && (
+            <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex flex-col gap-4">
+              <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider">Template</p>
+              <div className="flex items-center gap-3 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-xl px-4 py-3">
+                <div className="w-8 h-8 rounded-lg bg-[#111] border border-white/10 flex items-center justify-center shrink-0">
+                  <span className="font-sans font-black text-white text-[10px]">BW</span>
+                </div>
+                <div className="flex-1">
+                  <p className="font-sans text-sm font-medium text-[var(--fg)]">Minimal BW</p>
+                  <p className="font-sans text-xs text-[var(--fg-muted)]">Dark editorial · 8 sections</p>
+                </div>
+                <a href="/dashboard/templates" className="font-sans text-xs font-semibold text-yellow hover:text-yellow-dark transition-colors">Change</a>
+              </div>
+            </div>
+          )}
+
+          {pageId === "links" && (
+            <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex flex-col gap-3">
+              <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider">Links</p>
+              <div className="flex items-center justify-between bg-[var(--bg-subtle)] border border-[var(--border)] rounded-xl px-4 py-3">
+                <div>
+                  <p className="font-sans text-sm font-medium text-[var(--fg)]">4 active links</p>
+                  <p className="font-sans text-xs text-[var(--fg-muted)]">Instagram, Website, Booking, Shop</p>
+                </div>
+                <a href="/dashboard/links" className="font-sans text-xs font-semibold text-yellow hover:text-yellow-dark transition-colors">Manage</a>
+              </div>
+              <div className="flex items-center justify-between bg-[var(--bg-subtle)] border border-[var(--border)] rounded-xl px-4 py-3">
+                <div>
+                  <p className="font-sans text-sm font-medium text-[var(--fg)]">Theme: Dark</p>
+                  <p className="font-sans text-xs text-[var(--fg-muted)]">8 themes available</p>
+                </div>
+                <a href="/dashboard/links" className="font-sans text-xs font-semibold text-yellow hover:text-yellow-dark transition-colors">Edit</a>
+              </div>
+            </div>
+          )}
+
+          {pageId === "delivery" && (
+            <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex flex-col gap-3">
+              <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider">Galleries</p>
+              <div className="flex items-center justify-between bg-[var(--bg-subtle)] border border-[var(--border)] rounded-xl px-4 py-3">
+                <div>
+                  <p className="font-sans text-sm font-medium text-[var(--fg)]">2 active galleries</p>
+                  <p className="font-sans text-xs text-[var(--fg-muted)]">Garcia Wedding · Smith Portraits</p>
+                </div>
+                <a href="/dashboard/delivery" className="font-sans text-xs font-semibold text-yellow hover:text-yellow-dark transition-colors">View all</a>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: "Default watermark", value: "Off" },
+                  { label: "Download resolution", value: "Full" },
+                  { label: "Expiration", value: "30 days" },
+                  { label: "Proofing mode", value: "Off" },
+                ].map(({ label, value }) => (
+                  <div key={label} className="bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg px-3 py-2.5">
+                    <p className="font-sans text-[11px] text-[var(--fg-muted)]">{label}</p>
+                    <p className="font-sans text-xs font-semibold text-[var(--fg)] mt-0.5">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* SEO — portfolio & links only */}
+          {(pageId === "portfolio" || pageId === "links") && (
+            <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex flex-col gap-3">
+              <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider">SEO</p>
+              <div>
+                <label className="block font-sans text-xs font-semibold text-[var(--fg-secondary)] mb-1.5">Page title</label>
+                <input className={`${inputCls} w-full`} placeholder="Sofia Chen — Documentary Photographer" value={seoTitle} onChange={e => setSeoTitle(e.target.value)} />
+              </div>
+              <div>
+                <label className="block font-sans text-xs font-semibold text-[var(--fg-secondary)] mb-1.5">Meta description</label>
+                <textarea className={`${inputCls} w-full resize-none`} rows={2} placeholder="Portfolio of Sofia Chen, documentary and portrait photographer based in New York." value={seoDesc} onChange={e => setSeoDesc(e.target.value)} />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-sans text-sm font-medium text-[var(--fg)]">Search engine indexing</p>
+                  <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">Allow Google and Bing to index this page.</p>
+                </div>
+                <button
+                  onClick={() => setSeoIndex(p => !p)}
+                  className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${seoIndex ? "bg-yellow" : "bg-[var(--border)]"}`}
+                  role="switch" aria-checked={seoIndex}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${seoIndex ? "translate-x-4" : ""}`} />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* password protection */}
+          <div className="px-6 py-4 border-b border-[var(--border-subtle)]">
+            <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider mb-3">Access</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-sans text-sm font-medium text-[var(--fg)]">Password protection</p>
+                <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">Require a password to view this page.</p>
+              </div>
+              <button
+                onClick={() => setPwProtect(p => !p)}
+                className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${pwProtect ? "bg-yellow" : "bg-[var(--border)]"}`}
+                role="switch" aria-checked={pwProtect}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${pwProtect ? "translate-x-4" : ""}`} />
+              </button>
+            </div>
+            {pwProtect && (
+              <input className={`${inputCls} w-full mt-3`} type="password" placeholder="Set a password…" />
+            )}
+          </div>
+
+          {/* danger zone */}
+          <div className="px-6 py-4">
+            <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider mb-3">Danger zone</p>
+            <div className="flex gap-2">
+              <button className="font-sans text-xs font-semibold text-[var(--fg-muted)] border border-[var(--border)] px-3 py-2 rounded-lg hover:text-[var(--fg)] transition-colors">
+                Unpublish
+              </button>
+              {pageId !== "delivery" && (
+                <button className="font-sans text-xs font-semibold text-red-500 border border-red-500/20 px-3 py-2 rounded-lg hover:bg-red-500/10 transition-colors">
+                  Reset content
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* footer */}
+        <div className="px-6 py-4 border-t border-[var(--border)] flex justify-end gap-2 shrink-0">
+          <button onClick={onClose} className="font-sans text-sm text-[var(--fg-muted)] border border-[var(--border)] px-4 py-2 rounded-lg hover:text-[var(--fg)] transition-colors">
+            Cancel
+          </button>
+          <button
+            onClick={onClose}
+            className="font-sans text-sm font-semibold px-5 py-2 rounded-lg bg-yellow text-[#111] hover:bg-yellow-dark transition-colors"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── page card (horizontal, 1-col) ─── */
+function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editHref, onManage }: {
+  pageId: PageId; label: string; url: string; status: "live" | "draft";
+  meta: string; icon: React.ReactNode; editHref: string; onManage: () => void;
 }) {
+  const [status, setStatus] = useState<"live" | "draft">(initialStatus);
   const [copied, setCopied] = useState(false);
+
   function copy() {
     void navigator.clipboard.writeText(`https://${url}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   }
-  return (
-    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden flex flex-col">
-      <BrowserMockup url={`https://${url}`} />
-      <div className="px-4 py-3 flex flex-col gap-2.5 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="text-[var(--fg-muted)]">{icon}</span>
-          <span className="font-sans text-sm font-semibold text-[var(--fg)] flex-1">{label}</span>
-          <span className={`font-mono text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border ${
-            status === "live"
-              ? "bg-green-500/10 text-green-500 border-green-500/20"
-              : "bg-[var(--bg-subtle)] text-[var(--fg-muted)] border-[var(--border)]"
-          }`}>
-            {status}
-          </span>
+
+  /* page-specific mockup content */
+  const mockupContent = {
+    portfolio: (
+      <div className="px-3 py-3 flex flex-col gap-2">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="h-1.5 w-12 bg-[var(--border)] rounded-full" />
+          <div className="h-1.5 w-8 bg-[var(--border-subtle)] rounded-full" />
+          <div className="ml-auto h-1.5 w-6 bg-[var(--border-subtle)] rounded-full" />
         </div>
-        <p className="font-mono text-[11px] text-[var(--fg-muted)] truncate">{url}</p>
-        <div className="flex gap-1.5 mt-auto pt-1">
-          <button
-            onClick={copy}
-            className="flex-1 font-sans text-xs font-medium py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center justify-center gap-1.5"
-          >
-            {copied ? (
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            ) : (
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            )}
-            {copied ? "Copied" : "Copy"}
+        <div className="h-12 w-full bg-[var(--bg-subtle)] rounded border border-[var(--border-subtle)] flex items-center justify-center">
+          <div className="h-1.5 w-20 bg-[var(--border)] rounded-full" />
+        </div>
+        <div className="grid grid-cols-3 gap-1">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className={`rounded aspect-square ${i === 0 ? "col-span-2 row-span-2" : ""} bg-[var(--bg-subtle)] border border-[var(--border-subtle)]`} style={{ height: i === 0 ? 40 : 18 }} />
+          ))}
+        </div>
+      </div>
+    ),
+    links: (
+      <div className="px-4 py-3 flex flex-col gap-1.5">
+        <div className="flex flex-col items-center gap-1 mb-1">
+          <div className="w-5 h-5 rounded-full bg-[var(--border)]" />
+          <div className="h-1 w-10 bg-[var(--border)] rounded-full" />
+        </div>
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-4 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border-subtle)]" />
+        ))}
+      </div>
+    ),
+    delivery: (
+      <div className="px-3 py-3 flex flex-col gap-2">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="h-1.5 w-16 bg-[var(--border)] rounded-full" />
+          <div className="ml-auto flex items-center gap-1">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)]"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            <div className="h-1 w-6 bg-[var(--border-subtle)] rounded-full" />
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-1">
+          {[...Array(9)].map((_, i) => (
+            <div key={i} className="h-8 rounded bg-[var(--bg-subtle)] border border-[var(--border-subtle)]" />
+          ))}
+        </div>
+      </div>
+    ),
+  };
+
+  return (
+    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden flex gap-0">
+
+      {/* left: browser mockup preview */}
+      <div className="shrink-0 w-48 border-r border-[var(--border)] bg-[var(--bg-subtle)] flex flex-col">
+        <div className="flex items-center gap-1 px-2 py-2 border-b border-[var(--border)] bg-[var(--bg-card)]">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-400/60" />
+          <span className="w-1.5 h-1.5 rounded-full bg-yellow/60" />
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400/60" />
+        </div>
+        <div className="flex-1 overflow-hidden">
+          {mockupContent[pageId]}
+        </div>
+      </div>
+
+      {/* right: info + actions */}
+      <div className="flex-1 min-w-0 flex flex-col px-5 py-4 gap-3">
+
+        {/* title row */}
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)] shrink-0 mt-0.5">
+            {icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-sans text-sm font-semibold text-[var(--fg)]">{label}</span>
+              {/* live/draft toggle pill */}
+              <button
+                onClick={() => setStatus(s => s === "live" ? "draft" : "live")}
+                className={`font-mono text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border transition-colors ${
+                  status === "live"
+                    ? "bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20"
+                    : "bg-[var(--bg-subtle)] text-[var(--fg-muted)] border-[var(--border)] hover:border-yellow/40 hover:text-yellow"
+                }`}
+              >
+                {status}
+              </button>
+            </div>
+            <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">{meta}</p>
+          </div>
+        </div>
+
+        {/* url row */}
+        <div className="flex items-center gap-2 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg px-3 py-2">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+          <span className="font-mono text-[11px] text-[var(--fg-muted)] truncate flex-1">{url}</span>
+          <button onClick={copy} className="shrink-0 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
+            {copied
+              ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            }
           </button>
+        </div>
+
+        {/* action row */}
+        <div className="flex items-center gap-2 mt-auto">
           <a
             href={`https://${url}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 font-sans text-xs font-medium py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center justify-center gap-1.5"
+            className="font-sans text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             Preview
           </a>
           <a
             href={editHref}
-            className="flex-1 font-sans text-xs font-semibold py-1.5 rounded-lg bg-yellow text-[#111] hover:bg-yellow-dark transition-colors flex items-center justify-center gap-1.5"
+            className="font-sans text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Edit
           </a>
+          <button
+            onClick={onManage}
+            className="ml-auto font-sans text-xs font-semibold px-4 py-1.5 rounded-lg bg-yellow text-[#111] hover:bg-yellow-dark transition-colors flex items-center gap-1.5"
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Manage
+          </button>
         </div>
       </div>
     </div>
@@ -168,6 +463,7 @@ export default function DomainPage() {
   const [saved, setSaved] = useState(false);
   const [routeLinks, setRouteLinks]       = useState("links");
   const [routeDelivery, setRouteDelivery] = useState("d");
+  const [modalPage, setModalPage] = useState<PageId | null>(null);
 
   const freeSubdomain = "sofia-chen.frame.so";
   const activeDomain =
@@ -248,32 +544,52 @@ export default function DomainPage() {
         )}
 
         {/* page cards */}
-        <div>
-          <h2 className="font-sans text-sm font-semibold text-[var(--fg)] mb-3">Your pages</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <PageCard
-              label="Portfolio"
-              url={activeDomain}
-              status="live"
-              editHref="/editor/minimal-bw"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
-            />
-            <PageCard
-              label="Links"
-              url={`${activeDomain}/${routeLinks || "links"}`}
-              status="live"
-              editHref="/dashboard/links"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>}
-            />
-            <PageCard
-              label="Delivery"
-              url={`${activeDomain}/${routeDelivery || "d"}/example-client`}
-              status="draft"
-              editHref="/dashboard/delivery"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>}
-            />
-          </div>
+        <div className="flex flex-col gap-3">
+          <h2 className="font-sans text-sm font-semibold text-[var(--fg)]">Your pages</h2>
+          <PageCard
+            pageId="portfolio"
+            label="Portfolio"
+            url={activeDomain}
+            status="live"
+            meta="Minimal BW · 8 sections · Last edited 2h ago"
+            editHref="/editor/minimal-bw"
+            icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
+            onManage={() => setModalPage("portfolio")}
+          />
+          <PageCard
+            pageId="links"
+            label="Links"
+            url={`${activeDomain}/${routeLinks || "links"}`}
+            status="live"
+            meta="4 active links · Dark theme · 128 clicks this month"
+            editHref="/dashboard/links"
+            icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>}
+            onManage={() => setModalPage("links")}
+          />
+          <PageCard
+            pageId="delivery"
+            label="Delivery"
+            url={`${activeDomain}/${routeDelivery || "d"}/client-name`}
+            status="draft"
+            meta="2 active galleries · Password protected · Full resolution"
+            editHref="/dashboard/delivery"
+            icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>}
+            onManage={() => setModalPage("delivery")}
+          />
         </div>
+
+        {/* manage modal */}
+        {modalPage && (
+          <ManageModal
+            pageId={modalPage}
+            url={
+              modalPage === "portfolio" ? activeDomain
+              : modalPage === "links"   ? `${activeDomain}/${routeLinks || "links"}`
+              : `${activeDomain}/${routeDelivery || "d"}/client-name`
+            }
+            onClose={() => setModalPage(null)}
+          />
+        )}
 
         {/* routes config */}
         <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden">
