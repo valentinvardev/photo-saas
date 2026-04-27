@@ -29,7 +29,9 @@ interface PageConfig {
   bgGradFrom:    string;
   bgGradTo:      string;
   bgGradAngle:   number;
-  bgImageUrl:    string;
+  bgImageUrl:        string;
+  bgOverlayColor:    string;
+  bgOverlayOpacity:  number;
   btnShape:      BtnShape;
   btnVariant:    BtnVariant;
   btnBg:         string;
@@ -145,7 +147,9 @@ const DEFAULT_CONFIG: PageConfig = {
   bgGradFrom:    "#111111",
   bgGradTo:      "#333333",
   bgGradAngle:   135,
-  bgImageUrl:    "",
+  bgImageUrl:        "",
+  bgOverlayColor:    "#000000",
+  bgOverlayOpacity:  0.4,
   btnShape:      "rounded",
   btnVariant:    "outline",
   btnBg:         "#111111",
@@ -830,7 +834,30 @@ function AppearanceTab({ config, setConfig }: { config: PageConfig; setConfig: R
           </div>
         )}
         {config.bgType === "image" && (
-          <BgImageButton value={config.bgImageUrl} onChange={(url) => set("bgImageUrl", url)} />
+          <div className="flex flex-col gap-2">
+            <BgImageButton value={config.bgImageUrl} onChange={(url) => set("bgImageUrl", url)} />
+            <div className="flex flex-col gap-2 pt-1 border-t border-[var(--border)]">
+              <span className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest">Overlay</span>
+              <ColorRow label="Color" value={config.bgOverlayColor} onChange={(v) => set("bgOverlayColor", v)} />
+              <div className="flex items-center gap-2">
+                <span className="font-sans text-xs text-[var(--fg-muted)] flex-1">Opacity</span>
+                <input
+                  type="range" min={0} max={1} step={0.05}
+                  value={config.bgOverlayOpacity}
+                  onChange={(e) => set("bgOverlayOpacity", Number(e.target.value))}
+                  className="w-24 accent-yellow"
+                />
+                <span className="font-mono text-xs text-[var(--fg)] w-8 text-right">
+                  {Math.round(config.bgOverlayOpacity * 100)}%
+                </span>
+              </div>
+              {/* Overlay preview swatch */}
+              <div
+                className="h-6 rounded-lg border border-[var(--border)]"
+                style={{ background: config.bgOverlayColor, opacity: config.bgOverlayOpacity }}
+              />
+            </div>
+          </div>
         )}
       </div>
 
@@ -994,10 +1021,17 @@ function LinkTreeView({ links, config }: { links: LinkItem[]; config: PageConfig
 
   return (
     <div
-      className="w-full h-full overflow-y-auto"
+      className="w-full h-full overflow-y-auto relative"
       style={{ ...getBgStyle(config), fontFamily: config.fontFamily }}
     >
-      <div className="flex flex-col items-center px-5 pt-10 pb-12 gap-4">
+      {/* Overlay — only for image background */}
+      {config.bgType === "image" && config.bgImageUrl && config.bgOverlayOpacity > 0 && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: config.bgOverlayColor, opacity: config.bgOverlayOpacity }}
+        />
+      )}
+      <div className="relative flex flex-col items-center px-5 pt-10 pb-12 gap-4">
         {/* Avatar */}
         <div
           className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center shrink-0"
