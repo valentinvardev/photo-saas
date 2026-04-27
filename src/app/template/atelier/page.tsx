@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const SERIF = "var(--atelier-serif), 'Cormorant Garamond', 'Playfair Display', Georgia, serif";
 const SANS  = "var(--atelier-sans), Inter, -apple-system, sans-serif";
 const MONO  = "var(--atelier-mono), 'Space Mono', ui-monospace, monospace";
 
 const HERO_SEED = 1015;
+const ATELIER_PASSWORD = "sarah2026";
 
 /* Editorial layout — each photo gets a deliberate column/row span to create rhythm */
 const PHOTOS: { seed: number; col: number; row: number }[] = [
@@ -26,7 +27,15 @@ const PHOTOS: { seed: number; col: number; row: number }[] = [
   { seed: 522,  col: 8, row: 4 },  // wide
 ];
 
-export default function AtelierTemplate() {
+export default function AtelierPage() {
+  const [unlocked, setUnlocked] = useState(false);
+  if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
+  return <AtelierGallery />;
+}
+
+function AtelierGallery() {
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+
   return (
     <main style={{ background: "#fafaf8", color: "#0a0a0a", fontFamily: SANS, minHeight: "100vh" }}>
 
@@ -111,7 +120,15 @@ export default function AtelierTemplate() {
           gridAutoRows: "84px",
         }}>
           {PHOTOS.map((p, i) => (
-            <Plate key={p.seed} seed={p.seed} idx={i} total={PHOTOS.length} col={p.col} row={p.row} />
+            <Plate
+              key={p.seed}
+              seed={p.seed}
+              idx={i}
+              total={PHOTOS.length}
+              col={p.col}
+              row={p.row}
+              onOpen={() => setLightboxIdx(i)}
+            />
           ))}
         </div>
       </section>
@@ -209,6 +226,11 @@ export default function AtelierTemplate() {
           <a href="#print" style={{ color: "#3a3a3a", textDecoration: "none", borderBottom: "1px solid transparent", paddingBottom: 2 }}>Print shop</a>
         </nav>
       </footer>
+
+      {/* ── Lightbox ────────────────────────────────────────── */}
+      {lightboxIdx !== null && (
+        <Lightbox photos={PHOTOS} startIndex={lightboxIdx} onClose={() => setLightboxIdx(null)} />
+      )}
     </main>
   );
 }
@@ -242,16 +264,17 @@ function Topbar() {
 }
 
 /* ── Single photo plate with hover state ──────────────────── */
-function Plate({ seed, idx, total, col, row }: { seed: number; idx: number; total: number; col: number; row: number }) {
+function Plate({ seed, idx, total, col, row, onOpen }: { seed: number; idx: number; total: number; col: number; row: number; onOpen: () => void }) {
   const [hover, setHover] = useState(false);
   return (
     <figure
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onClick={onOpen}
       style={{
         gridColumn: `span ${col}`, gridRow: `span ${row}`,
         margin: 0, position: "relative", overflow: "hidden",
-        background: "#0a0a0a", cursor: "pointer",
+        background: "#0a0a0a", cursor: "zoom-in",
       }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -289,9 +312,221 @@ function Plate({ seed, idx, total, col, row }: { seed: number; idx: number; tota
           opacity: hover ? 1 : 0,
           transition: "opacity 300ms ease",
         }}>
-          ↓ Download
+          ↗ Open
         </span>
       </figcaption>
     </figure>
+  );
+}
+
+/* ── Password gate ────────────────────────────────────────── */
+function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
+  const [pwd, setPwd] = useState("");
+  const [error, setError] = useState(false);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pwd.trim().toLowerCase() === ATELIER_PASSWORD) onUnlock();
+    else setError(true);
+  };
+
+  return (
+    <div style={{
+      minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center",
+      padding: 24,
+      background: `linear-gradient(135deg, rgba(10,10,10,0.85), rgba(10,10,10,0.65)), url(https://picsum.photos/seed/${HERO_SEED}/2400/1350) center/cover`,
+      color: "#fafaf8",
+    }}>
+      <form onSubmit={submit} style={{
+        width: 440, maxWidth: "100%",
+        background: "rgba(10,10,10,0.55)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        padding: "56px 48px",
+        textAlign: "center",
+      }}>
+        {/* Tiny mark */}
+        <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 28 }}>
+          Atelier · Private
+        </p>
+
+        {/* Title */}
+        <h1 style={{
+          fontFamily: SERIF, fontSize: 56, fontWeight: 300,
+          letterSpacing: "-0.02em", lineHeight: 1, margin: 0, marginBottom: 12,
+          color: "#fafaf8",
+        }}>
+          Sarah <span style={{ fontStyle: "italic", fontWeight: 400 }}>&amp;</span> James
+        </h1>
+        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: "rgba(250,250,248,0.7)", marginBottom: 40, fontWeight: 300 }}>
+          A private gallery awaits.
+        </p>
+
+        {/* Divider */}
+        <div style={{ width: 32, height: 1, background: "rgba(255,255,255,0.3)", margin: "0 auto 36px" }} />
+
+        {/* Input */}
+        <label style={{ display: "block", fontFamily: MONO, fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 12, textAlign: "left" }}>
+          Access key
+        </label>
+        <input
+          autoFocus type="password" value={pwd}
+          onChange={(e) => { setPwd(e.target.value); setError(false); }}
+          placeholder="Enter the password from your photographer"
+          style={{
+            width: "100%", boxSizing: "border-box",
+            padding: "14px 0",
+            background: "transparent",
+            border: "none",
+            borderBottom: error ? "1px solid #f59e9e" : "1px solid rgba(255,255,255,0.25)",
+            color: "#fafaf8",
+            fontFamily: SERIF, fontSize: 18, fontStyle: "italic",
+            outline: "none",
+            textAlign: "left",
+          }}
+        />
+        {error && (
+          <p style={{ marginTop: 12, fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "#f59e9e", textAlign: "left" }}>
+            Incorrect — try again
+          </p>
+        )}
+
+        {/* CTA */}
+        <button type="submit" style={{
+          marginTop: 36, width: "100%",
+          padding: "16px 24px",
+          background: "#fafaf8", color: "#0a0a0a",
+          border: "none", cursor: "pointer",
+          fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700,
+        }}>
+          Enter the gallery
+        </button>
+
+        <p style={{ marginTop: 32, fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
+          Hint: sarah2026
+        </p>
+      </form>
+    </div>
+  );
+}
+
+/* ── Lightbox ─────────────────────────────────────────────── */
+function Lightbox({ photos, startIndex, onClose }: { photos: typeof PHOTOS; startIndex: number; onClose: () => void }) {
+  const [index, setIndex]   = useState(startIndex);
+  const [zoom, setZoom]     = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [dragging, setDrag] = useState(false);
+  const dragRef             = useRef({ sx: 0, sy: 0, ox: 0, oy: 0 });
+  const containerRef        = useRef<HTMLDivElement>(null);
+  const photo               = photos[index]!;
+
+  const resetView = useCallback(() => { setZoom(1); setOffset({ x: 0, y: 0 }); }, []);
+  const prev = useCallback(() => { setIndex((i) => Math.max(i - 1, 0)); resetView(); }, [resetView]);
+  const next = useCallback(() => { setIndex((i) => Math.min(i + 1, photos.length - 1)); resetView(); }, [photos.length, resetView]);
+
+  // Keyboard
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => {
+      if (e.key === "Escape")     onClose();
+      if (e.key === "ArrowRight") next();
+      if (e.key === "ArrowLeft")  prev();
+    };
+    window.addEventListener("keydown", fn);
+    document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", fn); document.body.style.overflow = ""; };
+  }, [onClose, next, prev]);
+
+  // Wheel zoom
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const fn = (e: WheelEvent) => {
+      e.preventDefault();
+      setZoom((prev) => {
+        const nextZoom = Math.min(Math.max(prev * (e.deltaY < 0 ? 1.12 : 0.9), 1), 8);
+        if (nextZoom === 1) setOffset({ x: 0, y: 0 });
+        return nextZoom;
+      });
+    };
+    el.addEventListener("wheel", fn, { passive: false });
+    return () => el.removeEventListener("wheel", fn);
+  }, []);
+
+  const onMD = (e: React.MouseEvent) => { if (zoom <= 1) return; e.preventDefault(); setDrag(true); dragRef.current = { sx: e.clientX, sy: e.clientY, ox: offset.x, oy: offset.y }; };
+  const onMM = (e: React.MouseEvent) => { if (!dragging) return; setOffset({ x: dragRef.current.ox + e.clientX - dragRef.current.sx, y: dragRef.current.oy + e.clientY - dragRef.current.sy }); };
+  const onMU = () => setDrag(false);
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 1100, background: "#0a0a0a", display: "flex", flexDirection: "column", userSelect: "none" }}>
+      {/* Top bar */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", background: "linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)", pointerEvents: "none" }}>
+        <button onClick={onClose} style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.7)", padding: "6px 10px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back
+        </button>
+        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>
+          {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
+        </span>
+        <div style={{ pointerEvents: "auto", display: "flex", gap: 8 }}>
+          {zoom > 1 && (
+            <button onClick={resetView} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)", cursor: "pointer", padding: "5px 10px", fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+              {Math.round(zoom * 100)}% · Reset
+            </button>
+          )}
+          <button style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)", cursor: "pointer", padding: "5px 12px", fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+            ↓ Download
+          </button>
+        </div>
+      </div>
+
+      {/* Image */}
+      <div
+        ref={containerRef}
+        style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "72px 64px", cursor: zoom > 1 ? (dragging ? "grabbing" : "grab") : "default", overflow: "hidden" }}
+        onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`https://picsum.photos/seed/${photo.seed}/1800/1200`}
+          alt=""
+          draggable={false}
+          style={{
+            maxWidth: "100%", maxHeight: "100%", objectFit: "contain",
+            pointerEvents: "none", display: "block",
+            transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
+            transformOrigin: "center",
+            transition: dragging ? "none" : "transform 0.18s ease",
+          }}
+        />
+      </div>
+
+      {/* Nav arrows */}
+      {index > 0 && (
+        <button onClick={prev} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", cursor: "pointer", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+      )}
+      {index < photos.length - 1 && (
+        <button onClick={next} style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", cursor: "pointer", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      )}
+
+      {/* Bottom info */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px 24px", background: "linear-gradient(to top, rgba(0,0,0,0.55), transparent)", display: "flex", justifyContent: "space-between", alignItems: "flex-end", pointerEvents: "none" }}>
+        <div>
+          <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 22, color: "#fafaf8", margin: 0, marginBottom: 4, fontWeight: 300, letterSpacing: "-0.005em" }}>
+            Plate {String(index + 1).padStart(2, "0")}
+          </p>
+          <p style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", margin: 0 }}>
+            Sarah &amp; James · Apr 14, 2026
+          </p>
+        </div>
+        <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
+          Scroll to zoom · ← → to navigate
+        </span>
+      </div>
+    </div>
   );
 }
