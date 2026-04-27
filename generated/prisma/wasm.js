@@ -87,16 +87,11 @@ Prisma.NullTypes = {
  * Enums
  */
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
-
-exports.Prisma.PostScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  createdById: 'createdById'
-};
 
 exports.Prisma.AccountScalarFieldEnum = {
   id: 'id',
@@ -121,6 +116,12 @@ exports.Prisma.SessionScalarFieldEnum = {
   expires: 'expires'
 };
 
+exports.Prisma.VerificationTokenScalarFieldEnum = {
+  identifier: 'identifier',
+  token: 'token',
+  expires: 'expires'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -129,15 +130,99 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image'
 };
 
-exports.Prisma.VerificationTokenScalarFieldEnum = {
-  identifier: 'identifier',
-  token: 'token',
-  expires: 'expires'
+exports.Prisma.PhotoScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  url: 'url',
+  filename: 'filename',
+  size: 'size',
+  width: 'width',
+  height: 'height',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PortfolioScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  slug: 'slug',
+  status: 'status',
+  template: 'template',
+  customDomain: 'customDomain',
+  coverUrl: 'coverUrl',
+  views: 'views',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.LinksPageScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  slug: 'slug',
+  bio: 'bio',
+  avatarUrl: 'avatarUrl',
+  bgType: 'bgType',
+  bgColor: 'bgColor',
+  btnStyle: 'btnStyle',
+  btnBg: 'btnBg',
+  btnFg: 'btnFg',
+  font: 'font',
+  published: 'published',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.LinkItemScalarFieldEnum = {
+  id: 'id',
+  linksPageId: 'linksPageId',
+  label: 'label',
+  url: 'url',
+  order: 'order',
+  visible: 'visible',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.DeliveryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  clientName: 'clientName',
+  clientEmail: 'clientEmail',
+  title: 'title',
+  status: 'status',
+  template: 'template',
+  password: 'password',
+  expiresAt: 'expiresAt',
+  mode: 'mode',
+  pricePerPhoto: 'pricePerPhoto',
+  priceBundle: 'priceBundle',
+  selectionCount: 'selectionCount',
+  watermark: 'watermark',
+  downloadRes: 'downloadRes',
+  proofingMode: 'proofingMode',
+  layout: 'layout',
+  welcomeMsg: 'welcomeMsg',
+  views: 'views',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DeliveryPhotoScalarFieldEnum = {
+  id: 'id',
+  deliveryId: 'deliveryId',
+  photoId: 'photoId',
+  order: 'order'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
 };
 
 exports.Prisma.NullsOrder = {
@@ -147,11 +232,16 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  Post: 'Post',
   Account: 'Account',
   Session: 'Session',
+  VerificationToken: 'VerificationToken',
   User: 'User',
-  VerificationToken: 'VerificationToken'
+  Photo: 'Photo',
+  Portfolio: 'Portfolio',
+  LinksPage: 'LinksPage',
+  LinkItem: 'LinkItem',
+  Delivery: 'Delivery',
+  DeliveryPhoto: 'DeliveryPhoto'
 };
 /**
  * Create the Client
@@ -191,8 +281,7 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "sqlite",
-  "postinstall": false,
+  "activeProvider": "postgresql",
   "inlineDatasources": {
     "db": {
       "url": {
@@ -201,13 +290,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below\n  // Further reading:\n  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema\n  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Post {\n  id        Int      @id @default(autoincrement())\n  name      String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  createdBy   User   @relation(fields: [createdById], references: [id])\n  createdById String\n\n  @@index([name])\n}\n\n// Necessary for Next auth\nmodel Account {\n  id                       String  @id @default(cuid())\n  userId                   String\n  type                     String\n  provider                 String\n  providerAccountId        String\n  refresh_token            String? // @db.Text\n  access_token             String? // @db.Text\n  expires_at               Int?\n  token_type               String?\n  scope                    String?\n  id_token                 String? // @db.Text\n  session_state            String?\n  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  refresh_token_expires_in Int?\n\n  @@unique([provider, providerAccountId])\n}\n\nmodel Session {\n  id           String   @id @default(cuid())\n  sessionToken String   @unique\n  userId       String\n  expires      DateTime\n  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n\nmodel User {\n  id            String    @id @default(cuid())\n  name          String?\n  email         String?   @unique\n  emailVerified DateTime?\n  image         String?\n  accounts      Account[]\n  sessions      Session[]\n  posts         Post[]\n}\n\nmodel VerificationToken {\n  identifier String\n  token      String   @unique\n  expires    DateTime\n\n  @@unique([identifier, token])\n}\n",
-  "inlineSchemaHash": "2379fe619003a4532e1317ec33324f5549ff669a85866549ae71a5b6c8c7fc10",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  // DATABASE_URL: transaction pooler (port 6543) — runtime queries\n  // DIRECT_URL:  direct connection  (port 5432) — migrations\n  url       = env(\"DATABASE_URL\")\n  directUrl = env(\"DIRECT_URL\")\n}\n\n// ── NextAuth ──────────────────────────────────────────────────────────────────\n\nmodel Account {\n  id                       String  @id @default(cuid())\n  userId                   String\n  type                     String\n  provider                 String\n  providerAccountId        String\n  refresh_token            String? @db.Text\n  access_token             String? @db.Text\n  expires_at               Int?\n  token_type               String?\n  scope                    String?\n  id_token                 String? @db.Text\n  session_state            String?\n  refresh_token_expires_in Int?\n  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@unique([provider, providerAccountId])\n}\n\nmodel Session {\n  id           String   @id @default(cuid())\n  sessionToken String   @unique\n  userId       String\n  expires      DateTime\n  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n\nmodel VerificationToken {\n  identifier String\n  token      String   @unique\n  expires    DateTime\n\n  @@unique([identifier, token])\n}\n\n// ── FRAME ─────────────────────────────────────────────────────────────────────\n\nmodel User {\n  id            String    @id @default(cuid())\n  name          String?\n  email         String?   @unique\n  emailVerified DateTime?\n  image         String?\n  accounts      Account[]\n  sessions      Session[]\n\n  photos     Photo[]\n  portfolios Portfolio[]\n  linksPages LinksPage[]\n  deliveries Delivery[]\n}\n\n// Master photo library\nmodel Photo {\n  id        String   @id @default(cuid())\n  userId    String\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  url       String\n  filename  String\n  size      Int // bytes\n  width     Int?\n  height    Int?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  deliveryPhotos DeliveryPhoto[]\n\n  @@index([userId])\n}\n\n// Portfolio sites\nmodel Portfolio {\n  id           String   @id @default(cuid())\n  userId       String\n  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  title        String\n  slug         String   @unique\n  status       String   @default(\"draft\") // draft | published\n  template     String   @default(\"minimal\")\n  customDomain String?  @unique\n  coverUrl     String?\n  views        Int      @default(0)\n  createdAt    DateTime @default(now())\n  updatedAt    DateTime @updatedAt\n\n  @@index([userId])\n}\n\n// Link pages (linktree-style)\nmodel LinksPage {\n  id        String  @id @default(cuid())\n  userId    String\n  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  title     String\n  slug      String  @unique\n  bio       String?\n  avatarUrl String?\n\n  // Appearance\n  bgType   String @default(\"solid\") // solid | gradient | image\n  bgColor  String @default(\"#111111\")\n  btnStyle String @default(\"pill\") // pill | rounded | square | outline\n  btnBg    String @default(\"#fad502\")\n  btnFg    String @default(\"#111111\")\n  font     String @default(\"Inter\")\n\n  published Boolean  @default(false)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  links LinkItem[]\n\n  @@index([userId])\n}\n\nmodel LinkItem {\n  id          String    @id @default(cuid())\n  linksPageId String\n  linksPage   LinksPage @relation(fields: [linksPageId], references: [id], onDelete: Cascade)\n  label       String\n  url         String\n  order       Int\n  visible     Boolean   @default(true)\n  createdAt   DateTime  @default(now())\n\n  @@index([linksPageId])\n}\n\n// Client delivery galleries\nmodel Delivery {\n  id          String  @id @default(cuid())\n  userId      String\n  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  clientName  String\n  clientEmail String?\n  title       String?\n  status      String  @default(\"draft\") // draft | active | expired\n  template    String  @default(\"minimal\") // minimal | vogue | cinematic | editorial\n\n  // Access control\n  password  String?\n  expiresAt DateTime?\n\n  // Monetization\n  mode           String  @default(\"gift\") // gift | direct | selection\n  pricePerPhoto  Float?\n  priceBundle    Float?\n  selectionCount Int?\n  watermark      Boolean @default(false)\n  downloadRes    String  @default(\"original\") // original | web | mobile\n  proofingMode   Boolean @default(false)\n\n  // Look & Feel\n  layout     String  @default(\"grid\") // grid | masonry\n  welcomeMsg String?\n\n  views     Int      @default(0)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  photos DeliveryPhoto[]\n\n  @@index([userId])\n}\n\n// Junction: which photos belong to a delivery, in what order\nmodel DeliveryPhoto {\n  id         String   @id @default(cuid())\n  deliveryId String\n  delivery   Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)\n  photoId    String\n  photo      Photo    @relation(fields: [photoId], references: [id], onDelete: Cascade)\n  order      Int      @default(0)\n\n  @@unique([deliveryId, photoId])\n  @@index([deliveryId])\n}\n",
+  "inlineSchemaHash": "cd19e194096f9e6077c2c61a25647e10832728562040d793475480ec54bbe312",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Post\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdBy\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PostToUser\"},{\"name\":\"createdById\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"Account\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"provider\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"providerAccountId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"refresh_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"access_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires_at\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"token_type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"scope\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"session_state\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"AccountToUser\"},{\"name\":\"refresh_token_expires_in\",\"kind\":\"scalar\",\"type\":\"Int\"}],\"dbName\":null},\"Session\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sessionToken\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"SessionToUser\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"emailVerified\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"image\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"accounts\",\"kind\":\"object\",\"type\":\"Account\",\"relationName\":\"AccountToUser\"},{\"name\":\"sessions\",\"kind\":\"object\",\"type\":\"Session\",\"relationName\":\"SessionToUser\"},{\"name\":\"posts\",\"kind\":\"object\",\"type\":\"Post\",\"relationName\":\"PostToUser\"}],\"dbName\":null},\"VerificationToken\":{\"fields\":[{\"name\":\"identifier\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Account\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"provider\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"providerAccountId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"refresh_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"access_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires_at\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"token_type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"scope\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"session_state\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"refresh_token_expires_in\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"AccountToUser\"}],\"dbName\":null},\"Session\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sessionToken\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"SessionToUser\"}],\"dbName\":null},\"VerificationToken\":{\"fields\":[{\"name\":\"identifier\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"emailVerified\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"image\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"accounts\",\"kind\":\"object\",\"type\":\"Account\",\"relationName\":\"AccountToUser\"},{\"name\":\"sessions\",\"kind\":\"object\",\"type\":\"Session\",\"relationName\":\"SessionToUser\"},{\"name\":\"photos\",\"kind\":\"object\",\"type\":\"Photo\",\"relationName\":\"PhotoToUser\"},{\"name\":\"portfolios\",\"kind\":\"object\",\"type\":\"Portfolio\",\"relationName\":\"PortfolioToUser\"},{\"name\":\"linksPages\",\"kind\":\"object\",\"type\":\"LinksPage\",\"relationName\":\"LinksPageToUser\"},{\"name\":\"deliveries\",\"kind\":\"object\",\"type\":\"Delivery\",\"relationName\":\"DeliveryToUser\"}],\"dbName\":null},\"Photo\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PhotoToUser\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"filename\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"size\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"width\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"height\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"deliveryPhotos\",\"kind\":\"object\",\"type\":\"DeliveryPhoto\",\"relationName\":\"DeliveryPhotoToPhoto\"}],\"dbName\":null},\"Portfolio\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PortfolioToUser\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"slug\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"template\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"customDomain\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"coverUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"views\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"LinksPage\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"LinksPageToUser\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"slug\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bio\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatarUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgColor\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"btnStyle\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"btnBg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"btnFg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"font\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"published\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"links\",\"kind\":\"object\",\"type\":\"LinkItem\",\"relationName\":\"LinkItemToLinksPage\"}],\"dbName\":null},\"LinkItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"linksPageId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"linksPage\",\"kind\":\"object\",\"type\":\"LinksPage\",\"relationName\":\"LinkItemToLinksPage\"},{\"name\":\"label\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"order\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"visible\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Delivery\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"DeliveryToUser\"},{\"name\":\"clientName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"clientEmail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"template\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expiresAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"mode\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pricePerPhoto\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"priceBundle\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"selectionCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"watermark\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"downloadRes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"proofingMode\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"layout\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"welcomeMsg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"views\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"photos\",\"kind\":\"object\",\"type\":\"DeliveryPhoto\",\"relationName\":\"DeliveryToDeliveryPhoto\"}],\"dbName\":null},\"DeliveryPhoto\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"deliveryId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"delivery\",\"kind\":\"object\",\"type\":\"Delivery\",\"relationName\":\"DeliveryToDeliveryPhoto\"},{\"name\":\"photoId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"photo\",\"kind\":\"object\",\"type\":\"Photo\",\"relationName\":\"DeliveryPhotoToPhoto\"},{\"name\":\"order\",\"kind\":\"scalar\",\"type\":\"Int\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

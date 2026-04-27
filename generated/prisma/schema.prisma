@@ -7,42 +7,30 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // DATABASE_URL: transaction pooler (port 6543) — runtime queries
+  // DIRECT_URL:  direct connection  (port 5432) — migrations
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// ── NextAuth ──────────────────────────────────────────────────────────────────
 
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
-
-  @@index([name])
-}
-
-// Necessary for Next auth
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
   type                     String
   provider                 String
   providerAccountId        String
-  refresh_token            String? // @db.Text
-  access_token             String? // @db.Text
+  refresh_token            String? @db.Text
+  access_token             String? @db.Text
   expires_at               Int?
   token_type               String?
   scope                    String?
-  id_token                 String? // @db.Text
+  id_token                 String? @db.Text
   session_state            String?
-  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   refresh_token_expires_in Int?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -55,6 +43,16 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ── FRAME ─────────────────────────────────────────────────────────────────────
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -63,13 +61,135 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  posts         Post[]
+
+  photos     Photo[]
+  portfolios Portfolio[]
+  linksPages LinksPage[]
+  deliveries Delivery[]
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+// Master photo library
+model Photo {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  url       String
+  filename  String
+  size      Int // bytes
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@unique([identifier, token])
+  deliveryPhotos DeliveryPhoto[]
+
+  @@index([userId])
+}
+
+// Portfolio sites
+model Portfolio {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  slug         String   @unique
+  status       String   @default("draft") // draft | published
+  template     String   @default("minimal")
+  customDomain String?  @unique
+  coverUrl     String?
+  views        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// Link pages (linktree-style)
+model LinksPage {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  slug      String  @unique
+  bio       String?
+  avatarUrl String?
+
+  // Appearance
+  bgType   String @default("solid") // solid | gradient | image
+  bgColor  String @default("#111111")
+  btnStyle String @default("pill") // pill | rounded | square | outline
+  btnBg    String @default("#fad502")
+  btnFg    String @default("#111111")
+  font     String @default("Inter")
+
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  links LinkItem[]
+
+  @@index([userId])
+}
+
+model LinkItem {
+  id          String    @id @default(cuid())
+  linksPageId String
+  linksPage   LinksPage @relation(fields: [linksPageId], references: [id], onDelete: Cascade)
+  label       String
+  url         String
+  order       Int
+  visible     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  @@index([linksPageId])
+}
+
+// Client delivery galleries
+model Delivery {
+  id          String  @id @default(cuid())
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientName  String
+  clientEmail String?
+  title       String?
+  status      String  @default("draft") // draft | active | expired
+  template    String  @default("minimal") // minimal | vogue | cinematic | editorial
+
+  // Access control
+  password  String?
+  expiresAt DateTime?
+
+  // Monetization
+  mode           String  @default("gift") // gift | direct | selection
+  pricePerPhoto  Float?
+  priceBundle    Float?
+  selectionCount Int?
+  watermark      Boolean @default(false)
+  downloadRes    String  @default("original") // original | web | mobile
+  proofingMode   Boolean @default(false)
+
+  // Look & Feel
+  layout     String  @default("grid") // grid | masonry
+  welcomeMsg String?
+
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  photos DeliveryPhoto[]
+
+  @@index([userId])
+}
+
+// Junction: which photos belong to a delivery, in what order
+model DeliveryPhoto {
+  id         String   @id @default(cuid())
+  deliveryId String
+  delivery   Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  photoId    String
+  photo      Photo    @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  order      Int      @default(0)
+
+  @@unique([deliveryId, photoId])
+  @@index([deliveryId])
 }

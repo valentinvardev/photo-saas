@@ -456,6 +456,112 @@ function DesignTab() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
+   LOGO IMAGE PICKER  (gallery + url tabs, reused for main & alt logo)
+═══════════════════════════════════════════════════════════════════════ */
+const LOGO_GALLERY_SEEDS = [
+  20, 37, 48, 63, 71, 82, 95, 108, 133, 145, 156, 167,
+  201, 202, 210, 220, 230, 240, 250, 300,
+];
+
+function LogoImagePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  const [tab, setTab] = useState<"gallery" | "url">("gallery");
+  const [draft, setDraft] = useState(value);
+
+  function applyUrl() {
+    const v = draft.trim();
+    if (v) onChange(v);
+  }
+
+  const tabStyle = (active: boolean): React.CSSProperties => ({
+    flex: 1, background: "none", border: "none",
+    borderBottom: `2px solid ${active ? "#2563eb" : "transparent"}`,
+    color: active ? "#93c5fd" : "#444",
+    fontSize: 11, padding: "6px 0", cursor: "pointer",
+    fontFamily: "inherit", transition: "color 0.15s",
+  });
+
+  return (
+    <div>
+      {/* Current preview */}
+      {value && (
+        <div style={{ marginBottom: 10, borderRadius: 5, overflow: "hidden", aspectRatio: "16/9", position: "relative" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={value} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", background: "#111" }} />
+          <span style={{ position: "absolute", bottom: 5, left: 7, fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.45)" }}>current</span>
+        </div>
+      )}
+
+      {/* Tabs */}
+      <div style={{ display: "flex", borderBottom: "1px solid #1a1a1a", marginBottom: 10 }}>
+        <button style={tabStyle(tab === "gallery")} onClick={() => setTab("gallery")}>Gallery</button>
+        <button style={tabStyle(tab === "url")}     onClick={() => setTab("url")}>URL</button>
+      </div>
+
+      {tab === "gallery" && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 3 }}>
+          {LOGO_GALLERY_SEEDS.map((seed) => {
+            const url = `https://picsum.photos/seed/${seed}/400/500?grayscale`;
+            const isActive = value?.includes(`seed/${seed}/`);
+            return (
+              <div
+                key={seed}
+                onClick={() => onChange(`https://picsum.photos/seed/${seed}/800/800?grayscale`)}
+                style={{
+                  aspectRatio: "1/1", overflow: "hidden", cursor: "pointer", borderRadius: 3,
+                  border: isActive ? "2px solid #2563eb" : "2px solid transparent",
+                  position: "relative", transition: "border-color 0.15s",
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                {isActive && (
+                  <div style={{ position: "absolute", top: 3, right: 3, width: 14, height: 14, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {tab === "url" && (
+        <div>
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") applyUrl(); }}
+            placeholder="https://..."
+            style={{
+              width: "100%", background: "#0d0d0d", border: "1px solid #2a2a2a",
+              color: "#eee", fontSize: 12, padding: "7px 8px", borderRadius: 4,
+              outline: "none", boxSizing: "border-box", marginBottom: 8,
+              fontFamily: "monospace",
+            }}
+          />
+          <button
+            onClick={applyUrl}
+            style={{
+              width: "100%", background: "#1a2a3a", border: "1px solid #2563eb",
+              color: "#93c5fd", fontSize: 12, padding: "7px", borderRadius: 4,
+              cursor: "pointer", fontFamily: "inherit",
+            }}
+          >
+            Apply URL
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    SETTINGS TAB
 ═══════════════════════════════════════════════════════════════════════ */
 function SettingsTab() {
@@ -502,12 +608,12 @@ function SettingsTab() {
             <input value={logo.text} onChange={(e) => setLogo({ text: e.target.value })} style={inputStyle} />
           </div>
           <div>
-            <label style={labelStyle}>Logo image URL</label>
-            <input value={logo.imageUrl} onChange={(e) => setLogo({ imageUrl: e.target.value })} placeholder="https://..." style={inputStyle} />
+            <label style={labelStyle}>Logo image</label>
+            <LogoImagePicker value={logo.imageUrl} onChange={(url) => setLogo({ imageUrl: url })} />
           </div>
-          <div>
+          <div style={{ marginTop: 4 }}>
             <label style={labelStyle}>Alt logo (dark bg)</label>
-            <input value={logo.altImageUrl} onChange={(e) => setLogo({ altImageUrl: e.target.value })} placeholder="https://..." style={inputStyle} />
+            <LogoImagePicker value={logo.altImageUrl} onChange={(url) => setLogo({ altImageUrl: url })} />
           </div>
           <div>
             <label style={labelStyle}>Favicon URL</label>

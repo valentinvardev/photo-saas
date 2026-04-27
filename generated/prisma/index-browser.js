@@ -115,16 +115,11 @@ Prisma.NullTypes = {
  */
 
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
-
-exports.Prisma.PostScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  createdById: 'createdById'
-};
 
 exports.Prisma.AccountScalarFieldEnum = {
   id: 'id',
@@ -149,6 +144,12 @@ exports.Prisma.SessionScalarFieldEnum = {
   expires: 'expires'
 };
 
+exports.Prisma.VerificationTokenScalarFieldEnum = {
+  identifier: 'identifier',
+  token: 'token',
+  expires: 'expires'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -157,15 +158,99 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image'
 };
 
-exports.Prisma.VerificationTokenScalarFieldEnum = {
-  identifier: 'identifier',
-  token: 'token',
-  expires: 'expires'
+exports.Prisma.PhotoScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  url: 'url',
+  filename: 'filename',
+  size: 'size',
+  width: 'width',
+  height: 'height',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PortfolioScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  slug: 'slug',
+  status: 'status',
+  template: 'template',
+  customDomain: 'customDomain',
+  coverUrl: 'coverUrl',
+  views: 'views',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.LinksPageScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  slug: 'slug',
+  bio: 'bio',
+  avatarUrl: 'avatarUrl',
+  bgType: 'bgType',
+  bgColor: 'bgColor',
+  btnStyle: 'btnStyle',
+  btnBg: 'btnBg',
+  btnFg: 'btnFg',
+  font: 'font',
+  published: 'published',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.LinkItemScalarFieldEnum = {
+  id: 'id',
+  linksPageId: 'linksPageId',
+  label: 'label',
+  url: 'url',
+  order: 'order',
+  visible: 'visible',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.DeliveryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  clientName: 'clientName',
+  clientEmail: 'clientEmail',
+  title: 'title',
+  status: 'status',
+  template: 'template',
+  password: 'password',
+  expiresAt: 'expiresAt',
+  mode: 'mode',
+  pricePerPhoto: 'pricePerPhoto',
+  priceBundle: 'priceBundle',
+  selectionCount: 'selectionCount',
+  watermark: 'watermark',
+  downloadRes: 'downloadRes',
+  proofingMode: 'proofingMode',
+  layout: 'layout',
+  welcomeMsg: 'welcomeMsg',
+  views: 'views',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DeliveryPhotoScalarFieldEnum = {
+  id: 'id',
+  deliveryId: 'deliveryId',
+  photoId: 'photoId',
+  order: 'order'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
 };
 
 exports.Prisma.NullsOrder = {
@@ -175,11 +260,16 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  Post: 'Post',
   Account: 'Account',
   Session: 'Session',
+  VerificationToken: 'VerificationToken',
   User: 'User',
-  VerificationToken: 'VerificationToken'
+  Photo: 'Photo',
+  Portfolio: 'Portfolio',
+  LinksPage: 'LinksPage',
+  LinkItem: 'LinkItem',
+  Delivery: 'Delivery',
+  DeliveryPhoto: 'DeliveryPhoto'
 };
 
 /**
