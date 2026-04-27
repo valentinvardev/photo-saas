@@ -8,10 +8,20 @@ import { useState, useCallback, useEffect, useRef } from "react";
 
 interface LinkItem {
   id: string;
-  type: "link" | "divider";
+  type: "link" | "divider" | "whatsapp" | "instagram" | "email" | "delivery";
   title: string;
   url: string;
   enabled: boolean;
+  icon: string;
+  // whatsapp
+  waCountry?: string;
+  waPhone?: string;
+  waMessage?: string;
+  // instagram
+  igUsername?: string;
+  // email
+  emailAddress?: string;
+  emailSubject?: string;
 }
 
 type BgType     = "solid" | "gradient" | "image";
@@ -130,10 +140,10 @@ const THEMES: ThemePreset[] = [
 ];
 
 const DEFAULT_LINKS: LinkItem[] = [
-  { id: "1", type: "link",    title: "Portfolio website",  url: "https://sofia.frame.so",               enabled: true  },
-  { id: "2", type: "link",    title: "Instagram",          url: "https://instagram.com/sofiachenphoto",  enabled: true  },
-  { id: "3", type: "link",    title: "Book a session",     url: "https://sofia.frame.so/book",           enabled: true  },
-  { id: "4", type: "link",    title: "Print shop",         url: "https://sofia.frame.so/prints",         enabled: false },
+  { id: "1", type: "link",    title: "Portfolio website",  url: "https://sofia.frame.so",               enabled: true,  icon: "globe"  },
+  { id: "2", type: "link",    title: "Instagram",          url: "https://instagram.com/sofiachenphoto",  enabled: true,  icon: "ig"     },
+  { id: "3", type: "link",    title: "Book a session",     url: "https://sofia.frame.so/book",           enabled: true,  icon: "calendar" },
+  { id: "4", type: "link",    title: "Print shop",         url: "https://sofia.frame.so/prints",         enabled: false, icon: "shop"   },
 ];
 
 const DEFAULT_CONFIG: PageConfig = {
@@ -247,6 +257,104 @@ function DividerIcon() {
     </svg>
   );
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SMART LINK HELPERS
+══════════════════════════════════════════════════════════════════════════ */
+
+const COUNTRY_CODES = [
+  { code: "54",  label: "Argentina (+54)"  },
+  { code: "1",   label: "USA / Canada (+1)" },
+  { code: "55",  label: "Brasil (+55)"     },
+  { code: "34",  label: "España (+34)"     },
+  { code: "52",  label: "México (+52)"     },
+  { code: "57",  label: "Colombia (+57)"   },
+  { code: "56",  label: "Chile (+56)"      },
+  { code: "598", label: "Uruguay (+598)"   },
+  { code: "595", label: "Paraguay (+595)"  },
+  { code: "51",  label: "Perú (+51)"       },
+  { code: "44",  label: "UK (+44)"         },
+  { code: "49",  label: "Germany (+49)"    },
+  { code: "33",  label: "France (+33)"     },
+  { code: "39",  label: "Italy (+39)"      },
+];
+
+const LINK_ICONS: { id: string; label: string; svg: React.ReactNode }[] = [
+  { id: "link",     label: "Link",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> },
+  { id: "globe",    label: "Website",   svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> },
+  { id: "camera",   label: "Camera",    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> },
+  { id: "calendar", label: "Calendar",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+  { id: "shop",     label: "Shop",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> },
+  { id: "mail",     label: "Email",     svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/></svg> },
+  { id: "phone",    label: "Phone",     svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/></svg> },
+  { id: "ig",       label: "Instagram", svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> },
+  { id: "wa",       label: "WhatsApp",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg> },
+  { id: "yt",       label: "YouTube",   svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg> },
+  { id: "tt",       label: "TikTok",    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg> },
+  { id: "x",        label: "X",         svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> },
+];
+
+function getLinkIcon(iconId: string, size = 14): React.ReactNode {
+  const found = LINK_ICONS.find((i) => i.id === iconId);
+  if (!found) return LINK_ICONS[0]!.svg;
+  // Re-clone with size
+  return found.svg;
+}
+
+function buildLinkUrl(link: LinkItem): string {
+  if (link.type === "whatsapp") {
+    const phone = (link.waCountry ?? "54") + (link.waPhone ?? "").replace(/\D/g, "");
+    if (!phone) return "";
+    const msg = link.waMessage ? `?text=${encodeURIComponent(link.waMessage)}` : "";
+    return `https://wa.me/${phone}${msg}`;
+  }
+  if (link.type === "instagram") {
+    const user = (link.igUsername ?? "").replace(/^@/, "");
+    return user ? `https://instagram.com/${user}` : "";
+  }
+  if (link.type === "email") {
+    if (!link.emailAddress) return "";
+    const sub = link.emailSubject ? `?subject=${encodeURIComponent(link.emailSubject)}` : "";
+    return `mailto:${link.emailAddress}${sub}`;
+  }
+  return link.url;
+}
+
+const SMART_TYPES: {
+  type: LinkItem["type"];
+  label: string;
+  description: string;
+  defaultIcon: string;
+  disabled?: boolean;
+  color: string;
+  svg: React.ReactNode;
+}[] = [
+  {
+    type: "link", label: "Custom link", description: "Any URL",
+    defaultIcon: "link", color: "#444",
+    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>,
+  },
+  {
+    type: "whatsapp", label: "WhatsApp", description: "Phone + optional message",
+    defaultIcon: "wa", color: "#22c55e",
+    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>,
+  },
+  {
+    type: "instagram", label: "Instagram", description: "@username",
+    defaultIcon: "ig", color: "#e1306c",
+    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>,
+  },
+  {
+    type: "email", label: "Email", description: "Address + optional subject",
+    defaultIcon: "mail", color: "#3b82f6",
+    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/></svg>,
+  },
+  {
+    type: "delivery", label: "Delivery page", description: "Link a client gallery",
+    defaultIcon: "camera", color: "#666", disabled: true,
+    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>,
+  },
+];
 
 /* ══════════════════════════════════════════════════════════════════════════
    GALLERY PICKER MODAL
@@ -544,23 +652,30 @@ function LinksTab({
   links: LinkItem[];
   setLinks: React.Dispatch<React.SetStateAction<LinkItem[]>>;
 }) {
-  const [editingId,  setEditingId]  = useState<string | null>(null);
-  const [dragId,     setDragId]     = useState<string | null>(null);
-  const [dragOverId, setDragOverId] = useState<string | null>(null);
-  const dragSide    = useRef<"top" | "bottom">("bottom");
+  const [editingId,    setEditingId]    = useState<string | null>(null);
+  const [showTypePicker, setShowTypePicker] = useState(false);
+  const [showIconPicker, setShowIconPicker] = useState<string | null>(null);
+  const [dragId,       setDragId]       = useState<string | null>(null);
+  const [dragOverId,   setDragOverId]   = useState<string | null>(null);
+  const dragSide = useRef<"top" | "bottom">("bottom");
 
   /* ── mutations ── */
-  const addLink = () => {
+  const addLink = (type: LinkItem["type"] = "link") => {
+    const smartType = SMART_TYPES.find((t) => t.type === type);
     const id = `lnk-${Date.now()}`;
-    setLinks((p) => [...p, { id, type: "link", title: "New link", url: "https://", enabled: true }]);
+    setLinks((p) => [...p, {
+      id, type, title: smartType?.label ?? "New link",
+      url: "", enabled: true, icon: smartType?.defaultIcon ?? "link",
+    }]);
     setEditingId(id);
+    setShowTypePicker(false);
   };
   const addDivider = () =>
-    setLinks((p) => [...p, { id: `div-${Date.now()}`, type: "divider", title: "Section", url: "", enabled: true }]);
+    setLinks((p) => [...p, { id: `div-${Date.now()}`, type: "divider", title: "Section", url: "", enabled: true, icon: "" }]);
   const remove = (id: string) => setLinks((p) => p.filter((l) => l.id !== id));
   const toggle = (id: string) => setLinks((p) => p.map((l) => (l.id === id ? { ...l, enabled: !l.enabled } : l)));
-  const update = (id: string, field: "title" | "url", val: string) =>
-    setLinks((p) => p.map((l) => (l.id === id ? { ...l, [field]: val } : l)));
+  const patch = (id: string, changes: Partial<LinkItem>) =>
+    setLinks((p) => p.map((l) => (l.id === id ? { ...l, ...changes } : l)));
   const moveUp = (idx: number) =>
     setLinks((p) => {
       if (idx === 0) return p;
@@ -619,8 +734,8 @@ function LinksTab({
       {/* Add buttons */}
       <div className="flex gap-2">
         <button
-          onClick={addLink}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-[var(--border)] font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+          onClick={() => setShowTypePicker((v) => !v)}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed font-sans text-xs font-medium transition-colors ${showTypePicker ? "border-yellow text-yellow" : "border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)]"}`}
         >
           <PlusIcon /> Add link
         </button>
@@ -631,6 +746,28 @@ function LinksTab({
           <DividerIcon /> Divider
         </button>
       </div>
+
+      {/* Type picker */}
+      {showTypePicker && (
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 flex flex-col gap-1.5">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] mb-1">Choose type</span>
+          {SMART_TYPES.map((t) => (
+            <button
+              key={t.type}
+              disabled={t.disabled}
+              onClick={() => addLink(t.type)}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${t.disabled ? "opacity-35 cursor-not-allowed" : "hover:bg-[var(--bg-subtle)]"}`}
+            >
+              <span style={{ color: t.color }}>{t.svg}</span>
+              <div className="flex-1 min-w-0">
+                <span className="font-sans text-xs font-medium text-[var(--fg)] block">{t.label}</span>
+                <span className="font-mono text-[10px] text-[var(--fg-muted)]">{t.description}</span>
+              </div>
+              {t.disabled && <span className="font-mono text-[9px] bg-[var(--bg-subtle)] text-[var(--fg-muted)] px-1.5 py-0.5 rounded tracking-wider uppercase">Soon</span>}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Items */}
       <div className="flex flex-col gap-1.5">
@@ -660,7 +797,7 @@ function LinksTab({
                   <span className="text-[var(--fg-muted)] cursor-grab active:cursor-grabbing shrink-0"><DragDots /></span>
                   <input
                     value={link.title}
-                    onChange={(e) => update(link.id, "title", e.target.value)}
+                    onChange={(e) => patch(link.id, { title: e.target.value })}
                     className="flex-1 min-w-0 font-sans text-xs text-[var(--fg-muted)] italic bg-transparent outline-none"
                     placeholder="Section label"
                   />
@@ -677,34 +814,135 @@ function LinksTab({
 
                     <div className="flex-1 min-w-0">
                       {editingId === link.id ? (
-                        <div className="flex flex-col gap-1.5">
-                          <input
-                            autoFocus
-                            value={link.title}
-                            onChange={(e) => update(link.id, "title", e.target.value)}
-                            className="w-full font-sans text-sm font-medium text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                            placeholder="Link title"
-                          />
-                          <input
-                            value={link.url}
-                            onChange={(e) => update(link.id, "url", e.target.value)}
-                            className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                            placeholder="https://"
-                          />
+                        <div className="flex flex-col gap-2">
+                          {/* Title + icon row */}
+                          <div className="flex gap-1.5">
+                            {/* Icon picker trigger */}
+                            <button
+                              onClick={() => setShowIconPicker(showIconPicker === link.id ? null : link.id)}
+                              className={`shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${showIconPicker === link.id ? "border-yellow text-yellow bg-yellow/10" : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)]"}`}
+                            >
+                              {getLinkIcon(link.icon)}
+                            </button>
+                            <input
+                              autoFocus
+                              value={link.title}
+                              onChange={(e) => patch(link.id, { title: e.target.value })}
+                              className="flex-1 font-sans text-sm font-medium text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                              placeholder="Link title"
+                            />
+                          </div>
+
+                          {/* Icon picker grid */}
+                          {showIconPicker === link.id && (
+                            <div className="grid grid-cols-6 gap-1 p-2 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)]">
+                              {LINK_ICONS.map((ic) => (
+                                <button
+                                  key={ic.id}
+                                  onClick={() => { patch(link.id, { icon: ic.id }); setShowIconPicker(null); }}
+                                  title={ic.label}
+                                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${link.icon === ic.id ? "bg-yellow/15 text-yellow" : "text-[var(--fg-muted)] hover:bg-[var(--bg-card)] hover:text-[var(--fg)]"}`}
+                                >
+                                  {ic.svg}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Smart inputs by type */}
+                          {link.type === "link" && (
+                            <input
+                              value={link.url}
+                              onChange={(e) => patch(link.id, { url: e.target.value })}
+                              className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                              placeholder="https://"
+                            />
+                          )}
+                          {link.type === "whatsapp" && (
+                            <div className="flex flex-col gap-1.5">
+                              <div className="flex gap-1.5">
+                                <select
+                                  value={link.waCountry ?? "54"}
+                                  onChange={(e) => patch(link.id, { waCountry: e.target.value })}
+                                  className="font-mono text-xs text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                                >
+                                  {COUNTRY_CODES.map((c) => (
+                                    <option key={c.code} value={c.code}>{c.label}</option>
+                                  ))}
+                                </select>
+                                <input
+                                  value={link.waPhone ?? ""}
+                                  onChange={(e) => patch(link.id, { waPhone: e.target.value.replace(/\D/g, "") })}
+                                  className="flex-1 font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                                  placeholder="Phone number"
+                                />
+                              </div>
+                              <input
+                                value={link.waMessage ?? ""}
+                                onChange={(e) => patch(link.id, { waMessage: e.target.value })}
+                                className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                                placeholder="Pre-filled message (optional)"
+                              />
+                              {link.waPhone && (
+                                <p className="font-mono text-[10px] text-[var(--fg-muted)] truncate">
+                                  wa.me/{link.waCountry ?? "54"}{link.waPhone}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          {link.type === "instagram" && (
+                            <div>
+                              <div className="relative">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-xs text-[var(--fg-muted)]">@</span>
+                                <input
+                                  value={link.igUsername ?? ""}
+                                  onChange={(e) => patch(link.id, { igUsername: e.target.value.replace(/^@/, "") })}
+                                  className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg pl-6 pr-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                                  placeholder="username"
+                                />
+                              </div>
+                              {link.igUsername && (
+                                <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">instagram.com/{link.igUsername}</p>
+                              )}
+                            </div>
+                          )}
+                          {link.type === "email" && (
+                            <div className="flex flex-col gap-1.5">
+                              <input
+                                value={link.emailAddress ?? ""}
+                                onChange={(e) => patch(link.id, { emailAddress: e.target.value })}
+                                className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                                placeholder="email@example.com"
+                                type="email"
+                              />
+                              <input
+                                value={link.emailSubject ?? ""}
+                                onChange={(e) => patch(link.id, { emailSubject: e.target.value })}
+                                className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                                placeholder="Subject (optional)"
+                              />
+                            </div>
+                          )}
+
                           <button
-                            onClick={() => setEditingId(null)}
+                            onClick={() => { setEditingId(null); setShowIconPicker(null); }}
                             className="self-start font-sans text-xs text-yellow hover:opacity-80 transition-opacity"
                           >
                             Done
                           </button>
                         </div>
                       ) : (
-                        <button onClick={() => setEditingId(link.id)} className="text-left w-full group">
-                          <div className="font-sans text-sm font-medium text-[var(--fg)] group-hover:text-yellow transition-colors leading-tight truncate">
-                            {link.title || "Untitled"}
-                          </div>
-                          <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 truncate">
-                            {link.url || "No URL set"}
+                        <button onClick={() => setEditingId(link.id)} className="text-left w-full group flex items-center gap-2">
+                          <span className="text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors shrink-0">
+                            {getLinkIcon(link.icon)}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-sans text-sm font-medium text-[var(--fg)] group-hover:text-yellow transition-colors leading-tight truncate">
+                              {link.title || "Untitled"}
+                            </div>
+                            <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 truncate">
+                              {buildLinkUrl(link) || "Not configured"}
+                            </div>
                           </div>
                         </button>
                       )}
@@ -1079,9 +1317,14 @@ function LinkTreeView({ links, config }: { links: LinkItem[]; config: PageConfig
             ) : (
               <div
                 key={link.id}
-                className="w-full py-3 px-4 text-center"
+                className="w-full py-3 px-4 flex items-center justify-center gap-1.5"
                 style={{ ...btnStyle, fontSize: "12px", fontWeight: config.fontWeight }}
               >
+                {link.icon && (
+                  <span style={{ opacity: 0.75, display: "flex", alignItems: "center" }}>
+                    {getLinkIcon(link.icon)}
+                  </span>
+                )}
                 {link.title}
               </div>
             )
