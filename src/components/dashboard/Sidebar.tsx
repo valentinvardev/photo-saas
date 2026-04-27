@@ -78,6 +78,15 @@ function AnalyticsIcon() {
     </svg>
   );
 }
+function DomainIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+    </svg>
+  );
+}
 function SettingsIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -111,6 +120,7 @@ const navMain = [
   { label: "Templates", href: "/dashboard/templates",  icon: TemplatesIcon },
   { label: "Links",     href: "/dashboard/links",      icon: LinksIcon },
   { label: "Delivery",  href: "/dashboard/delivery",   icon: DeliveryIcon },
+  { label: "Domain",    href: "/dashboard/domain",     icon: DomainIcon },
   { label: "Sales",     href: "/dashboard/sales",      icon: SalesIcon,    soon: true },
   { label: "Clients",   href: "/dashboard/clients",    icon: ClientsIcon,  soon: true },
   { label: "Analytics", href: "/dashboard/analytics",  icon: AnalyticsIcon, soon: true },
