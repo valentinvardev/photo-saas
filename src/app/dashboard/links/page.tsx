@@ -279,26 +279,85 @@ const COUNTRY_CODES = [
   { code: "39",  label: "Italy (+39)"      },
 ];
 
-const LINK_ICONS: { id: string; label: string; svg: React.ReactNode }[] = [
-  { id: "link",     label: "Link",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> },
-  { id: "globe",    label: "Website",   svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> },
-  { id: "camera",   label: "Camera",    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> },
-  { id: "calendar", label: "Calendar",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
-  { id: "shop",     label: "Shop",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> },
-  { id: "mail",     label: "Email",     svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/></svg> },
-  { id: "phone",    label: "Phone",     svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/></svg> },
-  { id: "ig",       label: "Instagram", svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> },
-  { id: "wa",       label: "WhatsApp",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg> },
-  { id: "yt",       label: "YouTube",   svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg> },
-  { id: "tt",       label: "TikTok",    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg> },
-  { id: "x",        label: "X",         svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> },
+type IconDef = { id: string; label: string; svg: React.ReactNode };
+
+const ICON_PACKS: { name: string; icons: IconDef[] }[] = [
+  {
+    name: "General",
+    icons: [
+      { id: "link",     label: "Link",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> },
+      { id: "globe",    label: "Website",   svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> },
+      { id: "arrow",    label: "Arrow",     svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> },
+      { id: "star",     label: "Star",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> },
+      { id: "heart",    label: "Heart",     svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> },
+      { id: "bookmark", label: "Bookmark",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> },
+      { id: "home",     label: "Home",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
+      { id: "search",   label: "Search",    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
+      { id: "bell",     label: "Bell",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> },
+      { id: "share",    label: "Share",     svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> },
+      { id: "external", label: "External",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> },
+      { id: "info",     label: "Info",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg> },
+    ],
+  },
+  {
+    name: "Social",
+    icons: [
+      { id: "ig",   label: "Instagram", svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> },
+      { id: "wa",   label: "WhatsApp",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.4 3.6C18.2 1.4 15.2.2 12 .2 5.4.2.2 5.4.2 12c0 2.1.6 4.1 1.6 5.9L.2 23.8l6-1.6c1.7.9 3.6 1.4 5.8 1.4 6.6 0 11.8-5.2 11.8-11.8 0-3.1-1.2-6.1-3.4-8.2zm-8.4 18.2c-1.8 0-3.5-.5-4.9-1.4l-.4-.2-3.6 1 1-3.5-.3-.4C3 15.9 2.4 14 2.4 12 2.4 6.7 6.7 2.4 12 2.4c2.6 0 5 1 6.8 2.8 1.8 1.8 2.8 4.2 2.8 6.8 0 5.3-4.3 9.6-9.6 9.6zm5.3-7.2c-.3-.1-1.7-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.9 1.1-.1.2-.3.2-.5.1-.3-.1-1.2-.4-2.3-1.4-.8-.8-1.4-1.7-1.6-2-.1-.3 0-.5.1-.6.1-.1.3-.3.4-.5l.2-.4c.1-.2 0-.4-.1-.5-.1-.2-.6-1.5-.8-2.1-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.7.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.2-.3-.3-.6-.4z"/></svg> },
+      { id: "yt",   label: "YouTube",   svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg> },
+      { id: "tt",   label: "TikTok",    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg> },
+      { id: "x",    label: "X",         svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> },
+      { id: "fb",   label: "Facebook",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg> },
+      { id: "li",   label: "LinkedIn",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg> },
+      { id: "pin",  label: "Pinterest", svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.65 7.86 6.39 9.29-.09-.78-.17-1.98.04-2.83.18-.77 1.22-5.17 1.22-5.17s-.31-.62-.31-1.54c0-1.45.84-2.53 1.88-2.53.89 0 1.32.67 1.32 1.47 0 .9-.57 2.24-.87 3.48-.25 1.04.52 1.88 1.54 1.88 1.85 0 3.27-1.95 3.27-4.77 0-2.49-1.79-4.23-4.35-4.23-2.96 0-4.7 2.22-4.7 4.52 0 .9.35 1.86.78 2.38.09.1.1.19.07.29l-.29 1.18c-.05.19-.15.23-.35.14-1.3-.61-2.11-2.5-2.11-4.03 0-3.28 2.38-6.3 6.87-6.3 3.61 0 6.41 2.57 6.41 6.01 0 3.59-2.26 6.47-5.4 6.47-1.05 0-2.04-.55-2.38-1.2l-.65 2.43c-.23.9-.86 2.03-1.29 2.72.97.3 2 .46 3.07.46 5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg> },
+      { id: "sp",   label: "Spotify",   svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 12.5c2.33-.78 4.67-.78 7 0M7 9.5c3.33-1 6.67-1 10 0M9 15.5c1.67-.5 3.33-.5 5 0"/></svg> },
+      { id: "tg",   label: "Telegram",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21.2 4.8L2.8 11.4c-.8.3-.8 1.5.1 1.7l4.6 1.4 1.8 5.6c.3.8 1.3.9 1.8.3L13.5 18l4.8 3.5c.7.5 1.7.1 1.9-.7L22.9 6c.3-1.1-.7-2-1.7-1.2z"/><path d="M10.8 14.9L10.5 18"/></svg> },
+      { id: "tw",   label: "Twitch",    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 2H3v16h5v4l4-4h5l4-4V2zM11 11V7M16 11V7"/></svg> },
+      { id: "mail", label: "Email",     svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/></svg> },
+    ],
+  },
+  {
+    name: "Photo",
+    icons: [
+      { id: "camera",   label: "Camera",    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> },
+      { id: "aperture", label: "Aperture",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="14.31" y1="8" x2="20.05" y2="17.94"/><line x1="9.69" y1="8" x2="21.17" y2="8"/><line x1="7.38" y1="12" x2="13.12" y2="2.06"/><line x1="9.69" y1="16" x2="3.95" y2="6.06"/><line x1="14.31" y1="16" x2="2.83" y2="16"/><line x1="16.62" y1="12" x2="10.88" y2="21.94"/></svg> },
+      { id: "image",    label: "Image",     svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> },
+      { id: "film",     label: "Film",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg> },
+      { id: "eye",      label: "Eye",       svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> },
+      { id: "sun",      label: "Sun",       svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> },
+      { id: "moon",     label: "Moon",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg> },
+      { id: "wand",     label: "Wand",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8L19.2 13.2M17.8 6.2L19.2 4.8M12.2 6.2L10.8 4.8M12.2 11.8L10.8 13.2"/><path d="M3 21l9-9"/></svg> },
+      { id: "layers",   label: "Layers",    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> },
+      { id: "sliders",  label: "Sliders",   svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg> },
+      { id: "crop",     label: "Crop",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6.13 1L6 16a2 2 0 002 2h15"/><path d="M1 6.13L16 6a2 2 0 012 2v15"/></svg> },
+      { id: "zoom",     label: "Zoom",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg> },
+    ],
+  },
+  {
+    name: "Business",
+    icons: [
+      { id: "calendar",   label: "Calendar",   svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+      { id: "shop",       label: "Shop",       svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> },
+      { id: "phone",      label: "Phone",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/></svg> },
+      { id: "briefcase",  label: "Briefcase",  svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2M12 12v4M8 12h8"/></svg> },
+      { id: "chart",      label: "Chart",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
+      { id: "clock",      label: "Clock",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
+      { id: "mappin",     label: "Location",   svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
+      { id: "card",       label: "Card",       svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+      { id: "tag",        label: "Tag",        svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> },
+      { id: "dollar",     label: "Price",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
+      { id: "users",      label: "Clients",    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg> },
+      { id: "award",      label: "Award",      svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg> },
+    ],
+  },
 ];
 
-function getLinkIcon(iconId: string, size = 14): React.ReactNode {
-  const found = LINK_ICONS.find((i) => i.id === iconId);
-  if (!found) return LINK_ICONS[0]!.svg;
-  // Re-clone with size
-  return found.svg;
+function getLinkIcon(iconId: string): React.ReactNode {
+  for (const pack of ICON_PACKS) {
+    const found = pack.icons.find((i) => i.id === iconId);
+    if (found) return found.svg;
+  }
+  return ICON_PACKS[0]!.icons[0]!.svg;
 }
 
 function buildLinkUrl(link: LinkItem): string {
@@ -337,7 +396,7 @@ const SMART_TYPES: {
   {
     type: "whatsapp", label: "WhatsApp", description: "Phone + optional message",
     defaultIcon: "wa", color: "#22c55e",
-    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>,
+    svg: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.4 3.6C18.2 1.4 15.2.2 12 .2 5.4.2.2 5.4.2 12c0 2.1.6 4.1 1.6 5.9L.2 23.8l6-1.6c1.7.9 3.6 1.4 5.8 1.4 6.6 0 11.8-5.2 11.8-11.8 0-3.1-1.2-6.1-3.4-8.2zm-8.4 18.2c-1.8 0-3.5-.5-4.9-1.4l-.4-.2-3.6 1 1-3.5-.3-.4C3 15.9 2.4 14 2.4 12 2.4 6.7 6.7 2.4 12 2.4c2.6 0 5 1 6.8 2.8 1.8 1.8 2.8 4.2 2.8 6.8 0 5.3-4.3 9.6-9.6 9.6zm5.3-7.2c-.3-.1-1.7-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.9 1.1-.1.2-.3.2-.5.1-.3-.1-1.2-.4-2.3-1.4-.8-.8-1.4-1.7-1.6-2-.1-.3 0-.5.1-.6.1-.1.3-.3.4-.5l.2-.4c.1-.2 0-.4-.1-.5-.1-.2-.6-1.5-.8-2.1-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.7.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.2-.3-.3-.6-.4z"/></svg>,
   },
   {
     type: "instagram", label: "Instagram", description: "@username",
@@ -655,6 +714,7 @@ function LinksTab({
   const [editingId,    setEditingId]    = useState<string | null>(null);
   const [showTypePicker, setShowTypePicker] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState<string | null>(null);
+  const [iconPack,     setIconPack]     = useState(0);
   const [dragId,       setDragId]       = useState<string | null>(null);
   const [dragOverId,   setDragOverId]   = useState<string | null>(null);
   const dragSide = useRef<"top" | "bottom">("bottom");
@@ -749,21 +809,26 @@ function LinksTab({
 
       {/* Type picker */}
       {showTypePicker && (
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 flex flex-col gap-1.5">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] mb-1">Choose type</span>
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-2 flex flex-col gap-1">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] px-2 pt-1 pb-0.5">Choose type</span>
           {SMART_TYPES.map((t) => (
             <button
               key={t.type}
               disabled={t.disabled}
               onClick={() => addLink(t.type)}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${t.disabled ? "opacity-35 cursor-not-allowed" : "hover:bg-[var(--bg-subtle)]"}`}
+              className={`flex items-center gap-2.5 px-2 py-2 rounded-lg text-left transition-colors ${t.disabled ? "opacity-35 cursor-not-allowed" : "hover:bg-[var(--bg-subtle)]"}`}
             >
-              <span style={{ color: t.color }}>{t.svg}</span>
+              <span
+                className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
+                style={{ background: `${t.color}15`, color: t.color }}
+              >
+                {t.svg}
+              </span>
               <div className="flex-1 min-w-0">
-                <span className="font-sans text-xs font-medium text-[var(--fg)] block">{t.label}</span>
+                <span className="font-sans text-xs font-medium text-[var(--fg)] block leading-tight">{t.label}</span>
                 <span className="font-mono text-[10px] text-[var(--fg-muted)]">{t.description}</span>
               </div>
-              {t.disabled && <span className="font-mono text-[9px] bg-[var(--bg-subtle)] text-[var(--fg-muted)] px-1.5 py-0.5 rounded tracking-wider uppercase">Soon</span>}
+              {t.disabled && <span className="font-mono text-[9px] bg-[var(--bg-subtle)] text-[var(--fg-muted)] px-1.5 py-0.5 rounded tracking-wider uppercase shrink-0">Soon</span>}
             </button>
           ))}
         </div>
@@ -807,148 +872,168 @@ function LinksTab({
                     <button onClick={() => remove(link.id)} className="p-0.5 text-[var(--fg-muted)] hover:text-red-400 transition-colors"><TrashIcon /></button>
                   </div>
                 </div>
-              ) : (
-                <div className="px-3 py-2.5">
-                  <div className="flex items-start gap-2">
-                    <span className="text-[var(--fg-muted)] cursor-grab active:cursor-grabbing shrink-0 mt-1"><DragDots /></span>
+              ) : editingId === link.id ? (
+                /* Full-width editor — no sibling buttons to overlap */
+                <div className="px-3 py-2.5 flex flex-col gap-2">
+                  {/* Header row: drag + icon button + title + done + delete */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[var(--fg-muted)] cursor-grab active:cursor-grabbing shrink-0"><DragDots /></span>
+                    <button
+                      onClick={() => setShowIconPicker(showIconPicker === link.id ? null : link.id)}
+                      className={`shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${showIconPicker === link.id ? "border-yellow text-yellow bg-yellow/10" : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)]"}`}
+                    >
+                      {getLinkIcon(link.icon)}
+                    </button>
+                    <input
+                      autoFocus
+                      value={link.title}
+                      onChange={(e) => patch(link.id, { title: e.target.value })}
+                      className="flex-1 min-w-0 font-sans text-sm font-medium text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                      placeholder="Link title"
+                    />
+                    <button
+                      onClick={() => { setEditingId(null); setShowIconPicker(null); }}
+                      className="shrink-0 px-2 py-1 rounded-lg font-sans text-xs font-bold text-[#111] bg-yellow hover:opacity-90 transition-opacity"
+                    >
+                      Done
+                    </button>
+                    <button
+                      onClick={() => remove(link.id)}
+                      className="shrink-0 p-1 text-[var(--fg-muted)] hover:text-red-400 transition-colors"
+                    >
+                      <TrashIcon />
+                    </button>
+                  </div>
 
-                    <div className="flex-1 min-w-0">
-                      {editingId === link.id ? (
-                        <div className="flex flex-col gap-2">
-                          {/* Title + icon row */}
-                          <div className="flex gap-1.5">
-                            {/* Icon picker trigger */}
-                            <button
-                              onClick={() => setShowIconPicker(showIconPicker === link.id ? null : link.id)}
-                              className={`shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${showIconPicker === link.id ? "border-yellow text-yellow bg-yellow/10" : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)]"}`}
-                            >
-                              {getLinkIcon(link.icon)}
-                            </button>
-                            <input
-                              autoFocus
-                              value={link.title}
-                              onChange={(e) => patch(link.id, { title: e.target.value })}
-                              className="flex-1 font-sans text-sm font-medium text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                              placeholder="Link title"
-                            />
-                          </div>
-
-                          {/* Icon picker grid */}
-                          {showIconPicker === link.id && (
-                            <div className="grid grid-cols-6 gap-1 p-2 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)]">
-                              {LINK_ICONS.map((ic) => (
-                                <button
-                                  key={ic.id}
-                                  onClick={() => { patch(link.id, { icon: ic.id }); setShowIconPicker(null); }}
-                                  title={ic.label}
-                                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${link.icon === ic.id ? "bg-yellow/15 text-yellow" : "text-[var(--fg-muted)] hover:bg-[var(--bg-card)] hover:text-[var(--fg)]"}`}
-                                >
-                                  {ic.svg}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-
-                          {/* Smart inputs by type */}
-                          {link.type === "link" && (
-                            <input
-                              value={link.url}
-                              onChange={(e) => patch(link.id, { url: e.target.value })}
-                              className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                              placeholder="https://"
-                            />
-                          )}
-                          {link.type === "whatsapp" && (
-                            <div className="flex flex-col gap-1.5">
-                              <div className="flex gap-1.5">
-                                <select
-                                  value={link.waCountry ?? "54"}
-                                  onChange={(e) => patch(link.id, { waCountry: e.target.value })}
-                                  className="font-mono text-xs text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                                >
-                                  {COUNTRY_CODES.map((c) => (
-                                    <option key={c.code} value={c.code}>{c.label}</option>
-                                  ))}
-                                </select>
-                                <input
-                                  value={link.waPhone ?? ""}
-                                  onChange={(e) => patch(link.id, { waPhone: e.target.value.replace(/\D/g, "") })}
-                                  className="flex-1 font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                                  placeholder="Phone number"
-                                />
-                              </div>
-                              <input
-                                value={link.waMessage ?? ""}
-                                onChange={(e) => patch(link.id, { waMessage: e.target.value })}
-                                className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                                placeholder="Pre-filled message (optional)"
-                              />
-                              {link.waPhone && (
-                                <p className="font-mono text-[10px] text-[var(--fg-muted)] truncate">
-                                  wa.me/{link.waCountry ?? "54"}{link.waPhone}
-                                </p>
-                              )}
-                            </div>
-                          )}
-                          {link.type === "instagram" && (
-                            <div>
-                              <div className="relative">
-                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-xs text-[var(--fg-muted)]">@</span>
-                                <input
-                                  value={link.igUsername ?? ""}
-                                  onChange={(e) => patch(link.id, { igUsername: e.target.value.replace(/^@/, "") })}
-                                  className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg pl-6 pr-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                                  placeholder="username"
-                                />
-                              </div>
-                              {link.igUsername && (
-                                <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">instagram.com/{link.igUsername}</p>
-                              )}
-                            </div>
-                          )}
-                          {link.type === "email" && (
-                            <div className="flex flex-col gap-1.5">
-                              <input
-                                value={link.emailAddress ?? ""}
-                                onChange={(e) => patch(link.id, { emailAddress: e.target.value })}
-                                className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                                placeholder="email@example.com"
-                                type="email"
-                              />
-                              <input
-                                value={link.emailSubject ?? ""}
-                                onChange={(e) => patch(link.id, { emailSubject: e.target.value })}
-                                className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                                placeholder="Subject (optional)"
-                              />
-                            </div>
-                          )}
-
+                  {/* Icon picker — pack switcher + grid */}
+                  {showIconPicker === link.id && (
+                    <div className="rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
+                      <div className="flex border-b border-[var(--border)]">
+                        {ICON_PACKS.map((pack, pi) => (
                           <button
-                            onClick={() => { setEditingId(null); setShowIconPicker(null); }}
-                            className="self-start font-sans text-xs text-yellow hover:opacity-80 transition-opacity"
+                            key={pack.name}
+                            onClick={() => setIconPack(pi)}
+                            className={`flex-1 font-sans text-[10px] uppercase tracking-widest py-1.5 transition-colors border-b-2 -mb-px ${iconPack === pi ? "border-yellow text-[var(--fg)]" : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}
                           >
-                            Done
+                            {pack.name}
                           </button>
-                        </div>
-                      ) : (
-                        <button onClick={() => setEditingId(link.id)} className="text-left w-full group flex items-center gap-2">
-                          <span className="text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors shrink-0">
-                            {getLinkIcon(link.icon)}
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-sans text-sm font-medium text-[var(--fg)] group-hover:text-yellow transition-colors leading-tight truncate">
-                              {link.title || "Untitled"}
-                            </div>
-                            <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 truncate">
-                              {buildLinkUrl(link) || "Not configured"}
-                            </div>
-                          </div>
-                        </button>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-6 gap-1 p-2">
+                        {ICON_PACKS[iconPack]!.icons.map((ic) => (
+                          <button
+                            key={ic.id}
+                            onClick={() => { patch(link.id, { icon: ic.id }); setShowIconPicker(null); }}
+                            title={ic.label}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${link.icon === ic.id ? "bg-yellow/15 text-yellow" : "text-[var(--fg-muted)] hover:bg-[var(--bg-card)] hover:text-[var(--fg)]"}`}
+                          >
+                            {ic.svg}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Smart inputs by type */}
+                  {link.type === "link" && (
+                    <input
+                      value={link.url}
+                      onChange={(e) => patch(link.id, { url: e.target.value })}
+                      className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                      placeholder="https://"
+                    />
+                  )}
+                  {link.type === "whatsapp" && (
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex gap-1.5">
+                        <select
+                          value={link.waCountry ?? "54"}
+                          onChange={(e) => patch(link.id, { waCountry: e.target.value })}
+                          className="min-w-0 font-mono text-xs text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                        >
+                          {COUNTRY_CODES.map((c) => (
+                            <option key={c.code} value={c.code}>+{c.code}</option>
+                          ))}
+                        </select>
+                        <input
+                          value={link.waPhone ?? ""}
+                          onChange={(e) => patch(link.id, { waPhone: e.target.value.replace(/\D/g, "") })}
+                          className="flex-1 min-w-0 font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                          placeholder="Phone number"
+                        />
+                      </div>
+                      <input
+                        value={link.waMessage ?? ""}
+                        onChange={(e) => patch(link.id, { waMessage: e.target.value })}
+                        className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                        placeholder="Pre-filled message (optional)"
+                      />
+                      {link.waPhone && (
+                        <p className="font-mono text-[10px] text-[var(--fg-muted)] truncate">
+                          wa.me/{link.waCountry ?? "54"}{link.waPhone}
+                        </p>
                       )}
                     </div>
+                  )}
+                  {link.type === "instagram" && (
+                    <div>
+                      <div className="relative">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-xs text-[var(--fg-muted)]">@</span>
+                        <input
+                          value={link.igUsername ?? ""}
+                          onChange={(e) => patch(link.id, { igUsername: e.target.value.replace(/^@/, "") })}
+                          className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg pl-6 pr-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                          placeholder="username"
+                        />
+                      </div>
+                      {link.igUsername && (
+                        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1 truncate">instagram.com/{link.igUsername}</p>
+                      )}
+                    </div>
+                  )}
+                  {link.type === "email" && (
+                    <div className="flex flex-col gap-1.5">
+                      <input
+                        value={link.emailAddress ?? ""}
+                        onChange={(e) => patch(link.id, { emailAddress: e.target.value })}
+                        className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                        placeholder="email@example.com"
+                        type="email"
+                      />
+                      <input
+                        value={link.emailSubject ?? ""}
+                        onChange={(e) => patch(link.id, { emailSubject: e.target.value })}
+                        className="w-full font-mono text-xs text-[var(--fg-muted)] bg-[var(--bg-subtle)] rounded-lg px-2.5 py-1.5 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                        placeholder="Subject (optional)"
+                      />
+                    </div>
+                  )}
 
-                    <div className="flex items-center gap-1 shrink-0 mt-0.5">
+                  {/* Toggle visible inside editor too */}
+                  <div className="flex items-center justify-between pt-1 border-t border-[var(--border)]">
+                    <span className="font-sans text-[11px] text-[var(--fg-muted)]">Visible</span>
+                    <Toggle checked={link.enabled} onChange={() => toggle(link.id)} />
+                  </div>
+                </div>
+              ) : (
+                /* Collapsed view — single flex row */
+                <div className="px-3 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[var(--fg-muted)] cursor-grab active:cursor-grabbing shrink-0"><DragDots /></span>
+                    <button onClick={() => setEditingId(link.id)} className="flex-1 min-w-0 text-left group flex items-center gap-2">
+                      <span className="text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors shrink-0">
+                        {getLinkIcon(link.icon)}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-sans text-sm font-medium text-[var(--fg)] group-hover:text-yellow transition-colors leading-tight truncate">
+                          {link.title || "Untitled"}
+                        </div>
+                        <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 truncate">
+                          {buildLinkUrl(link) || "Not configured"}
+                        </div>
+                      </div>
+                    </button>
+                    <div className="flex items-center gap-0.5 shrink-0">
                       <Toggle checked={link.enabled} onChange={() => toggle(link.id)} />
                       <button onClick={() => moveUp(idx)}     className="p-0.5 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"><ChevUp /></button>
                       <button onClick={() => moveDown(idx)}   className="p-0.5 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"><ChevDown /></button>
