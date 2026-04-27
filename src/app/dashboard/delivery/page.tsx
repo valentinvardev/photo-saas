@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -11,6 +11,7 @@ type DeliveryMode    = "gift" | "direct" | "selection";
 type LayoutStyle     = "grid" | "masonry";
 type TemplateName    = "minimal" | "vogue" | "cinematic" | "editorial";
 type DeliveryStatus  = "draft" | "active" | "expired";
+type LogoMode        = "none" | "text" | "image" | "image+text";
 
 interface DeliveryPage {
   id:               string;
@@ -20,6 +21,7 @@ interface DeliveryPage {
   photoCount:       number;
   photoSeeds:       number[];   // photos added to this delivery
   coverSeed:        number;
+  coverUrl:         string;     // optional override for cover image
   views:            number;
   lastViewed:       string | null;
   createdAt:        string;
@@ -42,6 +44,18 @@ interface DeliveryPage {
   layout:           LayoutStyle;
   welcomeMessage:   string;
   showUpsellBanner: boolean;
+  // Branding
+  logoMode:         LogoMode;
+  logoText:         string;
+  logoUrl:          string;
+  // Custom style override (off → use template defaults)
+  customColors:     boolean;
+  colorBg:          string;
+  colorFg:          string;
+  colorAccent:      string;
+  colorBtnBg:       string;
+  colorBtnFg:       string;
+  fontFamily:       string;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -51,44 +65,70 @@ interface DeliveryPage {
 // All photos in the photographer's general gallery (mock)
 const ALL_GALLERY_SEEDS = Array.from({ length: 48 }, (_, i) => i + 10);
 
+const DEFAULT_BRANDING = {
+  logoMode: "text" as LogoMode,
+  logoText: "STUDIO",
+  logoUrl: "",
+  customColors: false,
+  colorBg: "#ffffff", colorFg: "#111111",
+  colorAccent: "#f5f5f5",
+  colorBtnBg: "#111111", colorBtnFg: "#ffffff",
+  fontFamily: "Inter, sans-serif",
+};
+
 const INITIAL_PAGES: DeliveryPage[] = [
   {
     id: "dp1", title: "Wedding Gallery", client: "Sarah & James",
-    status: "active", photoCount: 247, photoSeeds: [10,11,12,13,14,15,16,17,18,19,20,21], coverSeed: 401,
+    status: "active", photoCount: 247, photoSeeds: [10,11,12,13,14,15,16,17,18,19,20,21], coverSeed: 401, coverUrl: "",
     views: 12, lastViewed: "2 hours ago", createdAt: "Apr 2, 2026", expiresAt: "May 2, 2026",
     passwordEnabled: true,  password: "sarah2026", whitelistEnabled: false, whitelist: [],
     mode: "selection", selectionLimit: 30, pricePerPhoto: 0, priceFullGallery: 0,
     watermark: true, downloadRes: "choice", proofingEnabled: false,
     template: "minimal", layout: "masonry", welcomeMessage: "Sarah & James — thank you for a beautiful day. Browse and select your 30 favorites.", showUpsellBanner: false,
+    ...DEFAULT_BRANDING, logoText: "S&J",
   },
   {
     id: "dp2", title: "Commercial Shoot", client: "Nike Brand",
-    status: "draft", photoCount: 84, photoSeeds: [22,23,24,25,26,27,28,29], coverSeed: 402,
+    status: "draft", photoCount: 84, photoSeeds: [22,23,24,25,26,27,28,29], coverSeed: 402, coverUrl: "",
     views: 0, lastViewed: null, createdAt: "Apr 8, 2026", expiresAt: null,
     passwordEnabled: false, password: "", whitelistEnabled: true, whitelist: ["brand@nike.com", "creative@nike.com"],
     mode: "gift", selectionLimit: 0, pricePerPhoto: 0, priceFullGallery: 0,
     watermark: false, downloadRes: "full", proofingEnabled: true,
     template: "cinematic", layout: "grid", welcomeMessage: "Here are the final assets from the Spring '26 campaign.", showUpsellBanner: false,
+    ...DEFAULT_BRANDING, logoText: "STUDIO",
   },
   {
     id: "dp3", title: "Portrait Session", client: "Emma K.",
-    status: "expired", photoCount: 48, photoSeeds: [30,31,32,33,34,35], coverSeed: 403,
+    status: "expired", photoCount: 48, photoSeeds: [30,31,32,33,34,35], coverSeed: 403, coverUrl: "",
     views: 34, lastViewed: "3 days ago", createdAt: "Mar 1, 2026", expiresAt: "Apr 1, 2026",
     passwordEnabled: false, password: "", whitelistEnabled: false, whitelist: [],
     mode: "direct", selectionLimit: 0, pricePerPhoto: 12, priceFullGallery: 399,
     watermark: true, downloadRes: "full", proofingEnabled: false,
     template: "editorial", layout: "grid", welcomeMessage: "Hi Emma! Your portraits are ready. Purchase individual photos or grab the full set.", showUpsellBanner: true,
+    ...DEFAULT_BRANDING, logoText: "EMMA K.",
   },
 ];
 
 const DEFAULT_PAGE: Omit<DeliveryPage, "id" | "title" | "client" | "createdAt"> = {
-  status: "draft", photoCount: 0, photoSeeds: [], coverSeed: 404,
+  status: "draft", photoCount: 0, photoSeeds: [], coverSeed: 404, coverUrl: "",
   views: 0, lastViewed: null, expiresAt: null,
   passwordEnabled: false, password: "", whitelistEnabled: false, whitelist: [],
   mode: "gift", selectionLimit: 20, pricePerPhoto: 15, priceFullGallery: 299,
   watermark: true, downloadRes: "full", proofingEnabled: false,
   template: "minimal", layout: "grid", welcomeMessage: "", showUpsellBanner: true,
+  ...DEFAULT_BRANDING,
 };
+
+const DELIVERY_FONTS: { label: string; value: string }[] = [
+  { label: "Inter",        value: "Inter, sans-serif" },
+  { label: "DM Sans",      value: "'DM Sans', sans-serif" },
+  { label: "Playfair",     value: "'Playfair Display', serif" },
+  { label: "Cormorant",    value: "'Cormorant Garamond', serif" },
+  { label: "Space Grotesk",value: "'Space Grotesk', sans-serif" },
+  { label: "Manrope",      value: "Manrope, sans-serif" },
+  { label: "DM Serif",     value: "'DM Serif Display', serif" },
+  { label: "Archivo",      value: "Archivo, sans-serif" },
+];
 
 const TEMPLATES: { id: TemplateName; label: string; desc: string; accent: string; fg: string; sub: string }[] = [
   { id: "minimal",   label: "Minimal",   desc: "Clean white space, serif typography, subtle grid",   accent: "#f5f5f5", fg: "#111111", sub: "#888888" },
@@ -545,9 +585,214 @@ function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; 
   );
 }
 
+/* ── Color row with native picker ── */
+function ColorRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  return (
+    <div className="flex items-center gap-2">
+      <span className="font-sans text-xs text-[var(--fg-muted)] flex-1 truncate">{label}</span>
+      <div className="flex items-center gap-1.5 border border-[var(--border)] rounded-lg px-2 py-1 hover:border-[var(--fg-muted)] transition-colors cursor-pointer" onClick={() => inputRef.current?.click()}>
+        <div className="relative w-4 h-4 shrink-0">
+          <div className="w-4 h-4 rounded border border-black/10" style={{ background: value }} />
+          <input
+            ref={inputRef}
+            type="color"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            style={{ position: "absolute", top: 0, left: 0, width: 1, height: 1, opacity: 0, border: "none", padding: 0, cursor: "pointer" }}
+          />
+        </div>
+        <span className="font-mono text-[11px] text-[var(--fg)] w-14 select-none">{value}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Single photo picker (for cover, logo) ── */
+function SinglePhotoPicker({
+  value,
+  onSelect,
+  onClose,
+}: {
+  value: string;
+  onSelect: (url: string) => void;
+  onClose: () => void;
+}) {
+  const [selected, setSelected] = useState(value);
+  const [tab, setTab] = useState<"gallery" | "url">("gallery");
+  const [urlDraft, setUrlDraft] = useState(value);
+  const [uploaded, setUploaded] = useState<string[]>([]);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setUploaded((prev) => [url, ...prev]);
+    setSelected(url);
+    e.target.value = "";
+  }
+
+  const allPhotos = [
+    ...uploaded,
+    ...ALL_GALLERY_SEEDS.map((s) => `https://picsum.photos/seed/${s}/800/800`),
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.97, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 28 }}
+        className="w-[700px] h-[480px] bg-[var(--bg)] border border-[var(--border)] rounded-2xl flex flex-col overflow-hidden shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)] shrink-0">
+          <span className="font-mono text-xs text-[var(--fg-muted)] uppercase tracking-widest">Select image</span>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div className="flex flex-1 overflow-hidden">
+          <div className="w-[360px] border-r border-[var(--border)] flex flex-col">
+            <div className="flex border-b border-[var(--border)] shrink-0">
+              {(["gallery", "url"] as const).map((t) => (
+                <button key={t} onClick={() => setTab(t)}
+                  className={`flex-1 font-sans text-xs py-2.5 capitalize transition-colors border-b-2 -mb-px ${tab === t ? "border-yellow text-[var(--fg)]" : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>
+                  {t}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1 overflow-y-auto p-3">
+              {tab === "gallery" ? (
+                <>
+                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    className="w-full mb-3 flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors font-sans text-xs"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    Upload photo
+                  </button>
+                  <div className="grid grid-cols-4 gap-2">
+                    {allPhotos.map((url, i) => {
+                      const isActive = selected === url;
+                      return (
+                        <div
+                          key={i}
+                          onClick={() => setSelected(url)}
+                          className={`aspect-square overflow-hidden rounded-lg cursor-pointer relative border-2 transition-all ${isActive ? "border-yellow" : "border-transparent hover:border-[var(--fg-muted)]"}`}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <input
+                    value={urlDraft}
+                    onChange={(e) => setUrlDraft(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && urlDraft.trim()) setSelected(urlDraft.trim()); }}
+                    placeholder="https://..."
+                    className="w-full font-mono text-xs text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-3 py-2 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                  />
+                  <button
+                    onClick={() => { if (urlDraft.trim()) setSelected(urlDraft.trim()); }}
+                    className="w-full rounded-lg border border-[var(--border)] py-2 font-sans text-xs text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+                  >
+                    Use URL
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col p-4 gap-3">
+            <div className="flex-1 bg-[var(--bg-subtle)] rounded-xl flex items-center justify-center overflow-hidden">
+              {selected ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={selected} alt="" className="max-w-full max-h-full object-contain" />
+              ) : (
+                <span className="font-mono text-xs text-[var(--fg-muted)]">No image selected</span>
+              )}
+            </div>
+            <button
+              onClick={() => { if (selected) { onSelect(selected); onClose(); } }}
+              disabled={!selected}
+              className="w-full py-2 rounded-xl bg-yellow text-[#111] font-sans font-bold text-xs disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+            >
+              Use this image
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ── Image button: opens single picker, shows preview ── */
+function ImageButton({
+  value,
+  onChange,
+  placeholder = "Select from gallery",
+}: {
+  value: string;
+  onChange: (url: string) => void;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        {value && (
+          <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 border border-[var(--border)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={value} alt="" className="w-full h-full object-cover" />
+          </div>
+        )}
+        <button
+          onClick={() => setOpen(true)}
+          className="flex-1 min-w-0 flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors font-sans text-xs"
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span className="truncate">{value ? "Change image" : placeholder}</span>
+        </button>
+        {value && (
+          <button onClick={() => onChange("")} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-red-400 transition-colors shrink-0">
+            Clear
+          </button>
+        )}
+      </div>
+      <AnimatePresence>
+        {open && <SinglePhotoPicker value={value} onSelect={onChange} onClose={() => setOpen(false)} />}
+      </AnimatePresence>
+    </>
+  );
+}
+
 function AestheticSection({ page, set }: { page: DeliveryPage; set: <K extends keyof DeliveryPage>(k: K, v: DeliveryPage[K]) => void }) {
   const [showTemplates, setShowTemplates] = useState(false);
   const current = TEMPLATES.find((t) => t.id === page.template)!;
+
+  // When user enables custom colors for the first time, seed from template
+  function toggleCustomColors() {
+    if (!page.customColors) {
+      const ts = TEMPLATE_STYLES[page.template];
+      set("colorBg", ts.bg);
+      set("colorFg", ts.fg);
+      set("colorAccent", ts.accent);
+      set("colorBtnBg", ts.btnBg);
+      set("colorBtnFg", ts.btnFg);
+    }
+    set("customColors", !page.customColors);
+  }
 
   return (
     <Accordion title="Look & Feel" icon={
@@ -579,6 +824,82 @@ function AestheticSection({ page, set }: { page: DeliveryPage; set: <K extends k
             />
           )}
         </AnimatePresence>
+      </div>
+
+      {/* Cover image */}
+      <div>
+        <SectionLabel>Cover image</SectionLabel>
+        <ImageButton value={page.coverUrl} onChange={(u) => set("coverUrl", u)} placeholder="Use template default" />
+      </div>
+
+      {/* Logo */}
+      <div>
+        <SectionLabel>Logo</SectionLabel>
+        <div className="flex gap-1 mb-2">
+          {([
+            { id: "none", label: "None" },
+            { id: "text", label: "Text" },
+            { id: "image", label: "Image" },
+            { id: "image+text", label: "Both" },
+          ] as { id: LogoMode; label: string }[]).map((opt) => (
+            <button
+              key={opt.id}
+              onClick={() => set("logoMode", opt.id)}
+              className={`flex-1 py-1.5 rounded-lg font-sans text-[11px] transition-colors border ${
+                page.logoMode === opt.id
+                  ? "border-yellow bg-yellow/10 text-[var(--fg)]"
+                  : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-col gap-2">
+          {(page.logoMode === "text" || page.logoMode === "image+text") && (
+            <input
+              value={page.logoText}
+              onChange={(e) => set("logoText", e.target.value)}
+              placeholder="STUDIO"
+              className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors"
+            />
+          )}
+          {(page.logoMode === "image" || page.logoMode === "image+text") && (
+            <ImageButton value={page.logoUrl} onChange={(u) => set("logoUrl", u)} placeholder="Upload logo" />
+          )}
+        </div>
+      </div>
+
+      {/* Custom colors */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <SectionLabel>Custom colors</SectionLabel>
+          <Toggle checked={page.customColors} onChange={toggleCustomColors} />
+        </div>
+        {page.customColors && (
+          <div className="flex flex-col gap-2 p-3 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
+            <ColorRow label="Background"  value={page.colorBg}     onChange={(v) => set("colorBg", v)} />
+            <ColorRow label="Text"        value={page.colorFg}     onChange={(v) => set("colorFg", v)} />
+            <ColorRow label="Accent"      value={page.colorAccent} onChange={(v) => set("colorAccent", v)} />
+            <ColorRow label="Button bg"   value={page.colorBtnBg}  onChange={(v) => set("colorBtnBg", v)} />
+            <ColorRow label="Button text" value={page.colorBtnFg}  onChange={(v) => set("colorBtnFg", v)} />
+          </div>
+        )}
+      </div>
+
+      {/* Font */}
+      <div>
+        <SectionLabel>Font family</SectionLabel>
+        <select
+          value={page.fontFamily}
+          onChange={(e) => set("fontFamily", e.target.value)}
+          className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors"
+          style={{ fontFamily: page.fontFamily }}
+        >
+          {DELIVERY_FONTS.map((f) => (
+            <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.label}</option>
+          ))}
+        </select>
       </div>
 
       {/* Layout */}
@@ -632,17 +953,22 @@ const TEMPLATE_STYLES: Record<TemplateName, { bg: string; fg: string; muted: str
 };
 
 function GalleryPreview({ page, viewport }: { page: DeliveryPage; viewport: "mobile" | "desktop" }) {
-  const ts = TEMPLATE_STYLES[page.template];
+  const tplStyle = TEMPLATE_STYLES[page.template];
+  // Resolve effective styles: custom overrides → template → default
+  const ts = page.customColors
+    ? { bg: page.colorBg, fg: page.colorFg, muted: tplStyle.muted, accent: page.colorAccent, btnBg: page.colorBtnBg, btnFg: page.colorBtnFg }
+    : tplStyle;
   const allSeeds = page.photoSeeds.length > 0 ? page.photoSeeds : ALL_GALLERY_SEEDS.slice(0, 12);
   const photos = allSeeds.slice(0, 12);
   const isMobile = viewport === "mobile";
+  const coverSrc = page.coverUrl || `https://picsum.photos/seed/${page.coverSeed}/800/400?grayscale`;
 
   const heights = [110, 80, 140, 100, 120, 90, 130, 85, 115, 95, 125, 100];
 
   return (
     <div
       className="w-full h-full overflow-y-auto flex flex-col"
-      style={{ background: ts.bg, fontFamily: "Inter, sans-serif", fontSize: isMobile ? 12 : 13 }}
+      style={{ background: ts.bg, fontFamily: page.fontFamily || "Inter, sans-serif", fontSize: isMobile ? 12 : 13 }}
     >
       {/* Upsell banner */}
       {page.mode === "direct" && page.showUpsellBanner && page.priceFullGallery > 0 && (
@@ -655,15 +981,20 @@ function GalleryPreview({ page, viewport }: { page: DeliveryPage; viewport: "mob
       {/* Cover */}
       <div className="relative shrink-0 overflow-hidden" style={{ height: isMobile ? 120 : 180 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`https://picsum.photos/seed/${page.coverSeed}/800/400?grayscale`} alt="" className="w-full h-full object-cover" />
+        <img src={coverSrc} alt="" className="w-full h-full object-cover" />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.55))" }}/>
         {/* Logo */}
-        <div style={{ position: "absolute", top: isMobile ? 10 : 14, left: isMobile ? 12 : 18, display: "flex", alignItems: "center", gap: 6 }}>
-          <div style={{ width: isMobile ? 20 : 24, height: isMobile ? 20 : 24, background: "#fad502", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: "#111", fontWeight: 900, fontSize: isMobile ? 9 : 11 }}>F</span>
+        {page.logoMode !== "none" && (
+          <div style={{ position: "absolute", top: isMobile ? 10 : 14, left: isMobile ? 12 : 18, display: "flex", alignItems: "center", gap: 6 }}>
+            {(page.logoMode === "image" || page.logoMode === "image+text") && page.logoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={page.logoUrl} alt="" style={{ height: isMobile ? 20 : 24, width: "auto", objectFit: "contain", borderRadius: 4 }} />
+            )}
+            {(page.logoMode === "text" || page.logoMode === "image+text") && page.logoText && (
+              <span style={{ color: "#fff", fontWeight: 900, fontSize: isMobile ? 10 : 12, letterSpacing: "0.05em", fontFamily: page.fontFamily }}>{page.logoText}</span>
+            )}
           </div>
-          <span style={{ color: "#fff", fontWeight: 900, fontSize: isMobile ? 10 : 12, letterSpacing: "0.05em" }}>FRAME</span>
-        </div>
+        )}
         {/* Welcome */}
         {page.welcomeMessage && (
           <div style={{ position: "absolute", bottom: isMobile ? 10 : 14, left: isMobile ? 12 : 18, right: isMobile ? 12 : 18 }}>
