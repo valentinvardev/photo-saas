@@ -702,8 +702,8 @@ function SettingsTab() {
             </>
           )}
           <div>
-            <label style={labelStyle}>Favicon URL</label>
-            <input value={logo.faviconUrl} onChange={(e) => setLogo({ faviconUrl: e.target.value })} placeholder="https://..." style={inputStyle} />
+            <label style={labelStyle}>Favicon</label>
+            <LogoImageButton value={logo.faviconUrl} onChange={(url) => setLogo({ faviconUrl: url })} />
           </div>
         </div>
       </div>
