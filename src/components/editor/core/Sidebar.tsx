@@ -475,6 +475,19 @@ function LogoGalleryModal({
   const [selected, setSelected] = useState(value);
   const [tab, setTab] = useState<"gallery" | "url">("gallery");
   const [urlDraft, setUrlDraft] = useState(value);
+  const [uploaded, setUploaded] = useState<string[]>([]);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setUploaded((prev) => [url, ...prev]);
+    setSelected(url);
+    e.target.value = "";
+  }
+
+  const allSeeds = [...uploaded, ...LOGO_GALLERY_SEEDS.map((s) => `https://picsum.photos/seed/${s}/800/800?grayscale`)];
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
     flex: 1, background: "none", border: "none",
@@ -511,31 +524,48 @@ function LogoGalleryModal({
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: 10 }}>
               {tab === "gallery" ? (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
-                  {LOGO_GALLERY_SEEDS.map((seed) => {
-                    const url = `https://picsum.photos/seed/${seed}/800/800?grayscale`;
-                    const isActive = selected === url;
-                    return (
-                      <div
-                        key={seed}
-                        onClick={() => setSelected(url)}
-                        style={{
-                          aspectRatio: "1/1", overflow: "hidden", cursor: "pointer", borderRadius: 3,
-                          border: isActive ? "2px solid #2563eb" : "2px solid transparent",
-                          position: "relative",
-                        }}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={`https://picsum.photos/seed/${seed}/200/200?grayscale`} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                        {isActive && (
-                          <div style={{ position: "absolute", top: 3, right: 3, width: 14, height: 14, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                <>
+                  <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFileChange} />
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    style={{
+                      width: "100%", marginBottom: 8, background: "none",
+                      border: "1px dashed #2a2a2a", color: "#555", fontSize: 11,
+                      padding: "7px", borderRadius: 4, cursor: "pointer",
+                      fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#facc15"; e.currentTarget.style.color = "#facc15"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#2a2a2a"; e.currentTarget.style.color = "#555"; }}
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    Upload photo
+                  </button>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
+                    {allSeeds.map((url, i) => {
+                      const isActive = selected === url;
+                      const thumb = url.startsWith("blob:") ? url : url.replace("800/800", "200/200");
+                      return (
+                        <div
+                          key={i}
+                          onClick={() => setSelected(url)}
+                          style={{
+                            aspectRatio: "1/1", overflow: "hidden", cursor: "pointer", borderRadius: 3,
+                            border: isActive ? "2px solid #2563eb" : "2px solid transparent",
+                            position: "relative",
+                          }}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={thumb} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                          {isActive && (
+                            <div style={{ position: "absolute", top: 3, right: 3, width: 14, height: 14, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
               ) : (
                 <div>
                   <input

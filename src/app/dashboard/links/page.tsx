@@ -21,6 +21,7 @@ type BtnVariant = "filled" | "outline" | "glass";
 interface PageConfig {
   displayName:   string;
   bio:           string;
+  avatarUrl:     string;
   avatarBg:      string;
   avatarInitial: string;
   bgType:        BgType;
@@ -136,6 +137,7 @@ const DEFAULT_LINKS: LinkItem[] = [
 const DEFAULT_CONFIG: PageConfig = {
   displayName:   "Sofia Chen",
   bio:           "Fine art & portrait photographer · Buenos Aires",
+  avatarUrl:     "",
   avatarBg:      "#fad502",
   avatarInitial: "S",
   bgType:        "solid",
@@ -243,8 +245,218 @@ function DividerIcon() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
+   GALLERY PICKER MODAL
+══════════════════════════════════════════════════════════════════════════ */
+
+const GALLERY_SEEDS = [
+  20, 37, 48, 63, 71, 82, 95, 108, 133, 145, 156, 167,
+  201, 202, 210, 220, 230, 240, 250, 300, 42, 55, 77, 99,
+];
+
+function GalleryPickerModal({
+  value,
+  onSelect,
+  onClose,
+}: {
+  value: string;
+  onSelect: (url: string) => void;
+  onClose: () => void;
+}) {
+  const [selected, setSelected] = useState(value);
+  const [tab, setTab] = useState<"gallery" | "url">("gallery");
+  const [urlDraft, setUrlDraft] = useState(value);
+  const [uploaded, setUploaded] = useState<string[]>([]);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setUploaded((prev) => [url, ...prev]);
+    setSelected(url);
+    e.target.value = "";
+  }
+
+  const allPhotos = [
+    ...uploaded,
+    ...GALLERY_SEEDS.map((s) => `https://picsum.photos/seed/${s}/800/800`),
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="w-[700px] h-[480px] bg-[var(--bg)] border border-[var(--border)] rounded-2xl flex flex-col overflow-hidden shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)] shrink-0">
+          <span className="font-mono text-xs text-[var(--fg-muted)] uppercase tracking-widest">Select image</span>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left: gallery */}
+          <div className="w-[360px] border-r border-[var(--border)] flex flex-col">
+            <div className="flex border-b border-[var(--border)] shrink-0">
+              {(["gallery", "url"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`flex-1 font-sans text-xs py-2.5 capitalize transition-colors border-b-2 -mb-px ${
+                    tab === t ? "border-yellow text-[var(--fg)]" : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-3">
+              {tab === "gallery" ? (
+                <>
+                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    className="w-full mb-3 flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors font-sans text-xs"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    Upload photo
+                  </button>
+                  <div className="grid grid-cols-4 gap-2">
+                    {allPhotos.map((url, i) => {
+                      const isActive = selected === url;
+                      return (
+                        <div
+                          key={i}
+                          onClick={() => setSelected(url)}
+                          className={`aspect-square overflow-hidden rounded-lg cursor-pointer relative border-2 transition-all ${
+                            isActive ? "border-yellow" : "border-transparent hover:border-[var(--fg-muted)]"
+                          }`}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                          {isActive && (
+                            <div className="absolute top-1 right-1 w-4 h-4 bg-yellow rounded-full flex items-center justify-center">
+                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <input
+                    value={urlDraft}
+                    onChange={(e) => setUrlDraft(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && urlDraft.trim()) setSelected(urlDraft.trim()); }}
+                    placeholder="https://..."
+                    className="w-full font-mono text-xs text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-3 py-2 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                  />
+                  <button
+                    onClick={() => { if (urlDraft.trim()) setSelected(urlDraft.trim()); }}
+                    className="w-full rounded-lg border border-[var(--border)] py-2 font-sans text-xs text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+                  >
+                    Use URL
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right: preview */}
+          <div className="flex-1 flex flex-col p-4 gap-3">
+            <div className="flex-1 bg-[var(--bg-subtle)] rounded-xl flex items-center justify-center overflow-hidden">
+              {selected ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={selected} alt="" className="max-w-full max-h-full object-contain" />
+              ) : (
+                <span className="font-mono text-xs text-[var(--fg-muted)]">No image selected</span>
+              )}
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <button
+                disabled={!selected}
+                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-[var(--border)] font-sans text-xs text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 2v14a2 2 0 002 2h14M18 22V8a2 2 0 00-2-2H2"/></svg>
+                Crop
+              </button>
+              <button
+                onClick={() => { if (selected) { onSelect(selected); onClose(); } }}
+                disabled={!selected}
+                className="flex-[2] py-2 rounded-xl bg-yellow text-[#111] font-sans font-bold text-xs disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
    SMALL HELPERS
 ══════════════════════════════════════════════════════════════════════════ */
+
+function AvatarPhotoButton({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setOpen(true)}
+          className="flex-1 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors font-sans text-xs"
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          {value ? "Change photo" : "Upload photo"}
+        </button>
+        {value && (
+          <button
+            onClick={() => onChange("")}
+            className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-red-400 transition-colors"
+          >
+            Remove
+          </button>
+        )}
+      </div>
+      {open && <GalleryPickerModal value={value} onSelect={onChange} onClose={() => setOpen(false)} />}
+    </>
+  );
+}
+
+function BgImageButton({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        {value && (
+          <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-[var(--border)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={value} alt="" className="w-full h-full object-cover" />
+          </div>
+        )}
+        <button
+          onClick={() => setOpen(true)}
+          className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors font-sans text-xs"
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          {value ? "Change background" : "Select from gallery"}
+        </button>
+      </div>
+      {open && <GalleryPickerModal value={value} onSelect={onChange} onClose={() => setOpen(false)} />}
+    </>
+  );
+}
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -527,22 +739,33 @@ function AppearanceTab({ config, setConfig }: { config: PageConfig; setConfig: R
         <SectionLabel>Profile</SectionLabel>
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
+            {/* Avatar preview */}
             <div
-              className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 font-sans font-black text-xl text-[#111] border-2 border-[var(--border)]"
-              style={{ background: config.avatarBg }}
+              className="w-12 h-12 rounded-full shrink-0 border-2 border-[var(--border)] overflow-hidden flex items-center justify-center font-sans font-black text-xl text-[#111]"
+              style={{ background: config.avatarUrl ? "transparent" : config.avatarBg }}
             >
-              {config.avatarInitial}
+              {config.avatarUrl
+                // eslint-disable-next-line @next/next/no-img-element
+                ? <img src={config.avatarUrl} alt="" className="w-full h-full object-cover" />
+                : config.avatarInitial
+              }
             </div>
             <div className="flex flex-col gap-2 flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-sans text-xs text-[var(--fg-muted)] w-10 shrink-0">Initial</span>
-                <input
-                  value={config.avatarInitial}
-                  onChange={(e) => set("avatarInitial", e.target.value.slice(0, 2).toUpperCase())}
-                  className="w-10 font-sans text-sm text-center font-bold text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2 py-1 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-                />
-              </div>
-              <ColorRow label="Color" value={config.avatarBg} onChange={(v) => set("avatarBg", v)} />
+              {/* Photo button */}
+              <AvatarPhotoButton value={config.avatarUrl} onChange={(url) => set("avatarUrl", url)} />
+              {!config.avatarUrl && (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="font-sans text-xs text-[var(--fg-muted)] w-10 shrink-0">Initial</span>
+                    <input
+                      value={config.avatarInitial}
+                      onChange={(e) => set("avatarInitial", e.target.value.slice(0, 2).toUpperCase())}
+                      className="w-10 font-sans text-sm text-center font-bold text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-2 py-1 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
+                    />
+                  </div>
+                  <ColorRow label="Color" value={config.avatarBg} onChange={(v) => set("avatarBg", v)} />
+                </>
+              )}
             </div>
           </div>
           <div>
@@ -607,15 +830,7 @@ function AppearanceTab({ config, setConfig }: { config: PageConfig; setConfig: R
           </div>
         )}
         {config.bgType === "image" && (
-          <div>
-            <span className="font-sans text-xs text-[var(--fg-muted)] block mb-1">Image URL</span>
-            <input
-              value={config.bgImageUrl}
-              onChange={(e) => set("bgImageUrl", e.target.value)}
-              className="w-full font-mono text-xs text-[var(--fg)] bg-[var(--bg-subtle)] rounded-lg px-3 py-2 outline-none border border-[var(--border)] focus:border-yellow transition-colors"
-              placeholder="https://..."
-            />
-          </div>
+          <BgImageButton value={config.bgImageUrl} onChange={(url) => set("bgImageUrl", url)} />
         )}
       </div>
 
@@ -785,10 +1000,14 @@ function LinkTreeView({ links, config }: { links: LinkItem[]; config: PageConfig
       <div className="flex flex-col items-center px-5 pt-10 pb-12 gap-4">
         {/* Avatar */}
         <div
-          className="w-16 h-16 rounded-full flex items-center justify-center shrink-0"
-          style={{ background: config.avatarBg, color: "#111111", fontFamily: config.fontFamily, fontWeight: "800", fontSize: "1.5rem" }}
+          className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center shrink-0"
+          style={{ background: config.avatarUrl ? "transparent" : config.avatarBg, color: "#111111", fontFamily: config.fontFamily, fontWeight: "800", fontSize: "1.5rem" }}
         >
-          {config.avatarInitial}
+          {config.avatarUrl
+            // eslint-disable-next-line @next/next/no-img-element
+            ? <img src={config.avatarUrl} alt="" className="w-full h-full object-cover" />
+            : config.avatarInitial
+          }
         </div>
         {/* Name + bio */}
         <div className="text-center">
