@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SERIF = "var(--atelier-serif), 'Cormorant Garamond', 'Playfair Display', Georgia, serif";
 const SANS  = "var(--atelier-sans), Inter, -apple-system, sans-serif";
@@ -321,6 +322,7 @@ function Plate({ seed, idx, total, col, row, onOpen }: { seed: number; idx: numb
 
 /* ── Password gate ────────────────────────────────────────── */
 function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
+  const [step, setStep] = useState<"welcome" | "password">("welcome");
   const [pwd, setPwd] = useState("");
   const [error, setError] = useState(false);
 
@@ -337,76 +339,138 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
       background: `linear-gradient(135deg, rgba(10,10,10,0.85), rgba(10,10,10,0.65)), url(https://picsum.photos/seed/${HERO_SEED}/2400/1350) center/cover`,
       color: "#fafaf8",
     }}>
-      <form onSubmit={submit} style={{
-        width: 440, maxWidth: "100%",
-        background: "rgba(10,10,10,0.55)",
-        backdropFilter: "blur(24px)",
-        WebkitBackdropFilter: "blur(24px)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        padding: "56px 48px",
-        textAlign: "center",
-      }}>
-        {/* Tiny mark */}
-        <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 28 }}>
-          Atelier · Private
-        </p>
-
-        {/* Title */}
-        <h1 style={{
-          fontFamily: SERIF, fontSize: 56, fontWeight: 300,
-          letterSpacing: "-0.02em", lineHeight: 1, margin: 0, marginBottom: 12,
-          color: "#fafaf8",
-        }}>
-          Sarah <span style={{ fontStyle: "italic", fontWeight: 400 }}>&amp;</span> James
-        </h1>
-        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: "rgba(250,250,248,0.7)", marginBottom: 40, fontWeight: 300 }}>
-          A private gallery awaits.
-        </p>
-
-        {/* Divider */}
-        <div style={{ width: 32, height: 1, background: "rgba(255,255,255,0.3)", margin: "0 auto 36px" }} />
-
-        {/* Input */}
-        <label style={{ display: "block", fontFamily: MONO, fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 12, textAlign: "left" }}>
-          Access key
-        </label>
-        <input
-          autoFocus type="password" value={pwd}
-          onChange={(e) => { setPwd(e.target.value); setError(false); }}
-          placeholder="Enter the password from your photographer"
-          style={{
-            width: "100%", boxSizing: "border-box",
-            padding: "14px 0",
-            background: "transparent",
-            border: "none",
-            borderBottom: error ? "1px solid #f59e9e" : "1px solid rgba(255,255,255,0.25)",
-            color: "#fafaf8",
-            fontFamily: SERIF, fontSize: 18, fontStyle: "italic",
-            outline: "none",
-            textAlign: "left",
-          }}
-        />
-        {error && (
-          <p style={{ marginTop: 12, fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "#f59e9e", textAlign: "left" }}>
-            Incorrect — try again
+      <motion.div
+        layout
+        transition={{ layout: { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] } }}
+        style={{
+          width: 440, maxWidth: "100%",
+          background: "rgba(10,10,10,0.55)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          padding: "56px 48px",
+          textAlign: "center",
+          overflow: "hidden",
+        }}
+      >
+        {/* Persistent header — stays across steps */}
+        <motion.div layout="position">
+          <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 28 }}>
+            Atelier · Private
           </p>
-        )}
+          <h1 style={{
+            fontFamily: SERIF, fontSize: 56, fontWeight: 300,
+            letterSpacing: "-0.02em", lineHeight: 1, margin: 0, marginBottom: 12,
+            color: "#fafaf8",
+          }}>
+            Sarah <span style={{ fontStyle: "italic", fontWeight: 400 }}>&amp;</span> James
+          </h1>
+        </motion.div>
 
-        {/* CTA */}
-        <button type="submit" style={{
-          marginTop: 36, width: "100%",
-          padding: "16px 24px",
-          background: "#fafaf8", color: "#0a0a0a",
-          border: "none", cursor: "pointer",
-          fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700,
-        }}>
-          Enter the gallery
-        </button>
+        {/* Animated step content */}
+        <AnimatePresence mode="wait" initial={false}>
+          {step === "welcome" ? (
+            <motion.div
+              key="welcome"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+            >
+              <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, color: "rgba(250,250,248,0.78)", marginTop: 4, marginBottom: 36, fontWeight: 300, lineHeight: 1.5 }}>
+                We&rsquo;ve been waiting for this moment.
+                <br />
+                Your gallery is ready.
+              </p>
 
-        <p style={{ marginTop: 32, fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
-          Hint: sarah2026
-        </p>
-      </form>
+              <div style={{ width: 32, height: 1, background: "rgba(255,255,255,0.3)", margin: "0 auto 36px" }} />
+
+              <button
+                onClick={() => setStep("password")}
+                style={{
+                  width: "100%",
+                  padding: "16px 24px",
+                  background: "#fafaf8", color: "#0a0a0a",
+                  border: "none", cursor: "pointer",
+                  fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700,
+                  display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 10,
+                }}
+              >
+                Enter
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+
+              <p style={{ marginTop: 32, fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
+                A private collection · Apr 2026
+              </p>
+            </motion.div>
+          ) : (
+            <motion.form
+              key="password"
+              onSubmit={submit}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+            >
+              <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: "rgba(250,250,248,0.7)", marginTop: 4, marginBottom: 36, fontWeight: 300 }}>
+                Enter your access key to continue.
+              </p>
+
+              <div style={{ width: 32, height: 1, background: "rgba(255,255,255,0.3)", margin: "0 auto 32px" }} />
+
+              <label style={{ display: "block", fontFamily: MONO, fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 10, textAlign: "left" }}>
+                Access key
+              </label>
+              <input
+                autoFocus type="password" value={pwd}
+                onChange={(e) => { setPwd(e.target.value); setError(false); }}
+                placeholder="From your photographer"
+                style={{
+                  width: "100%", boxSizing: "border-box",
+                  padding: "14px 0",
+                  background: "transparent", border: "none",
+                  borderBottom: error ? "1px solid #f59e9e" : "1px solid rgba(255,255,255,0.25)",
+                  color: "#fafaf8",
+                  fontFamily: SERIF, fontSize: 18, fontStyle: "italic",
+                  outline: "none", textAlign: "left",
+                }}
+              />
+              {error && (
+                <p style={{ marginTop: 12, fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "#f59e9e", textAlign: "left" }}>
+                  Incorrect — try again
+                </p>
+              )}
+
+              <button type="submit" style={{
+                marginTop: 36, width: "100%",
+                padding: "16px 24px",
+                background: "#fafaf8", color: "#0a0a0a",
+                border: "none", cursor: "pointer",
+                fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700,
+              }}>
+                Unlock the gallery
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setStep("welcome"); setPwd(""); setError(false); }}
+                style={{
+                  marginTop: 16, background: "none", border: "none", cursor: "pointer",
+                  color: "rgba(255,255,255,0.45)",
+                  fontFamily: MONO, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase",
+                }}
+              >
+                ← Back
+              </button>
+
+              <p style={{ marginTop: 24, fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
+                Hint: sarah2026
+              </p>
+            </motion.form>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }
