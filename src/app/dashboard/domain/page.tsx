@@ -101,6 +101,21 @@ function ManageModal({ pageId, url, onClose }: { pageId: PageId; url: string; on
     delivery:  "Delivery settings",
   };
 
+  /* visual builder route per page type
+     portfolio uses the working /editor/minimal-bw
+     links/delivery point at the same shell — actual editable templates
+     for those products still need to be adapted per docs/template-adapter-guide.md */
+  const builderHref: Record<PageId, string> = {
+    portfolio: "/editor/minimal-bw",
+    links:     "/editor/minimal-bw",
+    delivery:  "/editor/minimal-bw",
+  };
+  const builderTemplate: Record<PageId, string> = {
+    portfolio: "Minimal BW",
+    links:     "Default",
+    delivery:  "Standard gallery",
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -146,39 +161,45 @@ function ManageModal({ pageId, url, onClose }: { pageId: PageId; url: string; on
             </div>
           </div>
 
-          {/* page-specific sections */}
-          {pageId === "portfolio" && (
-            <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex flex-col gap-4">
-              <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider">Template</p>
-              <div className="flex items-center gap-3 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-xl px-4 py-3">
-                <div className="w-8 h-8 rounded-lg bg-[#111] border border-white/10 flex items-center justify-center shrink-0">
-                  <span className="font-sans font-black text-white text-[10px]">BW</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-sans text-sm font-medium text-[var(--fg)]">Minimal BW</p>
-                  <p className="font-sans text-xs text-[var(--fg-muted)]">Dark editorial · 8 sections</p>
-                </div>
-                <a href="/dashboard/templates" className="font-sans text-xs font-semibold text-yellow hover:text-yellow-dark transition-colors">Change</a>
+          {/* design — unified across all page types */}
+          <div className="px-6 py-4 border-b border-[var(--border-subtle)]">
+            <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider mb-3">Design</p>
+            <a
+              href={builderHref[pageId]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-3 bg-[var(--bg-subtle)] border border-[var(--border)] hover:border-yellow/40 rounded-xl p-3 transition-colors"
+            >
+              <div className="w-10 h-10 rounded-lg bg-yellow/10 border border-yellow/20 flex items-center justify-center text-yellow shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
               </div>
-            </div>
-          )}
+              <div className="flex-1 min-w-0">
+                <p className="font-sans text-sm font-medium text-[var(--fg)]">Visual builder</p>
+                <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">Edit images, text and layout — everything in one place.</p>
+                <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">Template: {builderTemplate[pageId]}</p>
+              </div>
+              <span className="shrink-0 font-sans text-xs font-semibold bg-yellow text-[#111] px-3.5 py-2 rounded-lg group-hover:bg-yellow-dark transition-colors flex items-center gap-1.5">
+                Open builder
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </span>
+            </a>
+          </div>
 
+          {/* page-specific operational sections (links/galleries) */}
           {pageId === "links" && (
-            <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex flex-col gap-3">
-              <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider">Links</p>
+            <div className="px-6 py-4 border-b border-[var(--border-subtle)]">
+              <p className="font-sans text-xs font-semibold text-[var(--fg-muted)] uppercase tracking-wider mb-3">Links</p>
               <div className="flex items-center justify-between bg-[var(--bg-subtle)] border border-[var(--border)] rounded-xl px-4 py-3">
                 <div>
                   <p className="font-sans text-sm font-medium text-[var(--fg)]">4 active links</p>
                   <p className="font-sans text-xs text-[var(--fg-muted)]">Instagram, Website, Booking, Shop</p>
                 </div>
                 <a href="/dashboard/links" className="font-sans text-xs font-semibold text-yellow hover:text-yellow-dark transition-colors">Manage</a>
-              </div>
-              <div className="flex items-center justify-between bg-[var(--bg-subtle)] border border-[var(--border)] rounded-xl px-4 py-3">
-                <div>
-                  <p className="font-sans text-sm font-medium text-[var(--fg)]">Theme: Dark</p>
-                  <p className="font-sans text-xs text-[var(--fg-muted)]">8 themes available</p>
-                </div>
-                <a href="/dashboard/links" className="font-sans text-xs font-semibold text-yellow hover:text-yellow-dark transition-colors">Edit</a>
               </div>
             </div>
           )}
