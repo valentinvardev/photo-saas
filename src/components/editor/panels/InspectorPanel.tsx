@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import type { EditorNode } from "~/lib/editor/types";
+import { ImageGalleryModal } from "./ImageGalleryModal";
 
 /* ─────────────────────────────────────────────────────────────────
    Shared primitives
@@ -185,9 +187,73 @@ const POSITION_OPTIONS = [
 function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Partial<EditorNode>) => void }) {
   const fit = node.objectFit ?? "cover";
   const pos = node.objectPosition ?? "center center";
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [urlDraft, setUrlDraft] = useState(node.src ?? "");
+
+  function applyUrl() {
+    const v = urlDraft.trim();
+    if (v) update({ src: v });
+  }
 
   return (
     <div>
+      {/* Source */}
+      <SectionLabel>Source</SectionLabel>
+      {node.src && (
+        <div style={{ marginBottom: 8, borderRadius: 4, overflow: "hidden", aspectRatio: "4/3", background: "#111" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={node.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        </div>
+      )}
+      <input
+        value={urlDraft}
+        onChange={(e) => setUrlDraft(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") applyUrl(); }}
+        placeholder="https://..."
+        style={{
+          width: "100%", background: "#0d0d0d", border: "1px solid #1f1f1f",
+          color: "#aaa", fontSize: 11, padding: "6px 8px", borderRadius: 4,
+          outline: "none", boxSizing: "border-box", fontFamily: "monospace",
+          marginBottom: 6,
+        }}
+      />
+      <div style={{ display: "flex", gap: 4 }}>
+        <button
+          onClick={applyUrl}
+          disabled={!urlDraft.trim() || urlDraft.trim() === node.src}
+          style={{
+            flex: 1, background: "#1a1a1a", border: "1px solid #252525",
+            color: "#888", fontSize: 10, padding: "6px", borderRadius: 4,
+            cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          Apply URL
+        </button>
+        <button
+          onClick={() => setGalleryOpen(true)}
+          style={{
+            flex: 1, background: "#1a2a3a", border: "1px solid #2563eb",
+            color: "#93c5fd", fontSize: 10, padding: "6px", borderRadius: 4,
+            cursor: "pointer", fontFamily: "inherit",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
+          }}
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          Gallery
+        </button>
+      </div>
+
+      {galleryOpen && (
+        <ImageGalleryModal
+          value={node.src ?? ""}
+          title="Select image"
+          onChange={(url) => { update({ src: url }); setUrlDraft(url); }}
+          onClose={() => setGalleryOpen(false)}
+        />
+      )}
+
+      <Divider />
+
       {/* Object fit */}
       <SectionLabel>Fit</SectionLabel>
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>

@@ -43,7 +43,7 @@ const PHOTOS: { seed: number; col: number; row: number }[] = [
 ];
 
 export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
-  const { selectNode } = useEditorStore();
+  const { selectNode, logo } = useEditorStore();
   const isMobile = viewport === "mobile";
   const isTablet = viewport === "tablet";
 
@@ -51,6 +51,29 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
 
   /* Responsive scaling — mirrors the source template's clamp() values */
   const padX = isMobile ? 20 : isTablet ? 32 : 48;
+
+  /* Brand renders text/image/both based on Settings > Logo */
+  function Brand({ nodeId, height = 22 }: { nodeId: string; height?: number }) {
+    const textEl = (
+      <EditableNode id={nodeId} tag="span">
+        <EditableText id={nodeId} />
+      </EditableNode>
+    );
+    if (logo.mode === "image" && logo.imageUrl) {
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img src={logo.imageUrl} alt={logo.text} style={{ height, objectFit: "contain", display: "block" }} />;
+    }
+    if (logo.mode === "image+text" && logo.imageUrl) {
+      return (
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={logo.imageUrl} alt="" style={{ height, objectFit: "contain", display: "block" }} />
+          {textEl}
+        </span>
+      );
+    }
+    return textEl;
+  }
 
   return (
     <main
@@ -74,9 +97,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
           gap: 12,
         }}
       >
-        <EditableNode id="atl-nav-brand" tag="span">
-          <EditableText id="atl-nav-brand" />
-        </EditableNode>
+        <Brand nodeId="atl-nav-brand" height={isMobile ? 18 : 22} />
 
         {!isMobile && (
           <EditableNode id="atl-nav-subtitle" tag="span" style={{ color: "#7a766f", textAlign: "center" }}>
@@ -315,12 +336,12 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
         }}
       >
         <div>
-          <EditableNode id="atl-footer-brand" tag="p" style={{
+          <div style={{
             fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: "#0a0a0a",
-            margin: 0, marginBottom: 8, fontWeight: 300, letterSpacing: "-0.01em",
+            marginBottom: 8, fontWeight: 300, letterSpacing: "-0.01em",
           }}>
-            <EditableText id="atl-footer-brand" />
-          </EditableNode>
+            <Brand nodeId="atl-footer-brand" height={32} />
+          </div>
           <EditableNode id="atl-footer-copy" tag="p" style={{
             fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em",
             textTransform: "uppercase", color: "#7a766f", margin: 0,
