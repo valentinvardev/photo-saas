@@ -23,6 +23,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import { TiptapEditor } from "~/components/editor/toolbars/TiptapEditor";
+import { LogoImage } from "./primitives";
 import type { Viewport } from "~/lib/editor/types";
 
 /* ═══════════════════════════════════════════
@@ -304,14 +305,12 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
       </EditableNode>
     );
     if (logo.mode === "image" && imgSrc) {
-      // eslint-disable-next-line @next/next/no-img-element
-      return <img src={imgSrc} alt={logo.text} style={{ width: logo.width, height: "auto", objectFit: "contain", display: "block" }} />;
+      return <LogoImage src={imgSrc} alt={logo.text} width={logo.width} crop={logo.imageCrop} />;
     }
     if (logo.mode === "image+text" && imgSrc) {
       return (
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imgSrc} alt="" style={{ width: logo.width, height: "auto", objectFit: "contain", display: "block" }} />
+          <LogoImage src={imgSrc} width={logo.width} crop={logo.imageCrop} />
           {textEl}
         </div>
       );

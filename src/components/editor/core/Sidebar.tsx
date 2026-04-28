@@ -10,6 +10,7 @@ import { ColorPalettePanel } from "~/components/editor/panels/ColorPalettePanel"
 import { TypographyPanel } from "~/components/editor/panels/TypographyPanel";
 import { TextPanel } from "~/components/editor/panels/TextPanel";
 import { ImagePickerButton } from "~/components/editor/panels/ImageGalleryModal";
+import { ImageCropModal } from "~/components/editor/panels/ImageCropModal";
 
 function LockIcon() {
   return <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
@@ -363,93 +364,107 @@ const BRAND_NODES: Record<string, string[]> = {
 
 const LOGO_WIDTH_MIN  = 16;
 const LOGO_WIDTH_MAX  = 240;
-const LOGO_WIDTH_STEP = 4;
+const LOGO_WIDTH_STEP = 1;
 
-function LogoWidthStepper({
+function LogoWidthSlider({
   width, onChange, labelStyle,
 }: {
   width: number;
   onChange: (w: number) => void;
   labelStyle: React.CSSProperties;
 }) {
-  const [draft, setDraft] = useState(String(width));
-
-  /* keep local input in sync with external store changes (e.g. +/- buttons) */
-  if (draft !== String(width) && document.activeElement?.tagName !== "INPUT") {
-    setTimeout(() => setDraft(String(width)), 0);
-  }
-
-  function commit(value: number) {
-    const clamped = Math.max(LOGO_WIDTH_MIN, Math.min(LOGO_WIDTH_MAX, Math.round(value)));
-    onChange(clamped);
-    setDraft(String(clamped));
-  }
-
-  const btnStyle: React.CSSProperties = {
-    width: 28, height: 28, background: "#1a1a1a", border: "1px solid #2a2a2a",
-    color: "#888", fontSize: 14, lineHeight: 1, cursor: "pointer",
-    fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center",
-    flexShrink: 0,
-  };
+  const pct = ((width - LOGO_WIDTH_MIN) / (LOGO_WIDTH_MAX - LOGO_WIDTH_MIN)) * 100;
+  /* Custom-painted track: filled portion uses the editor's blue accent */
+  const trackBg = `linear-gradient(to right, #2563eb 0%, #2563eb ${pct}%, #1f1f1f ${pct}%, #1f1f1f 100%)`;
 
   return (
     <div>
-      <label style={labelStyle}>Logo width</label>
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <button
-          type="button"
-          aria-label="Decrease logo width"
-          onClick={() => commit(width - LOGO_WIDTH_STEP)}
-          disabled={width <= LOGO_WIDTH_MIN}
-          style={{ ...btnStyle, borderRadius: "4px 0 0 4px", marginRight: -1, opacity: width <= LOGO_WIDTH_MIN ? 0.4 : 1 }}
-        >
-          −
-        </button>
-        <div style={{
-          flex: 1, position: "relative",
-          background: "#0a0a0a", border: "1px solid #2a2a2a",
-          height: 28, display: "flex", alignItems: "center",
-        }}>
-          <input
-            type="number"
-            min={LOGO_WIDTH_MIN}
-            max={LOGO_WIDTH_MAX}
-            step={LOGO_WIDTH_STEP}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onBlur={() => {
-              const n = Number(draft);
-              if (Number.isFinite(n)) commit(n);
-              else setDraft(String(width));
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const n = Number(draft);
-                if (Number.isFinite(n)) commit(n);
-                e.currentTarget.blur();
-              }
-            }}
-            style={{
-              flex: 1, background: "transparent", border: "none", outline: "none",
-              color: "#ccc", fontSize: 12, padding: "0 32px 0 10px", height: "100%",
-              fontFamily: "monospace", boxSizing: "border-box", width: "100%",
-              MozAppearance: "textfield",
-            }}
-          />
-          <span style={{ position: "absolute", right: 10, color: "#444", fontSize: 10, fontFamily: "monospace", pointerEvents: "none" }}>
-            px
-          </span>
-        </div>
-        <button
-          type="button"
-          aria-label="Increase logo width"
-          onClick={() => commit(width + LOGO_WIDTH_STEP)}
-          disabled={width >= LOGO_WIDTH_MAX}
-          style={{ ...btnStyle, borderRadius: "0 4px 4px 0", marginLeft: -1, opacity: width >= LOGO_WIDTH_MAX ? 0.4 : 1 }}
-        >
-          +
-        </button>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 5 }}>
+        <label style={{ ...labelStyle, marginBottom: 0 }}>Logo width</label>
+        <span style={{ fontFamily: "monospace", fontSize: 11, color: "#888" }}>{width}<span style={{ color: "#444" }}>px</span></span>
       </div>
+      <input
+        type="range"
+        min={LOGO_WIDTH_MIN}
+        max={LOGO_WIDTH_MAX}
+        step={LOGO_WIDTH_STEP}
+        value={width}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="ed-logo-width-range"
+        style={{
+          width: "100%", appearance: "none", WebkitAppearance: "none",
+          height: 4, borderRadius: 2, background: trackBg, outline: "none",
+          cursor: "grab",
+        }}
+      />
+      {/* Inline thumb styling — applies only to inputs in the editor sidebar */}
+      <style>{`
+        .ed-logo-width-range::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 14px; height: 14px; border-radius: 50%;
+          background: #fff; border: 2px solid #2563eb;
+          cursor: grab; margin-top: 0;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+        .ed-logo-width-range::-webkit-slider-thumb:active { cursor: grabbing; }
+        .ed-logo-width-range::-moz-range-thumb {
+          width: 14px; height: 14px; border-radius: 50%;
+          background: #fff; border: 2px solid #2563eb;
+          cursor: grab;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+        .ed-logo-width-range::-moz-range-track {
+          background: transparent;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function LogoCropButton({
+  imageUrl, crop, onChange, labelStyle,
+}: {
+  imageUrl: string;
+  crop?: { x: number; y: number; w: number; h: number; aspectRatio: number };
+  onChange: (crop: { x: number; y: number; w: number; h: number; aspectRatio: number } | null) => void;
+  labelStyle: React.CSSProperties;
+}) {
+  const [open, setOpen] = useState(false);
+  const hasCrop = !!crop;
+
+  return (
+    <div>
+      <label style={labelStyle}>Crop</label>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        disabled={!imageUrl}
+        style={{
+          width: "100%", background: "#1a1a1a", border: "1px solid #2a2a2a",
+          color: imageUrl ? "#888" : "#333", fontSize: 11, padding: "7px 10px",
+          borderRadius: 4, cursor: imageUrl ? "pointer" : "default",
+          fontFamily: "inherit", textAlign: "left",
+          display: "flex", alignItems: "center", gap: 8,
+        }}
+      >
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/>
+        </svg>
+        <span style={{ flex: 1 }}>{hasCrop ? "Adjust crop" : "Crop image"}</span>
+        {hasCrop && (
+          <span style={{ fontFamily: "monospace", fontSize: 9, color: "#2563eb", background: "#1a2a3a", border: "1px solid #2563eb", padding: "1px 5px", borderRadius: 3 }}>
+            ON
+          </span>
+        )}
+      </button>
+      {open && imageUrl && (
+        <ImageCropModal
+          src={imageUrl}
+          value={crop}
+          onChange={onChange}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -509,13 +524,22 @@ function SettingsTab() {
             <>
               <div>
                 <label style={labelStyle}>Logo image</label>
-                <ImagePickerButton value={logo.imageUrl} onChange={(url) => setLogo({ imageUrl: url })} />
+                <ImagePickerButton
+                  value={logo.imageUrl}
+                  onChange={(url) => setLogo({ imageUrl: url, imageCrop: undefined })}
+                />
               </div>
+              <LogoCropButton
+                imageUrl={logo.imageUrl}
+                crop={logo.imageCrop}
+                onChange={(c) => setLogo({ imageCrop: c ?? undefined })}
+                labelStyle={labelStyle}
+              />
               <div>
                 <label style={labelStyle}>Alt logo (dark bg)</label>
                 <ImagePickerButton value={logo.altImageUrl} onChange={(url) => setLogo({ altImageUrl: url })} />
               </div>
-              <LogoWidthStepper width={logo.width} onChange={(w) => setLogo({ width: w })} labelStyle={labelStyle} />
+              <LogoWidthSlider width={logo.width} onChange={(w) => setLogo({ width: w })} labelStyle={labelStyle} />
             </>
           )}
           <div>

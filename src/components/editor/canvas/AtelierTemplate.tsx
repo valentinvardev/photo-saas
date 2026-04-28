@@ -18,7 +18,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import type { Viewport } from "~/lib/editor/types";
-import { EditableNode, EditableText, EditableImage } from "./primitives";
+import { EditableNode, EditableText, EditableImage, LogoImage } from "./primitives";
 
 const SERIF = "var(--tpl-serif), 'Cormorant Garamond', Georgia, serif";
 const SANS  = "var(--tpl-sans), Inter, -apple-system, sans-serif";
@@ -61,14 +61,12 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
       </EditableNode>
     );
     if (logo.mode === "image" && logo.imageUrl) {
-      // eslint-disable-next-line @next/next/no-img-element
-      return <img src={logo.imageUrl} alt={logo.text} style={{ width: logo.width, height: "auto", objectFit: "contain", display: "block" }} />;
+      return <LogoImage src={logo.imageUrl} alt={logo.text} width={logo.width} crop={logo.imageCrop} />;
     }
     if (logo.mode === "image+text" && logo.imageUrl) {
       return (
         <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={logo.imageUrl} alt="" style={{ width: logo.width, height: "auto", objectFit: "contain", display: "block" }} />
+          <LogoImage src={logo.imageUrl} width={logo.width} crop={logo.imageCrop} />
           {textEl}
         </span>
       );

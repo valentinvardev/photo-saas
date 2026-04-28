@@ -38,6 +38,17 @@ export interface Typography {
   mono: string;
 }
 
+/* Crop region as percentages of the source image (0-100).
+   `aspectRatio` is captured at crop time so renderers can size the wrapper
+   without knowing the original image's intrinsic dimensions. */
+export interface ImageCrop {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  aspectRatio: number;
+}
+
 export interface LogoSettings {
   mode: "text" | "image" | "image+text";
   text: string;
@@ -46,6 +57,7 @@ export interface LogoSettings {
   faviconUrl: string;
   /* Image logo width in px — height is auto to preserve aspect ratio */
   width: number;
+  imageCrop?: ImageCrop;
 }
 
 export interface EditorState {

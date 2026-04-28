@@ -7,6 +7,50 @@
 
 import { useEditorStore } from "~/lib/editor/store";
 import { TiptapEditor } from "~/components/editor/toolbars/TiptapEditor";
+import type { ImageCrop } from "~/lib/editor/types";
+
+/**
+ * Renders a logo image, optionally cropped via Settings > Logo > Crop.
+ * Uses logo.width as the displayed width; height auto-derives from the
+ * crop's captured aspectRatio (or the natural image when uncropped).
+ */
+export function LogoImage({
+  src, alt, width, crop, style,
+}: {
+  src: string;
+  alt?: string;
+  width: number;
+  crop?: ImageCrop;
+  style?: React.CSSProperties;
+}) {
+  if (!crop) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={src} alt={alt ?? ""} style={{ width, height: "auto", objectFit: "contain", display: "block", ...style }} />;
+  }
+  /* Wrapper sized by crop aspect ratio; image scaled to show only the
+     selected region. */
+  return (
+    <div style={{
+      width, aspectRatio: crop.aspectRatio,
+      overflow: "hidden", position: "relative",
+      display: "block", ...style,
+    }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt ?? ""}
+        style={{
+          position: "absolute",
+          left:  `${(-crop.x / crop.w) * 100}%`,
+          top:   `${(-crop.y / crop.h) * 100}%`,
+          width:  `${(100 / crop.w) * 100}%`,
+          height: `${(100 / crop.h) * 100}%`,
+          maxWidth: "none",
+        }}
+      />
+    </div>
+  );
+}
 
 export function EditableNode({
   id,
