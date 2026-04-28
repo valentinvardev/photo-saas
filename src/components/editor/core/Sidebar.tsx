@@ -3,52 +3,14 @@
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useEditorStore } from "~/lib/editor/store";
+import { TEMPLATES } from "~/lib/editor/templates/registry";
+import type { SectionDef } from "~/lib/editor/templates/types";
 import { deviceContentRef } from "~/lib/editor/deviceRef";
 import { ColorPalettePanel } from "~/components/editor/panels/ColorPalettePanel";
 import { TypographyPanel } from "~/components/editor/panels/TypographyPanel";
 import { TextPanel } from "~/components/editor/panels/TextPanel";
 import { ImagePanel } from "~/components/editor/panels/ImagePanel";
 
-/* ═══════════════════════════════════════════════════════════════════════
-   SECTION TREE  (static definition for Minimal BW single-page template)
-═══════════════════════════════════════════════════════════════════════ */
-interface SectionElement {
-  nodeId: string;
-  label: string;
-  type: "text" | "image";
-}
-interface SectionDef {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  locked: boolean;
-  elements: SectionElement[];
-}
-
-function NavIcon() {
-  return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>;
-}
-function HeroIcon() {
-  return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><rect x="3" y="3" width="18" height="10" rx="1"/><path d="M3 17h18M7 21h10"/></svg>;
-}
-function GridIcon() {
-  return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>;
-}
-function QuoteIcon() {
-  return <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1zm12 0c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>;
-}
-function UserIcon() {
-  return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-}
-function PaperIcon() {
-  return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8L2 8v12a2 2 0 002 2z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>;
-}
-function MailIcon() {
-  return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/></svg>;
-}
-function FooterIcon() {
-  return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M3 7h18M3 12h18M3 17h8"/></svg>;
-}
 function LockIcon() {
   return <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
 }
@@ -58,79 +20,6 @@ function TextNodeIcon() {
 function ImageNodeIcon() {
   return <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>;
 }
-
-const SECTIONS: SectionDef[] = [
-  {
-    id: "section-nav", label: "Navigation", icon: <NavIcon />, locked: true,
-    elements: [{ nodeId: "nav-logo", label: "Logo", type: "text" }],
-  },
-  {
-    id: "section-hero", label: "Hero", icon: <HeroIcon />, locked: false,
-    elements: [
-      { nodeId: "hero-heading",  label: "Heading",       type: "text"  },
-      { nodeId: "hero-sub",      label: "Subtitle",      type: "text"  },
-      { nodeId: "hero-avail",    label: "Availability",  type: "text"  },
-      { nodeId: "hero-image-1",  label: "Main image",    type: "image" },
-      { nodeId: "hero-image-2",  label: "Second image",  type: "image" },
-    ],
-  },
-  {
-    id: "work", label: "Work", icon: <GridIcon />, locked: false,
-    elements: [],
-  },
-  {
-    id: "section-quote", label: "Quote", icon: <QuoteIcon />, locked: false,
-    elements: [
-      { nodeId: "quote-text",   label: "Quote",  type: "text" },
-      { nodeId: "quote-author", label: "Author", type: "text" },
-    ],
-  },
-  {
-    id: "about", label: "About", icon: <UserIcon />, locked: false,
-    elements: [
-      { nodeId: "about-heading",  label: "Heading",     type: "text"  },
-      { nodeId: "about-body-1",   label: "Paragraph 1", type: "text"  },
-      { nodeId: "about-body-2",   label: "Paragraph 2", type: "text"  },
-      { nodeId: "stat-1-value",   label: "Stat 1 — val", type: "text" },
-      { nodeId: "stat-1-label",   label: "Stat 1 — lbl", type: "text" },
-      { nodeId: "stat-2-value",   label: "Stat 2 — val", type: "text" },
-      { nodeId: "stat-2-label",   label: "Stat 2 — lbl", type: "text" },
-      { nodeId: "stat-3-value",   label: "Stat 3 — val", type: "text" },
-      { nodeId: "stat-3-label",   label: "Stat 3 — lbl", type: "text" },
-      { nodeId: "about-image",    label: "Portrait",    type: "image" },
-      { nodeId: "about-caption",  label: "Caption",     type: "text"  },
-    ],
-  },
-  {
-    id: "press", label: "Press", icon: <PaperIcon />, locked: false,
-    elements: [
-      { nodeId: "press-1",      label: "Publication 1", type: "text" },
-      { nodeId: "press-1-year", label: "Year 1",        type: "text" },
-      { nodeId: "press-2",      label: "Publication 2", type: "text" },
-      { nodeId: "press-2-year", label: "Year 2",        type: "text" },
-      { nodeId: "press-3",      label: "Publication 3", type: "text" },
-      { nodeId: "press-3-year", label: "Year 3",        type: "text" },
-      { nodeId: "press-4",      label: "Publication 4", type: "text" },
-      { nodeId: "press-4-year", label: "Year 4",        type: "text" },
-      { nodeId: "press-5",      label: "Publication 5", type: "text" },
-      { nodeId: "press-5-year", label: "Year 5",        type: "text" },
-    ],
-  },
-  {
-    id: "contact", label: "Contact", icon: <MailIcon />, locked: false,
-    elements: [
-      { nodeId: "contact-heading", label: "Heading", type: "text" },
-      { nodeId: "contact-body",    label: "Body",    type: "text" },
-    ],
-  },
-  {
-    id: "section-footer", label: "Footer", icon: <FooterIcon />, locked: true,
-    elements: [
-      { nodeId: "nav-logo",          label: "Logo",      type: "text" },
-      { nodeId: "footer-copyright",  label: "Copyright", type: "text" },
-    ],
-  },
-];
 
 /* ═══════════════════════════════════════════════════════════════════════
    SCROLL TO SECTION HELPER
@@ -154,8 +43,12 @@ function scrollToSection(sectionId: string) {
    PAGES TAB
 ═══════════════════════════════════════════════════════════════════════ */
 function PagesTab() {
-  const { selectedSection, setSelectedSection, setHoveredSection, selectNode, selectedId, hiddenSections, hideSection, showSection } = useEditorStore();
-  const [expanded, setExpanded] = useState<Set<string>>(new Set(["section-hero"]));
+  const { templateId, selectedSection, setSelectedSection, setHoveredSection, selectNode, selectedId, hiddenSections, hideSection, showSection } = useEditorStore();
+  const SECTIONS: SectionDef[] = TEMPLATES[templateId]!.sections;
+  const [expanded, setExpanded] = useState<Set<string>>(() => {
+    const first = SECTIONS.find((s) => !s.locked);
+    return new Set(first ? [first.id] : []);
+  });
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
 
   function toggleExpand(id: string) {

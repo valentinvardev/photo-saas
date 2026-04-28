@@ -7,16 +7,23 @@ import { TopBar } from "./TopBar";
 import { Canvas } from "./Canvas";
 import { Sidebar } from "./Sidebar";
 import { InspectorPanel } from "~/components/editor/panels/InspectorPanel";
+import type { TemplateId } from "~/lib/editor/templates/registry";
 
 // Side-effect: load all @fontsource CSS
 import "~/lib/editor/fonts";
 
-export function EditorShell() {
+export function EditorShell({ templateId }: { templateId?: TemplateId } = {}) {
   const {
-    updateNode, setPalette, setTypography, setLogo,
+    setTemplate, updateNode, setPalette, setTypography, setLogo,
     palette, typography, selectedSection, hoveredSection,
     hiddenSections,
   } = useEditorStore();
+
+  // Set the active template before any other hydration
+  useEffect(() => {
+    if (templateId) setTemplate(templateId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateId]);
 
   // Hydrate from localStorage on first render
   useEffect(() => {

@@ -3,7 +3,15 @@
 import { useEffect, useRef } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import { deviceContentRef } from "~/lib/editor/deviceRef";
-import { EditableTemplate } from "~/components/editor/canvas/EditableTemplate";
+import { TEMPLATES } from "~/lib/editor/templates/registry";
+import type { Viewport } from "~/lib/editor/types";
+
+/* Resolves the active template's component from the editor store */
+function ActiveTemplate({ viewport }: { viewport: Viewport }) {
+  const templateId = useEditorStore((s) => s.templateId);
+  const Component  = TEMPLATES[templateId]!.Component;
+  return <Component viewport={viewport} />;
+}
 
 /* ─────────────────────────────────────────────────────────────────────────
    Device content heights (visible scroll window, in px)
@@ -122,7 +130,7 @@ function MobileFrame({ contentRef }: { contentRef: React.RefObject<HTMLDivElemen
 
         {/* Screen */}
         <DeviceScreen refEl={contentRef} height={CONTENT_H.mobile} width={375} radius={14}>
-          <EditableTemplate viewport="mobile" />
+          <ActiveTemplate viewport="mobile" />
         </DeviceScreen>
 
         {/* Home bar */}
@@ -156,7 +164,7 @@ function TabletFrame({ contentRef }: { contentRef: React.RefObject<HTMLDivElemen
 
       {/* Screen */}
       <DeviceScreen refEl={contentRef} height={CONTENT_H.tablet} width={768} radius={6}>
-        <EditableTemplate viewport="tablet" />
+        <ActiveTemplate viewport="tablet" />
       </DeviceScreen>
 
       {/* Home bar */}
@@ -225,7 +233,7 @@ function DesktopFrame({ contentRef }: { contentRef: React.RefObject<HTMLDivEleme
 
       {/* Screen */}
       <DeviceScreen refEl={contentRef} height={CONTENT_H.desktop}>
-        <EditableTemplate viewport="desktop" />
+        <ActiveTemplate viewport="desktop" />
       </DeviceScreen>
     </div>
   );

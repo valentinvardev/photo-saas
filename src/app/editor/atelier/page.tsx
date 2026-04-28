@@ -8,5 +8,5 @@ const EditorShell = dynamic(
 );
 
 export default function EditorPage() {
-  return <EditorShell templateId="minimal-bw" />;
+  return <EditorShell templateId="atelier" />;
 }

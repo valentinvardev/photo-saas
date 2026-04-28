@@ -101,19 +101,17 @@ function ManageModal({ pageId, url, onClose }: { pageId: PageId; url: string; on
     delivery:  "Delivery settings",
   };
 
-  /* visual builder route per page type
-     portfolio uses the working /editor/minimal-bw
-     links/delivery point at the same shell — actual editable templates
-     for those products still need to be adapted per docs/template-adapter-guide.md */
+  /* visual builder route per page type. Each route loads EditorShell with the
+     adapted template registered in src/lib/editor/templates/registry.tsx */
   const builderHref: Record<PageId, string> = {
     portfolio: "/editor/minimal-bw",
-    links:     "/editor/minimal-bw",
-    delivery:  "/editor/minimal-bw",
+    links:     "/editor/minimal-bw", // links template not yet adapted
+    delivery:  "/editor/atelier",
   };
   const builderTemplate: Record<PageId, string> = {
     portfolio: "Minimal BW",
     links:     "Default",
-    delivery:  "Standard gallery",
+    delivery:  "Atelier",
   };
 
   return (
