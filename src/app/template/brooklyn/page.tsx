@@ -1251,7 +1251,7 @@ export default function BrooklynPage() {
             position: "fixed", right: 20, top: isMobile ? "75%" : "50%", transform: "translateY(-50%)",
             zIndex: 90, display: "flex", flexDirection: "column", gap: 9, alignItems: "flex-end",
             padding: showGlass ? (isMobile ? "12px 8px" : "16px 12px") : "0",
-            background: showGlass ? (isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.1)") : "transparent",
+            background: showGlass ? (isLight ? "rgba(0,0,0,0.42)" : "rgba(255,255,255,0.1)") : "transparent",
             backdropFilter: showGlass ? "blur(10px)" : "none",
             borderRadius: 20,
             transition: "background 0.5s, backdrop-filter 0.5s, padding 0.4s",
