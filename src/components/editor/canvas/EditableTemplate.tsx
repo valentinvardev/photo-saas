@@ -305,13 +305,13 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
     );
     if (logo.mode === "image" && imgSrc) {
       // eslint-disable-next-line @next/next/no-img-element
-      return <img src={imgSrc} alt={logo.text} style={{ height: 28, objectFit: "contain" }} />;
+      return <img src={imgSrc} alt={logo.text} style={{ width: logo.width, height: "auto", objectFit: "contain", display: "block" }} />;
     }
     if (logo.mode === "image+text" && imgSrc) {
       return (
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imgSrc} alt="" style={{ height: 24, objectFit: "contain" }} />
+          <img src={imgSrc} alt="" style={{ width: logo.width, height: "auto", objectFit: "contain", display: "block" }} />
           {textEl}
         </div>
       );

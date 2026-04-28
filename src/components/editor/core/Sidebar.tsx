@@ -361,6 +361,99 @@ const BRAND_NODES: Record<string, string[]> = {
   "atelier":    ["atl-nav-brand", "atl-footer-brand"],
 };
 
+const LOGO_WIDTH_MIN  = 16;
+const LOGO_WIDTH_MAX  = 240;
+const LOGO_WIDTH_STEP = 4;
+
+function LogoWidthStepper({
+  width, onChange, labelStyle,
+}: {
+  width: number;
+  onChange: (w: number) => void;
+  labelStyle: React.CSSProperties;
+}) {
+  const [draft, setDraft] = useState(String(width));
+
+  /* keep local input in sync with external store changes (e.g. +/- buttons) */
+  if (draft !== String(width) && document.activeElement?.tagName !== "INPUT") {
+    setTimeout(() => setDraft(String(width)), 0);
+  }
+
+  function commit(value: number) {
+    const clamped = Math.max(LOGO_WIDTH_MIN, Math.min(LOGO_WIDTH_MAX, Math.round(value)));
+    onChange(clamped);
+    setDraft(String(clamped));
+  }
+
+  const btnStyle: React.CSSProperties = {
+    width: 28, height: 28, background: "#1a1a1a", border: "1px solid #2a2a2a",
+    color: "#888", fontSize: 14, lineHeight: 1, cursor: "pointer",
+    fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center",
+    flexShrink: 0,
+  };
+
+  return (
+    <div>
+      <label style={labelStyle}>Logo width</label>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <button
+          type="button"
+          aria-label="Decrease logo width"
+          onClick={() => commit(width - LOGO_WIDTH_STEP)}
+          disabled={width <= LOGO_WIDTH_MIN}
+          style={{ ...btnStyle, borderRadius: "4px 0 0 4px", marginRight: -1, opacity: width <= LOGO_WIDTH_MIN ? 0.4 : 1 }}
+        >
+          −
+        </button>
+        <div style={{
+          flex: 1, position: "relative",
+          background: "#0a0a0a", border: "1px solid #2a2a2a",
+          height: 28, display: "flex", alignItems: "center",
+        }}>
+          <input
+            type="number"
+            min={LOGO_WIDTH_MIN}
+            max={LOGO_WIDTH_MAX}
+            step={LOGO_WIDTH_STEP}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={() => {
+              const n = Number(draft);
+              if (Number.isFinite(n)) commit(n);
+              else setDraft(String(width));
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const n = Number(draft);
+                if (Number.isFinite(n)) commit(n);
+                e.currentTarget.blur();
+              }
+            }}
+            style={{
+              flex: 1, background: "transparent", border: "none", outline: "none",
+              color: "#ccc", fontSize: 12, padding: "0 32px 0 10px", height: "100%",
+              fontFamily: "monospace", boxSizing: "border-box", width: "100%",
+              MozAppearance: "textfield",
+            }}
+          />
+          <span style={{ position: "absolute", right: 10, color: "#444", fontSize: 10, fontFamily: "monospace", pointerEvents: "none" }}>
+            px
+          </span>
+        </div>
+        <button
+          type="button"
+          aria-label="Increase logo width"
+          onClick={() => commit(width + LOGO_WIDTH_STEP)}
+          disabled={width >= LOGO_WIDTH_MAX}
+          style={{ ...btnStyle, borderRadius: "0 4px 4px 0", marginLeft: -1, opacity: width >= LOGO_WIDTH_MAX ? 0.4 : 1 }}
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function SettingsTab() {
   const { logo, setLogo, templateId, updateNode } = useEditorStore();
 
@@ -422,6 +515,7 @@ function SettingsTab() {
                 <label style={labelStyle}>Alt logo (dark bg)</label>
                 <ImagePickerButton value={logo.altImageUrl} onChange={(url) => setLogo({ altImageUrl: url })} />
               </div>
+              <LogoWidthStepper width={logo.width} onChange={(w) => setLogo({ width: w })} labelStyle={labelStyle} />
             </>
           )}
           <div>

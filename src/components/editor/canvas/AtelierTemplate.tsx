@@ -52,8 +52,9 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
   /* Responsive scaling — mirrors the source template's clamp() values */
   const padX = isMobile ? 20 : isTablet ? 32 : 48;
 
-  /* Brand renders text/image/both based on Settings > Logo */
-  function Brand({ nodeId, height = 22 }: { nodeId: string; height?: number }) {
+  /* Brand renders text/image/both based on Settings > Logo.
+     Image uses logo.width (height auto) so it scales with the Settings stepper. */
+  function Brand({ nodeId }: { nodeId: string }) {
     const textEl = (
       <EditableNode id={nodeId} tag="span">
         <EditableText id={nodeId} />
@@ -61,13 +62,13 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
     );
     if (logo.mode === "image" && logo.imageUrl) {
       // eslint-disable-next-line @next/next/no-img-element
-      return <img src={logo.imageUrl} alt={logo.text} style={{ height, objectFit: "contain", display: "block" }} />;
+      return <img src={logo.imageUrl} alt={logo.text} style={{ width: logo.width, height: "auto", objectFit: "contain", display: "block" }} />;
     }
     if (logo.mode === "image+text" && logo.imageUrl) {
       return (
         <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={logo.imageUrl} alt="" style={{ height, objectFit: "contain", display: "block" }} />
+          <img src={logo.imageUrl} alt="" style={{ width: logo.width, height: "auto", objectFit: "contain", display: "block" }} />
           {textEl}
         </span>
       );
@@ -97,7 +98,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
           gap: 12,
         }}
       >
-        <Brand nodeId="atl-nav-brand" height={isMobile ? 18 : 22} />
+        <Brand nodeId="atl-nav-brand" />
 
         {!isMobile && (
           <EditableNode id="atl-nav-subtitle" tag="span" style={{ color: "#7a766f", textAlign: "center" }}>
@@ -340,7 +341,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
             fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: "#0a0a0a",
             marginBottom: 8, fontWeight: 300, letterSpacing: "-0.01em",
           }}>
-            <Brand nodeId="atl-footer-brand" height={32} />
+            <Brand nodeId="atl-footer-brand" />
           </div>
           <EditableNode id="atl-footer-copy" tag="p" style={{
             fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em",

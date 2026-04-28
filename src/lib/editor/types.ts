@@ -44,6 +44,8 @@ export interface LogoSettings {
   imageUrl: string;
   altImageUrl: string;
   faviconUrl: string;
+  /* Image logo width in px — height is auto to preserve aspect ratio */
+  width: number;
 }
 
 export interface EditorState {
@@ -78,4 +80,5 @@ export const DEFAULT_LOGO: LogoSettings = {
   imageUrl:    "",
   altImageUrl: "",
   faviconUrl:  "",
+  width:       32,
 };
