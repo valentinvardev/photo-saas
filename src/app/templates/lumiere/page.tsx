@@ -2,71 +2,99 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/* ─────────────────────────────────────────────────────────────
-   Lumière — Pastel editorial portfolio template for FRAME
-   Palette  warm cream · dusty blush · sage · soft lavender
-   Fonts    Cormorant Garamond · DM Sans · Space Mono (via layout)
-───────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   Petal — Playful pastel portfolio template · FRAME platform
+   ───────────────────────────────────────────────────────────────
+   FRAME Standard Palette
+   bg #f0ebe3 · surface #e8e2da · ink #18181b · mid #6b6560
+   coral #fdd5cf · mint #caf0e0 · periwi #d8d4f8
+   peach #fde8c8 · lemon #f5f4ba
+═══════════════════════════════════════════════════════════════ */
 
 const C = {
-  bg:      "#faf8f5",
-  blush:   "#f2e8e7",
-  sage:    "#e8ede9",
-  lav:     "#ece8f4",
-  ink:     "#2a2520",
-  mid:     "#5a534e",
-  muted:   "#9a9088",
-  rose:    "#c4a99a",
-  dim:     "rgba(42,37,32,0.09)",
-  dimMed:  "rgba(42,37,32,0.16)",
+  bg:       "#f0ebe3",
+  surface:  "#e8e2da",
+  ink:      "#18181b",
+  mid:      "#6b6560",
+  muted:    "#a09890",
+  coral:    "#fdd5cf",
+  coralDk:  "#d9544a",
+  mint:     "#caf0e0",
+  mintDk:   "#259a6f",
+  periwi:   "#d8d4f8",
+  periwiDk: "#5c52c8",
+  peach:    "#fde8c8",
+  lemon:    "#f5f4ba",
+  dim:      "rgba(24,24,27,0.08)",
+  dimMed:   "rgba(24,24,27,0.15)",
 } as const;
 
-const SERIF = "var(--tpl-serif), 'Cormorant Garamond', Georgia, serif";
-const SANS  = "var(--tpl-sans), 'DM Sans', system-ui, sans-serif";
-const MONO  = "var(--tpl-mono), 'Space Mono', ui-monospace, monospace";
+const SANS = "var(--tpl-sans), 'DM Sans', system-ui, sans-serif";
+const MONO = "var(--tpl-mono), 'Space Mono', ui-monospace, monospace";
+
+/* ── Data ───────────────────────────────────────────────────── */
 
 const WORKS = [
-  {
-    seed: 452, title: "Golden Hour",
-    year: "2024", cat: "Portrait",
-    desc: "A series exploring the way afternoon light dissolves form — skin and shadow in slow conversation.",
-  },
-  {
-    seed: 338, title: "Still Waters",
-    year: "2024", cat: "Landscape",
-    desc: "Coastal studies at low tide, where the horizon blurs and reflection becomes the only truth.",
-  },
-  {
-    seed: 866, title: "Bloom",
-    year: "2023", cat: "Editorial",
-    desc: "A fashion collaboration set in an abandoned greenhouse, reclaimed by wildflowers and quiet light.",
-  },
+  { seed: 452, title: "Golden Hour",     year: "2024", cat: "Portrait",    bg: C.coral,  tag: C.coralDk,  desc: "Sun-drenched portraits for a debut album campaign." },
+  { seed: 338, title: "Still Waters",    year: "2024", cat: "Landscape",   bg: C.mint,   tag: C.mintDk,   desc: "Six weeks chasing coastlines at low tide." },
+  { seed: 866, title: "Bloom",           year: "2023", cat: "Editorial",   bg: C.periwi, tag: C.periwiDk, desc: "Fashion in an overgrown greenhouse." },
+  { seed: 730, title: "Saturday Market", year: "2023", cat: "Documentary", bg: C.peach,  tag: "#c2710a",  desc: "A year spent at the same market stall." },
+  { seed: 575, title: "Small Hours",     year: "2022", cat: "Portrait",    bg: C.lemon,  tag: "#8a8000",  desc: "Night portraits in neon-lit city corners." },
+  { seed: 190, title: "Overgrown",       year: "2022", cat: "Landscape",   bg: C.mint,   tag: C.mintDk,   desc: "Abandoned spaces swallowed by plants." },
 ];
 
-const GALLERY = [
-  { seed: 20,  tall: true  },
-  { seed: 37,  tall: false },
-  { seed: 48,  tall: false },
-  { seed: 63,  tall: true  },
-  { seed: 71,  tall: false },
-  { seed: 82,  tall: true  },
-  { seed: 95,  tall: false },
-  { seed: 108, tall: true  },
-  { seed: 133, tall: false },
-  { seed: 145, tall: false },
-  { seed: 156, tall: true  },
-  { seed: 167, tall: false },
+const BENTO_SPANS = [4, 2, 2, 4, 3, 3];
+const BENTO_IMG_H = [280, 200, 200, 280, 240, 240];
+
+const GALLERY: { seed: number; w: number; h: number }[] = [
+  { seed: 20,  w: 800, h: 533 },
+  { seed: 37,  w: 533, h: 800 },
+  { seed: 48,  w: 600, h: 600 },
+  { seed: 63,  w: 533, h: 800 },
+  { seed: 71,  w: 800, h: 533 },
+  { seed: 82,  w: 533, h: 760 },
+  { seed: 95,  w: 800, h: 600 },
+  { seed: 108, w: 600, h: 600 },
+  { seed: 133, w: 533, h: 800 },
+  { seed: 145, w: 800, h: 533 },
+  { seed: 156, w: 533, h: 800 },
+  { seed: 167, w: 700, h: 500 },
+  { seed: 178, w: 533, h: 800 },
+  { seed: 189, w: 800, h: 533 },
+  { seed: 200, w: 600, h: 800 },
 ];
 
-const STATS = [
-  { value: "11", label: "Years" },
-  { value: "340+", label: "Projects" },
-  { value: "6", label: "Countries" },
-];
+/* ── Scroll-reveal hook ─────────────────────────────────────── */
 
-export default function LumierePage() {
+function useReveal(threshold = 0.12) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry?.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, visible };
+}
+
+function revealStyle(visible: boolean, delay = 0): React.CSSProperties {
+  return {
+    opacity:    visible ? 1 : 0,
+    transform:  visible ? "translateY(0)" : "translateY(28px)",
+    transition: `opacity 0.7s ${delay}ms cubic-bezier(0.2,0.8,0.2,1), transform 0.7s ${delay}ms cubic-bezier(0.2,0.8,0.2,1)`,
+  };
+}
+
+/* ── Page ───────────────────────────────────────────────────── */
+
+export default function PetalPage() {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled,    setScrolled]    = useState(false);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 32);
@@ -76,673 +104,537 @@ export default function LumierePage() {
 
   return (
     <main style={{ fontFamily: SANS, background: C.bg, color: C.ink, overflowX: "hidden" }}>
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(32px); }
+          to   { opacity: 1; transform: translateY(0);    }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        ::selection { background: ${C.coral}; }
+        img { display: block; }
+        a   { text-decoration: none; }
+      `}</style>
 
-      <LumiereNav scrolled={scrolled} />
+      <PetalNav scrolled={scrolled} />
       <HeroSection />
-      <SelectedWorksSection />
-      <GallerySection onOpen={(i) => setLightboxIdx(i)} />
+      <WorksSection />
+      <GallerySection onOpen={setLightboxIdx} />
       <AboutSection />
-      <FooterSection />
+      <ContactSection />
+      <FooterBar />
 
       {lightboxIdx !== null && (
-        <GalleryLightbox
-          photos={GALLERY}
-          startIndex={lightboxIdx}
-          onClose={() => setLightboxIdx(null)}
-        />
+        <PetalLightbox photos={GALLERY} startIndex={lightboxIdx} onClose={() => setLightboxIdx(null)} />
       )}
     </main>
   );
 }
 
-/* ── Nav ──────────────────────────────────────────────────────── */
+/* ── Nav ────────────────────────────────────────────────────── */
 
-function LumiereNav({ scrolled }: { scrolled: boolean }) {
-  const [open, setOpen] = useState(false);
-
+function PetalNav({ scrolled }: { scrolled: boolean }) {
   return (
-    <header style={{
-      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+    <nav style={{
+      position: "fixed", top: 0, left: 0, right: 0, zIndex: 200,
       display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "0 clamp(24px, 5vw, 72px)",
-      height: 64,
-      background: scrolled ? "rgba(250,248,245,0.92)" : "transparent",
-      backdropFilter: scrolled ? "blur(12px)" : "none",
+      padding: "0 clamp(20px, 5vw, 64px)", height: 60,
+      background: scrolled ? "rgba(240,235,227,0.88)" : "transparent",
+      backdropFilter: scrolled ? "blur(16px)" : "none",
       borderBottom: scrolled ? `1px solid ${C.dim}` : "1px solid transparent",
-      transition: "background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease",
+      transition: "background 0.4s, border-color 0.4s",
     }}>
-      {/* Logo */}
-      <span style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 400, letterSpacing: "0.04em", color: C.ink }}>
-        Sofia Marlowe
+      <span style={{ fontFamily: SANS, fontSize: 17, fontWeight: 800, letterSpacing: "-0.03em" }}>
+        mia.<span style={{ color: C.coralDk }}>photo</span>
       </span>
 
-      {/* Desktop nav */}
-      <nav style={{ display: "flex", gap: 40, alignItems: "center" }}>
-        {["Work", "About", "Journal", "Contact"].map((item) => (
-          <a
-            key={item}
-            href="#"
-            style={{
-              fontFamily: SANS, fontSize: 11, fontWeight: 500,
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              color: C.mid, textDecoration: "none",
-              borderBottom: "1px solid transparent",
-              paddingBottom: 1,
-              transition: "color 0.2s, border-color 0.2s",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = C.ink; e.currentTarget.style.borderBottomColor = C.rose; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = C.mid; e.currentTarget.style.borderBottomColor = "transparent"; }}
-          >
-            {item}
-          </a>
-        ))}
-        <a
-          href="#"
-          style={{
-            fontFamily: SANS, fontSize: 11, fontWeight: 500,
-            letterSpacing: "0.12em", textTransform: "uppercase",
-            color: C.bg, background: C.ink,
-            padding: "8px 20px", textDecoration: "none",
-            transition: "background 0.2s, color 0.2s",
+      <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+        {["Work", "About", "Shop"].map((item) => (
+          <a key={item} href="#" style={{
+            fontFamily: SANS, fontSize: 13, fontWeight: 500, color: C.mid,
+            padding: "7px 16px", borderRadius: 100,
+            transition: "background 0.18s, color 0.18s",
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = C.rose; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; }}
-        >
-          Hire me
-        </a>
-      </nav>
-    </header>
+            onMouseEnter={(e) => { e.currentTarget.style.background = C.dim; e.currentTarget.style.color = C.ink; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = C.mid; }}
+          >{item}</a>
+        ))}
+        <a href="#" style={{
+          fontFamily: SANS, fontSize: 13, fontWeight: 700, color: "#fff",
+          background: C.ink, padding: "9px 22px", borderRadius: 100, marginLeft: 8,
+          transition: "background 0.2s, transform 0.2s", display: "inline-block",
+        }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = C.coralDk; e.currentTarget.style.transform = "scale(1.05)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; e.currentTarget.style.transform = "scale(1)"; }}
+        >Let's talk</a>
+      </div>
+    </nav>
   );
 }
 
-/* ── Hero ─────────────────────────────────────────────────────── */
+/* ── Hero ───────────────────────────────────────────────────── */
 
 function HeroSection() {
   return (
     <section style={{
-      minHeight: "100vh",
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      paddingTop: 64,
+      minHeight: "100svh", paddingTop: 60,
+      display: "grid", gridTemplateColumns: "55fr 45fr",
     }}>
       {/* Left — text */}
       <div style={{
         display: "flex", flexDirection: "column", justifyContent: "center",
-        padding: "80px clamp(24px, 5vw, 72px) 80px clamp(24px, 5vw, 72px)",
-        gap: 32,
+        padding: "64px clamp(24px, 5vw, 72px) 64px clamp(24px, 5vw, 72px)",
+        gap: 28,
       }}>
-        <div>
-          <p style={{
-            fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em",
-            textTransform: "uppercase", color: C.rose, marginBottom: 28,
-          }}>
-            Photographer · Paris & New York
-          </p>
-          <h1 style={{
-            fontFamily: SERIF,
-            fontSize: "clamp(52px, 6.5vw, 92px)",
-            fontWeight: 300, fontStyle: "italic",
-            lineHeight: 1.0, letterSpacing: "-0.02em",
-            color: C.ink, margin: 0,
-          }}>
-            Light is my<br />
-            <span style={{ color: C.rose }}>language.</span>
-          </h1>
-        </div>
+        <span style={{
+          fontFamily: MONO, fontSize: 10, letterSpacing: "0.26em",
+          textTransform: "uppercase", color: C.coralDk,
+          background: C.coral, padding: "6px 16px",
+          borderRadius: 100, alignSelf: "flex-start",
+          animation: "fadeUp 0.6s 0.1s both cubic-bezier(0.2,0.8,0.2,1)",
+        }}>
+          Photographer · Berlin
+        </span>
+
+        <h1 style={{
+          fontFamily: SANS, fontWeight: 800,
+          fontSize: "clamp(44px, 7.5vw, 108px)",
+          lineHeight: 0.95, letterSpacing: "-0.04em",
+          maxWidth: "13ch",
+          animation: "fadeUp 0.7s 0.22s both cubic-bezier(0.2,0.8,0.2,1)",
+        }}>
+          Making light{" "}
+          <span style={{
+            display: "inline-block", background: C.coral,
+            borderRadius: 14, padding: "2px 18px",
+            transform: "rotate(-1.8deg)",
+            whiteSpace: "nowrap",
+          }}>work</span>{" "}
+          for you.
+        </h1>
 
         <p style={{
-          fontFamily: SANS, fontSize: 15, fontWeight: 300,
-          lineHeight: 1.75, color: C.mid,
-          maxWidth: 380,
+          fontFamily: SANS, fontSize: 16, fontWeight: 400,
+          lineHeight: 1.7, color: C.mid, maxWidth: 440,
+          animation: "fadeUp 0.7s 0.38s both cubic-bezier(0.2,0.8,0.2,1)",
         }}>
-          I document the quiet hours between — when light softens and people forget
-          the camera is there. Portraits, landscapes, and editorial work.
+          I'm Mia — a photographer obsessed with natural light, genuine moments,
+          and the kind of images you actually want to keep forever.
         </p>
 
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+        <div style={{
+          display: "flex", gap: 12, flexWrap: "wrap",
+          animation: "fadeUp 0.7s 0.52s both cubic-bezier(0.2,0.8,0.2,1)",
+        }}>
           <a href="#" style={{
-            fontFamily: SANS, fontSize: 11, fontWeight: 500,
-            letterSpacing: "0.12em", textTransform: "uppercase",
-            color: C.bg, background: C.ink,
-            padding: "13px 28px", textDecoration: "none",
-            transition: "background 0.25s",
+            fontFamily: SANS, fontSize: 14, fontWeight: 700,
+            color: "#fff", background: C.ink,
+            padding: "14px 30px", borderRadius: 100,
+            display: "flex", alignItems: "center", gap: 8,
+            transition: "background 0.22s, transform 0.22s",
           }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = C.rose; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = C.coralDk; e.currentTarget.style.transform = "translateY(-3px)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; e.currentTarget.style.transform = "translateY(0)"; }}
           >
-            View work
+            See my work
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
           <a href="#" style={{
-            fontFamily: SANS, fontSize: 11, fontWeight: 500,
-            letterSpacing: "0.12em", textTransform: "uppercase",
-            color: C.ink, textDecoration: "none",
-            borderBottom: `1px solid ${C.dimMed}`,
-            paddingBottom: 2,
-          }}>
-            About me
-          </a>
+            fontFamily: SANS, fontSize: 14, fontWeight: 600,
+            color: C.ink, padding: "14px 30px", borderRadius: 100,
+            border: `2px solid ${C.dimMed}`,
+            transition: "border-color 0.2s",
+          }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = C.dimMed; }}
+          >Download press kit</a>
         </div>
 
-        {/* Stats */}
-        <div style={{ display: "flex", gap: 40, paddingTop: 16, borderTop: `1px solid ${C.dim}` }}>
-          {STATS.map((s) => (
-            <div key={s.label}>
-              <div style={{ fontFamily: SERIF, fontSize: 32, fontWeight: 300, color: C.ink, lineHeight: 1 }}>
-                {s.value}
-              </div>
-              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: C.muted, marginTop: 4 }}>
-                {s.label}
-              </div>
+        {/* Stats row */}
+        <div style={{
+          display: "flex", gap: 36, paddingTop: 20,
+          borderTop: `1px solid ${C.dimMed}`,
+          animation: "fadeUp 0.7s 0.64s both cubic-bezier(0.2,0.8,0.2,1)",
+        }}>
+          {[{ v: "11", l: "Years" }, { v: "340+", l: "Projects" }, { v: "6", l: "Countries" }].map((s) => (
+            <div key={s.l}>
+              <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 28, letterSpacing: "-0.03em" }}>{s.v}</div>
+              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: C.muted, marginTop: 3 }}>{s.l}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Right — image */}
-      <div style={{ position: "relative", overflow: "hidden", background: C.blush }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="https://picsum.photos/seed/452/900/1200"
-          alt="Hero"
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-        />
-        {/* Soft gradient at bottom */}
+      {/* Right — portrait image */}
+      <div style={{
+        padding: "24px 24px 24px 0",
+        animation: "fadeUp 0.9s 0.3s both cubic-bezier(0.2,0.8,0.2,1)",
+      }}>
         <div style={{
-          position: "absolute", bottom: 0, left: 0, right: 0, height: 200,
-          background: "linear-gradient(to top, rgba(242,232,231,0.55) 0%, transparent 100%)",
-          pointerEvents: "none",
-        }} />
-        {/* Floating caption */}
-        <div style={{
-          position: "absolute", bottom: 28, right: 28,
-          fontFamily: MONO, fontSize: 9, letterSpacing: "0.22em",
-          textTransform: "uppercase", color: "rgba(250,248,245,0.85)",
+          borderRadius: 28, overflow: "hidden",
+          height: "100%", minHeight: 480,
+          background: C.coral,
+          position: "relative",
         }}>
-          Paris, 2024
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://picsum.photos/seed/452/800/1100"
+            alt="Hero portrait"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+          <div style={{
+            position: "absolute", bottom: 20, left: 20,
+            background: "rgba(240,235,227,0.85)", backdropFilter: "blur(10px)",
+            borderRadius: 14, padding: "10px 16px",
+            fontFamily: MONO, fontSize: 9, letterSpacing: "0.22em",
+            textTransform: "uppercase", color: C.mid,
+          }}>
+            Berlin, 2024
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* ── Selected Works ───────────────────────────────────────────── */
+/* ── Works — Bento grid ─────────────────────────────────────── */
 
-function SelectedWorksSection() {
+function WorksSection() {
+  const { ref, visible } = useReveal();
+
   return (
-    <section style={{ background: C.bg, padding: "120px clamp(24px, 5vw, 72px)" }}>
-      {/* Section header */}
-      <div style={{
-        display: "flex", alignItems: "baseline", justifyContent: "space-between",
-        marginBottom: 80, borderBottom: `1px solid ${C.dim}`, paddingBottom: 20,
-      }}>
-        <h2 style={{
-          fontFamily: SERIF, fontSize: "clamp(32px, 4vw, 52px)",
-          fontWeight: 300, fontStyle: "italic", color: C.ink, margin: 0,
-        }}>
-          Selected works
-        </h2>
+    <section style={{ padding: "100px clamp(20px, 5vw, 64px)" }}>
+      {/* Header */}
+      <div ref={ref} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 40, ...revealStyle(visible) }}>
+        <div>
+          <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: C.mid, marginBottom: 10 }}>Selected projects</p>
+          <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-0.03em" }}>Recent work</h2>
+        </div>
         <a href="#" style={{
-          fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em",
-          textTransform: "uppercase", color: C.muted, textDecoration: "none",
-          borderBottom: `1px solid ${C.dimMed}`, paddingBottom: 1,
-        }}>
-          View all →
-        </a>
+          fontFamily: SANS, fontSize: 13, fontWeight: 600, color: C.ink,
+          padding: "10px 22px", borderRadius: 100, border: `2px solid ${C.dimMed}`,
+          whiteSpace: "nowrap", transition: "border-color 0.2s",
+        }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = C.dimMed; }}
+        >All projects →</a>
       </div>
 
-      {/* Work items */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+      {/* Bento */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 16 }}>
         {WORKS.map((work, i) => (
-          <WorkItem key={work.seed} work={work} index={i} />
+          <BentoCard key={work.seed} work={work} span={BENTO_SPANS[i]!} imgH={BENTO_IMG_H[i]!} delay={i * 80} />
         ))}
       </div>
     </section>
   );
 }
 
-function WorkItem({ work, index }: { work: typeof WORKS[0]; index: number }) {
+function BentoCard({ work, span, imgH, delay }: { work: typeof WORKS[0]; span: number; imgH: number; delay: number }) {
   const [hovered, setHovered] = useState(false);
-  const even = index % 2 === 0;
+  const { ref, visible } = useReveal();
 
   return (
-    <article
+    <div
+      ref={ref}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        display: "grid",
-        gridTemplateColumns: even ? "1fr 1fr" : "1fr 1fr",
-        gap: "clamp(32px, 5vw, 80px)",
-        alignItems: "center",
-        padding: "64px 0",
-        borderBottom: `1px solid ${C.dim}`,
-        cursor: "pointer",
+        gridColumn: `span ${span}`,
+        borderRadius: 24, overflow: "hidden",
+        background: work.bg, cursor: "pointer",
+        transform: hovered ? "translateY(-6px)" : "translateY(0)",
+        boxShadow: hovered ? "0 24px 56px rgba(0,0,0,0.13)" : "0 2px 8px rgba(0,0,0,0.04)",
+        transition: "transform 0.32s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.32s ease",
+        ...revealStyle(visible, delay),
       }}
     >
       {/* Image */}
-      <div
-        style={{
-          order: even ? 0 : 1,
-          overflow: "hidden",
-          aspectRatio: index === 1 ? "16/9" : "4/3",
-          background: index === 0 ? C.blush : index === 1 ? C.sage : C.lav,
-        }}
-      >
+      <div style={{ height: imgH, overflow: "hidden" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`https://picsum.photos/seed/${work.seed}/800/600`}
+          src={`https://picsum.photos/seed/${work.seed}/640/480`}
           alt={work.title}
           style={{
-            width: "100%", height: "100%", objectFit: "cover", display: "block",
-            transform: hovered ? "scale(1.03)" : "scale(1)",
-            transition: "transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+            width: "100%", height: "100%", objectFit: "cover",
+            transform: hovered ? "scale(1.06)" : "scale(1)",
+            transition: "transform 650ms cubic-bezier(0.2,0.8,0.2,1)",
           }}
         />
       </div>
 
-      {/* Text */}
-      <div style={{ order: even ? 1 : 0, padding: "8px 0" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+      {/* Info */}
+      <div style={{ padding: "18px 20px 22px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
           <span style={{
-            fontFamily: SERIF, fontSize: 72, fontWeight: 300,
-            color: C.dim, lineHeight: 1, userSelect: "none",
-          }}>
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <span style={{
-            fontFamily: MONO, fontSize: 9, letterSpacing: "0.24em",
-            textTransform: "uppercase",
-            color: C.rose,
-            background: C.blush, padding: "4px 10px",
-          }}>
-            {work.cat}
-          </span>
+            fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase",
+            color: work.tag, background: "rgba(255,255,255,0.5)",
+            padding: "4px 10px", borderRadius: 100,
+          }}>{work.cat}</span>
+          <span style={{ fontFamily: MONO, fontSize: 10, color: C.mid }}>{work.year}</span>
         </div>
-
         <h3 style={{
-          fontFamily: SERIF,
-          fontSize: "clamp(32px, 4vw, 52px)",
-          fontWeight: 300, fontStyle: "italic",
-          color: C.ink, margin: "0 0 16px",
-          lineHeight: 1.1,
-          borderBottom: hovered ? `1px solid ${C.rose}` : "1px solid transparent",
-          display: "inline-block",
-          transition: "border-color 0.3s",
+          fontFamily: SANS, fontWeight: 700, fontSize: span >= 4 ? 22 : 17,
+          letterSpacing: "-0.02em", marginBottom: 6,
+        }}>{work.title}</h3>
+        <p style={{ fontFamily: SANS, fontSize: 13, color: C.mid, lineHeight: 1.55, marginBottom: 14 }}>{work.desc}</p>
+        <span style={{
+          fontFamily: SANS, fontSize: 12, fontWeight: 700,
+          display: "flex", alignItems: "center", gap: 4,
+          opacity: hovered ? 1 : 0.35, transition: "opacity 0.25s",
         }}>
-          {work.title}
-        </h3>
-
-        <p style={{
-          fontFamily: SANS, fontSize: 14, fontWeight: 300,
-          lineHeight: 1.75, color: C.mid, maxWidth: 420,
-          marginBottom: 28,
-        }}>
-          {work.desc}
-        </p>
-
-        <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-          <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.16em", color: C.muted }}>
-            {work.year}
-          </span>
-          <a href="#" style={{
-            fontFamily: SANS, fontSize: 11, fontWeight: 500,
-            letterSpacing: "0.1em", textTransform: "uppercase",
-            color: C.ink, textDecoration: "none",
-            display: "flex", alignItems: "center", gap: 6,
-            opacity: hovered ? 1 : 0.5,
-            transition: "opacity 0.3s",
-          }}>
-            Open project
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
+          View project
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
       </div>
-    </article>
+    </div>
   );
 }
 
-/* ── Gallery ──────────────────────────────────────────────────── */
+/* ── Gallery — CSS columns masonry ─────────────────────────── */
 
 function GallerySection({ onOpen }: { onOpen: (i: number) => void }) {
+  const { ref, visible } = useReveal();
+
   return (
-    <section style={{ background: C.blush, padding: "120px clamp(24px, 5vw, 72px)" }}>
-      <div style={{
-        display: "flex", alignItems: "flex-end", justifyContent: "space-between",
-        marginBottom: 56,
-      }}>
+    <section style={{
+      background: C.periwi,
+      borderRadius: "40px 40px 0 0",
+      padding: "80px clamp(20px, 5vw, 64px) 100px",
+    }}>
+      <div ref={ref} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 40, ...revealStyle(visible) }}>
         <div>
-          <p style={{
-            fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em",
-            textTransform: "uppercase", color: C.rose, marginBottom: 10,
-          }}>
-            Archive
-          </p>
-          <h2 style={{
-            fontFamily: SERIF, fontSize: "clamp(32px, 4vw, 52px)",
-            fontWeight: 300, fontStyle: "italic", color: C.ink, margin: 0,
-          }}>
-            The collection
-          </h2>
+          <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: C.periwiDk, marginBottom: 10 }}>The archive</p>
+          <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-0.03em", color: C.ink }}>All shots</h2>
         </div>
-        <span style={{
-          fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em",
-          textTransform: "uppercase", color: C.muted,
-        }}>
-          {GALLERY.length} photographs
-        </span>
+        <span style={{ fontFamily: MONO, fontSize: 11, color: C.periwiDk }}>{GALLERY.length} photographs</span>
       </div>
 
-      {/* Masonry-like grid */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 16,
-      }}>
+      {/* True masonry via CSS columns */}
+      <div style={{ columns: 3, columnGap: 12 }}>
         {GALLERY.map((photo, i) => (
-          <GalleryPlate key={photo.seed} photo={photo} index={i} onOpen={onOpen} />
+          <MasonryItem key={photo.seed} photo={photo} index={i} onOpen={onOpen} />
         ))}
       </div>
     </section>
   );
 }
 
-function GalleryPlate({ photo, index, onOpen }: {
-  photo: typeof GALLERY[0]; index: number; onOpen: (i: number) => void;
-}) {
+function MasonryItem({ photo, index, onOpen }: { photo: typeof GALLERY[0]; index: number; onOpen: (i: number) => void }) {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <figure
+    <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => onOpen(index)}
       style={{
-        margin: 0, position: "relative", overflow: "hidden",
-        aspectRatio: photo.tall ? "3/4" : "4/3",
-        background: C.lav, cursor: "zoom-in",
-        gridRow: photo.tall ? "span 1" : "span 1",
+        breakInside: "avoid",
+        marginBottom: 12,
+        borderRadius: 16,
+        overflow: "hidden",
+        position: "relative",
+        cursor: "zoom-in",
       }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={`https://picsum.photos/seed/${photo.seed}/600/600`}
+        src={`https://picsum.photos/seed/${photo.seed}/${photo.w}/${photo.h}`}
         alt=""
         style={{
-          width: "100%", height: "100%", objectFit: "cover", display: "block",
-          transform: hovered ? "scale(1.05)" : "scale(1)",
-          filter: hovered ? "saturate(1.08)" : "saturate(0.9)",
-          transition: "transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 500ms ease",
+          width: "100%", height: "auto",
+          transform: hovered ? "scale(1.04)" : "scale(1)",
+          transition: "transform 550ms cubic-bezier(0.2,0.8,0.2,1)",
         }}
       />
-
-      {/* Overlay */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "rgba(42,37,32,0.28)",
+        background: "rgba(24,24,27,0.32)",
         opacity: hovered ? 1 : 0,
-        transition: "opacity 300ms ease",
+        transition: "opacity 0.25s",
         display: "flex", alignItems: "center", justifyContent: "center",
-        pointerEvents: "none",
       }}>
-        <span style={{
-          fontFamily: MONO, fontSize: 9, letterSpacing: "0.28em",
-          textTransform: "uppercase", color: "rgba(250,248,245,0.9)",
-        }}>
-          ↗ Open
-        </span>
+        <div style={{
+          background: "rgba(240,235,227,0.15)", border: "1px solid rgba(240,235,227,0.3)",
+          backdropFilter: "blur(8px)", borderRadius: 100,
+          padding: "8px 18px",
+          fontFamily: SANS, fontSize: 12, fontWeight: 600, color: "#fff",
+        }}>↗ Open</div>
       </div>
-
-      {/* Index */}
-      <div style={{
-        position: "absolute", bottom: 12, left: 14,
-        fontFamily: MONO, fontSize: 8, letterSpacing: "0.2em",
-        color: "rgba(250,248,245,0.55)",
-        transition: "opacity 0.3s",
-        opacity: hovered ? 0 : 1,
-      }}>
-        {String(index + 1).padStart(2, "0")}
-      </div>
-    </figure>
+    </div>
   );
 }
 
-/* ── About ────────────────────────────────────────────────────── */
+/* ── About ──────────────────────────────────────────────────── */
 
 function AboutSection() {
+  const { ref, visible } = useReveal();
+
   return (
     <section style={{
-      background: C.bg,
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      minHeight: "80vh",
+      background: C.mint, borderRadius: "40px 40px 0 0",
+      marginTop: -24, padding: "100px clamp(20px, 5vw, 64px)",
     }}>
-      {/* Portrait */}
-      <div style={{ position: "relative", overflow: "hidden", background: C.sage }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="https://picsum.photos/seed/700/800/1000"
-          alt="Sofia Marlowe"
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-        />
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(135deg, rgba(232,237,233,0.3) 0%, transparent 60%)",
-          pointerEvents: "none",
-        }} />
-      </div>
-
-      {/* Text */}
-      <div style={{
-        display: "flex", flexDirection: "column", justifyContent: "center",
-        padding: "80px clamp(40px, 6vw, 96px)",
-        gap: 32,
+      <div ref={ref} style={{
+        display: "grid", gridTemplateColumns: "1fr 1fr",
+        gap: "clamp(32px, 6vw, 96px)", alignItems: "center",
+        ...revealStyle(visible),
       }}>
-        <div>
-          <p style={{
-            fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em",
-            textTransform: "uppercase", color: C.rose, marginBottom: 16,
+        {/* Portrait */}
+        <div style={{ position: "relative" }}>
+          <div style={{ borderRadius: 32, overflow: "hidden", aspectRatio: "4/5", background: C.peach }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://picsum.photos/seed/700/800/1000" alt="Mia" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          </div>
+          {/* Floating badge */}
+          <div style={{
+            position: "absolute", bottom: 24, right: -20,
+            background: "#fff", borderRadius: 20,
+            padding: "16px 22px",
+            boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
           }}>
-            About the artist
-          </p>
-          <h2 style={{
-            fontFamily: SERIF,
-            fontSize: "clamp(40px, 5vw, 64px)",
-            fontWeight: 300, fontStyle: "italic",
-            color: C.ink, margin: "0 0 8px",
-            lineHeight: 1.05,
-          }}>
-            Sofia Marlowe
-          </h2>
-          <p style={{
-            fontFamily: SANS, fontSize: 12, fontWeight: 500,
-            letterSpacing: "0.12em", textTransform: "uppercase",
-            color: C.muted, margin: 0,
-          }}>
-            Visual artist · documentary photographer
-          </p>
+            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 30, letterSpacing: "-0.03em", lineHeight: 1 }}>340+</div>
+            <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, color: C.mid, marginTop: 4 }}>happy clients</div>
+          </div>
         </div>
 
-        <p style={{
-          fontFamily: SANS, fontSize: 15, fontWeight: 300,
-          lineHeight: 1.8, color: C.mid,
-        }}>
-          I grew up between two coasts and three languages, which taught me that
-          light speaks differently in every latitude. My practice sits at the
-          intersection of documentary restraint and editorial vision — always
-          looking for the moment before the moment.
-        </p>
+        {/* Text */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+          <div>
+            <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.26em", textTransform: "uppercase", color: C.mintDk, marginBottom: 14 }}>Hey, I'm Mia!</p>
+            <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(32px, 4vw, 52px)", letterSpacing: "-0.03em", lineHeight: 1.08 }}>
+              I shoot what{" "}
+              <span style={{ background: C.coral, borderRadius: 10, padding: "1px 12px", display: "inline-block" }}>feels real.</span>
+            </h2>
+          </div>
+          <p style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.75, color: C.mid }}>
+            Based in Berlin, I've been making pictures for eleven years. Drawn to in-between moments — the laugh before the pose, the glance before the ceremony, the quiet after the gig.
+          </p>
+          <p style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.75, color: C.mid }}>
+            I work with musicians, brands, couples, and anyone who wants images that don't feel like stock photos.
+          </p>
 
-        <p style={{
-          fontFamily: SANS, fontSize: 15, fontWeight: 300,
-          lineHeight: 1.8, color: C.mid,
-        }}>
-          Currently based in Paris, available for commissions worldwide.
-          My work has appeared in <em>Vogue</em>, <em>The New Yorker</em>,
-          and <em>National Geographic Traveler</em>.
-        </p>
+          {/* Pill stats */}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {[
+              { label: "11 years shooting", bg: C.coral },
+              { label: "6 countries",       bg: C.lemon },
+              { label: "2 dogs",             bg: C.peach },
+              { label: "∞ cups of tea",      bg: C.periwi },
+            ].map((pill) => (
+              <span key={pill.label} style={{
+                fontFamily: SANS, fontSize: 13, fontWeight: 600,
+                background: pill.bg, color: C.ink,
+                padding: "8px 16px", borderRadius: 100,
+              }}>{pill.label}</span>
+            ))}
+          </div>
 
-        {/* Stats */}
-        <div style={{
-          display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 24, paddingTop: 24,
-          borderTop: `1px solid ${C.dim}`,
-        }}>
-          {STATS.map((s) => (
-            <div key={s.label}>
-              <div style={{
-                fontFamily: SERIF, fontSize: 40, fontWeight: 300,
-                color: C.ink, lineHeight: 1,
-              }}>
-                {s.value}
-              </div>
-              <div style={{
-                fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em",
-                textTransform: "uppercase", color: C.muted, marginTop: 6,
-              }}>
-                {s.label}
-              </div>
-            </div>
-          ))}
+          <a href="#" style={{
+            alignSelf: "flex-start",
+            fontFamily: SANS, fontSize: 14, fontWeight: 700,
+            color: "#fff", background: C.ink,
+            padding: "13px 28px", borderRadius: 100,
+            display: "flex", alignItems: "center", gap: 8,
+            transition: "background 0.2s, transform 0.2s",
+          }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = C.mintDk; e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; e.currentTarget.style.transform = "translateY(0)"; }}
+          >My full story →</a>
         </div>
-
-        <a href="#" style={{
-          display: "inline-flex", alignItems: "center", gap: 8, alignSelf: "flex-start",
-          fontFamily: SANS, fontSize: 11, fontWeight: 500,
-          letterSpacing: "0.12em", textTransform: "uppercase",
-          color: C.ink, textDecoration: "none",
-          borderBottom: `1px solid ${C.dimMed}`, paddingBottom: 2,
-        }}>
-          Full biography
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
       </div>
     </section>
   );
 }
 
-/* ── Services / Quote band ────────────────────────────────────── */
+/* ── Contact ────────────────────────────────────────────────── */
 
-function FooterSection() {
+function ContactSection() {
+  const { ref, visible } = useReveal();
+
   return (
-    <>
-      {/* Contact band */}
-      <section style={{
-        background: C.lav,
-        padding: "96px clamp(24px, 5vw, 72px)",
-        textAlign: "center",
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 32,
-      }}>
-        <p style={{
-          fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em",
-          textTransform: "uppercase", color: C.rose,
-        }}>
-          Let's collaborate
-        </p>
-        <h2 style={{
-          fontFamily: SERIF,
-          fontSize: "clamp(36px, 5vw, 72px)",
-          fontWeight: 300, fontStyle: "italic",
-          color: C.ink, margin: 0, lineHeight: 1.1,
-          maxWidth: 640,
-        }}>
-          Every project begins with a conversation.
+    <section style={{
+      background: C.bg, borderRadius: "40px 40px 0 0",
+      marginTop: -24, padding: "100px clamp(20px, 5vw, 64px)",
+      textAlign: "center",
+    }}>
+      <div ref={ref} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24, ...revealStyle(visible) }}>
+        <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.26em", textTransform: "uppercase", color: C.mid }}>Say hello</p>
+        <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(36px, 6vw, 80px)", letterSpacing: "-0.04em", maxWidth: "14ch", lineHeight: 0.97 }}>
+          Got a project in mind?
         </h2>
-        <p style={{
-          fontFamily: SANS, fontSize: 15, fontWeight: 300,
-          lineHeight: 1.7, color: C.mid, maxWidth: 480,
-        }}>
-          Whether you have a brief or just an idea, I'd love to hear about it.
-          Commissions, editorial, and limited print inquiries welcome.
+        <p style={{ fontFamily: SANS, fontSize: 16, lineHeight: 1.7, color: C.mid, maxWidth: 460 }}>
+          Whether it's a wedding, a campaign, or just an idea on a napkin — let's figure it out together.
         </p>
-        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
           <a href="#" style={{
-            fontFamily: SANS, fontSize: 11, fontWeight: 500,
-            letterSpacing: "0.12em", textTransform: "uppercase",
-            color: C.bg, background: C.ink,
-            padding: "14px 32px", textDecoration: "none",
-            transition: "background 0.25s",
+            fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff",
+            background: C.ink, padding: "15px 36px", borderRadius: 100,
+            transition: "background 0.2s, transform 0.2s",
           }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = C.rose; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; }}
-          >
-            Get in touch
-          </a>
+            onMouseEnter={(e) => { e.currentTarget.style.background = C.coralDk; e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; e.currentTarget.style.transform = "translateY(0)"; }}
+          >Send me a message</a>
           <a href="#" style={{
-            fontFamily: SANS, fontSize: 11, fontWeight: 500,
-            letterSpacing: "0.12em", textTransform: "uppercase",
-            color: C.ink, background: "transparent",
-            padding: "14px 32px", textDecoration: "none",
-            border: `1px solid ${C.dimMed}`,
+            fontFamily: SANS, fontSize: 15, fontWeight: 600, color: C.ink,
+            padding: "15px 36px", borderRadius: 100, border: `2px solid ${C.dimMed}`,
             transition: "border-color 0.2s",
           }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.rose; }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.ink; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = C.dimMed; }}
-          >
-            View prints
-          </a>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer style={{
-        background: C.ink,
-        padding: "48px clamp(24px, 5vw, 72px)",
-        display: "grid",
-        gridTemplateColumns: "1fr auto 1fr",
-        alignItems: "center",
-        gap: 24,
-      }}>
-        <div>
-          <div style={{
-            fontFamily: SERIF, fontSize: 20, fontStyle: "italic", fontWeight: 300,
-            color: "rgba(250,248,245,0.9)", marginBottom: 6,
-          }}>
-            Sofia Marlowe
-          </div>
-          <div style={{
-            fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em",
-            textTransform: "uppercase", color: "rgba(250,248,245,0.35)",
-          }}>
-            © 2024 · All rights reserved
-          </div>
+          >Book a call</a>
         </div>
 
-        <div style={{ display: "flex", gap: 32 }}>
-          {["Work", "About", "Journal", "Contact"].map((item) => (
-            <a key={item} href="#" style={{
-              fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em",
-              textTransform: "uppercase", color: "rgba(250,248,245,0.45)",
-              textDecoration: "none", transition: "color 0.2s",
-            }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(250,248,245,0.9)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(250,248,245,0.45)"; }}
-            >
-              {item}
-            </a>
-          ))}
-        </div>
-
-        <div style={{ display: "flex", gap: 20, justifyContent: "flex-end" }}>
-          {["Instagram", "Behance", "Substack"].map((s) => (
+        {/* Social pills */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", marginTop: 8 }}>
+          {["Instagram", "TikTok", "Behance", "Substack"].map((s) => (
             <a key={s} href="#" style={{
-              fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em",
-              textTransform: "uppercase", color: "rgba(250,248,245,0.35)",
-              textDecoration: "none", transition: "color 0.2s",
+              fontFamily: SANS, fontSize: 13, fontWeight: 500,
+              color: C.mid, background: C.surface,
+              padding: "8px 18px", borderRadius: 100,
+              transition: "background 0.18s, color 0.18s",
             }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = C.rose; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(250,248,245,0.35)"; }}
-            >
-              {s}
-            </a>
+              onMouseEnter={(e) => { e.currentTarget.style.background = C.coral; e.currentTarget.style.color = C.ink; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = C.surface; e.currentTarget.style.color = C.mid; }}
+            >{s}</a>
           ))}
         </div>
-      </footer>
-    </>
+      </div>
+    </section>
   );
 }
 
-/* ── Lightbox ─────────────────────────────────────────────────── */
+/* ── Footer ─────────────────────────────────────────────────── */
 
-function GalleryLightbox({
+function FooterBar() {
+  return (
+    <footer style={{
+      background: C.ink, padding: "0 clamp(20px, 5vw, 64px)",
+      height: 52, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+    }}>
+      <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 14, letterSpacing: "-0.02em", color: "#fff" }}>
+        mia.<span style={{ color: C.coralDk }}>photo</span>
+      </span>
+      <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em", color: "rgba(255,255,255,0.28)" }}>
+        © 2024 · Made with love in Berlin
+      </span>
+      <div style={{ display: "flex", gap: 20 }}>
+        {["Privacy", "Terms", "Colophon"].map((item) => (
+          <a key={item} href="#" style={{
+            fontFamily: SANS, fontSize: 12, fontWeight: 500,
+            color: "rgba(255,255,255,0.32)", transition: "color 0.18s",
+          }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.85)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.32)"; }}
+          >{item}</a>
+        ))}
+      </div>
+    </footer>
+  );
+}
+
+/* ── Lightbox ───────────────────────────────────────────────── */
+
+function PetalLightbox({
   photos, startIndex, onClose,
 }: { photos: typeof GALLERY; startIndex: number; onClose: () => void }) {
   const [index, setIndex]   = useState(startIndex);
@@ -782,126 +674,86 @@ function GalleryLightbox({
     return () => el.removeEventListener("wheel", fn);
   }, []);
 
-  const onMD = (e: React.MouseEvent) => {
-    if (zoom <= 1) return; e.preventDefault(); setDrag(true);
-    dragRef.current = { sx: e.clientX, sy: e.clientY, ox: offset.x, oy: offset.y };
-  };
-  const onMM = (e: React.MouseEvent) => {
-    if (!dragging) return;
-    setOffset({ x: dragRef.current.ox + e.clientX - dragRef.current.sx, y: dragRef.current.oy + e.clientY - dragRef.current.sy });
-  };
+  const onMD = (e: React.MouseEvent) => { if (zoom <= 1) return; e.preventDefault(); setDrag(true); dragRef.current = { sx: e.clientX, sy: e.clientY, ox: offset.x, oy: offset.y }; };
+  const onMM = (e: React.MouseEvent) => { if (!dragging) return; setOffset({ x: dragRef.current.ox + e.clientX - dragRef.current.sx, y: dragRef.current.oy + e.clientY - dragRef.current.sy }); };
   const onMU = () => setDrag(false);
 
   return (
-    <div
-      onClick={(e) => e.stopPropagation()}
-      style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(30,26,23,0.96)", display: "flex", flexDirection: "column", userSelect: "none" }}
-    >
+    <div onClick={(e) => e.stopPropagation()} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(18,18,20,0.97)", display: "flex", flexDirection: "column", userSelect: "none" }}>
+
       {/* Top bar */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, zIndex: 10,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "20px 28px",
-        background: "linear-gradient(to bottom, rgba(30,26,23,0.7), transparent)",
-        pointerEvents: "none",
-      }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 24px", flexShrink: 0 }}>
         <button onClick={onClose} style={{
-          pointerEvents: "auto", background: "none", border: "none",
-          cursor: "pointer", color: "rgba(250,248,245,0.65)",
-          padding: "6px 10px", fontFamily: MONO, fontSize: 10,
-          letterSpacing: "0.22em", textTransform: "uppercase",
-          display: "flex", alignItems: "center", gap: 8,
-        }}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          Back
+          background: "rgba(255,255,255,0.08)", border: "none", cursor: "pointer",
+          color: "rgba(255,255,255,0.7)", padding: "8px 18px", borderRadius: 100,
+          fontFamily: SANS, fontSize: 13, fontWeight: 600,
+          display: "flex", alignItems: "center", gap: 6,
+          transition: "background 0.18s",
+        }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Close
         </button>
-        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(250,248,245,0.3)" }}>
+        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", color: "rgba(255,255,255,0.3)" }}>
           {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
         </span>
-        {zoom > 1 && (
-          <button onClick={resetView} style={{
-            pointerEvents: "auto",
-            background: "rgba(250,248,245,0.08)", border: "1px solid rgba(250,248,245,0.1)",
-            color: "rgba(250,248,245,0.55)", cursor: "pointer", padding: "5px 10px",
-            fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
-          }}>
+        {zoom > 1 ? (
+          <button onClick={resetView} style={{ background: C.coral, border: "none", cursor: "pointer", color: C.ink, padding: "8px 18px", borderRadius: 100, fontFamily: SANS, fontSize: 12, fontWeight: 700 }}>
             {Math.round(zoom * 100)}% · Reset
           </button>
-        )}
+        ) : <div style={{ width: 90 }} />}
       </div>
 
-      {/* Image container */}
-      <div
-        ref={containerRef}
-        style={{
-          flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-          padding: "72px 80px",
-          cursor: zoom > 1 ? (dragging ? "grabbing" : "grab") : "default",
-          overflow: "hidden",
-        }}
-        onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU}
-      >
+      {/* Image */}
+      <div ref={containerRef} style={{
+        flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "8px 80px", overflow: "hidden",
+        cursor: zoom > 1 ? (dragging ? "grabbing" : "grab") : "default",
+      }} onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`https://picsum.photos/seed/${photo.seed}/1600/1200`}
-          alt=""
-          draggable={false}
+          src={`https://picsum.photos/seed/${photo.seed}/${photo.w * 2}/${photo.h * 2}`}
+          alt="" draggable={false}
           style={{
             maxWidth: "100%", maxHeight: "100%", objectFit: "contain",
-            pointerEvents: "none", display: "block",
+            borderRadius: 16, pointerEvents: "none",
             transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
-            transformOrigin: "center",
             transition: dragging ? "none" : "transform 0.18s ease",
           }}
         />
       </div>
 
-      {/* Prev / Next */}
+      {/* Arrows */}
       {index > 0 && (
-        <button onClick={prev} style={{
-          position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)",
-          background: "rgba(250,248,245,0.07)", border: "1px solid rgba(250,248,245,0.1)",
-          color: "rgba(250,248,245,0.6)", cursor: "pointer",
-          width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%",
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        <button onClick={prev} style={{ position: "absolute", left: 18, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.1)", border: "none", color: "rgba(255,255,255,0.75)", cursor: "pointer", width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", transition: "background 0.18s" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
       )}
       {index < photos.length - 1 && (
-        <button onClick={next} style={{
-          position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)",
-          background: "rgba(250,248,245,0.07)", border: "1px solid rgba(250,248,245,0.1)",
-          color: "rgba(250,248,245,0.6)", cursor: "pointer",
-          width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%",
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <button onClick={next} style={{ position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.1)", border: "none", color: "rgba(255,255,255,0.75)", cursor: "pointer", width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", transition: "background 0.18s" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       )}
 
       {/* Thumbnail strip */}
-      <div style={{
-        position: "absolute", bottom: 0, left: 0, right: 0,
-        display: "flex", gap: 6, padding: "16px 28px",
-        background: "linear-gradient(to top, rgba(30,26,23,0.8), transparent)",
-        overflowX: "auto", justifyContent: "center",
-      }}>
+      <div style={{ display: "flex", gap: 8, padding: "12px 24px", overflowX: "auto", justifyContent: "center", flexShrink: 0 }}>
         {photos.map((p, i) => (
-          <button
-            key={p.seed}
-            onClick={() => { setIndex(i); resetView(); }}
-            style={{
-              flex: "0 0 52px", height: 36,
-              padding: 0, border: i === index ? "2px solid rgba(201,168,154,0.8)" : "2px solid transparent",
-              cursor: "pointer", overflow: "hidden", borderRadius: 2,
-              transition: "border-color 0.2s",
-            }}
-          >
+          <button key={p.seed} onClick={() => { setIndex(i); resetView(); }} style={{
+            flex: "0 0 52px", height: 36, padding: 0, border: "none",
+            borderRadius: 8, cursor: "pointer", overflow: "hidden",
+            outline: i === index ? `2px solid ${C.coral}` : "2px solid transparent",
+            outlineOffset: 2, transition: "outline-color 0.2s",
+          }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`https://picsum.photos/seed/${p.seed}/120/80`}
-              alt=""
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
+            <img src={`https://picsum.photos/seed/${p.seed}/120/80`} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </button>
         ))}
       </div>
