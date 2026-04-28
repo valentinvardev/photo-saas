@@ -77,7 +77,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
   return (
     <main
       onClick={() => selectNode(null)}
-      style={{ background: "#fafaf8", color: "#0a0a0a", fontFamily: SANS, minHeight: "100%" }}
+      style={{ background: "var(--ed-bg, #fafaf8)", color: "var(--ed-fg, #0a0a0a)", fontFamily: SANS, minHeight: "100%" }}
     >
 
       {/* ── Topbar ───────────────────────────────────────────── */}
@@ -89,26 +89,26 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
           gridTemplateColumns: isMobile ? "1fr auto" : "1fr auto 1fr",
           alignItems: "center",
           padding: `${isMobile ? 16 : 22}px ${padX}px`,
-          borderBottom: "1px solid rgba(216,212,204,0.6)",
-          background: "rgba(250,250,248,0.95)",
+          borderBottom: "1px solid rgba(128,120,112,0.25)",
+          background: "var(--ed-bg, #fafaf8)",
           fontFamily: MONO, fontSize: isMobile ? 10 : 11,
-          letterSpacing: "0.22em", textTransform: "uppercase", color: "#0a0a0a",
+          letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)",
           gap: 12,
         }}
       >
         <Brand nodeId="atl-nav-brand" />
 
         {!isMobile && (
-          <EditableNode id="atl-nav-subtitle" tag="span" style={{ color: "#7a766f", textAlign: "center" }}>
+          <EditableNode id="atl-nav-subtitle" tag="span" style={{ color: "var(--ed-muted, #7a766f)", textAlign: "center" }}>
             <EditableText id="atl-nav-subtitle" />
           </EditableNode>
         )}
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: isMobile ? 14 : 24 }}>
-          {!isMobile && <span style={{ color: "#0a0a0a" }}>The collection</span>}
+          {!isMobile && <span style={{ color: "var(--ed-fg, #0a0a0a)" }}>The collection</span>}
           <span style={{
-            color: "#0a0a0a",
-            borderBottom: "1px solid #0a0a0a", paddingBottom: 1,
+            color: "var(--ed-fg, #0a0a0a)",
+            borderBottom: "1px solid var(--ed-fg, #0a0a0a)", paddingBottom: 1,
           }}>Download ↓</span>
         </div>
       </nav>
@@ -123,7 +123,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
       >
         <EditableNode id="atl-hero-eyebrow" tag="p" style={{
           fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em",
-          textTransform: "uppercase", color: "#7a766f", marginBottom: 36,
+          textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", marginBottom: 36,
         }}>
           <EditableText id="atl-hero-eyebrow" />
         </EditableNode>
@@ -132,7 +132,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
           fontFamily: SERIF,
           fontSize: isMobile ? 64 : isTablet ? 96 : "clamp(72px, 12vw, 152px)",
           fontWeight: 300, lineHeight: 0.92, letterSpacing: "-0.035em",
-          margin: 0, marginBottom: 20, color: "#0a0a0a",
+          margin: 0, marginBottom: 20, color: "var(--ed-fg, #0a0a0a)",
         }}>
           <EditableText id="atl-hero-title" />
         </EditableNode>
@@ -140,13 +140,13 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
         <EditableNode id="atl-hero-subtitle" tag="p" style={{
           fontFamily: SERIF,
           fontSize: isMobile ? 18 : "clamp(20px, 2.4vw, 28px)",
-          fontStyle: "italic", color: "#4a4742", lineHeight: 1.4,
+          fontStyle: "italic", color: "var(--ed-muted, #4a4742)", lineHeight: 1.4,
           fontWeight: 300, maxWidth: 640, margin: "0 auto",
         }}>
           <EditableText id="atl-hero-subtitle" />
         </EditableNode>
 
-        <div style={{ width: 1, height: isMobile ? 32 : 48, background: "#0a0a0a", margin: `${isMobile ? 48 : 72}px auto 0` }} />
+        <div style={{ width: 1, height: isMobile ? 32 : 48, background: "var(--ed-fg, #0a0a0a)", margin: `${isMobile ? 48 : 72}px auto 0` }} />
       </header>
 
       {/* ── Cover photo ──────────────────────────────────────── */}
@@ -164,12 +164,12 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
         <div style={{ marginTop: 24, display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
           <EditableNode id="atl-hero-caption" tag="p" style={{
             fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em",
-            textTransform: "uppercase", color: "#7a766f", margin: 0,
+            textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", margin: 0,
           }}>
             <EditableText id="atl-hero-caption" />
           </EditableNode>
           <EditableNode id="atl-hero-date" tag="p" style={{
-            fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: "#4a4742", margin: 0,
+            fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: "var(--ed-muted, #4a4742)", margin: 0,
           }}>
             <EditableText id="atl-hero-date" />
           </EditableNode>
@@ -182,7 +182,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
         style={{
           padding: `${isMobile ? 56 : 80}px ${padX}px ${isMobile ? 40 : 56}px`,
           display: "flex", justifyContent: "space-between", alignItems: "baseline",
-          borderTop: "1px solid #d8d4cc",
+          borderTop: "1px solid rgba(128,120,112,0.25)",
           maxWidth: 1480, margin: "0 auto",
           flexWrap: "wrap", gap: 24,
         }}
@@ -190,7 +190,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
         <div>
           <EditableNode id="atl-coll-roman" tag="p" style={{
             fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em",
-            textTransform: "uppercase", color: "#7a766f", marginBottom: 12, margin: 0,
+            textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", marginBottom: 12, margin: 0,
           }}>
             <EditableText id="atl-coll-roman" />
           </EditableNode>
@@ -198,14 +198,14 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
             fontFamily: SERIF,
             fontSize: isMobile ? 44 : "clamp(44px, 6vw, 72px)",
             fontWeight: 300, fontStyle: "italic", letterSpacing: "-0.015em",
-            margin: 0, marginTop: 12, lineHeight: 1, color: "#0a0a0a",
+            margin: 0, marginTop: 12, lineHeight: 1, color: "var(--ed-fg, #0a0a0a)",
           }}>
             <EditableText id="atl-coll-title" />
           </EditableNode>
         </div>
         <EditableNode id="atl-coll-meta" tag="p" style={{
           fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em",
-          textTransform: "uppercase", color: "#7a766f", textAlign: "right", margin: 0,
+          textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", textAlign: "right", margin: 0,
         }}>
           <EditableText id="atl-coll-meta" />
         </EditableNode>
@@ -240,21 +240,21 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
           padding: `${isMobile ? 64 : 120}px ${padX}px`,
           maxWidth: 880, margin: "0 auto",
           textAlign: "center",
-          borderTop: "1px solid #d8d4cc",
-          borderBottom: "1px solid #d8d4cc",
+          borderTop: "1px solid rgba(128,120,112,0.25)",
+          borderBottom: "1px solid rgba(128,120,112,0.25)",
         }}
       >
         <EditableNode id="atl-quote-text" tag="blockquote" style={{
           fontFamily: SERIF,
           fontSize: isMobile ? 22 : "clamp(28px, 3.8vw, 44px)",
           fontWeight: 300, fontStyle: "italic", lineHeight: 1.35,
-          letterSpacing: "-0.005em", margin: 0, color: "#1a1a1a",
+          letterSpacing: "-0.005em", margin: 0, color: "var(--ed-fg, #1a1a1a)",
         }}>
           <EditableText id="atl-quote-text" />
         </EditableNode>
         <EditableNode id="atl-quote-author" tag="p" style={{
           marginTop: 32, fontFamily: MONO, fontSize: 10, letterSpacing: "0.25em",
-          textTransform: "uppercase", color: "#7a766f",
+          textTransform: "uppercase", color: "var(--ed-muted, #7a766f)",
         }}>
           <EditableText id="atl-quote-author" />
         </EditableNode>
@@ -280,7 +280,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
           <div>
             <EditableNode id="atl-close-eyebrow" tag="p" style={{
               fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em",
-              textTransform: "uppercase", color: "#7a766f", marginBottom: 24, margin: 0,
+              textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", marginBottom: 24, margin: 0,
             }}>
               <EditableText id="atl-close-eyebrow" />
             </EditableNode>
@@ -289,13 +289,13 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
               fontFamily: SERIF,
               fontSize: isMobile ? 32 : "clamp(36px, 4.5vw, 56px)",
               fontWeight: 300, fontStyle: "italic", letterSpacing: "-0.015em",
-              lineHeight: 1.05, margin: 0, marginTop: 24, marginBottom: 28, color: "#0a0a0a",
+              lineHeight: 1.05, margin: 0, marginTop: 24, marginBottom: 28, color: "var(--ed-fg, #0a0a0a)",
             }}>
               <EditableText id="atl-close-heading" />
             </EditableNode>
 
             <EditableNode id="atl-close-body" tag="p" style={{
-              fontSize: 15, lineHeight: 1.7, color: "#3a3a3a", maxWidth: 460, marginBottom: 28, margin: 0,
+              fontSize: 15, lineHeight: 1.7, color: "var(--ed-muted, #3a3a3a)", maxWidth: 460, marginBottom: 28, margin: 0,
             }}>
               <EditableText id="atl-close-body" />
             </EditableNode>
@@ -303,7 +303,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 28 }}>
               <EditableNode id="atl-close-cta-1" tag="span" style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "14px 26px", background: "#0a0a0a", color: "#fafaf8",
+                padding: "14px 26px", background: "var(--ed-fg, #0a0a0a)", color: "var(--ed-bg, #fafaf8)",
                 fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em",
                 textTransform: "uppercase", cursor: "pointer",
               }}>
@@ -312,8 +312,8 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
               </EditableNode>
               <EditableNode id="atl-close-cta-2" tag="span" style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "14px 26px", background: "transparent", color: "#0a0a0a",
-                border: "1px solid #0a0a0a",
+                padding: "14px 26px", background: "transparent", color: "var(--ed-fg, #0a0a0a)",
+                border: "1px solid var(--ed-fg, #0a0a0a)",
                 fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em",
                 textTransform: "uppercase", cursor: "pointer",
               }}>
@@ -329,29 +329,29 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
         id="atl-section-footer"
         style={{
           padding: `${isMobile ? 32 : 48}px ${padX}px ${isMobile ? 40 : 64}px`,
-          borderTop: "1px solid #d8d4cc",
+          borderTop: "1px solid rgba(128,120,112,0.25)",
           display: "flex", justifyContent: "space-between", alignItems: "flex-end",
           flexWrap: "wrap", gap: 32,
         }}
       >
         <div>
           <div style={{
-            fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: "#0a0a0a",
+            fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: "var(--ed-fg, #0a0a0a)",
             marginBottom: 8, fontWeight: 300, letterSpacing: "-0.01em",
           }}>
             <Brand nodeId="atl-footer-brand" />
           </div>
           <EditableNode id="atl-footer-copy" tag="p" style={{
             fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em",
-            textTransform: "uppercase", color: "#7a766f", margin: 0,
+            textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", margin: 0,
           }}>
             <EditableText id="atl-footer-copy" />
           </EditableNode>
         </div>
         <nav style={{ display: "flex", gap: 28, fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-          <span style={{ color: "#3a3a3a", paddingBottom: 2 }}>Contact</span>
-          <span style={{ color: "#3a3a3a", paddingBottom: 2 }}>Instagram</span>
-          <span style={{ color: "#3a3a3a", paddingBottom: 2 }}>Print shop</span>
+          <span style={{ color: "var(--ed-fg, #3a3a3a)", paddingBottom: 2 }}>Contact</span>
+          <span style={{ color: "var(--ed-fg, #3a3a3a)", paddingBottom: 2 }}>Instagram</span>
+          <span style={{ color: "var(--ed-fg, #3a3a3a)", paddingBottom: 2 }}>Print shop</span>
         </nav>
       </footer>
 
