@@ -363,7 +363,7 @@ function UseStageButton({ stage, onUse }: {
           <motion.button key="edit"
             initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 flex items-center justify-center gap-2 font-sans text-xs font-bold rounded-lg bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
+            className="absolute inset-0 flex items-center justify-center gap-2 font-sans text-xs font-bold rounded-lg bg-white text-[#111] hover:bg-white/90 border border-[var(--border)] transition-colors"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Start building
@@ -528,13 +528,11 @@ function CollectionPreviewModal({ c, initialPage = "portfolio", onClose }: {
 /* ── Collection mobile modal ────────────────────────────────── */
 function CollectionModal({ c, onClose, onPreview }: { c: TemplateCollection; onClose: () => void; onPreview: (p: PageType) => void }) {
   const PAGE_LABELS: Record<string, string> = { portfolio: "Portfolio", links: "Links", delivery: "Delivery" };
-  const { addItem, hasItem } = useCart();
-  const [stage, setStage] = useState<UseStage>(hasItem(c.name) ? "active" : "idle");
+  const [stage, setStage] = useState<UseStage>("idle");
 
   function handleUse() {
     if (stage !== "idle") return;
     setStage("checking");
-    if (!hasItem(c.name)) addItem({ type: "template", name: c.name, detail: "Collection · Free", price: 0, period: "one-time" });
     setTimeout(() => setStage("active"), 1300);
   }
 
@@ -616,13 +614,11 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
   const [modalOpen, setModalOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState<PageType | null>(null);
   const isMobile = useIsMobile();
-  const { addItem, hasItem } = useCart();
-  const [stage, setStage] = useState<UseStage>(hasItem(c.name) ? "active" : "idle");
+  const [stage, setStage] = useState<UseStage>("idle");
 
   function handleUse() {
     if (stage !== "idle") return;
     setStage("checking");
-    if (!hasItem(c.name)) addItem({ type: "template", name: c.name, detail: "Collection · Free", price: 0, period: "one-time" });
     setTimeout(() => setStage("active"), 1300);
   }
 
@@ -733,40 +729,27 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
             </div>
           </div>
 
-          {/* ── Right: page previews ── */}
-          <div className="w-72 shrink-0 flex gap-2 items-stretch py-5 pr-5">
-            {c.pages.map((page, pi) => (
-              <div key={page.type}
-                className="relative flex-1 overflow-hidden rounded-xl"
-                style={{
-                  background: "var(--bg-subtle)",
-                  transform: hovered
-                    ? pi === 0 ? "rotate(-3deg) translateY(-4px) scale(1.02)"
-                    : pi === 2 ? "rotate(3deg) translateY(-4px) scale(1.02)"
-                    : "translateY(-6px) scale(1.02)"
-                    : "none",
-                  transition: `transform 0.35s cubic-bezier(0.2,0.8,0.2,1) ${pi * 40}ms`,
-                  zIndex: pi === 1 ? 2 : 1,
-                  boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.2)" : "0 2px 8px rgba(0,0,0,0.1)",
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`https://picsum.photos/seed/${page.seed}/240/360`}
-                  alt={PAGE_LABELS[page.type]}
-                  className="w-full h-full object-cover"
-                  style={{ filter: page.href ? "none" : "grayscale(1) opacity(0.35)" }}
-                />
-                <div className="absolute bottom-0 left-0 right-0 px-2 py-2" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)" }}>
-                  <span className="font-mono text-[7px] uppercase tracking-widest text-white/80">{page.type}</span>
-                </div>
-                {!page.href && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="font-mono text-[8px] text-white/50 bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm">Soon</span>
-                  </div>
-                )}
-              </div>
-            ))}
+          {/* ── Right: theme hero image (50%) ── */}
+          <div className="relative w-1/2 shrink-0 overflow-hidden hidden md:block" style={{ minHeight: 280 }}>
+            {/* Accent strip on the left edge of the image */}
+            <div className="absolute top-0 bottom-0 left-0 w-1 z-10" style={{ background: c.accentColor }} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`https://picsum.photos/seed/${c.pages[0]?.seed ?? 10}/1200/900`}
+              alt={`${c.name} theme preview`}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
+              style={{ transform: hovered ? "scale(1.04)" : "scale(1)" }}
+            />
+            {/* Subtle vignette on the left edge so the photo blends with the card */}
+            <div className="absolute inset-0 pointer-events-none"
+              style={{ background: "linear-gradient(to right, var(--bg-card) 0%, transparent 12%)" }} />
+            {/* Theme tag overlay */}
+            <div className="absolute bottom-3 right-3 z-10">
+              <span className="font-mono text-[8px] uppercase tracking-widest px-2 py-1 rounded backdrop-blur-md"
+                style={{ background: "rgba(0,0,0,0.55)", color: "#fff" }}>
+                Live preview
+              </span>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -776,6 +759,108 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
         {previewOpen && <CollectionPreviewModal c={c} initialPage={previewOpen} onClose={() => setPreviewOpen(null)} />}
       </AnimatePresence>
     </>
+  );
+}
+
+/* ── Page-type mockup cards ──────────────────────────────────
+   Coded wireframes that visually represent each page type.
+   Used inside the "One style, three pages" banner. */
+
+const MOCK_BG    = "#f5f1ea";
+const MOCK_INK   = "#1a1a1a";
+const MOCK_DIM   = "#bbb3a8";
+const MOCK_LINE  = "#e0d8c9";
+
+function MockShell({ rotate, ty, zIndex, children }: {
+  rotate: string; ty: string; zIndex: number; children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="relative overflow-hidden rounded-xl shadow-2xl"
+      style={{
+        width: 110, height: 156, background: MOCK_BG, color: MOCK_INK,
+        transform: `rotate(${rotate}) translateY(${ty})`,
+        zIndex,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function PortfolioMock(props: { rotate: string; ty: string; zIndex: number }) {
+  return (
+    <MockShell {...props}>
+      {/* Nav strip */}
+      <div className="flex items-center justify-between px-2.5 py-2 border-b" style={{ borderColor: MOCK_LINE }}>
+        <div className="w-2 h-2 rounded-sm" style={{ background: MOCK_INK }} />
+        <div className="flex gap-1.5">
+          <div className="h-1 w-3 rounded-full" style={{ background: MOCK_DIM }} />
+          <div className="h-1 w-3 rounded-full" style={{ background: MOCK_DIM }} />
+          <div className="h-1 w-3 rounded-full" style={{ background: MOCK_DIM }} />
+        </div>
+      </div>
+      {/* Hero text */}
+      <div className="px-2.5 pt-3 pb-2">
+        <div className="h-2 w-16 mb-1" style={{ background: MOCK_INK }} />
+        <div className="h-2 w-12 mb-2" style={{ background: MOCK_INK }} />
+        <div className="h-0.5 w-8" style={{ background: MOCK_DIM }} />
+      </div>
+      {/* Photo grid */}
+      <div className="grid grid-cols-3 gap-0.5 px-1.5">
+        {[0,1,2,3,4,5].map((i) => (
+          <div key={i} className="aspect-square" style={{ background: i % 2 === 0 ? "#cfc6b6" : "#9d927e" }} />
+        ))}
+      </div>
+      {/* Type tag */}
+      <div className="absolute bottom-1.5 left-2.5 font-mono text-[7px] uppercase tracking-widest opacity-60">Portfolio</div>
+    </MockShell>
+  );
+}
+
+function LinksMock(props: { rotate: string; ty: string; zIndex: number }) {
+  return (
+    <MockShell {...props}>
+      {/* Centered profile */}
+      <div className="flex flex-col items-center pt-5 px-3 gap-1.5">
+        <div className="w-7 h-7 rounded-full" style={{ background: "#9d927e" }} />
+        <div className="h-1.5 w-12" style={{ background: MOCK_INK }} />
+        <div className="h-1 w-8" style={{ background: MOCK_DIM }} />
+      </div>
+      {/* Link buttons */}
+      <div className="flex flex-col gap-1.5 px-3 mt-3">
+        <div className="h-3 rounded-full" style={{ background: MOCK_INK }} />
+        <div className="h-3 rounded-full border" style={{ borderColor: MOCK_LINE, background: "transparent" }} />
+        <div className="h-3 rounded-full border" style={{ borderColor: MOCK_LINE, background: "transparent" }} />
+        <div className="h-3 rounded-full border" style={{ borderColor: MOCK_LINE, background: "transparent" }} />
+      </div>
+      {/* Type tag */}
+      <div className="absolute bottom-1.5 left-2.5 font-mono text-[7px] uppercase tracking-widest opacity-60">Links</div>
+    </MockShell>
+  );
+}
+
+function DeliveryMock(props: { rotate: string; ty: string; zIndex: number }) {
+  return (
+    <MockShell {...props}>
+      {/* Nav strip with title + count */}
+      <div className="flex items-center justify-between px-2.5 py-2 border-b" style={{ borderColor: MOCK_LINE }}>
+        <div className="h-1.5 w-10" style={{ background: MOCK_INK }} />
+        <div className="h-1 w-5" style={{ background: MOCK_DIM }} />
+      </div>
+      {/* Tightly packed gallery */}
+      <div className="grid grid-cols-3 gap-0.5 p-1.5">
+        {[0,1,2,3,4,5,6,7,8,9,10,11].map((i) => (
+          <div key={i} className="aspect-square relative" style={{ background: i === 3 ? "#9d927e" : "#cfc6b6" }}>
+            {i === 1 && (
+              <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 rounded-full" style={{ background: MOCK_INK }} />
+            )}
+          </div>
+        ))}
+      </div>
+      {/* Type tag */}
+      <div className="absolute bottom-1.5 left-2.5 font-mono text-[7px] uppercase tracking-widest opacity-60">Delivery</div>
+    </MockShell>
   );
 }
 
@@ -825,28 +910,11 @@ function TemplateBanner({ onDismiss, onBrowse }: { onDismiss: () => void; onBrow
           </div>
         </div>
 
-        {/* Page previews */}
+        {/* Coded mockups — minimized representations of each page type */}
         <div className="hidden md:flex gap-3 items-end shrink-0 pr-2">
-          {[
-            { seed: 10,  label: "Portfolio", rotate: "-6deg",  ty: "10px" },
-            { seed: 82,  label: "Links",     rotate: "0deg",   ty: "0px"  },
-            { seed: 93,  label: "Delivery",  rotate: "6deg",   ty: "10px" },
-          ].map((p, i) => (
-            <div key={p.label}
-              className="relative overflow-hidden rounded-xl shadow-2xl"
-              style={{
-                width: 100, height: 140,
-                transform: `rotate(${p.rotate}) translateY(${p.ty})`,
-                zIndex: i === 1 ? 3 : i === 0 ? 2 : 1,
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`https://picsum.photos/seed/${p.seed}/200/280`} alt="" className="w-full h-full object-cover" style={{ filter: "brightness(0.65)" }} />
-              <div className="absolute inset-x-0 bottom-0 px-2 py-1.5" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
-                <span className="font-mono text-[7px] uppercase tracking-widest text-white/75">{p.label}</span>
-              </div>
-            </div>
-          ))}
+          <PortfolioMock rotate="-6deg" ty="10px" zIndex={2} />
+          <LinksMock     rotate="0deg"  ty="0px"  zIndex={3} />
+          <DeliveryMock  rotate="6deg"  ty="10px" zIndex={1} />
         </div>
 
         {/* Close */}
@@ -861,6 +929,385 @@ function TemplateBanner({ onDismiss, onBrowse }: { onDismiss: () => void; onBrow
   );
 }
 
+
+/* ── "Create your own style" banner ─────────────────────────── */
+
+function StyleBanner({ onDismiss, onOpen }: { onDismiss: () => void; onOpen: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.3 }}
+      className="relative overflow-hidden rounded-xl mx-5 mt-3"
+      style={{
+        background: "linear-gradient(135deg, #fad502 0%, #f4c40c 100%)",
+      }}
+    >
+      {/* Diagonal stripes pattern */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.07]" style={{
+        backgroundImage: "repeating-linear-gradient(45deg, #111 0 1px, transparent 1px 14px)",
+      }} />
+
+      <div className="relative flex items-center gap-6 p-5">
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="font-mono text-[9px] font-bold uppercase tracking-widest bg-[#111] text-yellow px-2 py-0.5 rounded-sm">Wizard</span>
+            <span className="font-mono text-[9px] text-[#111]/55 uppercase tracking-wider">Custom brand</span>
+          </div>
+          <h2 className="font-sans font-black text-[#111] text-base leading-tight mb-1">
+            Create your own style.
+          </h2>
+          <p className="font-sans text-xs text-[#111]/60 leading-relaxed max-w-sm">
+            Pick fonts, colors, and a logo before you open the editor — save time and lock in your visual identity.
+          </p>
+          <div className="flex items-center gap-3 mt-4">
+            <button
+              onClick={onOpen}
+              className="flex items-center gap-2 bg-[#111] text-yellow font-sans text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#111]/90 transition-colors"
+            >
+              Open style wizard
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button onClick={onDismiss} className="font-sans text-xs text-[#111]/50 hover:text-[#111]/80 transition-colors">
+              Dismiss
+            </button>
+          </div>
+        </div>
+
+        {/* Decorative — typography Aa stack + color swatch row */}
+        <div className="hidden md:flex items-end gap-3 shrink-0 pr-2">
+          <div className="flex flex-col items-end gap-1.5">
+            <span style={{ fontFamily: "var(--font-serif, Georgia, serif)", fontSize: 36, fontWeight: 700, lineHeight: 1, color: "#111" }}>Aa</span>
+            <span style={{ fontFamily: "var(--font-sans, system-ui)", fontSize: 22, fontWeight: 500, lineHeight: 1, color: "#111", opacity: 0.65 }}>Aa</span>
+            <span style={{ fontFamily: "monospace", fontSize: 14, lineHeight: 1, color: "#111", opacity: 0.4 }}>Aa</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            {["#0d0d0d", "#e8382c", "#fad502", "#f0efe9"].map((c) => (
+              <div key={c} className="w-6 h-6 rounded-full border-2 border-[#111]/15" style={{ background: c }} />
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={onDismiss}
+          className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center text-[#111]/40 hover:text-[#111] hover:bg-[#111]/10 transition-colors"
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── Style wizard modal ─────────────────────────────────────── */
+
+const WIZARD_FONTS = [
+  { id: "cormorant",  label: "Cormorant Garamond", stack: "'Cormorant Garamond', Georgia, serif",       cat: "serif" },
+  { id: "dm-serif",   label: "DM Serif Display",   stack: "'DM Serif Display', Georgia, serif",         cat: "serif" },
+  { id: "playfair",   label: "Playfair Display",   stack: "'Playfair Display', Georgia, serif",         cat: "serif" },
+  { id: "dm-sans",    label: "DM Sans",            stack: "'DM Sans', system-ui, sans-serif",           cat: "sans"  },
+  { id: "space-grot", label: "Space Grotesk",      stack: "'Space Grotesk', system-ui, sans-serif",     cat: "sans"  },
+  { id: "inter",      label: "Inter",              stack: "'Inter', system-ui, sans-serif",             cat: "sans"  },
+  { id: "space-mono", label: "Space Mono",         stack: "'Space Mono', ui-monospace, monospace",      cat: "mono"  },
+  { id: "jetbrains",  label: "JetBrains Mono",     stack: "'JetBrains Mono', ui-monospace, monospace",  cat: "mono"  },
+];
+
+const WIZARD_PALETTES = [
+  { id: "bw",       label: "Black & White",  bg: "#fafafa", fg: "#0a0a0a", accent: "#facc15", muted: "#888888" },
+  { id: "noir",     label: "Noir",            bg: "#0a0a0a", fg: "#f5f5f5", accent: "#e8382c", muted: "#666666" },
+  { id: "warm",     label: "Warm Cream",      bg: "#faf8f5", fg: "#2a2520", accent: "#c9a89a", muted: "#9a9088" },
+  { id: "petal",    label: "Petal Pastel",    bg: "#f0ebe3", fg: "#18181b", accent: "#d9544a", muted: "#71717a" },
+  { id: "brooklyn", label: "Brooklyn Red",    bg: "#0d0d0d", fg: "#f0efe9", accent: "#e8382c", muted: "#7a7a7a" },
+  { id: "slate",    label: "Cool Slate",      bg: "#f0f4f8", fg: "#1e293b", accent: "#334155", muted: "#64748b" },
+];
+
+type WizardState = {
+  brandName:  string;
+  logoMode:   "text" | "image" | "both";
+  primary:    typeof WIZARD_FONTS[number];
+  secondary:  typeof WIZARD_FONTS[number];
+  mono:       typeof WIZARD_FONTS[number];
+  palette:    typeof WIZARD_PALETTES[number];
+};
+
+function StyleWizardModal({ onClose }: { onClose: () => void }) {
+  const [state, setState] = useState<WizardState>({
+    brandName: "Sofia Chen",
+    logoMode:  "text",
+    primary:   WIZARD_FONTS[0]!,
+    secondary: WIZARD_FONTS[3]!,
+    mono:      WIZARD_FONTS[6]!,
+    palette:   WIZARD_PALETTES[0]!,
+  });
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", fn);
+    return () => document.removeEventListener("keydown", fn);
+  }, [onClose]);
+
+  function patch<K extends keyof WizardState>(key: K, value: WizardState[K]) {
+    setState((s) => ({ ...s, [key]: value }));
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.96, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 20 }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        className="relative bg-[var(--bg-card)] border border-[var(--border)] rounded-xl w-full max-w-5xl max-h-[88dvh] flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
+          <div>
+            <h2 className="font-sans font-black text-[var(--fg)] text-base leading-none">Style wizard</h2>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] mt-1">Pick brand, fonts, colors</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        {/* Body — split */}
+        <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+
+          {/* Left — form */}
+          <div className="overflow-y-auto p-6 flex flex-col gap-6 border-b md:border-b-0 md:border-r border-[var(--border)]">
+            {/* Brand name */}
+            <Field label="Brand name">
+              <input
+                value={state.brandName}
+                onChange={(e) => patch("brandName", e.target.value)}
+                className="w-full px-3 py-2 rounded-lg bg-[var(--bg)] border border-[var(--border)] text-[var(--fg)] text-sm font-sans focus:border-yellow focus:outline-none transition-colors"
+                placeholder="Your name or studio"
+              />
+            </Field>
+
+            {/* Logo mode */}
+            <Field label="Logo">
+              <div className="grid grid-cols-3 gap-1 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg p-1">
+                {(["text", "image", "both"] as const).map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => patch("logoMode", m)}
+                    className={`py-2 rounded-md font-sans text-xs font-medium transition-colors capitalize ${
+                      state.logoMode === m ? "bg-[var(--bg-card)] text-[var(--fg)] shadow-sm" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"
+                    }`}
+                  >
+                    {m === "both" ? "Image + text" : m}
+                  </button>
+                ))}
+              </div>
+            </Field>
+
+            {/* Primary font (headings) */}
+            <FontSelect
+              label="Primary font · Headings"
+              value={state.primary}
+              onChange={(f) => patch("primary", f)}
+            />
+
+            {/* Secondary (body) */}
+            <FontSelect
+              label="Secondary font · Body"
+              value={state.secondary}
+              onChange={(f) => patch("secondary", f)}
+            />
+
+            {/* Mono (labels) */}
+            <FontSelect
+              label="Tertiary font · Labels"
+              value={state.mono}
+              onChange={(f) => patch("mono", f)}
+              filterCat="mono"
+            />
+
+            {/* Palette */}
+            <Field label="Color palette">
+              <div className="grid grid-cols-2 gap-2">
+                {WIZARD_PALETTES.map((p) => {
+                  const active = state.palette.id === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => patch("palette", p)}
+                      className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
+                        active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"
+                      }`}
+                    >
+                      <div className="flex gap-0.5 rounded overflow-hidden">
+                        {[p.bg, p.fg, p.accent, p.muted].map((c) => (
+                          <div key={c} className="w-3 h-6" style={{ background: c }} />
+                        ))}
+                      </div>
+                      <span className="font-sans text-[11px] font-medium text-[var(--fg)] truncate flex-1 text-left">{p.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </Field>
+          </div>
+
+          {/* Right — wireframe preview */}
+          <div className="overflow-y-auto p-6 bg-[var(--bg-subtle)] flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)]">Live wireframe</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] opacity-60">Preview</span>
+            </div>
+
+            <WireframePreview state={state} />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-[var(--border)] shrink-0">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] hidden sm:block">Settings will pre-fill the editor</p>
+          <div className="flex gap-2 ml-auto">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => { /* TODO: persist wizard state */ alert("Style saved — open the editor to apply."); onClose(); }}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 transition-colors"
+            >
+              Apply to editor
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ── Wizard helper components ───────────────────────────────── */
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)]">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function FontSelect({ label, value, onChange, filterCat }: {
+  label: string;
+  value: typeof WIZARD_FONTS[number];
+  onChange: (f: typeof WIZARD_FONTS[number]) => void;
+  filterCat?: "serif" | "sans" | "mono";
+}) {
+  const opts = filterCat ? WIZARD_FONTS.filter((f) => f.cat === filterCat) : WIZARD_FONTS;
+  return (
+    <Field label={label}>
+      {/* Preview */}
+      <div className="px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)]" style={{ fontFamily: value.stack }}>
+        <span className="text-2xl text-[var(--fg)] font-medium">Aa Bb 123</span>
+      </div>
+      {/* Options grid */}
+      <div className="grid grid-cols-2 gap-1.5">
+        {opts.map((f) => {
+          const active = f.id === value.id;
+          return (
+            <button
+              key={f.id}
+              onClick={() => onChange(f)}
+              className={`px-3 py-2 rounded-lg border text-left transition-all ${
+                active ? "border-yellow ring-2 ring-yellow/30 bg-[var(--bg)]" : "border-[var(--border)] hover:border-[var(--fg-muted)]"
+              }`}
+            >
+              <div style={{ fontFamily: f.stack, fontSize: 14, color: "var(--fg)", lineHeight: 1 }}>Ag</div>
+              <div className="font-mono text-[8px] uppercase tracking-wider text-[var(--fg-muted)] mt-1 truncate">{f.label}</div>
+            </button>
+          );
+        })}
+      </div>
+    </Field>
+  );
+}
+
+function WireframePreview({ state }: { state: WizardState }) {
+  const { brandName, logoMode, primary, secondary, mono, palette } = state;
+
+  return (
+    <div
+      className="relative overflow-hidden rounded-lg border border-[var(--border)] aspect-[3/4] flex flex-col"
+      style={{ background: palette.bg, color: palette.fg, fontFamily: secondary.stack }}
+    >
+      {/* Nav */}
+      <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: palette.fg + "15" }}>
+        <div className="flex items-center gap-2">
+          {(logoMode === "image" || logoMode === "both") && (
+            <div className="w-4 h-4 rounded" style={{ background: palette.accent }} />
+          )}
+          {(logoMode === "text" || logoMode === "both") && (
+            <span style={{ fontFamily: primary.stack, fontWeight: 700, fontSize: 13, letterSpacing: "-0.02em" }}>
+              {brandName || "Brand"}
+            </span>
+          )}
+        </div>
+        <div className="flex gap-3">
+          {["work", "about", "contact"].map((l) => (
+            <span key={l} style={{ fontFamily: mono.stack, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.55 }}>
+              {l}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Hero */}
+      <div className="px-4 pt-6 pb-4 flex-1 flex flex-col gap-3">
+        <span style={{ fontFamily: mono.stack, fontSize: 8, letterSpacing: "0.24em", textTransform: "uppercase", color: palette.accent }}>
+          Photographer · Visual artist
+        </span>
+        <h1 style={{ fontFamily: primary.stack, fontSize: 28, fontWeight: 400, lineHeight: 1, letterSpacing: "-0.02em", margin: 0 }}>
+          Light, framed.
+        </h1>
+        <p style={{ fontFamily: secondary.stack, fontSize: 11, fontWeight: 300, lineHeight: 1.55, opacity: 0.7, margin: 0 }}>
+          Documentary, editorial, and portrait photography across cities, climates, and quiet evenings.
+        </p>
+
+        {/* CTA */}
+        <div className="flex gap-2 mt-1">
+          <span style={{
+            fontFamily: mono.stack, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
+            background: palette.accent, color: palette.bg, padding: "5px 12px",
+          }}>View work</span>
+          <span style={{
+            fontFamily: mono.stack, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
+            border: `1px solid ${palette.fg}50`, color: palette.fg, padding: "5px 12px", opacity: 0.85,
+          }}>About</span>
+        </div>
+
+        {/* Photo grid placeholder */}
+        <div className="grid grid-cols-3 gap-1 mt-2">
+          {[0,1,2,3,4,5].map((i) => (
+            <div key={i} className="aspect-[3/4] rounded-sm" style={{ background: palette.muted, opacity: 0.65 }} />
+          ))}
+        </div>
+      </div>
+
+      {/* Footer strip */}
+      <div className="px-4 py-3 flex items-center justify-between border-t" style={{ borderColor: palette.fg + "12" }}>
+        <span style={{ fontFamily: primary.stack, fontStyle: "italic", fontWeight: 400, fontSize: 11, opacity: 0.7 }}>
+          {brandName || "Brand"}
+        </span>
+        <span style={{ fontFamily: mono.stack, fontSize: 7, letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.4 }}>
+          © 2025
+        </span>
+      </div>
+    </div>
+  );
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    SHARED ICONS
@@ -1138,7 +1585,9 @@ const PRODUCT_TABS: { id: ProductType; label: string; count: number; icon: React
 export default function TemplatesPage() {
   const [productType,     setProductType]     = useState<ProductType>("portfolio");
   const [portfolioFilter, setPortfolioFilter] = useState<PortfolioCategory>("All");
-  const [bannerVisible,   setBannerVisible]   = useState(true);
+  const [bannerVisible,    setBannerVisible]    = useState(true);
+  const [styleBannerVisible, setStyleBannerVisible] = useState(true);
+  const [wizardOpen,       setWizardOpen]       = useState(false);
 
   const filteredPortfolio = portfolioFilter === "All"
     ? PORTFOLIO_TEMPLATES
@@ -1209,14 +1658,27 @@ export default function TemplatesPage() {
         </AnimatePresence>
       </div>
 
-      {/* Banner */}
+      {/* Banners */}
       <AnimatePresence>
         {bannerVisible && (
           <TemplateBanner
+            key="banner-collections"
             onDismiss={() => setBannerVisible(false)}
             onBrowse={() => { setBannerVisible(false); setProductType("collections"); }}
           />
         )}
+        {styleBannerVisible && (
+          <StyleBanner
+            key="banner-style"
+            onDismiss={() => setStyleBannerVisible(false)}
+            onOpen={() => setWizardOpen(true)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Style wizard modal */}
+      <AnimatePresence>
+        {wizardOpen && <StyleWizardModal onClose={() => setWizardOpen(false)} />}
       </AnimatePresence>
 
       {/* Content */}
