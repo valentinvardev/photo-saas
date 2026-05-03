@@ -384,10 +384,9 @@ function AddCollectionToCart({ collection }: { collection: TemplateCollection })
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center gap-1.5 w-full py-2.5 font-mono text-[9px] uppercase tracking-wider border transition-all"
-        style={{ borderColor: collection.accentColor, color: collection.accentColor }}
+        className="flex items-center justify-center gap-1.5 w-full py-2 font-mono text-[9px] text-yellow hover:text-[var(--fg)] transition-colors uppercase tracking-wider"
       >
-        In cart — view →
+        <CheckIcon /> In cart — view →
       </button>
     );
   }
@@ -395,10 +394,7 @@ function AddCollectionToCart({ collection }: { collection: TemplateCollection })
   return (
     <button
       onClick={() => addItem({ type: "template", name: collection.name, detail: "Collection · Free", price: 0, period: "one-time" })}
-      className="flex items-center justify-center gap-1.5 w-full py-2.5 font-mono text-[9px] uppercase tracking-wider transition-all font-bold"
-      style={{ background: collection.accentColor, color: collection.accentText }}
-      onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.85"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
+      className="flex items-center justify-center gap-1.5 w-full py-2 font-mono text-[9px] text-yellow hover:text-[var(--fg)] transition-colors uppercase tracking-wider"
     >
       Use this collection →
     </button>
@@ -679,9 +675,8 @@ const PRODUCT_TABS: { id: ProductType; label: string; count: number; icon: React
 ];
 
 export default function TemplatesPage() {
-  const [productType,     setProductType]     = useState<ProductType>("collections");
+  const [productType,     setProductType]     = useState<ProductType>("portfolio");
   const [portfolioFilter, setPortfolioFilter] = useState<PortfolioCategory>("All");
-  const [bannerOpen,      setBannerOpen]      = useState(true);
 
   const filteredPortfolio = portfolioFilter === "All"
     ? PORTFOLIO_TEMPLATES
@@ -689,37 +684,6 @@ export default function TemplatesPage() {
 
   return (
     <div className="min-h-full">
-
-      {/* ── Closeable CTA banner ── */}
-      <AnimatePresence>
-        {bannerOpen && (
-          <motion.div
-            initial={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="overflow-hidden"
-          >
-            <div className="flex items-center gap-3 px-5 py-3 bg-yellow/10 border-b border-yellow/20">
-              <div className="w-1.5 h-1.5 rounded-full bg-yellow flex-shrink-0 animate-pulse" />
-              <p className="font-sans text-xs text-[var(--fg)] flex-1">
-                <span className="font-bold">Pick a collection</span> and build your portfolio, link page, and client gallery — all with a consistent look.{" "}
-                <button
-                  onClick={() => setProductType("collections")}
-                  className="text-yellow font-mono text-[10px] uppercase tracking-wider hover:text-[var(--fg)] transition-colors"
-                >
-                  Browse collections →
-                </button>
-              </p>
-              <button
-                onClick={() => setBannerOpen(false)}
-                className="flex-shrink-0 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors p-1"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[var(--bg)] border-b border-[var(--border)] px-5 pt-4 pb-0">

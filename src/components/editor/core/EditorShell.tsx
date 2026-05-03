@@ -43,7 +43,7 @@ function EditorShellInner({ templateId }: { templateId?: TemplateId }) {
     <div
       style={{
         display: "flex", flexDirection: "column", height: "100dvh",
-        background: "var(--ec-bg)",
+        background: "#0a0a0a",
         ...THEME_VARS[theme],
       }}
     >
