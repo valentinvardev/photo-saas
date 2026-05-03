@@ -328,8 +328,8 @@ function useIsMobile() {
 /* ── Use-stage button ───────────────────────────────────────── */
 type UseStage = "idle" | "checking" | "active";
 
-function UseStageButton({ stage, onUse, accentColor, accentText }: {
-  stage: UseStage; onUse: () => void; accentColor: string; accentText: string;
+function UseStageButton({ stage, onUse }: {
+  stage: UseStage; onUse: () => void;
 }) {
   return (
     <div style={{ position: "relative", height: 34, width: 160 }}>
@@ -339,8 +339,7 @@ function UseStageButton({ stage, onUse, accentColor, accentText }: {
             initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.2 }}
             onClick={onUse}
-            className="absolute inset-0 flex items-center justify-center gap-2 font-sans text-xs font-bold rounded-lg transition-opacity hover:opacity-85"
-            style={{ background: accentColor, color: accentText }}
+            className="absolute inset-0 flex items-center justify-center gap-2 font-sans text-xs font-bold rounded-lg bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
           >
             Use collection
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -364,7 +363,7 @@ function UseStageButton({ stage, onUse, accentColor, accentText }: {
           <motion.button key="edit"
             initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 flex items-center justify-center gap-2 font-sans text-xs font-bold rounded-lg bg-[var(--fg)] text-[var(--bg)] transition-opacity hover:opacity-85"
+            className="absolute inset-0 flex items-center justify-center gap-2 font-sans text-xs font-bold rounded-lg bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Start building
@@ -375,8 +374,159 @@ function UseStageButton({ stage, onUse, accentColor, accentText }: {
   );
 }
 
+/* ── Collection preview modal (device + page selector) ─────── */
+
+type Device = "mobile" | "tablet" | "desktop";
+type PageType = "portfolio" | "links" | "delivery";
+
+const DEVICE_DIMS: Record<Device, { w: number; h: number; label: string }> = {
+  mobile:  { w: 390,  h: 780,  label: "375px"  },
+  tablet:  { w: 820,  h: 1100, label: "768px"  },
+  desktop: { w: 1280, h: 800,  label: "1280px" },
+};
+
+function DeviceIcon({ d }: { d: Device }) {
+  if (d === "mobile") return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>;
+  if (d === "tablet") return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>;
+  return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>;
+}
+
+function CollectionPreviewModal({ c, initialPage = "portfolio", onClose }: {
+  c: TemplateCollection; initialPage?: PageType; onClose: () => void;
+}) {
+  const [device, setDevice] = useState<Device>("desktop");
+  const [page, setPage]     = useState<PageType>(initialPage);
+  const [loading, setLoading] = useState(true);
+
+  const currentPage = c.pages.find((p) => p.type === page);
+  const url         = currentPage?.href ?? null;
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", fn);
+    return () => document.removeEventListener("keydown", fn);
+  }, [onClose]);
+
+  useEffect(() => { setLoading(true); }, [url, device]);
+
+  const dims = DEVICE_DIMS[device];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex flex-col bg-[#0a0a0a]/95 backdrop-blur-md"
+      onClick={onClose}
+    >
+      {/* Toolbar */}
+      <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10 flex-wrap">
+        {/* Left: collection name + close */}
+        <div className="flex items-center gap-3 min-w-0">
+          <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-sm" style={{ background: c.accentColor }} />
+            <span className="font-sans font-black text-white text-sm">{c.name}</span>
+            <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">Preview</span>
+          </div>
+        </div>
+
+        {/* Center: page selector */}
+        <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
+          {(["portfolio", "links", "delivery"] as const).map((p) => {
+            const pageData = c.pages.find((x) => x.type === p);
+            const available = !!pageData?.href;
+            const active = page === p;
+            return (
+              <button
+                key={p}
+                onClick={() => available && setPage(p)}
+                disabled={!available}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-sans text-xs font-medium transition-colors ${
+                  active ? "bg-white text-[#111]" : available ? "text-white/60 hover:text-white" : "text-white/20 cursor-not-allowed"
+                }`}
+              >
+                {!available && <LockIcon />}
+                {p === "portfolio" ? "Portfolio" : p === "links" ? "Links" : "Delivery"}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right: device selector */}
+        <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
+          {(["mobile", "tablet", "desktop"] as Device[]).map((d) => {
+            const active = device === d;
+            return (
+              <button
+                key={d}
+                onClick={() => setDevice(d)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-sans text-xs font-medium transition-colors ${
+                  active ? "bg-white text-[#111]" : "text-white/60 hover:text-white"
+                }`}
+                title={DEVICE_DIMS[d].label}
+              >
+                <DeviceIcon d={d} />
+                <span className="hidden sm:inline capitalize">{d}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Preview viewport */}
+      <div onClick={(e) => e.stopPropagation()} className="flex-1 min-h-0 flex items-center justify-center p-6 overflow-auto">
+        {url ? (
+          <motion.div
+            key={`${device}-${page}`}
+            initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.25 }}
+            className="relative bg-white shadow-2xl"
+            style={{
+              width: dims.w, height: dims.h,
+              borderRadius: device === "mobile" ? 28 : device === "tablet" ? 16 : 8,
+              overflow: "hidden",
+              maxWidth: "100%", maxHeight: "100%",
+              transform: `scale(min(1, calc((100vw - 80px) / ${dims.w}), calc((100vh - 160px) / ${dims.h})))`,
+              transformOrigin: "center center",
+            }}
+          >
+            {loading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-[var(--bg-subtle)] z-10">
+                <div className="w-6 h-6 rounded-full border-2 border-[var(--border)] border-t-yellow animate-spin" />
+              </div>
+            )}
+            <iframe
+              src={url}
+              className="w-full h-full border-0"
+              onLoad={() => setLoading(false)}
+              title={`${c.name} ${page} preview`}
+            />
+          </motion.div>
+        ) : (
+          <div className="flex flex-col items-center gap-3 text-white/40">
+            <LockIcon />
+            <p className="font-sans text-sm">This page isn't available yet for this collection.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Footer status */}
+      <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center justify-between px-4 py-2 border-t border-white/10">
+        <span className="font-mono text-[10px] text-white/30 uppercase tracking-wider">{dims.label} · {device}</span>
+        {url && (
+          <a href={url} target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] text-white/40 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1.5">
+            Open in new tab <ArrowIcon />
+          </a>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 /* ── Collection mobile modal ────────────────────────────────── */
-function CollectionModal({ c, onClose }: { c: TemplateCollection; onClose: () => void }) {
+function CollectionModal({ c, onClose, onPreview }: { c: TemplateCollection; onClose: () => void; onPreview: (p: PageType) => void }) {
   const PAGE_LABELS: Record<string, string> = { portfolio: "Portfolio", links: "Links", delivery: "Delivery" };
   const { addItem, hasItem } = useCart();
   const [stage, setStage] = useState<UseStage>(hasItem(c.name) ? "active" : "idle");
@@ -443,7 +593,7 @@ function CollectionModal({ c, onClose }: { c: TemplateCollection; onClose: () =>
                   <span className="font-sans text-sm font-medium text-[var(--fg)]">{PAGE_LABELS[page.type]}</span>
                 </div>
                 {page.href
-                  ? <Link href={page.href} target="_blank" className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors uppercase tracking-wide">Preview <ArrowIcon /></Link>
+                  ? <button onClick={() => onPreview(page.type as PageType)} className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors uppercase tracking-wide">Preview <ArrowIcon /></button>
                   : <span className="font-mono text-[9px] text-[var(--fg-muted)] opacity-40">Soon</span>
                 }
               </div>
@@ -451,7 +601,7 @@ function CollectionModal({ c, onClose }: { c: TemplateCollection; onClose: () =>
           </div>
 
           {/* CTA */}
-          <UseStageButton stage={stage} onUse={handleUse} accentColor={c.accentColor} accentText={c.accentText} />
+          <UseStageButton stage={stage} onUse={handleUse} />
         </div>
       </motion.div>
     </div>
@@ -464,6 +614,7 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
   const PAGE_LABELS: Record<string, string> = { portfolio: "Portfolio", links: "Links", delivery: "Delivery" };
   const [hovered, setHovered] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState<PageType | null>(null);
   const isMobile = useIsMobile();
   const { addItem, hasItem } = useCart();
   const [stage, setStage] = useState<UseStage>(hasItem(c.name) ? "active" : "idle");
@@ -507,7 +658,8 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
         </motion.div>
 
         <AnimatePresence>
-          {modalOpen && <CollectionModal c={c} onClose={() => setModalOpen(false)} />}
+          {modalOpen && <CollectionModal c={c} onClose={() => setModalOpen(false)} onPreview={(p) => { setModalOpen(false); setPreviewOpen(p); }} />}
+          {previewOpen && <CollectionPreviewModal c={c} initialPage={previewOpen} onClose={() => setPreviewOpen(null)} />}
         </AnimatePresence>
       </>
     );
@@ -548,14 +700,13 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
             <div className="flex gap-2 flex-wrap">
               {c.pages.map((page) => (
                 page.href ? (
-                  <Link key={page.type} href={page.href} target="_blank"
+                  <button key={page.type} onClick={() => setPreviewOpen(page.type as PageType)}
                     className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-3 py-1.5 rounded-lg border transition-colors hover:brightness-105"
                     style={{ background: c.accentColor + "18", borderColor: c.accentColor + "40", color: c.accentColor }}
                   >
                     <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
                     {PAGE_LABELS[page.type]}
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                  </Link>
+                  </button>
                 ) : (
                   <span key={page.type}
                     className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-3 py-1.5 rounded-lg border"
@@ -569,14 +720,15 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
 
             {/* Action buttons */}
             <div className="flex items-center gap-3">
-              <UseStageButton stage={stage} onUse={handleUse} accentColor={c.accentColor} accentText={c.accentText} />
+              <UseStageButton stage={stage} onUse={handleUse} />
               {c.pages[0]?.href && (
-                <Link href={c.pages[0].href} target="_blank"
+                <button
+                  onClick={() => setPreviewOpen("portfolio")}
                   className="flex items-center gap-1.5 px-4 h-[34px] font-sans text-xs font-medium rounded-lg border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
                 >
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   Preview
-                </Link>
+                </button>
               )}
             </div>
           </div>
@@ -620,7 +772,8 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
       </motion.div>
 
       <AnimatePresence>
-        {modalOpen && <CollectionModal c={c} onClose={() => setModalOpen(false)} />}
+        {modalOpen && <CollectionModal c={c} onClose={() => setModalOpen(false)} onPreview={(p) => { setModalOpen(false); setPreviewOpen(p); }} />}
+        {previewOpen && <CollectionPreviewModal c={c} initialPage={previewOpen} onClose={() => setPreviewOpen(null)} />}
       </AnimatePresence>
     </>
   );
