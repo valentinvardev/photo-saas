@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "~/lib/cart";
@@ -312,115 +312,317 @@ const COLLECTIONS: TemplateCollection[] = [
   },
 ];
 
-function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) {
-  const PAGE_LABELS: Record<string, string> = { portfolio: "Portfolio", links: "Links page", delivery: "Delivery" };
-  const [hovered, setHovered] = useState(false);
+/* ── Mobile detection ───────────────────────────────────────── */
+function useIsMobile() {
+  const [is, setIs] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    setIs(mq.matches);
+    const h = (e: MediaQueryListEvent) => setIs(e.matches);
+    mq.addEventListener("change", h);
+    return () => mq.removeEventListener("change", h);
+  }, []);
+  return is;
+}
+
+/* ── Use-stage button ───────────────────────────────────────── */
+type UseStage = "idle" | "checking" | "active";
+
+function UseStageButton({ stage, onUse, accentColor, accentText }: {
+  stage: UseStage; onUse: () => void; accentColor: string; accentText: string;
+}) {
+  return (
+    <div style={{ position: "relative", height: 34, width: 160 }}>
+      <AnimatePresence mode="wait">
+        {stage === "idle" && (
+          <motion.button key="use"
+            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2 }}
+            onClick={onUse}
+            className="absolute inset-0 flex items-center justify-center gap-2 font-sans text-xs font-bold rounded-lg transition-opacity hover:opacity-85"
+            style={{ background: accentColor, color: accentText }}
+          >
+            Use collection
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </motion.button>
+        )}
+        {stage === "checking" && (
+          <motion.div key="check"
+            initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.7 }}
+            className="absolute inset-0 flex items-center justify-center rounded-lg"
+            style={{ background: "#16a34a" }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <motion.path d="M20 6L9 17l-5-5"
+                initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+              />
+            </svg>
+          </motion.div>
+        )}
+        {stage === "active" && (
+          <motion.button key="edit"
+            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center gap-2 font-sans text-xs font-bold rounded-lg bg-[var(--fg)] text-[var(--bg)] transition-opacity hover:opacity-85"
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Start building
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ── Collection mobile modal ────────────────────────────────── */
+function CollectionModal({ c, onClose }: { c: TemplateCollection; onClose: () => void }) {
+  const PAGE_LABELS: Record<string, string> = { portfolio: "Portfolio", links: "Links", delivery: "Delivery" };
+  const { addItem, hasItem } = useCart();
+  const [stage, setStage] = useState<UseStage>(hasItem(c.name) ? "active" : "idle");
+
+  function handleUse() {
+    if (stage !== "idle") return;
+    setStage("checking");
+    if (!hasItem(c.name)) addItem({ type: "template", name: c.name, detail: "Collection · Free", price: 0, period: "one-time" });
+    setTimeout(() => setStage("active"), 1300);
+  }
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", fn);
+    return () => document.removeEventListener("keydown", fn);
+  }, [onClose]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.1 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="group relative overflow-hidden border border-[var(--border)] bg-[var(--bg-card)]"
-      style={{
-        transition: "box-shadow 0.25s",
-        boxShadow: hovered ? "0 8px 32px rgba(0,0,0,0.12)" : "none",
-      }}
-    >
-      {/* Accent bar */}
-      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: c.accentColor }} />
-
-      <div className="flex gap-0 pl-4">
-        {/* ── Left: info ── */}
-        <div className="flex-1 min-w-0 py-6 pr-6 flex flex-col gap-4 justify-between">
-          {/* Number + name */}
-          <div className="flex items-baseline gap-3">
-            <span className="font-mono text-4xl font-bold leading-none select-none"
-              style={{ color: c.accentColor + "30" }}>
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <div>
-              <h3 className="font-sans font-black text-[var(--fg)] text-xl leading-none tracking-tight">{c.name}</h3>
-              <span className="font-mono text-[9px] uppercase tracking-widest"
-                style={{ color: c.accentColor }}>Collection</span>
-            </div>
-          </div>
-
-          <p className="font-sans text-xs text-[var(--fg-muted)] leading-relaxed max-w-xs">{c.description}</p>
-
-          {/* Page availability */}
-          <div className="flex gap-2 flex-wrap">
-            {c.pages.map((page) => (
-              <span key={page.type}
-                className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-2.5 py-1 rounded-full border"
-                style={page.href
-                  ? { background: c.accentColor + "18", borderColor: c.accentColor + "50", color: c.accentColor }
-                  : { borderColor: "var(--border)", color: "var(--fg-muted)", opacity: 0.5 }
-                }
-              >
-                {page.href
-                  ? <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-                  : <LockIcon />
-                }
-                {PAGE_LABELS[page.type]}
-              </span>
-            ))}
-          </div>
-
-          {/* CTA row */}
-          <div className="flex items-center gap-3 pt-1">
-            <AddCollectionToCart collection={c} />
-            <div className="flex gap-2">
-              {c.pages.filter(p => p.href).map((page) => (
-                <Link key={page.type} href={page.href!} target="_blank"
-                  className="font-mono text-[9px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors uppercase tracking-wide">
-                  {PAGE_LABELS[page.type]} ↗
-                </Link>
-              ))}
-            </div>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
+      <motion.div
+        initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        className="w-full max-h-[85dvh] overflow-y-auto rounded-t-2xl bg-[var(--bg-card)] border-t border-[var(--border)] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-2 shrink-0">
+          <div className="w-10 h-1 rounded-full bg-[var(--border)]" />
         </div>
 
-        {/* ── Right: page previews ── */}
-        <div className="w-64 shrink-0 flex gap-1 items-stretch py-4 pr-4">
-          {c.pages.map((page, pi) => (
-            <div key={page.type}
-              className="relative flex-1 overflow-hidden rounded-lg"
-              style={{
-                background: "var(--bg-subtle)",
-                transform: hovered
-                  ? pi === 0 ? "rotate(-2deg) translateY(-2px)" : pi === 2 ? "rotate(2deg) translateY(-2px)" : "translateY(-4px)"
-                  : "none",
-                transition: "transform 0.3s cubic-bezier(0.2,0.8,0.2,1)",
-                transitionDelay: `${pi * 30}ms`,
-                zIndex: pi === 1 ? 2 : 1,
-                boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
-              }}
-            >
+        {/* Preview images */}
+        <div className="flex gap-2 px-4 py-3 overflow-x-auto">
+          {c.pages.map((page) => (
+            <div key={page.type} className="relative flex-none rounded-xl overflow-hidden" style={{ width: 120, height: 160 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`https://picsum.photos/seed/${page.seed}/200/300`}
-                alt={PAGE_LABELS[page.type]}
-                className="w-full h-full object-cover"
-                style={{ filter: page.href ? "none" : "grayscale(1) opacity(0.4)" }}
-              />
-              {/* Page label */}
-              <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5"
-                style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)" }}>
-                <span className="font-mono text-[7px] uppercase tracking-widest text-white/80">
-                  {page.type}
-                </span>
+              <img src={`https://picsum.photos/seed/${page.seed}/240/320`} alt="" className="w-full h-full object-cover" style={{ filter: page.href ? "none" : "grayscale(1) opacity(0.4)" }} />
+              <div className="absolute inset-x-0 bottom-0 px-2 py-1.5" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)" }}>
+                <span className="font-mono text-[8px] uppercase tracking-widest text-white/80">{page.type}</span>
               </div>
-              {!page.href && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-mono text-[8px] text-white/50 bg-black/30 px-2 py-1 rounded-full">Soon</span>
-                </div>
-              )}
             </div>
           ))}
         </div>
-      </div>
-    </motion.div>
+
+        {/* Info */}
+        <div className="px-5 pb-8 flex flex-col gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ background: c.accentColor }} />
+              <h3 className="font-sans font-black text-[var(--fg)] text-lg">{c.name}</h3>
+              <span className="font-mono text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: c.accentColor + "22", color: c.accentColor }}>Collection</span>
+            </div>
+            <p className="font-sans text-sm text-[var(--fg-muted)] leading-relaxed">{c.description}</p>
+          </div>
+
+          {/* Pages */}
+          <div className="flex flex-col gap-2">
+            {c.pages.map((page) => (
+              <div key={page.type} className="flex items-center justify-between p-3 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]">
+                <div className="flex items-center gap-2">
+                  {page.href
+                    ? <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: c.accentColor + "20" }}><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={c.accentColor} strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+                    : <div className="w-5 h-5 rounded-md flex items-center justify-center bg-[var(--bg-card)]"><LockIcon /></div>
+                  }
+                  <span className="font-sans text-sm font-medium text-[var(--fg)]">{PAGE_LABELS[page.type]}</span>
+                </div>
+                {page.href
+                  ? <Link href={page.href} target="_blank" className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors uppercase tracking-wide">Preview <ArrowIcon /></Link>
+                  : <span className="font-mono text-[9px] text-[var(--fg-muted)] opacity-40">Soon</span>
+                }
+              </div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <UseStageButton stage={stage} onUse={handleUse} accentColor={c.accentColor} accentText={c.accentText} />
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ── Collection card ─────────────────────────────────────────── */
+
+function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) {
+  const PAGE_LABELS: Record<string, string> = { portfolio: "Portfolio", links: "Links", delivery: "Delivery" };
+  const [hovered, setHovered] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const { addItem, hasItem } = useCart();
+  const [stage, setStage] = useState<UseStage>(hasItem(c.name) ? "active" : "idle");
+
+  function handleUse() {
+    if (stage !== "idle") return;
+    setStage("checking");
+    if (!hasItem(c.name)) addItem({ type: "template", name: c.name, detail: "Collection · Free", price: 0, period: "one-time" });
+    setTimeout(() => setStage("active"), 1300);
+  }
+
+  /* On mobile — simplified tap card that opens a modal */
+  if (isMobile) {
+    return (
+      <>
+        <motion.div
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.08 }}
+          onClick={() => setModalOpen(true)}
+          className="relative overflow-hidden border border-[var(--border)] bg-[var(--bg-card)] flex items-center gap-3 p-4 active:bg-[var(--bg-subtle)] transition-colors cursor-pointer"
+        >
+          <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: c.accentColor }} />
+          <div className="pl-2 flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-2xl font-bold leading-none select-none" style={{ color: c.accentColor + "40" }}>{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <h3 className="font-sans font-black text-[var(--fg)] text-base leading-none">{c.name}</h3>
+                <span className="font-mono text-[9px] uppercase tracking-wider" style={{ color: c.accentColor }}>Collection</span>
+              </div>
+            </div>
+          </div>
+          {/* Mini previews */}
+          <div className="flex gap-1 shrink-0">
+            {c.pages.map((page) => (
+              <div key={page.type} className="relative overflow-hidden rounded-md" style={{ width: 40, height: 54 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={`https://picsum.photos/seed/${page.seed}/80/108`} alt="" className="w-full h-full object-cover" style={{ filter: page.href ? "brightness(0.85)" : "grayscale(1) opacity(0.3)" }} />
+              </div>
+            ))}
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-[var(--fg-muted)]"><path d="M9 18l6-6-6-6"/></svg>
+        </motion.div>
+
+        <AnimatePresence>
+          {modalOpen && <CollectionModal c={c} onClose={() => setModalOpen(false)} />}
+        </AnimatePresence>
+      </>
+    );
+  }
+
+  /* Desktop — full horizontal card */
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.1 }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="group relative overflow-hidden border border-[var(--border)] bg-[var(--bg-card)]"
+        style={{
+          transition: "box-shadow 0.25s",
+          boxShadow: hovered ? "0 8px 32px rgba(0,0,0,0.1)" : "none",
+        }}
+      >
+        {/* Accent bar */}
+        <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: c.accentColor }} />
+
+        <div className="flex pl-4">
+          {/* ── Left: info ── */}
+          <div className="flex-1 min-w-0 py-6 pr-8 flex flex-col gap-4 justify-between">
+            <div className="flex items-baseline gap-3">
+              <span className="font-mono text-5xl font-bold leading-none select-none" style={{ color: c.accentColor + "28" }}>
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <h3 className="font-sans font-black text-[var(--fg)] text-2xl leading-none tracking-tight">{c.name}</h3>
+                <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: c.accentColor }}>Collection</span>
+              </div>
+            </div>
+
+            <p className="font-sans text-xs text-[var(--fg-muted)] leading-relaxed max-w-sm">{c.description}</p>
+
+            {/* Page buttons */}
+            <div className="flex gap-2 flex-wrap">
+              {c.pages.map((page) => (
+                page.href ? (
+                  <Link key={page.type} href={page.href} target="_blank"
+                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-3 py-1.5 rounded-lg border transition-colors hover:brightness-105"
+                    style={{ background: c.accentColor + "18", borderColor: c.accentColor + "40", color: c.accentColor }}
+                  >
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                    {PAGE_LABELS[page.type]}
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </Link>
+                ) : (
+                  <span key={page.type}
+                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-3 py-1.5 rounded-lg border"
+                    style={{ borderColor: "var(--border)", color: "var(--fg-muted)", opacity: 0.45 }}
+                  >
+                    <LockIcon /> {PAGE_LABELS[page.type]}
+                  </span>
+                )
+              ))}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-3">
+              <UseStageButton stage={stage} onUse={handleUse} accentColor={c.accentColor} accentText={c.accentText} />
+              {c.pages[0]?.href && (
+                <Link href={c.pages[0].href} target="_blank"
+                  className="flex items-center gap-1.5 px-4 h-[34px] font-sans text-xs font-medium rounded-lg border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Preview
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* ── Right: page previews ── */}
+          <div className="w-72 shrink-0 flex gap-2 items-stretch py-5 pr-5">
+            {c.pages.map((page, pi) => (
+              <div key={page.type}
+                className="relative flex-1 overflow-hidden rounded-xl"
+                style={{
+                  background: "var(--bg-subtle)",
+                  transform: hovered
+                    ? pi === 0 ? "rotate(-3deg) translateY(-4px) scale(1.02)"
+                    : pi === 2 ? "rotate(3deg) translateY(-4px) scale(1.02)"
+                    : "translateY(-6px) scale(1.02)"
+                    : "none",
+                  transition: `transform 0.35s cubic-bezier(0.2,0.8,0.2,1) ${pi * 40}ms`,
+                  zIndex: pi === 1 ? 2 : 1,
+                  boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.2)" : "0 2px 8px rgba(0,0,0,0.1)",
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`https://picsum.photos/seed/${page.seed}/240/360`}
+                  alt={PAGE_LABELS[page.type]}
+                  className="w-full h-full object-cover"
+                  style={{ filter: page.href ? "none" : "grayscale(1) opacity(0.35)" }}
+                />
+                <div className="absolute bottom-0 left-0 right-0 px-2 py-2" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)" }}>
+                  <span className="font-mono text-[7px] uppercase tracking-widest text-white/80">{page.type}</span>
+                </div>
+                {!page.href && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="font-mono text-[8px] text-white/50 bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm">Soon</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      <AnimatePresence>
+        {modalOpen && <CollectionModal c={c} onClose={() => setModalOpen(false)} />}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -470,25 +672,25 @@ function TemplateBanner({ onDismiss, onBrowse }: { onDismiss: () => void; onBrow
           </div>
         </div>
 
-        {/* Mini page previews */}
-        <div className="hidden sm:flex gap-2 items-end shrink-0">
+        {/* Page previews */}
+        <div className="hidden md:flex gap-3 items-end shrink-0 pr-2">
           {[
-            { seed: 10,  label: "Portfolio", rotate: "-4deg",  bg: "#E8382C" },
-            { seed: 82,  label: "Links",     rotate: "0deg",   bg: "#0D0D0D" },
-            { seed: 93,  label: "Delivery",  rotate: "4deg",   bg: "#161616" },
+            { seed: 10,  label: "Portfolio", rotate: "-6deg",  ty: "10px" },
+            { seed: 82,  label: "Links",     rotate: "0deg",   ty: "0px"  },
+            { seed: 93,  label: "Delivery",  rotate: "6deg",   ty: "10px" },
           ].map((p, i) => (
             <div key={p.label}
-              className="relative overflow-hidden rounded-lg shadow-xl"
+              className="relative overflow-hidden rounded-xl shadow-2xl"
               style={{
-                width: 72, height: 96,
-                transform: `rotate(${p.rotate})`,
+                width: 100, height: 140,
+                transform: `rotate(${p.rotate}) translateY(${p.ty})`,
                 zIndex: i === 1 ? 3 : i === 0 ? 2 : 1,
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`https://picsum.photos/seed/${p.seed}/144/192`} alt="" className="w-full h-full object-cover" style={{ filter: "brightness(0.7)" }} />
-              <div className="absolute inset-x-0 bottom-0 px-1.5 py-1" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)" }}>
-                <span className="font-mono text-[6px] uppercase tracking-widest text-white/70">{p.label}</span>
+              <img src={`https://picsum.photos/seed/${p.seed}/200/280`} alt="" className="w-full h-full object-cover" style={{ filter: "brightness(0.65)" }} />
+              <div className="absolute inset-x-0 bottom-0 px-2 py-1.5" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+                <span className="font-mono text-[7px] uppercase tracking-widest text-white/75">{p.label}</span>
               </div>
             </div>
           ))}
@@ -506,30 +708,6 @@ function TemplateBanner({ onDismiss, onBrowse }: { onDismiss: () => void; onBrow
   );
 }
 
-function AddCollectionToCart({ collection }: { collection: TemplateCollection }) {
-  const { addItem, hasItem, setOpen } = useCart();
-  const inCart = hasItem(collection.name);
-
-  if (inCart) {
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        className="flex items-center justify-center gap-1.5 w-full py-2 font-mono text-[9px] text-yellow hover:text-[var(--fg)] transition-colors uppercase tracking-wider"
-      >
-        <CheckIcon /> In cart — view →
-      </button>
-    );
-  }
-
-  return (
-    <button
-      onClick={() => addItem({ type: "template", name: collection.name, detail: "Collection · Free", price: 0, period: "one-time" })}
-      className="flex items-center justify-center gap-1.5 w-full py-2 font-mono text-[9px] text-yellow hover:text-[var(--fg)] transition-colors uppercase tracking-wider"
-    >
-      Use this collection →
-    </button>
-  );
-}
 
 /* ══════════════════════════════════════════════════════════════════════════
    SHARED ICONS
