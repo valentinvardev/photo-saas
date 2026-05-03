@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDeliveryStore } from "~/lib/delivery/store";
-import { STATUS_META, type DeliveryPage } from "~/lib/delivery/data";
+import { STATUS_META, TEMPLATES, type DeliveryPage } from "~/lib/delivery/data";
 
 /* ══════════════════════════════════════════════════════════════════════════
    DELIVERY CARD
@@ -18,14 +18,16 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
     ? Math.round((1 - page.priceFullGallery / (page.pricePerPhoto * photoCount)) * 100)
     : 0;
   const cover = page.coverUrl || `https://picsum.photos/seed/${page.coverSeed}/600/300?grayscale`;
+  const tpl = TEMPLATES.find((t) => t.id === page.template);
 
   return (
-    <Link
-      href={`/delivery/edit/${page.id}`}
-      className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-[var(--fg-muted)] transition-all duration-200 cursor-pointer"
-    >
-      {/* Cover */}
-      <div className="relative h-36 overflow-hidden bg-[var(--bg-subtle)]">
+    <div className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-[var(--fg-muted)] transition-all duration-200 flex flex-col">
+      {/* Cover — clicking it opens the live preview */}
+      <Link
+        href={`/d/${page.id}`}
+        target="_blank"
+        className="relative h-36 overflow-hidden bg-[var(--bg-subtle)] block"
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={cover} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
@@ -40,33 +42,74 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
         <div className="absolute top-2.5 right-2.5 px-2 py-1 rounded-md bg-black/40 backdrop-blur-sm text-[10px] font-mono text-white/70 capitalize">
           {page.mode === "selection" ? `Pick ${page.selectionLimit}` : page.mode}
         </div>
-      </div>
 
-      <div className="p-3">
-        <div className="mb-2">
+        {/* Hover hint */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+          <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#111] font-sans text-[11px] font-semibold rounded-md">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Open preview
+          </span>
+        </div>
+      </Link>
+
+      {/* Body */}
+      <div className="p-3 flex flex-col flex-1 gap-2">
+        {/* Title */}
+        <div>
           <div className="font-sans font-bold text-[var(--fg)] text-xs truncate">{page.client}</div>
           <div className="font-mono text-[10px] text-[var(--fg-muted)] truncate mt-0.5">{page.title}</div>
         </div>
-        <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
-          <div className="flex items-center gap-2.5">
-            <span className="font-mono text-[9px] text-[var(--fg-muted)]">{photoCount} photos</span>
-            <span className="font-mono text-[9px] text-[var(--fg-muted)]">{page.views} views</span>
-            {discount > 0 && <span className="font-mono text-[9px] text-green-400">−{discount}%</span>}
+
+        {/* Tags row — collection / template + meta icons */}
+        <div className="flex items-center justify-between gap-2 pt-1 border-t border-[var(--border)]">
+          <div className="flex items-center gap-1.5 min-w-0">
+            {tpl && (
+              <span
+                className="inline-flex items-center gap-1 font-mono text-[8px] uppercase tracking-widest text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded shrink-0"
+                title={`Theme: ${tpl.label}`}
+              >
+                <span className="w-1.5 h-1.5 rounded-sm shrink-0" style={{ background: tpl.accent, border: `1px solid ${tpl.fg}30` }} />
+                {tpl.label}
+              </span>
+            )}
+            <span className="font-mono text-[9px] text-[var(--fg-muted)] truncate">
+              {photoCount} · {page.views} views
+              {discount > 0 && <span className="text-green-400 ml-1">−{discount}%</span>}
+            </span>
           </div>
-          <div className="flex items-center gap-1.5 text-[var(--fg-muted)]">
+          <div className="flex items-center gap-1.5 text-[var(--fg-muted)] shrink-0">
             {page.passwordEnabled && (
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-label="Password"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
             )}
             {page.watermark && (
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-label="Watermark"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             )}
             {page.proofingEnabled && (
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-label="Proofing"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
             )}
           </div>
         </div>
+
+        {/* CTA row — Preview + Edit */}
+        <div className="flex items-center gap-1.5 mt-auto">
+          <Link
+            href={`/d/${page.id}`}
+            target="_blank"
+            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview
+          </Link>
+          <Link
+            href={`/delivery/edit/${page.id}`}
+            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md font-sans text-[10px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit
+          </Link>
+        </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
