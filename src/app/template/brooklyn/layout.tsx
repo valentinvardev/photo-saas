@@ -31,7 +31,7 @@ export default function BrooklynLayout({ children }: { children: React.ReactNode
   return (
     <div
       className={`${serif.variable} ${sans.variable} ${mono.variable}`}
-      style={{ height: "100dvh", overflow: "hidden", background: "#0D0D0D" }}
+      style={{ background: "#0D0D0D" }}
     >
       {children}
     </div>
