@@ -313,64 +313,194 @@ const COLLECTIONS: TemplateCollection[] = [
 ];
 
 function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) {
-  const PAGE_LABELS = { portfolio: "Portfolio", links: "Links", delivery: "Delivery" };
+  const PAGE_LABELS: Record<string, string> = { portfolio: "Portfolio", links: "Links page", delivery: "Delivery" };
+  const [hovered, setHovered] = useState(false);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.08 }}
-      className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden flex flex-col"
+      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.1 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group relative overflow-hidden border border-[var(--border)] bg-[var(--bg-card)]"
+      style={{
+        transition: "box-shadow 0.25s",
+        boxShadow: hovered ? "0 8px 32px rgba(0,0,0,0.12)" : "none",
+      }}
     >
-      {/* Three-panel preview */}
-      <div className="grid grid-cols-3 gap-0.5 bg-[var(--border)]">
-        {c.pages.map((page) => (
-          <div key={page.type} className="relative overflow-hidden aspect-[3/4] bg-[var(--bg-subtle)]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`https://picsum.photos/seed/${page.seed}/300/400?grayscale`}
-              alt={PAGE_LABELS[page.type]}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              style={{ filter: "brightness(0.75)" }}
-            />
-            <div className="absolute bottom-0 left-0 right-0 p-1.5" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)" }}>
-              <span className="font-mono text-[8px] text-white/70 uppercase tracking-widest">{PAGE_LABELS[page.type]}</span>
+      {/* Accent bar */}
+      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: c.accentColor }} />
+
+      <div className="flex gap-0 pl-4">
+        {/* ── Left: info ── */}
+        <div className="flex-1 min-w-0 py-6 pr-6 flex flex-col gap-4 justify-between">
+          {/* Number + name */}
+          <div className="flex items-baseline gap-3">
+            <span className="font-mono text-4xl font-bold leading-none select-none"
+              style={{ color: c.accentColor + "30" }}>
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <div>
+              <h3 className="font-sans font-black text-[var(--fg)] text-xl leading-none tracking-tight">{c.name}</h3>
+              <span className="font-mono text-[9px] uppercase tracking-widest"
+                style={{ color: c.accentColor }}>Collection</span>
             </div>
-            {!page.href && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[1px]">
-                <LockIcon />
-              </div>
-            )}
           </div>
-        ))}
-      </div>
 
-      {/* Info */}
-      <div className="p-4 flex flex-col gap-3 flex-1">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm" style={{ background: c.accentColor }} />
-          <h3 className="font-sans font-black text-[var(--fg)] text-sm">{c.name}</h3>
-          <span className="font-mono text-[8px] px-1.5 py-0.5 rounded" style={{ background: c.accentColor + "22", color: c.accentColor }}>Collection</span>
-        </div>
-        <p className="font-sans text-[11px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{c.description}</p>
+          <p className="font-sans text-xs text-[var(--fg-muted)] leading-relaxed max-w-xs">{c.description}</p>
 
-        {/* Page links */}
-        <div className="flex flex-col gap-1 pt-2 border-t border-[var(--border)]">
-          {c.pages.map((page) => (
-            <div key={page.type} className="flex items-center justify-between">
-              <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-wide">{PAGE_LABELS[page.type]}</span>
-              {page.href ? (
-                <Link href={page.href} target="_blank"
-                  className="flex items-center gap-1 font-mono text-[9px] transition-colors hover:text-[var(--fg)]"
-                  style={{ color: c.accentColor }}>
-                  Preview <ArrowIcon />
+          {/* Page availability */}
+          <div className="flex gap-2 flex-wrap">
+            {c.pages.map((page) => (
+              <span key={page.type}
+                className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-2.5 py-1 rounded-full border"
+                style={page.href
+                  ? { background: c.accentColor + "18", borderColor: c.accentColor + "50", color: c.accentColor }
+                  : { borderColor: "var(--border)", color: "var(--fg-muted)", opacity: 0.5 }
+                }
+              >
+                {page.href
+                  ? <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                  : <LockIcon />
+                }
+                {PAGE_LABELS[page.type]}
+              </span>
+            ))}
+          </div>
+
+          {/* CTA row */}
+          <div className="flex items-center gap-3 pt-1">
+            <AddCollectionToCart collection={c} />
+            <div className="flex gap-2">
+              {c.pages.filter(p => p.href).map((page) => (
+                <Link key={page.type} href={page.href!} target="_blank"
+                  className="font-mono text-[9px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors uppercase tracking-wide">
+                  {PAGE_LABELS[page.type]} ↗
                 </Link>
-              ) : (
-                <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] opacity-40"><LockIcon /> Soon</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Right: page previews ── */}
+        <div className="w-64 shrink-0 flex gap-1 items-stretch py-4 pr-4">
+          {c.pages.map((page, pi) => (
+            <div key={page.type}
+              className="relative flex-1 overflow-hidden rounded-lg"
+              style={{
+                background: "var(--bg-subtle)",
+                transform: hovered
+                  ? pi === 0 ? "rotate(-2deg) translateY(-2px)" : pi === 2 ? "rotate(2deg) translateY(-2px)" : "translateY(-4px)"
+                  : "none",
+                transition: "transform 0.3s cubic-bezier(0.2,0.8,0.2,1)",
+                transitionDelay: `${pi * 30}ms`,
+                zIndex: pi === 1 ? 2 : 1,
+                boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://picsum.photos/seed/${page.seed}/200/300`}
+                alt={PAGE_LABELS[page.type]}
+                className="w-full h-full object-cover"
+                style={{ filter: page.href ? "none" : "grayscale(1) opacity(0.4)" }}
+              />
+              {/* Page label */}
+              <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5"
+                style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)" }}>
+                <span className="font-mono text-[7px] uppercase tracking-widest text-white/80">
+                  {page.type}
+                </span>
+              </div>
+              {!page.href && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-mono text-[8px] text-white/50 bg-black/30 px-2 py-1 rounded-full">Soon</span>
+                </div>
               )}
             </div>
           ))}
         </div>
+      </div>
+    </motion.div>
+  );
+}
 
-        <AddCollectionToCart collection={c} />
+/* ── Template Banner ─────────────────────────────────────────── */
+
+function TemplateBanner({ onDismiss, onBrowse }: { onDismiss: () => void; onBrowse: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.3 }}
+      className="relative overflow-hidden rounded-xl mx-5 mt-5"
+      style={{ background: "#111118" }}
+    >
+      {/* Dot grid decoration */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
+        backgroundSize: "24px 24px",
+      }} />
+      {/* Yellow glow blob */}
+      <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(250,205,21,0.18) 0%, transparent 70%)" }} />
+
+      <div className="relative flex items-center gap-6 p-5">
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="font-mono text-[9px] font-bold uppercase tracking-widest bg-yellow text-[#111] px-2 py-0.5 rounded-sm">New</span>
+            <span className="font-mono text-[9px] text-white/30 uppercase tracking-wider">Collections</span>
+          </div>
+          <h2 className="font-sans font-black text-white text-base leading-tight mb-1">
+            One style, three pages.
+          </h2>
+          <p className="font-sans text-xs text-white/45 leading-relaxed max-w-sm">
+            Pick a collection and get a portfolio, link page, and delivery gallery that all look like they belong together.
+          </p>
+          <div className="flex items-center gap-3 mt-4">
+            <button
+              onClick={onBrowse}
+              className="flex items-center gap-2 bg-yellow text-[#111] font-sans text-xs font-bold px-4 py-2 rounded-lg hover:bg-yellow/90 transition-colors"
+            >
+              Browse collections
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button onClick={onDismiss} className="font-sans text-xs text-white/30 hover:text-white/60 transition-colors">
+              Dismiss
+            </button>
+          </div>
+        </div>
+
+        {/* Mini page previews */}
+        <div className="hidden sm:flex gap-2 items-end shrink-0">
+          {[
+            { seed: 10,  label: "Portfolio", rotate: "-4deg",  bg: "#E8382C" },
+            { seed: 82,  label: "Links",     rotate: "0deg",   bg: "#0D0D0D" },
+            { seed: 93,  label: "Delivery",  rotate: "4deg",   bg: "#161616" },
+          ].map((p, i) => (
+            <div key={p.label}
+              className="relative overflow-hidden rounded-lg shadow-xl"
+              style={{
+                width: 72, height: 96,
+                transform: `rotate(${p.rotate})`,
+                zIndex: i === 1 ? 3 : i === 0 ? 2 : 1,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`https://picsum.photos/seed/${p.seed}/144/192`} alt="" className="w-full h-full object-cover" style={{ filter: "brightness(0.7)" }} />
+              <div className="absolute inset-x-0 bottom-0 px-1.5 py-1" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)" }}>
+                <span className="font-mono text-[6px] uppercase tracking-widest text-white/70">{p.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Close */}
+        <button
+          onClick={onDismiss}
+          className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/10 transition-colors"
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
       </div>
     </motion.div>
   );
@@ -677,6 +807,7 @@ const PRODUCT_TABS: { id: ProductType; label: string; count: number; icon: React
 export default function TemplatesPage() {
   const [productType,     setProductType]     = useState<ProductType>("portfolio");
   const [portfolioFilter, setPortfolioFilter] = useState<PortfolioCategory>("All");
+  const [bannerVisible,   setBannerVisible]   = useState(true);
 
   const filteredPortfolio = portfolioFilter === "All"
     ? PORTFOLIO_TEMPLATES
@@ -747,17 +878,27 @@ export default function TemplatesPage() {
         </AnimatePresence>
       </div>
 
+      {/* Banner */}
+      <AnimatePresence>
+        {bannerVisible && (
+          <TemplateBanner
+            onDismiss={() => setBannerVisible(false)}
+            onBrowse={() => { setBannerVisible(false); setProductType("collections"); }}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Content */}
       <div className="p-5 space-y-6">
         <AnimatePresence mode="wait">
 
           {/* ── Collections ── */}
           {productType === "collections" && (
-            <motion.div key="collections" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-4">
+            <motion.div key="collections" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-3">
               <p className="font-sans text-xs text-[var(--fg-muted)]">
-                Collections bundle a portfolio, links page, and delivery gallery in a single coherent visual style. Pick one and use it everywhere.
+                Each collection includes a portfolio, link page, and delivery gallery — all in one coherent visual style.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="flex flex-col gap-3">
                 {COLLECTIONS.map((c, i) => <CollectionCard key={c.id} c={c} index={i} />)}
               </div>
             </motion.div>
