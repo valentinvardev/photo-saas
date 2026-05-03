@@ -232,8 +232,8 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
         <button
           onClick={() => setGalleryOpen(true)}
           style={{
-            flex: 1, background: "#1a2a3a", border: "1px solid #2563eb",
-            color: "#93c5fd", fontSize: 10, padding: "6px", borderRadius: 4,
+            flex: 1, background: "rgba(37,99,235,0.12)", border: "1px solid #2563eb",
+            color: "#2563eb", fontSize: 10, padding: "6px", borderRadius: 4,
             cursor: "pointer", fontFamily: "inherit",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
           }}
@@ -267,7 +267,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 background: active ? "rgba(37,99,235,0.15)" : "var(--ec-bg)",
                 border: `1px solid ${active ? "#2563eb" : "var(--ec-line)"}`,
-                color: active ? "#93c5fd" : "var(--ec-sub)",
+                color: active ? "#2563eb" : "var(--ec-sub)",
                 fontSize: 11, padding: "6px 10px", borderRadius: 4, cursor: "pointer",
                 fontFamily: "inherit", textAlign: "left",
               }}

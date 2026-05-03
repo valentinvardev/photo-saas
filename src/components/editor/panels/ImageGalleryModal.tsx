@@ -39,7 +39,7 @@ export function ImageGalleryModal({
   const tabStyle = (active: boolean): React.CSSProperties => ({
     flex: 1, background: "none", border: "none",
     borderBottom: `2px solid ${active ? "#2563eb" : "transparent"}`,
-    color: active ? "#93c5fd" : "#444",
+    color: active ? "#2563eb" : "var(--ec-dim)",
     fontSize: 11, padding: "7px 0", cursor: "pointer",
     fontFamily: "inherit",
   });
@@ -50,13 +50,13 @@ export function ImageGalleryModal({
       onClick={onClose}
     >
       <div
-        style={{ width: 700, height: 460, background: "#0d0d0d", border: "1px solid #2a2a2a", borderRadius: 8, display: "flex", flexDirection: "column", overflow: "hidden" }}
+        style={{ width: 700, height: 460, background: "var(--ec-bg)", border: "1px solid var(--ec-border)", borderRadius: 8, display: "flex", flexDirection: "column", overflow: "hidden" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid #1a1a1a", flexShrink: 0 }}>
-          <span style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em" }}>{title}</span>
-          <button onClick={onClose} style={{ background: "none", border: "none", color: "#444", cursor: "pointer", padding: 2, display: "flex" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
+          <span style={{ color: "var(--ec-muted)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em" }}>{title}</span>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--ec-dim)", cursor: "pointer", padding: 2, display: "flex" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
         </div>
@@ -64,8 +64,8 @@ export function ImageGalleryModal({
         {/* Body */}
         <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
           {/* Left: gallery */}
-          <div style={{ width: 360, borderRight: "1px solid #1a1a1a", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", borderBottom: "1px solid #1a1a1a", flexShrink: 0 }}>
+          <div style={{ width: 360, borderRight: "1px solid var(--ec-raised)", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
               <button style={tabStyle(tab === "gallery")} onClick={() => setTab("gallery")}>Gallery</button>
               <button style={tabStyle(tab === "url")}     onClick={() => setTab("url")}>URL</button>
             </div>
@@ -77,12 +77,12 @@ export function ImageGalleryModal({
                     onClick={() => fileRef.current?.click()}
                     style={{
                       width: "100%", marginBottom: 8, background: "none",
-                      border: "1px dashed #2a2a2a", color: "#555", fontSize: 11,
+                      border: "1px dashed var(--ec-border)", color: "var(--ec-sub)", fontSize: 11,
                       padding: "7px", borderRadius: 4, cursor: "pointer",
                       fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                     }}
                     onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#facc15"; e.currentTarget.style.color = "#facc15"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#2a2a2a"; e.currentTarget.style.color = "#555"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--ec-border)"; e.currentTarget.style.color = "var(--ec-sub)"; }}
                   >
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
                     Upload photo
@@ -121,14 +121,14 @@ export function ImageGalleryModal({
                     onKeyDown={(e) => { if (e.key === "Enter" && urlDraft.trim()) setSelected(urlDraft.trim()); }}
                     placeholder="https://..."
                     style={{
-                      width: "100%", background: "#111", border: "1px solid #2a2a2a",
-                      color: "#eee", fontSize: 12, padding: "7px 8px", borderRadius: 4,
+                      width: "100%", background: "var(--ec-bg)", border: "1px solid var(--ec-border)",
+                      color: "var(--ec-bright)", fontSize: 12, padding: "7px 8px", borderRadius: 4,
                       outline: "none", boxSizing: "border-box", fontFamily: "monospace",
                     }}
                   />
                   <button
                     onClick={() => { if (urlDraft.trim()) setSelected(urlDraft.trim()); }}
-                    style={{ marginTop: 8, width: "100%", background: "#1a2a3a", border: "1px solid #2563eb", color: "#93c5fd", fontSize: 11, padding: "7px", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}
+                    style={{ marginTop: 8, width: "100%", background: "rgba(37,99,235,0.12)", border: "1px solid #2563eb", color: "#2563eb", fontSize: 11, padding: "7px", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}
                   >
                     Use URL
                   </button>
@@ -139,12 +139,12 @@ export function ImageGalleryModal({
 
           {/* Right: preview */}
           <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: 14, gap: 10 }}>
-            <div style={{ flex: 1, background: "#111", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+            <div style={{ flex: 1, background: "var(--ec-bg)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
               {selected ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={selected} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", display: "block" }} />
               ) : (
-                <span style={{ color: "#2a2a2a", fontSize: 11 }}>No image selected</span>
+                <span style={{ color: "var(--ec-border)", fontSize: 11 }}>No image selected</span>
               )}
             </div>
             <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
@@ -152,9 +152,9 @@ export function ImageGalleryModal({
                 onClick={() => { if (selected) { onChange(selected); onClose(); } }}
                 disabled={!selected}
                 style={{
-                  flex: 1, background: selected ? "#1a2a3a" : "#111",
-                  border: `1px solid ${selected ? "#2563eb" : "#1f1f1f"}`,
-                  color: selected ? "#93c5fd" : "#333",
+                  flex: 1, background: selected ? "rgba(37,99,235,0.12)" : "var(--ec-bg)",
+                  border: `1px solid ${selected ? "#2563eb" : "var(--ec-line)"}`,
+                  color: selected ? "#2563eb" : "var(--ec-ghost)",
                   fontSize: 11, padding: "8px", borderRadius: 4,
                   cursor: selected ? "pointer" : "default", fontFamily: "inherit", fontWeight: 600,
                 }}
@@ -185,7 +185,7 @@ export function ImagePickerButton({
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {value && (
-          <div style={{ width: 32, height: 32, borderRadius: 3, overflow: "hidden", flexShrink: 0, background: "#111" }}>
+          <div style={{ width: 32, height: 32, borderRadius: 3, overflow: "hidden", flexShrink: 0, background: "var(--ec-bg)" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={value} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           </div>
@@ -193,8 +193,8 @@ export function ImagePickerButton({
         <button
           onClick={() => setOpen(true)}
           style={{
-            flex: 1, background: "#1a1a1a", border: "1px solid #2a2a2a",
-            color: "#666", fontSize: 11, padding: "6px 10px", borderRadius: 4,
+            flex: 1, background: "var(--ec-raised)", border: "1px solid var(--ec-border)",
+            color: "var(--ec-sub)", fontSize: 11, padding: "6px 10px", borderRadius: 4,
             cursor: "pointer", fontFamily: "inherit", textAlign: "left",
             display: "flex", alignItems: "center", gap: 6,
           }}

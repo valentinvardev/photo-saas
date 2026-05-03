@@ -27,20 +27,20 @@ function FontPicker({
   return (
     <div style={{ marginBottom: 14 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-        <label style={{ color: "#555", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+        <label style={{ color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
           {label}
         </label>
-        <span style={{ fontFamily: "monospace", fontSize: 9, color: "#333", background: "#1a1a1a", padding: "1px 5px", borderRadius: 2 }}>
+        <span style={{ fontFamily: "monospace", fontSize: 9, color: "var(--ec-ghost)", background: "var(--ec-raised)", padding: "1px 5px", borderRadius: 2 }}>
           {category}
         </span>
       </div>
 
       {/* Font preview strip */}
-      <div style={{ marginBottom: 8, padding: "8px 10px", background: "#0a0a0a", borderRadius: 4, border: "1px solid #1a1a1a" }}>
-        <span style={{ fontFamily: active?.stack ?? value, fontSize: 18, color: "#ccc", lineHeight: 1 }}>
+      <div style={{ marginBottom: 8, padding: "8px 10px", background: "var(--ec-surface)", borderRadius: 4, border: "1px solid var(--ec-border)" }}>
+        <span style={{ fontFamily: active?.stack ?? value, fontSize: 18, color: "var(--ec-text)", lineHeight: 1 }}>
           {active?.label ?? "Font"}
         </span>
-        <span style={{ fontFamily: active?.stack ?? value, fontSize: 11, color: "#555", marginLeft: 8 }}>
+        <span style={{ fontFamily: active?.stack ?? value, fontSize: 11, color: "var(--ec-sub)", marginLeft: 8 }}>
           Aa Bb Cc
         </span>
       </div>
@@ -55,9 +55,9 @@ function FontPicker({
           }}
           style={{
             width:        "100%",
-            background:   "#111",
-            border:       "1px solid #2a2a2a",
-            color:        "#aaa",
+            background:   "var(--ec-bg)",
+            border:       "1px solid var(--ec-border)",
+            color:        "var(--ec-label)",
             fontSize:     12,
             padding:      "6px 28px 6px 8px",
             borderRadius: 4,
@@ -76,7 +76,7 @@ function FontPicker({
         </select>
         {/* Chevron */}
         <svg
-          width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#555"
+          width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--ec-sub)"
           strokeWidth="2" strokeLinecap="round"
           style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
         >
@@ -91,18 +91,18 @@ function FontPicker({
             key={f.value}
             onClick={() => onChange(f.stack)}
             style={{
-              background:   value.includes(f.value) ? "#1a2a3a" : "#111",
-              border:       `1px solid ${value.includes(f.value) ? "#2563eb" : "#1f1f1f"}`,
+              background:   value.includes(f.value) ? "rgba(37,99,235,0.12)" : "var(--ec-bg)",
+              border:       `1px solid ${value.includes(f.value) ? "#2563eb" : "var(--ec-line)"}`,
               borderRadius: 3,
               padding:      "5px 7px",
               cursor:       "pointer",
               textAlign:    "left",
             }}
           >
-            <span style={{ fontFamily: f.stack, fontSize: 13, color: value.includes(f.value) ? "#93c5fd" : "#555", display: "block", lineHeight: 1.2 }}>
+            <span style={{ fontFamily: f.stack, fontSize: 13, color: value.includes(f.value) ? "#2563eb" : "var(--ec-sub)", display: "block", lineHeight: 1.2 }}>
               Ag
             </span>
-            <span style={{ fontFamily: "inherit", fontSize: 9, color: "#333", display: "block", marginTop: 2 }}>
+            <span style={{ fontFamily: "inherit", fontSize: 9, color: "var(--ec-ghost)", display: "block", marginTop: 2 }}>
               {f.label}
             </span>
           </button>
@@ -120,7 +120,7 @@ export function TypographyPanel() {
 
   return (
     <div style={{ padding: "14px 12px" }}>
-      <p style={{ color: "#444", fontSize: 10, margin: "0 0 14px", lineHeight: 1.5 }}>
+      <p style={{ color: "var(--ec-dim)", fontSize: 10, margin: "0 0 14px", lineHeight: 1.5 }}>
         Changes apply site-wide via CSS variables.
       </p>
 

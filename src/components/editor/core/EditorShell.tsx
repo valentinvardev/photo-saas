@@ -56,6 +56,9 @@ function EditorShellInner({ templateId }: { templateId?: TemplateId }) {
       </div>
 
       <style>{`
+        :root {
+          ${(Object.entries(THEME_VARS[theme]) as [string, string][]).map(([k, v]) => `${k}: ${v};`).join(" ")}
+        }
         .canvas-frame {
           --ed-bg:     ${palette.bg};
           --ed-fg:     ${palette.fg};

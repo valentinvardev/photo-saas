@@ -26,11 +26,11 @@ export function ColorSwatch({ label, value, onChange }: Props) {
     <div ref={ref} style={{ position: "relative" }}>
       <div
         onClick={() => setOpen((o) => !o)}
-        style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", padding: "6px 8px", borderRadius: 4, background: open ? "#1a1a1a" : "transparent" }}
+        style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", padding: "6px 8px", borderRadius: 4, background: open ? "var(--ec-raised)" : "transparent" }}
       >
         <div style={{ width: 18, height: 18, borderRadius: 3, background: value, border: "1px solid rgba(255,255,255,0.15)", flexShrink: 0 }} />
-        <span style={{ flex: 1, color: "#aaa", fontSize: 12 }}>{label}</span>
-        <span style={{ fontFamily: "monospace", fontSize: 10, color: "#666" }}>{value}</span>
+        <span style={{ flex: 1, color: "var(--ec-label)", fontSize: 12 }}>{label}</span>
+        <span style={{ fontFamily: "monospace", fontSize: 10, color: "var(--ec-sub)" }}>{value}</span>
       </div>
 
       {open && (
@@ -40,7 +40,7 @@ export function ColorSwatch({ label, value, onChange }: Props) {
             right: 0,
             top: "calc(100% + 6px)",
             zIndex: 100,
-            background: "#1a1a1a",
+            background: "var(--ec-raised)",
             border: "1px solid #333",
             borderRadius: 6,
             padding: 12,
@@ -51,11 +51,11 @@ export function ColorSwatch({ label, value, onChange }: Props) {
         >
           <HexColorPicker color={value} onChange={onChange} />
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ color: "#666", fontSize: 11 }}>#</span>
+            <span style={{ color: "var(--ec-sub)", fontSize: 11 }}>#</span>
             <HexColorInput
               color={value}
               onChange={onChange}
-              style={{ background: "#0a0a0a", border: "1px solid #333", color: "#eee", fontSize: 12, padding: "4px 6px", width: "100%", borderRadius: 3, outline: "none", fontFamily: "monospace" }}
+              style={{ background: "var(--ec-bg)", border: "1px solid #333", color: "var(--ec-bright)", fontSize: 12, padding: "4px 6px", width: "100%", borderRadius: 3, outline: "none", fontFamily: "monospace" }}
             />
           </div>
         </div>

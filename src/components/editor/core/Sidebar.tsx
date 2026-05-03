@@ -452,7 +452,7 @@ function LogoCropButton({
         </svg>
         <span style={{ flex: 1 }}>{hasCrop ? "Adjust crop" : "Crop image"}</span>
         {hasCrop && (
-          <span style={{ fontFamily: "monospace", fontSize: 9, color: "#2563eb", background: "#1a2a3a", border: "1px solid #2563eb", padding: "1px 5px", borderRadius: 3 }}>
+          <span style={{ fontFamily: "monospace", fontSize: 9, color: "#2563eb", background: "rgba(37,99,235,0.12)", border: "1px solid #2563eb", padding: "1px 5px", borderRadius: 3 }}>
             ON
           </span>
         )}
@@ -479,7 +479,7 @@ function SettingsTab() {
   }
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "var(--ec-bg)", border: "1px solid var(--ec-line)",
+    width: "100%", background: "var(--ec-surface)", border: "1px solid var(--ec-border)",
     color: "var(--ec-text)", fontSize: 12, padding: "7px 8px", borderRadius: 4,
     outline: "none", boxSizing: "border-box", fontFamily: "inherit",
   };
@@ -489,9 +489,9 @@ function SettingsTab() {
   };
 
   const modeStyle = (active: boolean): React.CSSProperties => ({
-    flex: 1, background: active ? "#1a2a3a" : "#111",
-    border: `1px solid ${active ? "#2563eb" : "var(--ec-line)"}`,
-    color: active ? "#93c5fd" : "var(--ec-sub)",
+    flex: 1, background: active ? "rgba(37,99,235,0.12)" : "var(--ec-raised)",
+    border: `1px solid ${active ? "#2563eb" : "var(--ec-border)"}`,
+    color: active ? "#2563eb" : "var(--ec-sub)",
     fontSize: 10, padding: "5px 4px", borderRadius: 3,
     cursor: "pointer", fontFamily: "inherit", textAlign: "center",
   });
