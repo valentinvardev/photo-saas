@@ -28,6 +28,8 @@ type PortfolioTemplate = {
   new?: boolean;
   featured?: boolean;
   fonts: { serif: string; sans: string; mono: string };
+  style: { bg: string; fg: string; accent: string; muted?: string };
+  collection?: string;
 };
 
 const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
@@ -43,6 +45,8 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     new: true,
     featured: true,
     fonts: { serif: "Cormorant Garamond", sans: "DM Sans", mono: "Space Mono" },
+    style: { bg: "#fafafa", fg: "#0a0a0a", accent: "#facc15", muted: "#a8a8a8" },
+    collection: "minimal",
   },
   {
     id: "editorial-dark",
@@ -53,6 +57,7 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     href: null,
     seed: 37,
     fonts: { serif: "Freight Display", sans: "Neue Haas Grotesk", mono: "Input Mono" },
+    style: { bg: "#0e0e0e", fg: "#f5f5f5", accent: "#dddddd", muted: "#666666" },
   },
   {
     id: "magazine",
@@ -63,6 +68,7 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     href: null,
     seed: 63,
     fonts: { serif: "Canela", sans: "Söhne", mono: "Pitch" },
+    style: { bg: "#f5f0e8", fg: "#1a1a1a", accent: "#dc2626", muted: "#8a8a8a" },
   },
   {
     id: "grid-pure",
@@ -73,6 +79,7 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     href: null,
     seed: 88,
     fonts: { serif: "Domaine", sans: "Inter", mono: "Berkeley Mono" },
+    style: { bg: "#ffffff", fg: "#0a0a0a", accent: "#000000", muted: "#cccccc" },
   },
   {
     id: "story",
@@ -83,6 +90,7 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     href: null,
     seed: 110,
     fonts: { serif: "Tiempos", sans: "Aktiv Grotesk", mono: "Fira Code" },
+    style: { bg: "#1a1a1a", fg: "#ffffff", accent: "#aaaaaa", muted: "#555555" },
   },
   {
     id: "editorial-sand",
@@ -93,6 +101,8 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     href: null,
     seed: 154,
     fonts: { serif: "EB Garamond", sans: "GT Walsheim", mono: "Inconsolata" },
+    style: { bg: "#fafaf8", fg: "#0a0a0a", accent: "#c9a89a", muted: "#a09890" },
+    collection: "atelier",
   },
   {
     id: "brooklyn",
@@ -104,6 +114,8 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     seed: 10,
     new: true,
     fonts: { serif: "DM Serif Display", sans: "Space Grotesk", mono: "Space Mono" },
+    style: { bg: "#0D0D0D", fg: "#F0EFE9", accent: "#E8382C", muted: "#7A7A7A" },
+    collection: "brooklyn",
   },
   {
     id: "petal",
@@ -115,6 +127,8 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     seed: 452,
     new: true,
     fonts: { serif: "—", sans: "DM Sans", mono: "Space Mono" },
+    style: { bg: "#f0ebe3", fg: "#18181b", accent: "#d9544a", muted: "#9a9088" },
+    collection: "petal",
   },
 ];
 
@@ -138,6 +152,8 @@ type LinksTemplate = {
   btnBg: string;
   btnFg: string;
   font: string;
+  href?: string;
+  collection?: string;
 };
 
 const LINKS_TEMPLATES: LinksTemplate[] = [
@@ -149,6 +165,8 @@ const LINKS_TEMPLATES: LinksTemplate[] = [
     available: true, new: true,
     bg: "#0D0D0D", fg: "#F0EFE9", sub: "#7A7A7A",
     btnStyle: "square", btnBg: "#E8382C", btnFg: "#0D0D0D", font: "Space Grotesk",
+    href: "/template/brooklyn/links",
+    collection: "Brooklyn",
   },
   {
     id: "links-clean",
@@ -211,6 +229,8 @@ type DeliveryTemplate = {
   accent: string;
   fg: string;
   sub: string;
+  href?: string;
+  collection?: string;
 };
 
 const DELIVERY_TEMPLATES: DeliveryTemplate[] = [
@@ -221,6 +241,8 @@ const DELIVERY_TEMPLATES: DeliveryTemplate[] = [
     tags: ["Dark", "Urban", "Bold"],
     available: true, new: true,
     accent: "#161616", fg: "#F0EFE9", sub: "#7A7A7A",
+    href: "/template/brooklyn/delivery",
+    collection: "Brooklyn",
   },
   {
     id: "delivery-minimal",
@@ -1340,6 +1362,130 @@ function LockIcon() {
    PORTFOLIO CARDS
 ══════════════════════════════════════════════════════════════════════════ */
 
+/* ── Generated template preview ─────────────────────────────
+   Wireframe-style render of what each template type looks like,
+   colored from the template's own palette. */
+
+type PreviewKind = "portfolio" | "links" | "delivery";
+type PreviewStyle = { bg: string; fg: string; accent: string; muted?: string };
+
+function TemplatePreview({ kind, style, dense }: {
+  kind: PreviewKind;
+  style: PreviewStyle;
+  dense?: boolean; // smaller variant for delivery cards
+}) {
+  const { bg, fg, accent } = style;
+  const muted = style.muted ?? `${fg}40`;
+  const placeholder = `${fg}22`;
+  const placeholderAlt = `${fg}38`;
+  const borderColor = `${fg}18`;
+
+  if (kind === "portfolio") {
+    return (
+      <div className="relative w-full h-full overflow-hidden" style={{ background: bg, color: fg }}>
+        {/* Nav */}
+        <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor }}>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-sm" style={{ background: accent }} />
+            <div className="h-1.5 w-9 rounded-sm" style={{ background: fg, opacity: 0.85 }} />
+          </div>
+          <div className="flex gap-2">
+            {[0,1,2].map((i) => <div key={i} className="h-1 w-3.5 rounded-full" style={{ background: muted }} />)}
+          </div>
+        </div>
+        {/* Hero */}
+        <div className="px-3 pt-3 pb-2">
+          <div className="h-1 w-12 rounded-full mb-2" style={{ background: accent, opacity: 0.7 }} />
+          <div className="h-3 w-32 rounded-sm mb-1" style={{ background: fg }} />
+          <div className="h-3 w-24 rounded-sm mb-2" style={{ background: fg, opacity: 0.85 }} />
+          <div className="h-1 w-20 rounded-full" style={{ background: muted }} />
+        </div>
+        {/* Photo grid */}
+        <div className="grid grid-cols-3 gap-1 px-2 pb-2 mt-1">
+          {[0,1,2,3,4,5].map((i) => (
+            <div key={i} className="aspect-[4/5] rounded-sm" style={{ background: i % 2 === 0 ? placeholder : placeholderAlt }} />
+          ))}
+        </div>
+        {/* Mini CTA */}
+        <div className="absolute bottom-2 right-2 px-2 py-1 text-[8px] rounded font-mono uppercase tracking-widest"
+          style={{ background: accent, color: bg, fontWeight: 700 }}>
+          View →
+        </div>
+      </div>
+    );
+  }
+
+  if (kind === "links") {
+    return (
+      <div className="relative w-full h-full flex flex-col items-center pt-5 px-4 overflow-hidden" style={{ background: bg, color: fg }}>
+        {/* Avatar */}
+        <div className="w-9 h-9 rounded-full mb-2" style={{ background: placeholderAlt }} />
+        {/* Name */}
+        <div className="h-2 w-16 rounded-sm mb-1" style={{ background: fg }} />
+        {/* Bio */}
+        <div className="h-1 w-12 rounded-full mb-4" style={{ background: muted }} />
+        {/* Buttons */}
+        <div className="w-full flex flex-col gap-1.5">
+          <div className="h-4 rounded-md" style={{ background: accent }} />
+          <div className="h-4 rounded-md border" style={{ borderColor: `${fg}40`, background: "transparent" }} />
+          <div className="h-4 rounded-md border" style={{ borderColor: `${fg}40`, background: "transparent" }} />
+          <div className="h-4 rounded-md border" style={{ borderColor: `${fg}40`, background: "transparent" }} />
+        </div>
+      </div>
+    );
+  }
+
+  // delivery
+  const cols = dense ? 4 : 4;
+  const rows = dense ? 3 : 4;
+  const total = cols * rows;
+  return (
+    <div className="relative w-full h-full overflow-hidden" style={{ background: bg, color: fg }}>
+      {/* Nav with title + count */}
+      <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor }}>
+        <div className="flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
+          <div className="h-1.5 w-12 rounded-sm" style={{ background: fg, opacity: 0.85 }} />
+        </div>
+        <div className="h-1 w-7 rounded-full" style={{ background: muted }} />
+      </div>
+      {/* Action row */}
+      <div className="flex items-center justify-between px-3 py-1.5 border-b" style={{ borderColor }}>
+        <div className="flex gap-1">
+          <div className="h-1 w-5 rounded-full" style={{ background: muted }} />
+          <div className="h-1 w-5 rounded-full" style={{ background: muted }} />
+        </div>
+        <div className="h-2 w-9 rounded-sm" style={{ background: accent }} />
+      </div>
+      {/* Photo grid */}
+      <div className="grid p-1 gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+        {Array.from({ length: total }).map((_, i) => (
+          <div key={i} className="aspect-square relative" style={{ background: i % 3 === 1 ? placeholderAlt : placeholder }}>
+            {i === 2 && (
+              <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 rounded-sm" style={{ background: accent }} />
+            )}
+            {i === 5 && (
+              <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 rounded-sm" style={{ background: accent }} />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Tiny "Part of [collection]" tag ────────────────────────── */
+function CollectionTag({ name }: { name: string }) {
+  return (
+    <span className="inline-flex items-center gap-1 font-mono text-[8px] uppercase tracking-widest text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded">
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Part of {name}
+    </span>
+  );
+}
+
 function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: number; featured?: boolean }) {
   return (
     <motion.div
@@ -1348,28 +1494,40 @@ function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: nu
         featured ? "border-2 border-yellow" : "border border-[var(--border)] hover:border-[var(--fg-muted)]"
       }`}
     >
+      {/* Generated preview */}
       <div className="relative overflow-hidden" style={{ aspectRatio: "16/10" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`https://picsum.photos/seed/${t.seed}/800/500?grayscale`} alt={t.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          style={{ filter: "brightness(0.88)" }} />
+        <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
+          <TemplatePreview kind="portfolio" style={t.style} />
+        </div>
+        {/* Hover CTAs */}
         <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-250 bg-black/40">
           {t.href ? (
-            <Link href={t.href} target="_blank"
-              className="flex items-center gap-1.5 px-4 py-2 bg-white text-[#111] font-sans text-[11px] font-semibold hover:bg-yellow transition-colors">
-              <ArrowIcon /> Preview
-            </Link>
+            <>
+              <Link href={t.href} target="_blank"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-white text-[#111] font-sans text-[11px] font-semibold rounded-md hover:bg-yellow transition-colors">
+                <ArrowIcon /> Preview
+              </Link>
+              {t.editorHref && (
+                <Link href={t.editorHref}
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-yellow text-[#111] font-sans text-[11px] font-bold rounded-md hover:bg-yellow/90 transition-colors">
+                  Use →
+                </Link>
+              )}
+            </>
           ) : (
-            <span className="flex items-center gap-1.5 px-4 py-2 bg-white/20 backdrop-blur-sm text-white font-mono text-[10px]">
+            <span className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 backdrop-blur-sm text-white font-mono text-[10px] rounded-md">
               <LockIcon /> Soon
             </span>
           )}
         </div>
+        {/* Browser chrome */}
         <div className="absolute top-0 left-0 right-0 h-5 bg-black/40 backdrop-blur-sm flex items-center px-2 gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-white/20" /><div className="w-1.5 h-1.5 rounded-full bg-white/20" /><div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+          <div className="w-1.5 h-1.5 rounded-full bg-white/30" /><div className="w-1.5 h-1.5 rounded-full bg-white/30" /><div className="w-1.5 h-1.5 rounded-full bg-white/30" />
         </div>
-        {t.new && <div className="absolute top-5 left-2 bg-yellow text-[#111] font-mono text-[8px] font-bold px-1.5 py-0.5 tracking-widest uppercase">New</div>}
+        {t.new && <div className="absolute top-5 left-2 bg-yellow text-[#111] font-mono text-[8px] font-bold px-1.5 py-0.5 tracking-widest uppercase rounded-sm">New</div>}
       </div>
+
+      {/* Card body */}
       <div className="p-4 flex flex-col gap-2 flex-1">
         <div className="flex items-start justify-between gap-2">
           <div>
@@ -1377,21 +1535,39 @@ function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: nu
             <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-wider">{t.category}</span>
           </div>
           {featured
-            ? <span className="font-mono text-[9px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 shrink-0">In use</span>
-            : !t.href && <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0"><LockIcon /> Soon</span>
+            ? <span className="font-mono text-[9px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 shrink-0 rounded">In use</span>
+            : !t.href && <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0 rounded"><LockIcon /> Soon</span>
           }
         </div>
         <p className="font-sans text-[11px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{t.description}</p>
-        <div className="flex flex-wrap gap-1 pt-1">
-          {t.tags.map((tag) => <span key={tag} className="font-mono text-[8px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5">{tag}</span>)}
+
+        {/* Tags + collection */}
+        <div className="flex flex-wrap gap-1 pt-1 items-center">
+          {t.tags.map((tag) => <span key={tag} className="font-mono text-[8px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 rounded">{tag}</span>)}
+          {t.collection && <CollectionTag name={t.collection.charAt(0).toUpperCase() + t.collection.slice(1)} />}
         </div>
-        <div className="pt-2 border-t border-[var(--border)] flex items-center justify-between">
-          <div className="flex gap-2">
-            <span className="font-sans text-[10px] text-[var(--fg-muted)]">{t.fonts.serif}</span>
-            <span className="text-[var(--border)]">·</span>
-            <span className="font-sans text-[10px] text-[var(--fg-muted)]">{t.fonts.sans}</span>
-          </div>
-          {t.href && <button className="font-mono text-[9px] text-yellow hover:text-[var(--fg)] transition-colors uppercase tracking-wider">Use →</button>}
+
+        {/* CTA row */}
+        <div className="pt-2 border-t border-[var(--border)] flex items-center gap-2">
+          {t.href ? (
+            <>
+              <Link href={t.href} target="_blank"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Preview
+              </Link>
+              <Link href={t.editorHref ?? "#"}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
+              >
+                Use template →
+              </Link>
+            </>
+          ) : (
+            <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-[9px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed border border-dashed border-[var(--border)]">
+              <LockIcon /> Coming soon
+            </span>
+          )}
         </div>
       </div>
     </motion.div>
@@ -1458,17 +1634,33 @@ function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
           {!t.available && <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0"><LockIcon /> Soon</span>}
         </div>
         <p className="font-sans text-[11px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{t.description}</p>
-        <div className="flex flex-wrap gap-1 pt-1">
-          {t.tags.map((tag) => <span key={tag} className="font-mono text-[8px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5">{tag}</span>)}
+        <div className="flex flex-wrap gap-1 pt-1 items-center">
+          {t.tags.map((tag) => <span key={tag} className="font-mono text-[8px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 rounded">{tag}</span>)}
+          {t.collection && <CollectionTag name={t.collection} />}
         </div>
-        <div className="pt-2 border-t border-[var(--border)]">
+        <div className="pt-2 border-t border-[var(--border)] flex items-center gap-2">
           {t.available ? (
-            <Link href="/dashboard/links"
-              className="flex items-center justify-center gap-1.5 w-full py-2 font-mono text-[9px] text-yellow hover:text-[var(--fg)] transition-colors uppercase tracking-wider">
-              <CheckIcon /> Use in Links builder →
-            </Link>
+            <>
+              {t.href ? (
+                <Link href={t.href} target="_blank"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Preview
+                </Link>
+              ) : (
+                <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-dashed border-[var(--border)] text-[var(--fg-muted)] opacity-50 cursor-not-allowed">
+                  No preview
+                </span>
+              )}
+              <Link href="/dashboard/links"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
+              >
+                Use template →
+              </Link>
+            </>
           ) : (
-            <span className="flex items-center justify-center gap-1 w-full py-2 font-mono text-[9px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed">
+            <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-[9px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed border border-dashed border-[var(--border)]">
               <LockIcon /> Coming soon
             </span>
           )}
@@ -1483,32 +1675,44 @@ function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
 ══════════════════════════════════════════════════════════════════════════ */
 
 function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number }) {
-  const previewSeeds = [401, 402, 403, 404, 405, 406];
-  const imgRadius = (t.id === "delivery-minimal" || t.id === "delivery-editorial") ? 3 : 0;
+  /* Build a generated preview style from the template's existing color tokens.
+     accent = page background, fg = text, fg accents are derived as muted tint. */
+  const previewStyle: PreviewStyle = { bg: t.accent, fg: t.fg, accent: t.fg, muted: t.sub };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.05 }}
       className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden flex flex-col"
     >
-      {/* Gallery preview */}
-      <div className="relative overflow-hidden" style={{ background: t.accent, minHeight: 200 }}>
-        {/* Top nav */}
-        <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: `1px solid ${t.fg}15` }}>
-          <span style={{ fontFamily: "serif", fontSize: 11, fontWeight: 900, color: t.fg, letterSpacing: "0.1em", textTransform: "uppercase" }}>FRAME</span>
-          <div style={{ fontFamily: "monospace", fontSize: 8, color: t.sub, letterSpacing: "0.12em", textTransform: "uppercase" }}>Gallery · 84 photos</div>
+      {/* Generated delivery preview */}
+      <div className="relative overflow-hidden" style={{ aspectRatio: "16/10", minHeight: 180 }}>
+        <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
+          <TemplatePreview kind="delivery" style={previewStyle} dense />
         </div>
-        {/* Photo grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 3, padding: "10px 10px 12px" }}>
-          {previewSeeds.map((seed) => (
-            <div key={seed} style={{ aspectRatio: "1", overflow: "hidden", borderRadius: imgRadius }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`https://picsum.photos/seed/${seed}/160/160?grayscale`} alt=""
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-            </div>
-          ))}
+
+        {/* Hover CTAs */}
+        <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-250 bg-black/40">
+          {t.available ? (
+            <>
+              {t.href && (
+                <Link href={t.href} target="_blank"
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-white text-[#111] font-sans text-[11px] font-semibold rounded-md hover:bg-yellow transition-colors">
+                  <ArrowIcon /> Preview
+                </Link>
+              )}
+              <Link href="/dashboard/delivery"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-yellow text-[#111] font-sans text-[11px] font-bold rounded-md hover:bg-yellow/90 transition-colors">
+                Use →
+              </Link>
+            </>
+          ) : (
+            <span className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 backdrop-blur-sm text-white font-mono text-[10px] rounded-md">
+              <LockIcon /> Coming soon
+            </span>
+          )}
         </div>
-        {t.new && <div className="absolute top-3 left-3 bg-yellow text-[#111] font-mono text-[8px] font-bold px-1.5 py-0.5 tracking-widest uppercase">New</div>}
+
+        {t.new && <div className="absolute top-3 left-3 bg-yellow text-[#111] font-mono text-[8px] font-bold px-1.5 py-0.5 tracking-widest uppercase rounded-sm">New</div>}
         {!t.available && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
             <span className="flex items-center gap-1.5 font-mono text-[10px] text-white/80 bg-black/50 px-3 py-1.5 rounded-full">
@@ -1528,20 +1732,40 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
               <div className="w-3 h-3 rounded-sm border border-[var(--border)]" style={{ background: t.fg }} />
             </div>
           </div>
-          {!t.available && <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0"><LockIcon /> Soon</span>}
+          {!t.available && <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0 rounded"><LockIcon /> Soon</span>}
         </div>
         <p className="font-sans text-[11px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{t.description}</p>
-        <div className="flex flex-wrap gap-1 pt-1">
-          {t.tags.map((tag) => <span key={tag} className="font-mono text-[8px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5">{tag}</span>)}
+
+        {/* Tags + collection */}
+        <div className="flex flex-wrap gap-1 pt-1 items-center">
+          {t.tags.map((tag) => <span key={tag} className="font-mono text-[8px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 rounded">{tag}</span>)}
+          {t.collection && <CollectionTag name={t.collection} />}
         </div>
-        <div className="pt-2 border-t border-[var(--border)]">
+
+        {/* CTA row — Preview + Use side-by-side */}
+        <div className="pt-2 border-t border-[var(--border)] flex items-center gap-2">
           {t.available ? (
-            <Link href="/dashboard/delivery"
-              className="flex items-center justify-center gap-1.5 w-full py-2 font-mono text-[9px] text-yellow hover:text-[var(--fg)] transition-colors uppercase tracking-wider">
-              <CheckIcon /> Use in Delivery builder →
-            </Link>
+            <>
+              {t.href ? (
+                <Link href={t.href} target="_blank"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Preview
+                </Link>
+              ) : (
+                <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-dashed border-[var(--border)] text-[var(--fg-muted)] opacity-50 cursor-not-allowed">
+                  No preview
+                </span>
+              )}
+              <Link href="/dashboard/delivery"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
+              >
+                Use template →
+              </Link>
+            </>
           ) : (
-            <span className="flex items-center justify-center gap-1 w-full py-2 font-mono text-[9px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed">
+            <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-[9px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed border border-dashed border-[var(--border)]">
               <LockIcon /> Coming soon
             </span>
           )}

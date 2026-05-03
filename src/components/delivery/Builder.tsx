@@ -494,6 +494,26 @@ function PageTab({ page, set, onOpenGallery }: { page: DeliveryPage; set: Setter
               <TemplateModal current={page.template} onSelect={(t) => set("template", t)} onClose={() => setShowTemplates(false)} />
             )}
           </AnimatePresence>
+
+          {/* Edit website — opens the visual builder for the delivery page */}
+          <a
+            href={`/editor/delivery/${page.id}`}
+            className="mt-2 group w-full flex items-center gap-3 px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border)] hover:border-yellow hover:bg-yellow/5 transition-colors rounded-lg"
+          >
+            <div className="w-8 h-8 rounded-lg shrink-0 bg-[var(--bg-card)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)] group-hover:text-yellow transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </div>
+            <div className="flex-1 text-left min-w-0">
+              <div className="font-sans text-sm font-semibold text-[var(--fg)]">Edit website</div>
+              <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">Open in the visual builder for full control</div>
+            </div>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] group-hover:text-yellow shrink-0">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
         </div>
         <div>
           <FieldLabel>Cover image</FieldLabel>
