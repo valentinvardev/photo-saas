@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 
 /* ─── Brooklyn Delivery ──────────────────────────────────────────
    Password-protected client gallery. Same Brooklyn design language.
@@ -29,11 +30,64 @@ const PHOTOS = [
   276, 287, 298, 309,
 ];
 
+/* Curtain ease — same vibe as Brooklyn portfolio's slide easing */
+const CURTAIN_EASE = [0.76, 0, 0.24, 1] as const;
+const CURTAIN_DURATION = 1.1; // seconds
+
 export default function BrooklynDeliveryPage() {
-  const [unlocked, setUnlocked] = useState(false);
-  if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
-  return <Gallery />;
+  const [unlocked, setUnlocked]         = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+
+  /* When the user enters the correct code:
+     1. Trigger curtain (red panel wipes left → right across viewport)
+     2. At ~midpoint of curtain animation, swap from gate to gallery
+     3. Curtain finishes leaving — gallery photos stagger-in underneath */
+  function handleUnlock() {
+    setTransitioning(true);
+    const half = (CURTAIN_DURATION * 1000) / 2;
+    setTimeout(() => setUnlocked(true), half);
+    setTimeout(() => setTransitioning(false), CURTAIN_DURATION * 1000 + 50);
+  }
+
+  return (
+    <>
+      {!unlocked ? <PasswordGate onUnlock={handleUnlock} /> : <Gallery />}
+
+      <AnimatePresence>
+        {transitioning && (
+          <motion.div
+            key="bk-curtain"
+            initial={{ x: "-100%" }}
+            animate={{ x: "100%" }}
+            transition={{ duration: CURTAIN_DURATION, ease: CURTAIN_EASE }}
+            style={{
+              position: "fixed", inset: 0, background: RED,
+              zIndex: 2000, pointerEvents: "none",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            <span style={{
+              fontFamily: MONO, fontSize: 12, letterSpacing: "0.32em",
+              textTransform: "uppercase", color: BLACK, fontWeight: 700,
+            }}>
+              Welcome, {CLIENT_NAME.split(" & ")[0]}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
 }
+
+/* Stagger variants — photos cascade in as the curtain leaves */
+const gridVariants: Variants = {
+  hidden:  {},
+  visible: { transition: { staggerChildren: 0.035, delayChildren: 0.1 } },
+};
+const photoVariants: Variants = {
+  hidden:  { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+};
 
 /* ── Password gate ─────────────────────────────────────────────── */
 
@@ -232,13 +286,18 @@ function Gallery() {
         @keyframes bk-spin { to { transform: rotate(360deg); } }
       `}</style>
 
-      {/* Photo grid */}
-      <div style={{
-        padding: "clamp(16px, 3vw, 32px)",
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-        gap: 4,
-      }}>
+      {/* Photo grid — stagger reveal */}
+      <motion.div
+        variants={gridVariants}
+        initial="hidden"
+        animate="visible"
+        style={{
+          padding: "clamp(16px, 3vw, 32px)",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+          gap: 4,
+        }}
+      >
         {PHOTOS.map((seed, i) => (
           <GalleryThumb
             key={seed}
@@ -249,7 +308,7 @@ function Gallery() {
             onOpen={() => setLightboxIdx(i)}
           />
         ))}
-      </div>
+      </motion.div>
 
       {/* Footer */}
       <footer style={{
@@ -287,7 +346,8 @@ function GalleryThumb({ seed, index, selected, onSelect, onOpen }: {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <div
+    <motion.div
+      variants={photoVariants}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{ position: "relative", aspectRatio: "1", overflow: "hidden", background: DIM, cursor: "pointer" }}
@@ -345,7 +405,7 @@ function GalleryThumb({ seed, index, selected, onSelect, onOpen }: {
       }}>
         {String(index + 1).padStart(3, "0")}
       </span>
-    </div>
+    </motion.div>
   );
 }
 
