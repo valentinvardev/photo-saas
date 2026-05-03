@@ -375,7 +375,7 @@ function LogoWidthSlider({
 }) {
   const pct = ((width - LOGO_WIDTH_MIN) / (LOGO_WIDTH_MAX - LOGO_WIDTH_MIN)) * 100;
   /* Custom-painted track: filled portion uses the editor's blue accent */
-  const trackBg = `linear-gradient(to right, #2563eb 0%, #2563eb ${pct}%, var(--ec-line) ${pct}%, var(--ec-line) 100%)`;
+  const trackBg = `linear-gradient(to right, #2563eb 0%, #2563eb ${pct}%, var(--ec-border) ${pct}%, var(--ec-border) 100%)`;
 
   return (
     <div>
@@ -402,16 +402,16 @@ function LogoWidthSlider({
         .ed-logo-width-range::-webkit-slider-thumb {
           -webkit-appearance: none;
           width: 14px; height: 14px; border-radius: 50%;
-          background: #fff; border: 2px solid #2563eb;
+          background: var(--ec-bright); border: 2px solid #2563eb;
           cursor: grab; margin-top: 0;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         .ed-logo-width-range::-webkit-slider-thumb:active { cursor: grabbing; }
         .ed-logo-width-range::-moz-range-thumb {
           width: 14px; height: 14px; border-radius: 50%;
-          background: #fff; border: 2px solid #2563eb;
+          background: var(--ec-bright); border: 2px solid #2563eb;
           cursor: grab;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         .ed-logo-width-range::-moz-range-track {
           background: transparent;
