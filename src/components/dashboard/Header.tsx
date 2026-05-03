@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "~/components/providers/ThemeProvider";
+import { useCart } from "~/lib/cart";
+import { CartPanel } from "~/components/dashboard/CartPanel";
 
 /* ── Icons ─────────────────────────────────────────────── */
 function SearchIcon() {
@@ -238,6 +240,8 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
   const pathname = usePathname();
   const { theme } = useTheme();
 
+  const { items: cartItems, open: cartOpen, setOpen: setCartOpen } = useCart();
+
   const [searchFocused, setSearchFocused] = useState(false);
   const [notifOpen, setNotifOpen]         = useState(false);
   const [profileOpen, setProfileOpen]     = useState(false);
@@ -312,6 +316,23 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
         </button>
       </div>
 
+      {/* Cart */}
+      <button
+        onClick={() => setCartOpen(!cartOpen)}
+        className={`relative p-2 rounded-lg transition-colors ${cartOpen ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
+        aria-label="Cart"
+      >
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.99-1.78L23 6H6"/>
+        </svg>
+        {cartItems.length > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-yellow rounded-full flex items-center justify-center ring-2 ring-[var(--bg-card)]">
+            <span className="font-mono text-[8px] font-bold text-[#111] leading-none">{cartItems.length}</span>
+          </span>
+        )}
+      </button>
+
       {/* Chat */}
       <button
         onClick={onChatClick}
@@ -357,3 +378,4 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
     </header>
   );
 }
+

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useStore } from "zustand";
 import { useEditorStore } from "~/lib/editor/store";
 import { saveState } from "~/lib/editor/localStorage";
+import { useEditorTheme } from "~/lib/editor/editorTheme";
 import type { Viewport } from "~/lib/editor/types";
 
 /* ── Icons ── */
@@ -54,6 +55,21 @@ function MobileIcon() {
     </svg>
   );
 }
+function SunIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+  );
+}
+function MoonIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+    </svg>
+  );
+}
 
 const VIEWPORT_ICONS: Record<Viewport, React.ReactNode> = {
   desktop: <DesktopIcon />,
@@ -69,16 +85,19 @@ const VIEWPORT_LABELS: Record<Viewport, string> = {
 export function TopBar() {
   const { nodes, palette, typography, logo, reset, viewport, setViewport } = useEditorStore();
   const { undo, redo, pastStates, futureStates } = useStore(useEditorStore.temporal);
+  const { theme, toggle } = useEditorTheme();
 
   const canUndo = pastStates.length > 0;
   const canRedo = futureStates.length > 0;
+
+  const divider = <div style={{ width: 1, height: 18, background: "var(--ec-border)", margin: "0 2px" }} />;
 
   return (
     <header
       style={{
         height: "var(--ed-topbar-h)",
-        background: "#0d0d0d",
-        borderBottom: "1px solid #1f1f1f",
+        background: "var(--ec-bg)",
+        borderBottom: "1px solid var(--ec-line)",
         display: "flex",
         alignItems: "center",
         padding: "0 12px",
@@ -87,47 +106,48 @@ export function TopBar() {
         zIndex: 50,
       }}
     >
-      {/* Back + Logo */}
+      {/* Back */}
       <Link
         href="/dashboard/templates"
-        style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 4, textDecoration: "none" }}
+        style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 4, textDecoration: "none", color: "var(--ec-sub)" }}
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       </Link>
 
+      {/* Logo */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 6 }}>
         <div style={{ width: 20, height: 20, background: "#facc15", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <span style={{ fontWeight: 900, fontSize: 9, color: "#111", lineHeight: 1 }}>F</span>
         </div>
-        <span style={{ color: "#999", fontSize: 11, letterSpacing: "-0.01em" }}>Minimal BW</span>
+        <span style={{ color: "var(--ec-muted)", fontSize: 11, letterSpacing: "-0.01em" }}>Minimal BW</span>
       </div>
 
-      <div style={{ width: 1, height: 18, background: "#2a2a2a" }} />
+      {divider}
 
       {/* Undo / Redo */}
       <button onClick={() => undo()} disabled={!canUndo} title="Undo (Ctrl+Z)"
-        style={{ background: "none", border: "none", cursor: canUndo ? "pointer" : "not-allowed", color: canUndo ? "#aaa" : "#333", padding: "4px 5px", borderRadius: 3, display: "flex", alignItems: "center" }}>
+        style={{ background: "none", border: "none", cursor: canUndo ? "pointer" : "not-allowed", color: canUndo ? "var(--ec-label)" : "var(--ec-ghost)", padding: "4px 5px", borderRadius: 3, display: "flex", alignItems: "center" }}>
         <UndoIcon />
       </button>
       <button onClick={() => redo()} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)"
-        style={{ background: "none", border: "none", cursor: canRedo ? "pointer" : "not-allowed", color: canRedo ? "#aaa" : "#333", padding: "4px 5px", borderRadius: 3, display: "flex", alignItems: "center" }}>
+        style={{ background: "none", border: "none", cursor: canRedo ? "pointer" : "not-allowed", color: canRedo ? "var(--ec-label)" : "var(--ec-ghost)", padding: "4px 5px", borderRadius: 3, display: "flex", alignItems: "center" }}>
         <RedoIcon />
       </button>
 
-      <div style={{ width: 1, height: 18, background: "#2a2a2a", margin: "0 2px" }} />
+      {divider}
 
       {/* Viewport toggle */}
-      <div style={{ display: "flex", alignItems: "center", gap: 1, background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 5, padding: "2px 3px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 1, background: "var(--ec-raised)", border: "1px solid var(--ec-border)", borderRadius: 5, padding: "2px 3px" }}>
         {(["desktop", "tablet", "mobile"] as Viewport[]).map((v) => (
           <button
             key={v}
             onClick={() => setViewport(v)}
             title={VIEWPORT_LABELS[v]}
             style={{
-              background: viewport === v ? "#2a2a2a" : "none",
+              background: viewport === v ? "var(--ec-border)" : "none",
               border: "none",
               cursor: "pointer",
-              color: viewport === v ? "#fff" : "#555",
+              color: viewport === v ? "var(--ec-bright)" : "var(--ec-sub)",
               padding: "4px 7px",
               borderRadius: 3,
               display: "flex",
@@ -141,16 +161,34 @@ export function TopBar() {
       </div>
 
       {/* Viewport size label */}
-      <span style={{ fontFamily: "monospace", fontSize: 10, color: "#444", marginLeft: 2 }}>
+      <span style={{ fontFamily: "monospace", fontSize: 10, color: "var(--ec-dim)", marginLeft: 2 }}>
         {viewport === "desktop" ? "1280" : viewport === "tablet" ? "768" : "375"}px
       </span>
+
+      {divider}
+
+      {/* Light / Dark mode toggle */}
+      <button
+        onClick={toggle}
+        title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        style={{
+          background: "none", border: "none", cursor: "pointer",
+          color: "var(--ec-sub)", padding: "4px 5px", borderRadius: 3,
+          display: "flex", alignItems: "center",
+          transition: "color 0.15s",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = "var(--ec-text)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = "var(--ec-sub)"; }}
+      >
+        {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+      </button>
 
       <div style={{ flex: 1 }} />
 
       {/* Reset */}
       <button
         onClick={() => { if (confirm("Reset all changes?")) reset(); }}
-        style={{ background: "none", border: "1px solid #222", cursor: "pointer", color: "#555", padding: "3px 9px", borderRadius: 4, fontSize: 11 }}
+        style={{ background: "none", border: "1px solid var(--ec-lift)", cursor: "pointer", color: "var(--ec-sub)", padding: "3px 9px", borderRadius: 4, fontSize: 11 }}
       >
         Reset
       </button>
@@ -159,7 +197,7 @@ export function TopBar() {
       <a
         href="/templates/minimal-bw"
         target="_blank"
-        style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "1px solid #2a2a2a", color: "#aaa", padding: "3px 9px", borderRadius: 4, fontSize: 11, textDecoration: "none" }}
+        style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-label)", padding: "3px 9px", borderRadius: 4, fontSize: 11, textDecoration: "none" }}
       >
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Preview

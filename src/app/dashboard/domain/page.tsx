@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useCart } from "~/lib/cart";
 
 const inputCls =
   "font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition placeholder:text-[var(--fg-muted)]";
@@ -67,6 +68,14 @@ function RouteRow({ icon, label, hint, prefix, slug, onSlug, locked }: {
 
 /* ─── domain search result row ─── */
 function SearchResult({ domain, available, price }: { domain: string; available: boolean; price?: string }) {
+  const { addItem, hasItem, setOpen } = useCart();
+  const inCart = hasItem(domain);
+
+  function handleAdd() {
+    const cents = price ? parseInt(price.replace("$", ""), 10) * 100 : 0;
+    addItem({ type: "domain", name: domain, detail: `${price ?? "free"}/yr`, price: cents, period: "year" });
+  }
+
   return (
     <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-subtle)] last:border-0">
       <span className={`w-2 h-2 rounded-full shrink-0 ${available ? "bg-green-400" : "bg-[var(--border)]"}`} />
@@ -74,9 +83,21 @@ function SearchResult({ domain, available, price }: { domain: string; available:
       {available ? (
         <>
           <span className="font-sans text-xs text-[var(--fg-muted)]">{price}/yr</span>
-          <button className="font-sans text-xs font-semibold bg-yellow text-[#111] px-3 py-1.5 rounded-lg hover:bg-yellow-dark transition-colors">
-            Buy
-          </button>
+          {inCart ? (
+            <button
+              onClick={() => setOpen(true)}
+              className="font-sans text-xs font-semibold text-yellow border border-yellow/40 bg-yellow/10 px-3 py-1.5 rounded-lg hover:bg-yellow/20 transition-colors"
+            >
+              In cart →
+            </button>
+          ) : (
+            <button
+              onClick={handleAdd}
+              className="font-sans text-xs font-semibold bg-yellow text-[#111] px-3 py-1.5 rounded-lg hover:bg-yellow/90 transition-colors"
+            >
+              Add to cart
+            </button>
+          )}
         </>
       ) : (
         <span className="font-sans text-xs text-[var(--fg-muted)]">Taken</span>

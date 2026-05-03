@@ -10,14 +10,14 @@ import { ImageGalleryModal } from "./ImageGalleryModal";
 ───────────────────────────────────────────────────────────────── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ color: "#444", fontSize: 9, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 8px", fontWeight: 600 }}>
+    <p style={{ color: "var(--ec-dim)", fontSize: 9, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 8px", fontWeight: 600 }}>
       {children}
     </p>
   );
 }
 
 function Divider() {
-  return <div style={{ height: 1, background: "#1a1a1a", margin: "14px 0" }} />;
+  return <div style={{ height: 1, background: "var(--ec-raised)", margin: "14px 0" }} />;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -63,9 +63,9 @@ function TextInspector({ node, update }: { node: EditorNode; update: (patch: Par
               key={p.label}
               onClick={() => update({ fontSize: active ? undefined : p.value })}
               style={{
-                background: active ? "#2563eb" : "#1a1a1a",
-                border: `1px solid ${active ? "#2563eb" : "#252525"}`,
-                color: active ? "#fff" : "#666",
+                background: active ? "#2563eb" : "var(--ec-raised)",
+                border: `1px solid ${active ? "#2563eb" : "var(--ec-lift)"}`,
+                color: active ? "#fff" : "var(--ec-sub)",
                 fontSize: 9, padding: "3px 6px", borderRadius: 3, cursor: "pointer",
                 fontFamily: "inherit",
               }}
@@ -81,7 +81,7 @@ function TextInspector({ node, update }: { node: EditorNode; update: (patch: Par
         onChange={(e) => update({ fontSize: e.target.value || undefined })}
         placeholder="e.g. 18px, 1.5rem, clamp(…)"
         style={{
-          width: "100%", background: "#111", border: "1px solid #252525", color: "#aaa",
+          width: "100%", background: "var(--ec-bg)", border: "1px solid var(--ec-lift)", color: "var(--ec-label)",
           fontSize: 11, padding: "5px 8px", borderRadius: 4, outline: "none",
           boxSizing: "border-box", fontFamily: "monospace",
         }}
@@ -99,9 +99,9 @@ function TextInspector({ node, update }: { node: EditorNode; update: (patch: Par
               key={p.label}
               onClick={() => update({ fontWeight: active ? undefined : p.value })}
               style={{
-                background: active ? "#2563eb" : "#1a1a1a",
-                border: `1px solid ${active ? "#2563eb" : "#252525"}`,
-                color: active ? "#fff" : "#666",
+                background: active ? "#2563eb" : "var(--ec-raised)",
+                border: `1px solid ${active ? "#2563eb" : "var(--ec-lift)"}`,
+                color: active ? "#fff" : "var(--ec-sub)",
                 fontSize: 9, padding: "3px 6px", borderRadius: 3, cursor: "pointer",
                 fontFamily: "inherit", fontWeight: p.value,
               }}
@@ -122,9 +122,9 @@ function TextInspector({ node, update }: { node: EditorNode; update: (patch: Par
           onClick={() => update({ fontStyle: isItalic ? "normal" : "italic" })}
           title="Italic"
           style={{
-            background: isItalic ? "#2563eb" : "#1a1a1a",
-            border: `1px solid ${isItalic ? "#2563eb" : "#252525"}`,
-            color: isItalic ? "#fff" : "#666",
+            background: isItalic ? "#2563eb" : "var(--ec-raised)",
+            border: `1px solid ${isItalic ? "#2563eb" : "var(--ec-lift)"}`,
+            color: isItalic ? "#fff" : "var(--ec-sub)",
             width: 28, height: 28, borderRadius: 4, cursor: "pointer", display: "flex",
             alignItems: "center", justifyContent: "center",
           }}
@@ -134,7 +134,7 @@ function TextInspector({ node, update }: { node: EditorNode; update: (patch: Par
           </svg>
         </button>
 
-        <div style={{ width: 1, height: 20, background: "#252525" }} />
+        <div style={{ width: 1, height: 20, background: "var(--ec-lift)" }} />
 
         {/* Alignment */}
         {(["left", "center", "right"] as const).map((a) => {
@@ -150,9 +150,9 @@ function TextInspector({ node, update }: { node: EditorNode; update: (patch: Par
               onClick={() => update({ textAlign: active ? undefined : a })}
               title={`Align ${a}`}
               style={{
-                background: active ? "#2563eb" : "#1a1a1a",
-                border: `1px solid ${active ? "#2563eb" : "#252525"}`,
-                color: active ? "#fff" : "#666",
+                background: active ? "#2563eb" : "var(--ec-raised)",
+                border: `1px solid ${active ? "#2563eb" : "var(--ec-lift)"}`,
+                color: active ? "#fff" : "var(--ec-sub)",
                 width: 28, height: 28, borderRadius: 4, cursor: "pointer", display: "flex",
                 alignItems: "center", justifyContent: "center",
               }}
@@ -200,7 +200,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
       {/* Source */}
       <SectionLabel>Source</SectionLabel>
       {node.src && (
-        <div style={{ marginBottom: 8, borderRadius: 4, overflow: "hidden", aspectRatio: "4/3", background: "#111" }}>
+        <div style={{ marginBottom: 8, borderRadius: 4, overflow: "hidden", aspectRatio: "4/3", background: "var(--ec-bg)" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={node.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         </div>
@@ -211,8 +211,8 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
         onKeyDown={(e) => { if (e.key === "Enter") applyUrl(); }}
         placeholder="https://..."
         style={{
-          width: "100%", background: "#0d0d0d", border: "1px solid #1f1f1f",
-          color: "#aaa", fontSize: 11, padding: "6px 8px", borderRadius: 4,
+          width: "100%", background: "var(--ec-bg)", border: "1px solid var(--ec-line)",
+          color: "var(--ec-label)", fontSize: 11, padding: "6px 8px", borderRadius: 4,
           outline: "none", boxSizing: "border-box", fontFamily: "monospace",
           marginBottom: 6,
         }}
@@ -222,8 +222,8 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
           onClick={applyUrl}
           disabled={!urlDraft.trim() || urlDraft.trim() === node.src}
           style={{
-            flex: 1, background: "#1a1a1a", border: "1px solid #252525",
-            color: "#888", fontSize: 10, padding: "6px", borderRadius: 4,
+            flex: 1, background: "var(--ec-raised)", border: "1px solid var(--ec-lift)",
+            color: "var(--ec-muted)", fontSize: 10, padding: "6px", borderRadius: 4,
             cursor: "pointer", fontFamily: "inherit",
           }}
         >
@@ -265,9 +265,9 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
               onClick={() => update({ objectFit: o.value })}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
-                background: active ? "rgba(37,99,235,0.15)" : "#111",
-                border: `1px solid ${active ? "#2563eb" : "#1f1f1f"}`,
-                color: active ? "#93c5fd" : "#666",
+                background: active ? "rgba(37,99,235,0.15)" : "var(--ec-bg)",
+                border: `1px solid ${active ? "#2563eb" : "var(--ec-line)"}`,
+                color: active ? "#93c5fd" : "var(--ec-sub)",
                 fontSize: 11, padding: "6px 10px", borderRadius: 4, cursor: "pointer",
                 fontFamily: "inherit", textAlign: "left",
               }}
@@ -291,9 +291,9 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
               key={o.value}
               onClick={() => update({ objectPosition: o.value })}
               style={{
-                background: active ? "#2563eb" : "#1a1a1a",
-                border: `1px solid ${active ? "#2563eb" : "#252525"}`,
-                color: active ? "#fff" : "#666",
+                background: active ? "#2563eb" : "var(--ec-raised)",
+                border: `1px solid ${active ? "#2563eb" : "var(--ec-lift)"}`,
+                color: active ? "#fff" : "var(--ec-sub)",
                 fontSize: 10, padding: "4px 8px", borderRadius: 3, cursor: "pointer",
                 fontFamily: "inherit",
               }}
@@ -329,8 +329,8 @@ export function InspectorPanel() {
     <aside
       style={{
         width: 220,
-        background: "#0a0a0a",
-        borderRight: "1px solid #1a1a1a",
+        background: "var(--ec-bg)",
+        borderRight: "1px solid var(--ec-raised)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
@@ -340,11 +340,11 @@ export function InspectorPanel() {
       {/* Header */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "10px 12px", borderBottom: "1px solid #1a1a1a", flexShrink: 0,
+        padding: "10px 12px", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#2563eb" }} />
-          <span style={{ color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          <span style={{ color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
             {isImage ? "Image" : "Text"}
           </span>
         </div>
@@ -358,7 +358,7 @@ export function InspectorPanel() {
 
       {/* Node ID */}
       <div style={{ padding: "6px 12px", borderBottom: "1px solid #111" }}>
-        <span style={{ fontFamily: "monospace", fontSize: 9, color: "#2a2a2a" }}>{selectedId}</span>
+        <span style={{ fontFamily: "monospace", fontSize: 9, color: "var(--ec-border)" }}>{selectedId}</span>
       </div>
 
       {/* Controls */}

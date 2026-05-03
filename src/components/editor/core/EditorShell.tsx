@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import { loadState } from "~/lib/editor/localStorage";
+import { EditorThemeProvider, THEME_VARS, useEditorTheme } from "~/lib/editor/editorTheme";
 import { TopBar } from "./TopBar";
 import { Canvas } from "./Canvas";
 import { Sidebar } from "./Sidebar";
@@ -12,20 +13,20 @@ import type { TemplateId } from "~/lib/editor/templates/registry";
 // Side-effect: load all @fontsource CSS
 import "~/lib/editor/fonts";
 
-export function EditorShell({ templateId }: { templateId?: TemplateId } = {}) {
+function EditorShellInner({ templateId }: { templateId?: TemplateId }) {
   const {
     setTemplate, updateNode, setPalette, setTypography, setLogo,
     palette, typography, selectedSection, hoveredSection,
     hiddenSections,
   } = useEditorStore();
 
-  // Set the active template before any other hydration
+  const { theme } = useEditorTheme();
+
   useEffect(() => {
     if (templateId) setTemplate(templateId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId]);
 
-  // Hydrate from localStorage on first render
   useEffect(() => {
     const saved = loadState();
     if (!saved) return;
@@ -39,23 +40,21 @@ export function EditorShell({ templateId }: { templateId?: TemplateId } = {}) {
   }, []);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100dvh", background: "#0a0a0a" }}>
+    <div
+      style={{
+        display: "flex", flexDirection: "column", height: "100dvh",
+        background: "var(--ec-bg)",
+        ...THEME_VARS[theme],
+      }}
+    >
       <TopBar />
 
-      {/* Main area — Sidebar · InspectorPanel (when node selected) · Canvas */}
       <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
         <Sidebar />
         <InspectorPanel />
         <Canvas />
       </div>
 
-      {/*
-        Global style injections:
-        1. Palette + typography CSS variables on .canvas-frame
-        2. Section hover/selection amber outlines
-        3. Hidden sections (display:none)
-        4. Hidden nodes (display:none via data-node-id attribute)
-      */}
       <style>{`
         .canvas-frame {
           --ed-bg:     ${palette.bg};
@@ -80,5 +79,13 @@ export function EditorShell({ templateId }: { templateId?: TemplateId } = {}) {
         ${hiddenSections.map((id) => `#${id} { display: none !important; }`).join("\n")}
       `}</style>
     </div>
+  );
+}
+
+export function EditorShell({ templateId }: { templateId?: TemplateId } = {}) {
+  return (
+    <EditorThemeProvider>
+      <EditorShellInner templateId={templateId} />
+    </EditorThemeProvider>
   );
 }

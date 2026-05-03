@@ -3,12 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "~/lib/cart";
 
 /* ══════════════════════════════════════════════════════════════════════════
    TYPES
 ══════════════════════════════════════════════════════════════════════════ */
 
-type ProductType = "portfolio" | "links" | "delivery";
+type ProductType = "collections" | "portfolio" | "links" | "delivery";
 type PortfolioCategory = "All" | "Minimal" | "Editorial" | "Magazine" | "Story" | "Grid";
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -93,6 +94,28 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     seed: 154,
     fonts: { serif: "EB Garamond", sans: "GT Walsheim", mono: "Inconsolata" },
   },
+  {
+    id: "brooklyn",
+    name: "Brooklyn",
+    description: "Urban, high-contrast portfolio with full-screen vertical navigation, auto-glide slider, and bold NYC editorial aesthetic.",
+    category: "Editorial",
+    tags: ["Urban", "Dark", "NYC", "Bold"],
+    href: "/template/brooklyn",
+    seed: 10,
+    new: true,
+    fonts: { serif: "DM Serif Display", sans: "Space Grotesk", mono: "Space Mono" },
+  },
+  {
+    id: "petal",
+    name: "Petal",
+    description: "Playful pastel portfolio with bento works grid, VSCO masonry gallery, and warm sand background.",
+    category: "Minimal",
+    tags: ["Pastel", "Playful", "Modern"],
+    href: "/templates/lumiere",
+    seed: 452,
+    new: true,
+    fonts: { serif: "—", sans: "DM Sans", mono: "Space Mono" },
+  },
 ];
 
 const PORTFOLIO_CATEGORIES: PortfolioCategory[] = ["All", "Minimal", "Editorial", "Magazine", "Story", "Grid"];
@@ -118,6 +141,15 @@ type LinksTemplate = {
 };
 
 const LINKS_TEMPLATES: LinksTemplate[] = [
+  {
+    id: "links-brooklyn",
+    name: "Brooklyn",
+    description: "Urban dark layout with red accents, squared buttons, and a bold marquee. Matches the Brooklyn portfolio.",
+    tags: ["Dark", "Urban", "Bold"],
+    available: true, new: true,
+    bg: "#0D0D0D", fg: "#F0EFE9", sub: "#7A7A7A",
+    btnStyle: "square", btnBg: "#E8382C", btnFg: "#0D0D0D", font: "Space Grotesk",
+  },
   {
     id: "links-clean",
     name: "Clean",
@@ -183,6 +215,14 @@ type DeliveryTemplate = {
 
 const DELIVERY_TEMPLATES: DeliveryTemplate[] = [
   {
+    id: "delivery-brooklyn",
+    name: "Brooklyn",
+    description: "Dark client gallery with red download CTAs, checkbox selection, and password gate. Matches the Brooklyn portfolio.",
+    tags: ["Dark", "Urban", "Bold"],
+    available: true, new: true,
+    accent: "#161616", fg: "#F0EFE9", sub: "#7A7A7A",
+  },
+  {
     id: "delivery-minimal",
     name: "Minimal",
     description: "Clean white space, serif headings, and a strict grid. Lets your photography take center stage.",
@@ -215,6 +255,155 @@ const DELIVERY_TEMPLATES: DeliveryTemplate[] = [
     accent: "#f0ede8", fg: "#1a1a1a", sub: "#7a7065",
   },
 ];
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COLLECTIONS
+══════════════════════════════════════════════════════════════════════════ */
+
+type TemplateCollection = {
+  id:          string;
+  name:        string;
+  description: string;
+  accentColor: string;
+  accentText:  string;
+  pages: Array<{
+    type: "portfolio" | "links" | "delivery";
+    href: string | null;
+    seed: number;
+  }>;
+};
+
+const COLLECTIONS: TemplateCollection[] = [
+  {
+    id: "brooklyn",
+    name: "Brooklyn",
+    description: "Urban NYC aesthetic across your entire web presence. High-contrast, bold, and editorial — portfolio, links, and client gallery all in one coherent style.",
+    accentColor: "#E8382C",
+    accentText:  "#0D0D0D",
+    pages: [
+      { type: "portfolio", href: "/template/brooklyn",          seed: 10  },
+      { type: "links",     href: "/template/brooklyn/links",    seed: 82  },
+      { type: "delivery",  href: "/template/brooklyn/delivery", seed: 93  },
+    ],
+  },
+  {
+    id: "petal",
+    name: "Petal",
+    description: "Warm pastel palette with playful, modern layouts. Bento grid, masonry gallery, rounded cards — a cohesive identity that feels fresh and distinct.",
+    accentColor: "#d9544a",
+    accentText:  "#faf8f5",
+    pages: [
+      { type: "portfolio", href: "/templates/lumiere", seed: 452 },
+      { type: "links",     href: null,                  seed: 63  },
+      { type: "delivery",  href: null,                  seed: 71  },
+    ],
+  },
+  {
+    id: "atelier",
+    name: "Atelier",
+    description: "Editorial warmth with Cormorant Garamond headings and a restrained warm-cream palette. For photographers who want timeless over trendy.",
+    accentColor: "#c9a89a",
+    accentText:  "#2a2520",
+    pages: [
+      { type: "portfolio", href: "/templates/lumiere", seed: 338 },
+      { type: "links",     href: null,                  seed: 145 },
+      { type: "delivery",  href: "/template/atelier",  seed: 200 },
+    ],
+  },
+];
+
+function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) {
+  const PAGE_LABELS = { portfolio: "Portfolio", links: "Links", delivery: "Delivery" };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.08 }}
+      className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden flex flex-col"
+    >
+      {/* Three-panel preview */}
+      <div className="grid grid-cols-3 gap-0.5 bg-[var(--border)]">
+        {c.pages.map((page) => (
+          <div key={page.type} className="relative overflow-hidden aspect-[3/4] bg-[var(--bg-subtle)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`https://picsum.photos/seed/${page.seed}/300/400?grayscale`}
+              alt={PAGE_LABELS[page.type]}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              style={{ filter: "brightness(0.75)" }}
+            />
+            <div className="absolute bottom-0 left-0 right-0 p-1.5" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)" }}>
+              <span className="font-mono text-[8px] text-white/70 uppercase tracking-widest">{PAGE_LABELS[page.type]}</span>
+            </div>
+            {!page.href && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[1px]">
+                <LockIcon />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Info */}
+      <div className="p-4 flex flex-col gap-3 flex-1">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-sm" style={{ background: c.accentColor }} />
+          <h3 className="font-sans font-black text-[var(--fg)] text-sm">{c.name}</h3>
+          <span className="font-mono text-[8px] px-1.5 py-0.5 rounded" style={{ background: c.accentColor + "22", color: c.accentColor }}>Collection</span>
+        </div>
+        <p className="font-sans text-[11px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{c.description}</p>
+
+        {/* Page links */}
+        <div className="flex flex-col gap-1 pt-2 border-t border-[var(--border)]">
+          {c.pages.map((page) => (
+            <div key={page.type} className="flex items-center justify-between">
+              <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-wide">{PAGE_LABELS[page.type]}</span>
+              {page.href ? (
+                <Link href={page.href} target="_blank"
+                  className="flex items-center gap-1 font-mono text-[9px] transition-colors hover:text-[var(--fg)]"
+                  style={{ color: c.accentColor }}>
+                  Preview <ArrowIcon />
+                </Link>
+              ) : (
+                <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] opacity-40"><LockIcon /> Soon</span>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <AddCollectionToCart collection={c} />
+      </div>
+    </motion.div>
+  );
+}
+
+function AddCollectionToCart({ collection }: { collection: TemplateCollection }) {
+  const { addItem, hasItem, setOpen } = useCart();
+  const inCart = hasItem(collection.name);
+
+  if (inCart) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center justify-center gap-1.5 w-full py-2.5 font-mono text-[9px] uppercase tracking-wider border transition-all"
+        style={{ borderColor: collection.accentColor, color: collection.accentColor }}
+      >
+        In cart — view →
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => addItem({ type: "template", name: collection.name, detail: "Collection · Free", price: 0, period: "one-time" })}
+      className="flex items-center justify-center gap-1.5 w-full py-2.5 font-mono text-[9px] uppercase tracking-wider transition-all font-bold"
+      style={{ background: collection.accentColor, color: collection.accentText }}
+      onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.85"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
+    >
+      Use this collection →
+    </button>
+  );
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    SHARED ICONS
@@ -464,6 +653,12 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
 
 const PRODUCT_TABS: { id: ProductType; label: string; count: number; icon: React.ReactNode }[] = [
   {
+    id: "collections",
+    label: "Collections",
+    count: COLLECTIONS.length,
+    icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>,
+  },
+  {
     id: "portfolio",
     label: "Portfolio",
     count: PORTFOLIO_TEMPLATES.length,
@@ -484,8 +679,9 @@ const PRODUCT_TABS: { id: ProductType; label: string; count: number; icon: React
 ];
 
 export default function TemplatesPage() {
-  const [productType,     setProductType]     = useState<ProductType>("portfolio");
+  const [productType,     setProductType]     = useState<ProductType>("collections");
   const [portfolioFilter, setPortfolioFilter] = useState<PortfolioCategory>("All");
+  const [bannerOpen,      setBannerOpen]      = useState(true);
 
   const filteredPortfolio = portfolioFilter === "All"
     ? PORTFOLIO_TEMPLATES
@@ -493,6 +689,38 @@ export default function TemplatesPage() {
 
   return (
     <div className="min-h-full">
+
+      {/* ── Closeable CTA banner ── */}
+      <AnimatePresence>
+        {bannerOpen && (
+          <motion.div
+            initial={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <div className="flex items-center gap-3 px-5 py-3 bg-yellow/10 border-b border-yellow/20">
+              <div className="w-1.5 h-1.5 rounded-full bg-yellow flex-shrink-0 animate-pulse" />
+              <p className="font-sans text-xs text-[var(--fg)] flex-1">
+                <span className="font-bold">Pick a collection</span> and build your portfolio, link page, and client gallery — all with a consistent look.{" "}
+                <button
+                  onClick={() => setProductType("collections")}
+                  className="text-yellow font-mono text-[10px] uppercase tracking-wider hover:text-[var(--fg)] transition-colors"
+                >
+                  Browse collections →
+                </button>
+              </p>
+              <button
+                onClick={() => setBannerOpen(false)}
+                className="flex-shrink-0 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors p-1"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[var(--bg)] border-b border-[var(--border)] px-5 pt-4 pb-0">
         <div className="flex items-end justify-between gap-4 flex-wrap mb-4">
@@ -558,6 +786,18 @@ export default function TemplatesPage() {
       {/* Content */}
       <div className="p-5 space-y-6">
         <AnimatePresence mode="wait">
+
+          {/* ── Collections ── */}
+          {productType === "collections" && (
+            <motion.div key="collections" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-4">
+              <p className="font-sans text-xs text-[var(--fg-muted)]">
+                Collections bundle a portfolio, links page, and delivery gallery in a single coherent visual style. Pick one and use it everywhere.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {COLLECTIONS.map((c, i) => <CollectionCard key={c.id} c={c} index={i} />)}
+              </div>
+            </motion.div>
+          )}
 
           {/* ── Portfolio ── */}
           {productType === "portfolio" && (

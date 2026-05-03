@@ -78,8 +78,8 @@ function PagesTab() {
         }}
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#facc15" strokeWidth="1.75" strokeLinecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span style={{ color: "#eee", fontSize: 12, fontWeight: 600 }}>Home</span>
-        <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 9, color: "#444", background: "#1a1a1a", padding: "1px 5px", borderRadius: 2 }}>page</span>
+        <span style={{ color: "var(--ec-bright)", fontSize: 12, fontWeight: 600 }}>Home</span>
+        <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 9, color: "var(--ec-dim)", background: "var(--ec-raised)", padding: "1px 5px", borderRadius: 2 }}>page</span>
       </div>
 
       {/* Section rows */}
@@ -92,11 +92,11 @@ function PagesTab() {
         if (isHidden) {
           return (
             <div key={section.id} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 14px 4px 28px", opacity: 0.45 }}>
-              <span style={{ color: "#444", display: "flex" }}>{section.icon}</span>
-              <span style={{ fontSize: 11, color: "#444", flex: 1, textDecoration: "line-through" }}>{section.label}</span>
+              <span style={{ color: "var(--ec-dim)", display: "flex" }}>{section.icon}</span>
+              <span style={{ fontSize: 11, color: "var(--ec-dim)", flex: 1, textDecoration: "line-through" }}>{section.label}</span>
               <button
                 onClick={() => showSection(section.id)}
-                style={{ background: "none", border: "1px solid #2a2a2a", color: "#555", fontSize: 9, padding: "2px 6px", borderRadius: 3, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-sub)", fontSize: 9, padding: "2px 6px", borderRadius: 3, cursor: "pointer", fontFamily: "inherit" }}
               >
                 Restore
               </button>
@@ -125,10 +125,10 @@ function PagesTab() {
                   cursor:      "pointer",
                   padding:     "5px 12px 5px 20px",
                   textAlign:   "left",
-                  color:       isSelected ? "#93c5fd" : "#888",
+                  color:       isSelected ? "#93c5fd" : "var(--ec-muted)",
                   transition:  "background 0.1s, color 0.1s",
                 }}
-                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "#1a1a1a"; }}
+                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "var(--ec-raised)"; }}
                 onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = "none"; }}
               >
                 {/* Expand chevron */}
@@ -145,16 +145,16 @@ function PagesTab() {
                 </span>
 
                 {/* Icon */}
-                <span style={{ color: isSelected ? "#60a5fa" : "#444", display: "flex" }}>{section.icon}</span>
+                <span style={{ color: isSelected ? "#60a5fa" : "var(--ec-dim)", display: "flex" }}>{section.icon}</span>
 
                 {/* Label */}
                 <span style={{ flex: 1, fontSize: 11, fontWeight: isSelected ? 500 : 400 }}>{section.label}</span>
 
                 {/* Lock or drag handle */}
                 {section.locked ? (
-                  <span style={{ color: "#333", display: "flex", marginRight: 4 }}><LockIcon /></span>
+                  <span style={{ color: "var(--ec-ghost)", display: "flex", marginRight: 4 }}><LockIcon /></span>
                 ) : (
-                  <span style={{ color: "#2a2a2a", fontSize: 12, marginRight: 4, letterSpacing: -2 }}>⠿</span>
+                  <span style={{ color: "var(--ec-border)", fontSize: 12, marginRight: 4, letterSpacing: -2 }}>⠿</span>
                 )}
               </button>
 
@@ -172,7 +172,7 @@ function PagesTab() {
 
             {/* Element children */}
             {isExpanded && section.elements.length > 0 && (
-              <div style={{ borderLeft: "1px solid #1f1f1f", marginLeft: 28 }}>
+              <div style={{ borderLeft: "1px solid var(--ec-line)", marginLeft: 28 }}>
                 {section.elements.map((el) => {
                   const elSelected = selectedId === el.nodeId;
                   return (
@@ -190,16 +190,16 @@ function PagesTab() {
                         cursor:     "pointer",
                         padding:    "4px 10px 4px 10px",
                         textAlign:  "left",
-                        color:      elSelected ? "#93c5fd" : "#555",
+                        color:      elSelected ? "#93c5fd" : "var(--ec-sub)",
                       }}
-                      onMouseEnter={(e) => { if (!elSelected) e.currentTarget.style.background = "#161616"; }}
+                      onMouseEnter={(e) => { if (!elSelected) e.currentTarget.style.background = "var(--ec-surface)"; }}
                       onMouseLeave={(e) => { if (!elSelected) e.currentTarget.style.background = "none"; }}
                     >
                       <span style={{ color: el.type === "image" ? "#7c3aed" : "#2563eb", display: "flex" }}>
                         {el.type === "image" ? <ImageNodeIcon /> : <TextNodeIcon />}
                       </span>
                       <span style={{ fontSize: 11 }}>{el.label}</span>
-                      <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 9, color: "#2a2a2a" }}>
+                      <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 9, color: "var(--ec-border)" }}>
                         {el.type}
                       </span>
                     </button>
@@ -245,12 +245,12 @@ function ThreeDotMenu({ sectionId: _id, locked, isOpen, onOpen, onClose, onScrol
         ref={btnRef}
         onClick={handleToggle}
         style={{
-          background: "none", border: "none", cursor: "pointer", color: "#444",
+          background: "none", border: "none", cursor: "pointer", color: "var(--ec-dim)",
           padding: "2px 4px", borderRadius: 3, display: "flex", alignItems: "center",
           opacity: isOpen ? 1 : undefined,
         }}
-        onMouseEnter={(e) => { e.currentTarget.style.background = "#222"; e.currentTarget.style.color = "#aaa"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#444"; }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--ec-lift)"; e.currentTarget.style.color = "var(--ec-label)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--ec-dim)"; }}
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
       </button>
@@ -266,12 +266,12 @@ function ThreeDotMenu({ sectionId: _id, locked, isOpen, onOpen, onClose, onScrol
           <div
             style={{
               position: "fixed", top: pos.top, right: pos.right, zIndex: 9999,
-              background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 6,
+              background: "var(--ec-raised)", border: "1px solid var(--ec-border)", borderRadius: 6,
               minWidth: 140, overflow: "hidden", boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
             }}
           >
             <MenuItem label="Scroll to" onClick={() => { onScrollTo(); onClose(); }} />
-            <div style={{ height: 1, background: "#222", margin: "2px 0" }} />
+            <div style={{ height: 1, background: "var(--ec-lift)", margin: "2px 0" }} />
             <MenuItem label="Delete" onClick={onDelete} disabled={locked} danger />
           </div>
         </>,
@@ -289,13 +289,13 @@ function MenuItem({ label, onClick, disabled, danger }: { label: string; onClick
         display: "block", width: "100%", textAlign: "left",
         background: "none", border: "none",
         padding: "7px 12px", fontSize: 11,
-        color: disabled ? "#333" : danger ? "#f87171" : "#aaa",
+        color: disabled ? "var(--ec-ghost)" : danger ? "#f87171" : "var(--ec-label)",
         cursor: disabled ? "default" : "pointer",
       }}
-      onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.background = "#222"; }}
+      onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.background = "var(--ec-lift)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
     >
-      {label} {disabled && <span style={{ fontSize: 9, color: "#2a2a2a" }}>— template</span>}
+      {label} {disabled && <span style={{ fontSize: 9, color: "var(--ec-border)" }}>— template</span>}
     </button>
   );
 }
@@ -312,13 +312,13 @@ function ElementPanel({ nodeId }: { nodeId: string }) {
   if (!node || node.type === "image") return null;
 
   return (
-    <div style={{ borderTop: "1px solid #1a1a1a", marginTop: 4 }}>
+    <div style={{ borderTop: "1px solid var(--ec-raised)", marginTop: 4 }}>
       <div style={{ padding: "8px 14px", display: "flex", alignItems: "center", gap: 6 }}>
         <span style={{ color: "#2563eb", display: "flex" }}>
           <TextNodeIcon />
         </span>
-        <span style={{ color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
-          Text — <span style={{ color: "#444" }}>{nodeId}</span>
+        <span style={{ color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          Text — <span style={{ color: "var(--ec-dim)" }}>{nodeId}</span>
         </span>
       </div>
       <TextPanel nodeId={nodeId} />
@@ -333,15 +333,15 @@ function DesignTab() {
   const [section, setSection] = useState<"colors" | "type">("colors");
 
   const pillStyle = (active: boolean): React.CSSProperties => ({
-    flex: 1, background: active ? "#222" : "none", border: "none",
-    color: active ? "#eee" : "#555", fontSize: 11, padding: "5px 0",
+    flex: 1, background: active ? "var(--ec-lift)" : "none", border: "none",
+    color: active ? "var(--ec-bright)" : "var(--ec-sub)", fontSize: 11, padding: "5px 0",
     cursor: "pointer", borderRadius: 4, fontFamily: "inherit",
   });
 
   return (
     <div>
       {/* Sub-nav */}
-      <div style={{ display: "flex", gap: 2, padding: "10px 12px 6px", background: "#0d0d0d" }}>
+      <div style={{ display: "flex", gap: 2, padding: "10px 12px 6px", background: "var(--ec-bg)" }}>
         <button style={pillStyle(section === "colors")} onClick={() => setSection("colors")}>Colors</button>
         <button style={pillStyle(section === "type")}   onClick={() => setSection("type")}>Typography</button>
       </div>
@@ -375,13 +375,13 @@ function LogoWidthSlider({
 }) {
   const pct = ((width - LOGO_WIDTH_MIN) / (LOGO_WIDTH_MAX - LOGO_WIDTH_MIN)) * 100;
   /* Custom-painted track: filled portion uses the editor's blue accent */
-  const trackBg = `linear-gradient(to right, #2563eb 0%, #2563eb ${pct}%, #1f1f1f ${pct}%, #1f1f1f 100%)`;
+  const trackBg = `linear-gradient(to right, #2563eb 0%, #2563eb ${pct}%, var(--ec-line) ${pct}%, var(--ec-line) 100%)`;
 
   return (
     <div>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 5 }}>
         <label style={{ ...labelStyle, marginBottom: 0 }}>Logo width</label>
-        <span style={{ fontFamily: "monospace", fontSize: 11, color: "#888" }}>{width}<span style={{ color: "#444" }}>px</span></span>
+        <span style={{ fontFamily: "monospace", fontSize: 11, color: "var(--ec-muted)" }}>{width}<span style={{ color: "var(--ec-dim)" }}>px</span></span>
       </div>
       <input
         type="range"
@@ -440,8 +440,8 @@ function LogoCropButton({
         onClick={() => setOpen(true)}
         disabled={!imageUrl}
         style={{
-          width: "100%", background: "#1a1a1a", border: "1px solid #2a2a2a",
-          color: imageUrl ? "#888" : "#333", fontSize: 11, padding: "7px 10px",
+          width: "100%", background: "var(--ec-raised)", border: "1px solid var(--ec-border)",
+          color: imageUrl ? "var(--ec-muted)" : "var(--ec-ghost)", fontSize: 11, padding: "7px 10px",
           borderRadius: 4, cursor: imageUrl ? "pointer" : "default",
           fontFamily: "inherit", textAlign: "left",
           display: "flex", alignItems: "center", gap: 8,
@@ -479,19 +479,19 @@ function SettingsTab() {
   }
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0a0a0a", border: "1px solid #1f1f1f",
-    color: "#ccc", fontSize: 12, padding: "7px 8px", borderRadius: 4,
+    width: "100%", background: "var(--ec-bg)", border: "1px solid var(--ec-line)",
+    color: "var(--ec-text)", fontSize: 12, padding: "7px 8px", borderRadius: 4,
     outline: "none", boxSizing: "border-box", fontFamily: "inherit",
   };
   const labelStyle: React.CSSProperties = {
-    color: "#555", fontSize: 10, textTransform: "uppercase",
+    color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase",
     letterSpacing: "0.1em", display: "block", marginBottom: 5,
   };
 
   const modeStyle = (active: boolean): React.CSSProperties => ({
     flex: 1, background: active ? "#1a2a3a" : "#111",
-    border: `1px solid ${active ? "#2563eb" : "#1f1f1f"}`,
-    color: active ? "#93c5fd" : "#555",
+    border: `1px solid ${active ? "#2563eb" : "var(--ec-line)"}`,
+    color: active ? "#93c5fd" : "var(--ec-sub)",
     fontSize: 10, padding: "5px 4px", borderRadius: 3,
     cursor: "pointer", fontFamily: "inherit", textAlign: "center",
   });
@@ -501,7 +501,7 @@ function SettingsTab() {
 
       {/* Logo */}
       <div>
-        <p style={{ color: "#444", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Logo</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Logo</p>
 
         {/* Mode selector */}
         <label style={labelStyle}>Display mode</label>
@@ -550,8 +550,8 @@ function SettingsTab() {
       </div>
 
       {/* Site info */}
-      <div style={{ borderTop: "1px solid #1a1a1a", paddingTop: 16 }}>
-        <p style={{ color: "#444", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Site</p>
+      <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Site</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div>
             <label style={labelStyle}>Title</label>
@@ -564,41 +564,41 @@ function SettingsTab() {
           </div>
           <div>
             <label style={labelStyle}>Domain</label>
-            <input defaultValue="jameshollis.frame.co" style={{ ...inputStyle, color: "#444" }} disabled />
-            <p style={{ color: "#2a2a2a", fontSize: 10, margin: "4px 0 0" }}>Custom domains — upgrade to Pro</p>
+            <input defaultValue="jameshollis.frame.co" style={{ ...inputStyle, color: "var(--ec-dim)" }} disabled />
+            <p style={{ color: "var(--ec-border)", fontSize: 10, margin: "4px 0 0" }}>Custom domains — upgrade to Pro</p>
           </div>
         </div>
       </div>
 
       {/* SEO */}
-      <div style={{ borderTop: "1px solid #1a1a1a", paddingTop: 16 }}>
-        <p style={{ color: "#444", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Social links</p>
+      <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Social links</p>
         {[
           { label: "Instagram", placeholder: "@jameshollis" },
           { label: "X / Twitter", placeholder: "@jhollis" },
         ].map((s) => (
           <div key={s.label} style={{ marginBottom: 8 }}>
             <label style={labelStyle}>{s.label}</label>
-            <input placeholder={s.placeholder} style={{ ...inputStyle, color: "#555" }} />
+            <input placeholder={s.placeholder} style={{ ...inputStyle, color: "var(--ec-sub)" }} />
           </div>
         ))}
       </div>
 
       {/* Export */}
-      <div style={{ borderTop: "1px solid #1a1a1a", paddingTop: 16 }}>
-        <p style={{ color: "#444", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px", fontWeight: 600 }}>Export</p>
+      <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px", fontWeight: 600 }}>Export</p>
         <button
           onClick={() => alert("HTML export — coming soon.")}
           style={{
-            width: "100%", background: "#1a1a1a", border: "1px solid #2a2a2a",
-            color: "#888", fontSize: 11, padding: "8px", borderRadius: 4,
+            width: "100%", background: "var(--ec-raised)", border: "1px solid var(--ec-border)",
+            color: "var(--ec-muted)", fontSize: 11, padding: "8px", borderRadius: 4,
             cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
           }}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
           Export HTML
         </button>
-        <p style={{ color: "#2a2a2a", fontSize: 10, margin: "6px 0 0", lineHeight: 1.4 }}>
+        <p style={{ color: "var(--ec-border)", fontSize: 10, margin: "6px 0 0", lineHeight: 1.4 }}>
           Downloads a static HTML file of the current template with all your edits applied.
         </p>
       </div>
@@ -620,7 +620,7 @@ export function Sidebar() {
     background: "none",
     border: "none",
     borderBottom: `2px solid ${active ? "#facc15" : "transparent"}`,
-    color: active ? "#eee" : "#444",
+    color: active ? "var(--ec-bright)" : "var(--ec-dim)",
     fontSize: 11,
     padding: "9px 0",
     cursor: "pointer",
@@ -634,8 +634,8 @@ export function Sidebar() {
       style={{
         width:       "var(--ed-sidebar-w)",
         height:      "100%",
-        background:  "#0d0d0d",
-        borderRight: "1px solid #1a1a1a",
+        background:  "var(--ec-bg)",
+        borderRight: "1px solid var(--ec-raised)",
         display:     "flex",
         flexDirection: "column",
         overflow:    "hidden",
@@ -643,7 +643,7 @@ export function Sidebar() {
       }}
     >
       {/* Tab bar */}
-      <div style={{ display: "flex", borderBottom: "1px solid #1a1a1a", flexShrink: 0 }}>
+      <div style={{ display: "flex", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
         <button style={tabStyle(tab === "pages")}    onClick={() => setTab("pages")}>Page</button>
         <button style={tabStyle(tab === "design")}   onClick={() => setTab("design")}>Design</button>
         <button style={tabStyle(tab === "settings")} onClick={() => setTab("settings")}>Settings</button>
