@@ -19,6 +19,60 @@ function Sparkline({ data, color = "#fad502" }: { data: number[]; color?: string
   );
 }
 
+/* ── New-portfolio tile — sits in the grid as the last "card" ── */
+function NewPortfolioTile({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="group flex flex-col border border-dashed border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-yellow hover:bg-yellow/5 transition-all duration-200 rounded-xl text-left"
+    >
+      {/* Cover area — animated icon */}
+      <div className="relative h-32 flex items-center justify-center bg-[var(--bg-subtle)] group-hover:bg-yellow/5 transition-colors">
+        <motion.div
+          /* gentle idle breathing */
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+          /* pop more on hover */
+          whileHover={{ scale: 1.18 }}
+          className="relative text-[var(--fg-muted)] group-hover:text-yellow transition-colors"
+        >
+          {/* Stacked-frames glyph: three rectangles offset like a deck of cards */}
+          <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
+            <rect x="6"  y="14" width="22" height="26" rx="2" stroke="currentColor" strokeWidth="2" opacity="0.35" />
+            <rect x="11" y="11" width="22" height="26" rx="2" stroke="currentColor" strokeWidth="2" opacity="0.6"  />
+            <rect x="16" y="8"  width="22" height="26" rx="2" stroke="currentColor" strokeWidth="2" fill="var(--bg-card)" />
+            {/* tiny photo "horizon line" inside the front frame */}
+            <line x1="20" y1="22" x2="34" y2="22" stroke="currentColor" strokeWidth="1.5" opacity="0.45" />
+            <circle cx="22.5" cy="14.5" r="1.2" fill="currentColor" opacity="0.6" />
+          </svg>
+          {/* + badge top-right */}
+          <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-yellow text-[#111] flex items-center justify-center shadow-sm">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </motion.div>
+
+        {/* Subtle animated dot trail at the bottom */}
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              key={i}
+              className="w-1 h-1 rounded-full bg-[var(--fg-muted)] group-hover:bg-yellow transition-colors"
+              animate={{ opacity: [0.2, 0.6, 0.2] }}
+              transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="p-3 flex flex-col gap-1 flex-1 justify-center">
+        <h3 className="font-sans font-bold text-[var(--fg)] text-xs">New portfolio</h3>
+        <span className="font-mono text-[10px] text-[var(--fg-muted)] block">Start a fresh site from scratch</span>
+      </div>
+    </button>
+  );
+}
+
 /* ── Portfolio card — clicking it navigates to the manage page ── */
 function PortfolioCard({ p }: { p: Portfolio }) {
   const previewUrl = TEMPLATE_URL[p.template];
@@ -180,17 +234,9 @@ export default function PortfolioPage() {
           <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">
             <span className="text-green-400">{published} published</span>
             {drafts > 0 && <> · <span>{drafts} draft{drafts > 1 ? "s" : ""}</span></>}
+            <> · <span>{MOCK_PORTFOLIOS.length} total</span></>
           </p>
         </div>
-        <button
-          onClick={() => setShowNewModal(true)}
-          className="btn-primary flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-sans font-bold text-sm"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          New portfolio
-        </button>
       </div>
 
       {/* ── Grid ── */}
@@ -208,6 +254,7 @@ export default function PortfolioPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {MOCK_PORTFOLIOS.map((p) => <PortfolioCard key={p.id} p={p} />)}
+          <NewPortfolioTile onClick={() => setShowNewModal(true)} />
         </div>
       )}
 
