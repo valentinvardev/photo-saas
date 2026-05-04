@@ -1,19 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 
 /* ── Photo picker — pick one or many photos from your gallery ──
-   For now the gallery is mocked with picsum seeds. Wire to a real
-   gallery store when available. */
+   The gallery is mocked with picsum seeds + a list of mock folders.
+   Replace MOCK_GALLERY / MOCK_FOLDERS with the real gallery store
+   when it lands; the component shape (left rail of folders + main
+   grid) is already final. */
 
-const GALLERY_SEEDS = Array.from({ length: 60 }, (_, i) => 10 + i);
+interface MockFolder {
+  id:    string;
+  label: string;
+  seeds: number[];
+}
+
+const MOCK_FOLDERS: MockFolder[] = [
+  { id: "recent",    label: "Recent uploads", seeds: Array.from({ length: 18 }, (_, i) => 100 + i) },
+  { id: "weddings",  label: "Weddings",       seeds: Array.from({ length: 24 }, (_, i) => 200 + i) },
+  { id: "editorial", label: "Editorial",      seeds: Array.from({ length: 12 }, (_, i) => 300 + i) },
+  { id: "personal",  label: "Personal",       seeds: Array.from({ length: 9  }, (_, i) => 400 + i) },
+  { id: "raw",       label: "Raw / unsorted", seeds: Array.from({ length: 33 }, (_, i) => 500 + i) },
+];
+
+const ALL_SEEDS = MOCK_FOLDERS.flatMap((f) => f.seeds);
 
 export function PhotoPickerModal({ multi = true, onPick, onClose }: {
   multi?:  boolean;
   onPick:  (urls: string[]) => void;
   onClose: () => void;
 }) {
+  const [folderId, setFolderId] = useState<string>("all");
   const [selected, setSelected] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -21,6 +38,16 @@ export function PhotoPickerModal({ multi = true, onPick, onClose }: {
     document.addEventListener("keydown", fn);
     return () => document.removeEventListener("keydown", fn);
   }, [onClose]);
+
+  const seeds = useMemo(() => {
+    if (folderId === "all") return ALL_SEEDS;
+    return MOCK_FOLDERS.find((f) => f.id === folderId)?.seeds ?? [];
+  }, [folderId]);
+
+  const folderRows: { id: string; label: string; count: number }[] = [
+    { id: "all", label: "All photos", count: ALL_SEEDS.length },
+    ...MOCK_FOLDERS.map((f) => ({ id: f.id, label: f.label, count: f.seeds.length })),
+  ];
 
   function toggle(seed: number) {
     if (!multi) {
@@ -47,7 +74,7 @@ export function PhotoPickerModal({ multi = true, onPick, onClose }: {
       <motion.div
         initial={{ scale: 0.96, y: 12 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 12 }}
         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-        className="relative bg-[var(--bg-card)] border border-[var(--border)] rounded-xl w-full max-w-3xl max-h-[85dvh] flex flex-col overflow-hidden"
+        className="relative bg-[var(--bg-card)] border border-[var(--border)] rounded-xl w-full max-w-4xl max-h-[85dvh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -55,7 +82,7 @@ export function PhotoPickerModal({ multi = true, onPick, onClose }: {
           <div>
             <h2 className="font-sans font-black text-[var(--fg)] text-base leading-none">Pick photo{multi ? "s" : ""}</h2>
             <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1 uppercase tracking-widest">
-              From your gallery · {GALLERY_SEEDS.length} available
+              From your gallery · {ALL_SEEDS.length} available
             </p>
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
@@ -63,31 +90,72 @@ export function PhotoPickerModal({ multi = true, onPick, onClose }: {
           </button>
         </div>
 
-        {/* Grid */}
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-            {GALLERY_SEEDS.map((seed) => {
-              const isSelected = selected.has(seed);
-              return (
-                <button
-                  key={seed}
-                  onClick={() => toggle(seed)}
-                  className={`relative aspect-square overflow-hidden rounded-md border-2 transition-all ${
-                    isSelected ? "border-yellow ring-2 ring-yellow/30" : "border-transparent hover:border-[var(--fg-muted)]"
-                  }`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={`https://picsum.photos/seed/${seed}/300/300`} alt="" className="w-full h-full object-cover" />
-                  {isSelected && (
-                    <div className="absolute inset-0 bg-yellow/20 flex items-center justify-center">
-                      <div className="w-6 h-6 rounded-full bg-yellow flex items-center justify-center">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-                      </div>
-                    </div>
-                  )}
-                </button>
-              );
-            })}
+        {/* Body — folder rail + photo grid */}
+        <div className="flex-1 min-h-0 grid grid-cols-1 sm:grid-cols-[200px_1fr] overflow-hidden">
+
+          {/* Left: folder rail */}
+          <aside className="border-b sm:border-b-0 sm:border-r border-[var(--border)] bg-[var(--bg-subtle)]/40 overflow-y-auto">
+            <div className="p-2 flex flex-col gap-0.5">
+              {folderRows.map((f) => {
+                const active = folderId === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    onClick={() => setFolderId(f.id)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-left font-sans text-xs transition-colors ${
+                      active
+                        ? "bg-[var(--bg-card)] text-[var(--fg)] font-semibold"
+                        : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-card)]"
+                    }`}
+                  >
+                    {f.id === "all" ? (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                    ) : (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                    )}
+                    <span className="flex-1 truncate">{f.label}</span>
+                    <span className="font-mono text-[9px] text-[var(--fg-muted)] shrink-0">{f.count}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+
+          {/* Right: photo grid */}
+          <div className="overflow-y-auto p-4">
+            {seeds.length === 0 ? (
+              <div className="h-full flex items-center justify-center text-center text-[var(--fg-muted)]">
+                <div>
+                  <p className="font-sans text-sm font-semibold text-[var(--fg)]">This folder is empty</p>
+                  <p className="font-sans text-xs mt-1">Pick a different folder on the left.</p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-2">
+                {seeds.map((seed) => {
+                  const isSelected = selected.has(seed);
+                  return (
+                    <button
+                      key={seed}
+                      onClick={() => toggle(seed)}
+                      className={`relative aspect-square overflow-hidden rounded-md border-2 transition-all ${
+                        isSelected ? "border-yellow ring-2 ring-yellow/30" : "border-transparent hover:border-[var(--fg-muted)]"
+                      }`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`https://picsum.photos/seed/${seed}/300/300`} alt="" className="w-full h-full object-cover" />
+                      {isSelected && (
+                        <div className="absolute inset-0 bg-yellow/20 flex items-center justify-center">
+                          <div className="w-6 h-6 rounded-full bg-yellow flex items-center justify-center">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 

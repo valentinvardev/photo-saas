@@ -8,24 +8,42 @@ import { PhotoPickerModal } from "./PhotoPickerModal";
 
 /* ── Visibility ─────────────────────────────────────────────── */
 
-const VIS_META: Record<Visibility, { label: string; dot: string; text: string }> = {
-  public: { label: "Public", dot: "bg-green-400",         text: "text-green-400"         },
-  draft:  { label: "Draft",  dot: "bg-yellow",            text: "text-yellow"            },
-  hidden: { label: "Hidden", dot: "bg-[var(--fg-muted)]", text: "text-[var(--fg-muted)]" },
-};
-const VIS_CYCLE: Visibility[] = ["public", "draft", "hidden"];
-const cycleVis = (v: Visibility) => VIS_CYCLE[(VIS_CYCLE.indexOf(v) + 1) % VIS_CYCLE.length]!;
+/* Binary on/off — "hidden" maps to off, anything else to on. Toggling
+   off always sets "hidden"; toggling on always sets "public". */
+const isVisible = (v: Visibility) => v !== "hidden";
 
-function VisibilityChip({ v, onClick }: { v: Visibility; onClick?: () => void }) {
-  const m = VIS_META[v];
+function VisibilityToggle({ v, onChange }: { v: Visibility; onChange: (next: Visibility) => void }) {
+  const on = isVisible(v);
   return (
     <button
-      onClick={onClick}
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest bg-[var(--bg-subtle)] border border-[var(--border)] ${m.text} hover:border-[var(--fg-muted)] transition-colors`}
-      title="Click to cycle visibility"
+      onClick={() => onChange(on ? "hidden" : "public")}
+      role="switch"
+      aria-checked={on}
+      title={on ? "Visible — click to hide" : "Hidden — click to show"}
+      className="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-md hover:bg-[var(--bg-subtle)] transition-colors"
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${m.dot}`} />
-      {m.label}
+      {on ? (
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg)]">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      ) : (
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)]">
+          <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      )}
+      {/* Switch */}
+      <span
+        className={`relative inline-block w-7 h-3.5 rounded-full transition-colors ${
+          on ? "bg-yellow" : "bg-[var(--bg-subtle)] border border-[var(--fg-muted)]"
+        }`}
+      >
+        <span
+          className="absolute top-0.5 w-2.5 h-2.5 rounded-full transition-all"
+          style={{ left: on ? 14 : 2, background: on ? "#111" : "var(--fg)" }}
+        />
+      </span>
     </button>
   );
 }
@@ -244,7 +262,7 @@ export function ContentTree({ portfolioId }: { portfolioId: string }) {
                   <span className="font-mono text-[9px] text-[var(--fg-muted)] shrink-0">
                     {cat.folderIds.length}f · {photoCount}p
                   </span>
-                  <VisibilityChip v={cat.visibility} onClick={() => store.setCategoryVis(portfolioId, catId, cycleVis(cat.visibility))} />
+                  <VisibilityToggle v={cat.visibility} onChange={(next) => store.setCategoryVis(portfolioId, catId, next)} />
                   <button
                     onClick={() => { if (confirm(`Delete category "${cat.name}" and all its content?`)) store.removeCategory(portfolioId, catId); }}
                     className="text-[var(--fg-muted)] hover:text-red-400 transition-colors w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--bg-subtle)]"
@@ -277,7 +295,7 @@ export function ContentTree({ portfolioId }: { portfolioId: string }) {
                                   className="font-sans text-xs font-medium text-[var(--fg)] flex-1 min-w-0"
                                 />
                                 <span className="font-mono text-[9px] text-[var(--fg-muted)] shrink-0">{fol.photoIds.length}p</span>
-                                <VisibilityChip v={fol.visibility} onClick={() => store.setFolderVis(portfolioId, folId, cycleVis(fol.visibility))} />
+                                <VisibilityToggle v={fol.visibility} onChange={(next) => store.setFolderVis(portfolioId, folId, next)} />
                                 <button
                                   onClick={() => { if (confirm(`Delete folder "${fol.title}"?`)) store.removeFolder(portfolioId, folId); }}
                                   className="text-[var(--fg-muted)] hover:text-red-400 transition-colors w-6 h-6 flex items-center justify-center rounded hover:bg-[var(--bg-subtle)]"
