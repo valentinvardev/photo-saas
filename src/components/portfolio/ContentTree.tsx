@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, Reorder } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePortfolioContentStore } from "~/lib/portfolio/store";
 import { contentSummary, type Visibility } from "~/lib/portfolio/data";
 import { PhotoPickerModal } from "./PhotoPickerModal";
@@ -65,7 +65,10 @@ function EditableLabel({ value, onSave, className }: {
   );
 }
 
-/* ── Reorderable photo grid ─────────────────────────────────── */
+/* ── Reorderable photo grid (native HTML5 DnD + layout animations) ─
+   framer-motion's Reorder is a 1D widget; for a wrapping grid we use
+   native drag events. motion.div + layout prop animates items into
+   their new positions when the underlying array changes. */
 
 function PhotoGrid({ photoIds, photos, onReorder, onRemove, onAddClick }: {
   photoIds: string[];
@@ -74,40 +77,83 @@ function PhotoGrid({ photoIds, photos, onReorder, onRemove, onAddClick }: {
   onRemove:  (id: string) => void;
   onAddClick: () => void;
 }) {
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [overId,     setOverId]     = useState<string | null>(null);
+
+  function handleDragStart(e: React.DragEvent<HTMLDivElement>, id: string) {
+    setDraggingId(id);
+    e.dataTransfer.effectAllowed = "move";
+    /* Firefox needs a non-empty payload to start a drag */
+    e.dataTransfer.setData("text/plain", id);
+  }
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>, id: string) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (id !== overId) setOverId(id);
+  }
+  function handleDragLeave(id: string) {
+    if (id === overId) setOverId(null);
+  }
+  function handleDrop(e: React.DragEvent<HTMLDivElement>, targetId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    const from = draggingId;
+    cleanup();
+    if (!from || from === targetId) return;
+    const next     = [...photoIds];
+    const fromIdx  = next.indexOf(from);
+    const toIdx    = next.indexOf(targetId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    next.splice(fromIdx, 1);
+    next.splice(toIdx, 0, from);
+    onReorder(next);
+  }
+  function cleanup() {
+    setDraggingId(null);
+    setOverId(null);
+  }
+
   return (
-    <Reorder.Group
-      as="div"
-      axis="y"
-      values={photoIds}
-      onReorder={onReorder}
-      className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1.5"
-    >
+    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1.5">
       {photoIds.map((pid) => {
         const ph = photos[pid]; if (!ph) return null;
+        const isDragging = pid === draggingId;
+        const isOver     = pid === overId && overId !== draggingId;
         return (
-          <Reorder.Item
-            as="div"
+          <motion.div
             key={pid}
-            value={pid}
-            className="relative aspect-square overflow-hidden rounded border border-[var(--border)] cursor-grab active:cursor-grabbing"
-            style={{ opacity: ph.visibility === "hidden" ? 0.35 : 1 }}
-            whileDrag={{ scale: 1.05, boxShadow: "0 12px 32px rgba(0,0,0,0.35)", zIndex: 10 }}
+            layout
+            transition={{ type: "spring", stiffness: 500, damping: 35 }}
+            draggable
+            onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, pid)}
+            onDragOver={(e) => handleDragOver(e as unknown as React.DragEvent<HTMLDivElement>, pid)}
+            onDragLeave={() => handleDragLeave(pid)}
+            onDrop={(e) => handleDrop(e as unknown as React.DragEvent<HTMLDivElement>, pid)}
+            onDragEnd={cleanup}
+            className={`relative aspect-square overflow-hidden rounded border cursor-grab active:cursor-grabbing transition-all ${
+              isOver ? "border-yellow ring-2 ring-yellow/30 scale-105" : "border-[var(--border)]"
+            }`}
+            style={{
+              opacity:   isDragging ? 0.3 : ph.visibility === "hidden" ? 0.35 : 1,
+              transform: isOver ? undefined : "scale(1)",
+            }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={ph.src} alt="" className="w-full h-full object-cover pointer-events-none" draggable={false} />
             <button
               onClick={(e) => { e.stopPropagation(); if (confirm("Remove this photo?")) onRemove(pid); }}
-              className="absolute top-1 right-1 w-5 h-5 rounded bg-black/55 text-white opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+              onMouseDown={(e) => e.stopPropagation()}
+              className="absolute top-1 right-1 w-5 h-5 rounded bg-black/60 text-white opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity flex items-center justify-center"
               title="Remove photo"
-              onPointerDown={(e) => e.stopPropagation()}
+              draggable={false}
             >
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
-          </Reorder.Item>
+          </motion.div>
         );
       })}
 
-      {/* Add tile — same size as photos, dashed border, opens picker */}
+      {/* Add tile */}
       <button
         onClick={onAddClick}
         className="aspect-square rounded border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:text-yellow hover:border-yellow hover:bg-yellow/5 transition-colors flex flex-col items-center justify-center gap-1"
@@ -116,7 +162,7 @@ function PhotoGrid({ photoIds, photos, onReorder, onRemove, onAddClick }: {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         <span className="font-mono text-[8px] uppercase tracking-widest">Add</span>
       </button>
-    </Reorder.Group>
+    </div>
   );
 }
 
