@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useCart } from "~/lib/cart";
-import { LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
+import { AnimatePresence } from "framer-motion";
+import { DevicePreviewModal, LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
 
 /* Live URLs each page type points to — used to render real iframe
    previews in the page rows and the manage modal. */
@@ -345,8 +346,9 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
   pageId: PageId; label: string; url: string; status: "live" | "draft";
   meta: string; icon: React.ReactNode; editHref: string; onManage: () => void;
 }) {
-  const [status, setStatus] = useState<"live" | "draft">(initialStatus);
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus]           = useState<"live" | "draft">(initialStatus);
+  const [copied, setCopied]           = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   function copy() {
     void navigator.clipboard.writeText(`https://${url}`);
@@ -356,6 +358,7 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
 
   /* Live iframe preview of the actual template page */
   const previewUrl = PAGE_PREVIEW_URLS[pageId];
+  const pageLabel: Record<PageId, string> = { portfolio: "Portfolio", links: "Links page", delivery: "Delivery gallery" };
 
   return (
     <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden flex gap-0">
@@ -417,15 +420,13 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
 
         {/* action row */}
         <div className="flex items-center gap-2 mt-auto">
-          <a
-            href={`https://${url}`}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => setPreviewOpen(true)}
             className="font-sans text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"
           >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             Preview
-          </a>
+          </button>
           <a
             href={editHref}
             className="font-sans text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"
@@ -442,6 +443,17 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
           </button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {previewOpen && (
+          <DevicePreviewModal
+            url={previewUrl}
+            title={pageLabel[pageId]}
+            subtitle={url}
+            onClose={() => setPreviewOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
