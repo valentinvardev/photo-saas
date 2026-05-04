@@ -2,7 +2,7 @@
 
 export type DeliveryMode    = "gift" | "direct" | "selection";
 export type LayoutStyle     = "grid" | "masonry";
-export type TemplateName    = "minimal" | "vogue" | "cinematic" | "editorial";
+export type TemplateName    = "minimal" | "vogue" | "brooklyn";
 export type DeliveryStatus  = "draft" | "active" | "expired";
 export type LogoMode        = "none" | "text" | "image" | "image+text";
 
@@ -81,7 +81,7 @@ export const INITIAL_PAGES: DeliveryPage[] = [
     passwordEnabled: false, password: "", whitelistEnabled: true, whitelist: ["brand@nike.com", "creative@nike.com"],
     mode: "gift", selectionLimit: 0, pricePerPhoto: 0, priceFullGallery: 0,
     watermark: false, downloadRes: "full", proofingEnabled: true,
-    template: "cinematic", layout: "grid", welcomeMessage: "Here are the final assets from the Spring '26 campaign.", showUpsellBanner: false,
+    template: "vogue", layout: "grid", welcomeMessage: "Here are the final assets from the Spring '26 campaign.", showUpsellBanner: false,
     ...DEFAULT_BRANDING, logoText: "STUDIO",
   },
   {
@@ -91,7 +91,7 @@ export const INITIAL_PAGES: DeliveryPage[] = [
     passwordEnabled: false, password: "", whitelistEnabled: false, whitelist: [],
     mode: "direct", selectionLimit: 0, pricePerPhoto: 12, priceFullGallery: 399,
     watermark: true, downloadRes: "full", proofingEnabled: false,
-    template: "editorial", layout: "grid", welcomeMessage: "Hi Emma! Your portraits are ready. Purchase individual photos or grab the full set.", showUpsellBanner: true,
+    template: "brooklyn", layout: "grid", welcomeMessage: "Hi Emma! Your portraits are ready. Purchase individual photos or grab the full set.", showUpsellBanner: true,
     ...DEFAULT_BRANDING, logoText: "EMMA K.",
   },
 ];
@@ -118,17 +118,15 @@ export const DELIVERY_FONTS: { label: string; value: string }[] = [
 ];
 
 export const TEMPLATES: { id: TemplateName; label: string; desc: string; accent: string; fg: string; sub: string }[] = [
-  { id: "minimal",   label: "Minimal",   desc: "Clean white space, serif typography, subtle grid",   accent: "#f5f5f5", fg: "#111111", sub: "#888888" },
-  { id: "vogue",     label: "Vogue",     desc: "High-contrast black, bold editorial headlines",       accent: "#111111", fg: "#ffffff", sub: "#666666" },
-  { id: "cinematic", label: "Cinematic", desc: "Dark dramatic tones, full-bleed film aesthetic",      accent: "#1a1209", fg: "#e8dcc8", sub: "#7a6a50" },
-  { id: "editorial", label: "Editorial", desc: "Magazine layout, oversized type, neutral palette",    accent: "#f0ede8", fg: "#1a1a1a", sub: "#7a7065" },
+  { id: "minimal",  label: "Minimal",  desc: "Clean white space, serif typography, subtle grid",         accent: "#f5f5f5", fg: "#111111", sub: "#888888" },
+  { id: "vogue",    label: "Vogue",    desc: "High-contrast black, bold editorial headlines",            accent: "#111111", fg: "#ffffff", sub: "#666666" },
+  { id: "brooklyn", label: "Brooklyn", desc: "Urban dark theme with red accents and Space Grotesk type", accent: "#0D0D0D", fg: "#F0EFE9", sub: "#7A7A7A" },
 ];
 
 export const TEMPLATE_STYLES: Record<TemplateName, { bg: string; fg: string; muted: string; accent: string; btnBg: string; btnFg: string }> = {
-  minimal:   { bg: "#ffffff", fg: "#111111", muted: "#888888", accent: "#f5f5f5", btnBg: "#111111", btnFg: "#ffffff" },
-  vogue:     { bg: "#0a0a0a", fg: "#ffffff", muted: "#888888", accent: "#1a1a1a", btnBg: "#ffffff", btnFg: "#000000" },
-  cinematic: { bg: "#1a1209", fg: "#f0e6d0", muted: "#8a7860", accent: "#241a0e", btnBg: "#c8a96e", btnFg: "#1a1209" },
-  editorial: { bg: "#f0ede8", fg: "#1a1a1a", muted: "#6e6e6e", accent: "#e4e0da", btnBg: "#1a1a1a", btnFg: "#f0ede8" },
+  minimal:  { bg: "#ffffff", fg: "#111111", muted: "#888888", accent: "#f5f5f5", btnBg: "#111111", btnFg: "#ffffff" },
+  vogue:    { bg: "#0a0a0a", fg: "#ffffff", muted: "#888888", accent: "#1a1a1a", btnBg: "#ffffff", btnFg: "#000000" },
+  brooklyn: { bg: "#0D0D0D", fg: "#F0EFE9", muted: "#7A7A7A", accent: "#161616", btnBg: "#E8382C", btnFg: "#0D0D0D" },
 };
 
 export const STATUS_META: Record<DeliveryStatus, { dot: string; text: string; label: string }> = {

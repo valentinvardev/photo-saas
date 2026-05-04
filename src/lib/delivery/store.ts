@@ -43,6 +43,23 @@ export const useDeliveryStore = create<DeliveryStore>()(
     }),
     {
       name: "frame-delivery-pages",
+      version: 2,
+      /* v2: cinematic and editorial templates removed — map old values
+         to the closest visual replacements so previously-saved client
+         pages keep rendering. */
+      migrate: (persisted, version) => {
+        const state = persisted as { pages?: DeliveryPage[] } | undefined;
+        if (!state?.pages) return state as DeliveryStore;
+        if (version < 2) {
+          state.pages = state.pages.map((p) => {
+            const t = (p as { template: string }).template;
+            if (t === "cinematic") return { ...p, template: "vogue" };
+            if (t === "editorial") return { ...p, template: "minimal" };
+            return p;
+          });
+        }
+        return state as DeliveryStore;
+      },
       onRehydrateStorage: () => (state) => { state?.setHydrated(); },
     },
   ),

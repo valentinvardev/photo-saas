@@ -397,7 +397,7 @@ function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; 
                 <div style={{ fontFamily: "monospace", fontSize: 10, color: chosen.sub, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 24 }}>Wedding · April 2026 · 247 photos</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
                   {[401,402,403,404,405,406,407,408].map((seed) => (
-                    <div key={seed} style={{ aspectRatio: "1", overflow: "hidden", borderRadius: chosen.id === "minimal" || chosen.id === "editorial" ? 4 : 0 }}>
+                    <div key={seed} style={{ aspectRatio: "1", overflow: "hidden", borderRadius: chosen.id === "minimal" ? 4 : 0 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={`https://picsum.photos/seed/${seed}/200/200?grayscale`} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     </div>
