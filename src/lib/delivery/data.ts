@@ -91,8 +91,18 @@ export const INITIAL_PAGES: DeliveryPage[] = [
     passwordEnabled: false, password: "", whitelistEnabled: false, whitelist: [],
     mode: "direct", selectionLimit: 0, pricePerPhoto: 12, priceFullGallery: 399,
     watermark: true, downloadRes: "full", proofingEnabled: false,
-    template: "brooklyn", layout: "grid", welcomeMessage: "Hi Emma! Your portraits are ready. Purchase individual photos or grab the full set.", showUpsellBanner: true,
+    template: "minimal", layout: "grid", welcomeMessage: "Hi Emma! Your portraits are ready. Purchase individual photos or grab the full set.", showUpsellBanner: true,
     ...DEFAULT_BRANDING, logoText: "EMMA K.",
+  },
+  {
+    id: "dp4", title: "Album Cover Shoot", client: "Morrison Photo",
+    status: "active", photoCount: 24, photoSeeds: [10,11,12,13,14,15,16,17,18,19,20,21], coverSeed: 10, coverUrl: "",
+    views: 47, lastViewed: "yesterday", createdAt: "Apr 12, 2026", expiresAt: "Jun 12, 2026",
+    passwordEnabled: true,  password: "morrison2026", whitelistEnabled: false, whitelist: [],
+    mode: "direct", selectionLimit: 0, pricePerPhoto: 0, priceFullGallery: 0,
+    watermark: false, downloadRes: "full", proofingEnabled: false,
+    template: "brooklyn", layout: "grid", welcomeMessage: "Final selects from the album cover shoot.", showUpsellBanner: false,
+    ...DEFAULT_BRANDING, logoText: "MORRISON",
   },
 ];
 

@@ -7,6 +7,7 @@ import { useCart } from "~/lib/cart";
 import {
   DevicePreviewModal,
   DevicePicker,
+  LivePreviewThumbnail,
   DEVICE_DIMS,
   useIsSmallScreen,
   type Device,
@@ -636,21 +637,32 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
             </div>
           </div>
 
-          {/* ── Right: theme hero image (50%) ── */}
+          {/* ── Right: live theme preview (50%) ── */}
           <div className="relative w-1/2 shrink-0 overflow-hidden hidden md:block" style={{ minHeight: 280 }}>
-            {/* Accent strip on the left edge of the image */}
+            {/* Accent strip on the left edge of the preview */}
             <div className="absolute top-0 bottom-0 left-0 w-1 z-10" style={{ background: c.accentColor }} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`https://picsum.photos/seed/${c.pages[0]?.seed ?? 10}/1200/900`}
-              alt={`${c.name} theme preview`}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
-              style={{ transform: hovered ? "scale(1.04)" : "scale(1)" }}
-            />
-            {/* Subtle vignette on the left edge so the photo blends with the card */}
+
+            {c.pages[0]?.href ? (
+              <LivePreviewThumbnail
+                url={c.pages[0].href}
+                baseWidth={1280}
+                className="absolute inset-0 transition-transform duration-700"
+                style={{ transform: hovered ? "scale(1.04)" : "scale(1)", transformOrigin: "center" }}
+              />
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={`https://picsum.photos/seed/${c.pages[0]?.seed ?? 10}/1200/900`}
+                alt={`${c.name} theme preview`}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
+                style={{ transform: hovered ? "scale(1.04)" : "scale(1)" }}
+              />
+            )}
+
+            {/* Subtle vignette so the preview blends with the card on the left */}
             <div className="absolute inset-0 pointer-events-none"
               style={{ background: "linear-gradient(to right, var(--bg-card) 0%, transparent 12%)" }} />
-            {/* Theme tag overlay */}
+
             <div className="absolute bottom-3 right-3 z-10">
               <span className="font-mono text-[8px] uppercase tracking-widest px-2 py-1 rounded backdrop-blur-md"
                 style={{ background: "rgba(0,0,0,0.55)", color: "#fff" }}>
@@ -1381,10 +1393,14 @@ function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: nu
         featured ? "border-2 border-yellow" : "border border-[var(--border)] hover:border-[var(--fg-muted)]"
       }`}
     >
-      {/* Generated preview */}
+      {/* Live preview — iframe of the actual page when available, else wireframe */}
       <div className="relative overflow-hidden" style={{ aspectRatio: "16/10" }}>
         <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
-          <TemplatePreview kind="portfolio" style={t.style} />
+          {t.href ? (
+            <LivePreviewThumbnail url={t.href} baseWidth={1280} className="w-full h-full" />
+          ) : (
+            <TemplatePreview kind="portfolio" style={t.style} />
+          )}
         </div>
         {/* Hover CTAs */}
         <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-250 bg-black/40">
@@ -1607,10 +1623,14 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.05 }}
       className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden flex flex-col"
     >
-      {/* Generated delivery preview */}
+      {/* Live preview — iframe when available, else wireframe */}
       <div className="relative overflow-hidden" style={{ aspectRatio: "16/10", minHeight: 180 }}>
         <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
-          <TemplatePreview kind="delivery" style={previewStyle} dense />
+          {t.href ? (
+            <LivePreviewThumbnail url={t.href} baseWidth={1280} className="w-full h-full" />
+          ) : (
+            <TemplatePreview kind="delivery" style={previewStyle} dense />
+          )}
         </div>
 
         {/* Hover CTAs */}

@@ -1,7 +1,99 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { motion } from "framer-motion";
+
+/* ── Live preview thumbnail ─────────────────────────────────
+   Renders the URL inside an iframe scaled down to fit the
+   container. Lazy-mounts when scrolled into view. The iframe
+   is non-interactive (pointer-events: none, scrolling: no).
+   The container should set its own aspect-ratio + width. */
+
+export function LivePreviewThumbnail({
+  url,
+  baseWidth = 1280,
+  className,
+  style,
+  rootMargin = "200px",
+}: {
+  url: string;
+  baseWidth?: number;
+  className?: string;
+  style?: CSSProperties;
+  rootMargin?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  const [loaded,  setLoaded]  = useState(false);
+  const [scale,   setScale]   = useState(0.3);
+  const [size,    setSize]    = useState({ w: 0, h: 0 });
+
+  /* Lazy mount via IntersectionObserver — don't render iframes off-screen. */
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || visible) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry?.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { rootMargin }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [visible, rootMargin]);
+
+  /* Compute scale + base height so the iframe fills the container exactly. */
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w > 0) {
+        setScale(w / baseWidth);
+        setSize({ w, h });
+      }
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [baseWidth]);
+
+  const baseHeight = scale > 0 && size.w > 0 ? size.h / scale : baseWidth * 0.625;
+
+  return (
+    <div
+      ref={ref}
+      className={`relative overflow-hidden ${className ?? ""}`}
+      style={style}
+    >
+      {visible && (
+        <iframe
+          src={url}
+          className="absolute top-0 left-0 border-0 pointer-events-none"
+          style={{
+            width:           baseWidth,
+            height:          baseHeight,
+            transform:       `scale(${scale})`,
+            transformOrigin: "top left",
+            opacity:         loaded ? 1 : 0,
+            transition:      "opacity 0.4s ease",
+          }}
+          loading="lazy"
+          scrolling="no"
+          tabIndex={-1}
+          aria-hidden="true"
+          title=""
+          onLoad={() => setLoaded(true)}
+        />
+      )}
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-[var(--bg-subtle)]">
+          <div className="w-4 h-4 rounded-full border-2 border-[var(--border)] border-t-yellow animate-spin" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ── Shared device preview modal ────────────────────────────
    Used across template cards, delivery cards, and collection
