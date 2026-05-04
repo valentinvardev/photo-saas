@@ -2,6 +2,15 @@
 
 import { useState } from "react";
 import { useCart } from "~/lib/cart";
+import { LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
+
+/* Live URLs each page type points to — used to render real iframe
+   previews in the page rows and the manage modal. */
+const PAGE_PREVIEW_URLS: Record<"portfolio" | "links" | "delivery", string> = {
+  portfolio: "/templates/minimal-bw",
+  links:     "/template/brooklyn/links",
+  delivery:  "/template/brooklyn/delivery",
+};
 
 const inputCls =
   "font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition placeholder:text-[var(--fg-muted)]";
@@ -345,67 +354,24 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
     setTimeout(() => setCopied(false), 1800);
   }
 
-  /* page-specific mockup content */
-  const mockupContent = {
-    portfolio: (
-      <div className="px-3 py-3 flex flex-col gap-2">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="h-1.5 w-12 bg-[var(--border)] rounded-full" />
-          <div className="h-1.5 w-8 bg-[var(--border-subtle)] rounded-full" />
-          <div className="ml-auto h-1.5 w-6 bg-[var(--border-subtle)] rounded-full" />
-        </div>
-        <div className="h-12 w-full bg-[var(--bg-subtle)] rounded border border-[var(--border-subtle)] flex items-center justify-center">
-          <div className="h-1.5 w-20 bg-[var(--border)] rounded-full" />
-        </div>
-        <div className="grid grid-cols-3 gap-1">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className={`rounded aspect-square ${i === 0 ? "col-span-2 row-span-2" : ""} bg-[var(--bg-subtle)] border border-[var(--border-subtle)]`} style={{ height: i === 0 ? 40 : 18 }} />
-          ))}
-        </div>
-      </div>
-    ),
-    links: (
-      <div className="px-4 py-3 flex flex-col gap-1.5">
-        <div className="flex flex-col items-center gap-1 mb-1">
-          <div className="w-5 h-5 rounded-full bg-[var(--border)]" />
-          <div className="h-1 w-10 bg-[var(--border)] rounded-full" />
-        </div>
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-4 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border-subtle)]" />
-        ))}
-      </div>
-    ),
-    delivery: (
-      <div className="px-3 py-3 flex flex-col gap-2">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="h-1.5 w-16 bg-[var(--border)] rounded-full" />
-          <div className="ml-auto flex items-center gap-1">
-            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)]"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-            <div className="h-1 w-6 bg-[var(--border-subtle)] rounded-full" />
-          </div>
-        </div>
-        <div className="grid grid-cols-3 gap-1">
-          {[...Array(9)].map((_, i) => (
-            <div key={i} className="h-8 rounded bg-[var(--bg-subtle)] border border-[var(--border-subtle)]" />
-          ))}
-        </div>
-      </div>
-    ),
-  };
+  /* Live iframe preview of the actual template page */
+  const previewUrl = PAGE_PREVIEW_URLS[pageId];
 
   return (
     <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden flex gap-0">
 
-      {/* left: browser mockup preview */}
+      {/* left: live preview in browser chrome */}
       <div className="shrink-0 w-48 border-r border-[var(--border)] bg-[var(--bg-subtle)] flex flex-col">
         <div className="flex items-center gap-1 px-2 py-2 border-b border-[var(--border)] bg-[var(--bg-card)]">
           <span className="w-1.5 h-1.5 rounded-full bg-red-400/60" />
           <span className="w-1.5 h-1.5 rounded-full bg-yellow/60" />
           <span className="w-1.5 h-1.5 rounded-full bg-green-400/60" />
         </div>
-        <div className="flex-1 overflow-hidden">
-          {mockupContent[pageId]}
-        </div>
+        <LivePreviewThumbnail
+          url={previewUrl}
+          baseWidth={1280}
+          className="flex-1 w-full"
+        />
       </div>
 
       {/* right: info + actions */}
@@ -733,7 +699,9 @@ export default function DomainPage() {
               <p className="font-sans text-xs text-[var(--fg-muted)] mt-1">Ready instantly, no payment needed.</p>
             </div>
             <div className="px-5 py-4 flex-1 flex flex-col gap-3">
-              <BrowserMockup url={`https://${freeSubdomain}`} />
+              <BrowserMockup url={`https://${freeSubdomain}`}>
+                <LivePreviewThumbnail url={PAGE_PREVIEW_URLS.portfolio} baseWidth={1280} className="aspect-[4/3] w-full" />
+              </BrowserMockup>
               <p className="font-mono text-[11px] text-[var(--fg-muted)] text-center break-all">{freeSubdomain}</p>
             </div>
             <div className="px-5 pb-5">
@@ -759,7 +727,9 @@ export default function DomainPage() {
               <p className="font-sans text-xs text-[var(--fg-muted)] mt-1">Your own address — clients never see "frame.so".</p>
             </div>
             <div className="px-5 py-4 flex-1 flex flex-col gap-3">
-              <BrowserMockup url="https://sofiachen.com" />
+              <BrowserMockup url="https://sofiachen.com">
+                <LivePreviewThumbnail url={PAGE_PREVIEW_URLS.portfolio} baseWidth={1280} className="aspect-[4/3] w-full" />
+              </BrowserMockup>
               <ul className="flex flex-col gap-2 mt-1">
                 {[
                   ["Credibility", "Clients trust a branded domain."],
