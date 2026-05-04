@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "~/lib/cart";
+import {
+  DevicePreviewModal,
+  DevicePicker,
+  DEVICE_DIMS,
+  useIsSmallScreen,
+  type Device,
+} from "~/components/dashboard/DevicePreviewModal";
 
 /* ══════════════════════════════════════════════════════════════════════════
    TYPES
@@ -47,62 +54,6 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     fonts: { serif: "Cormorant Garamond", sans: "DM Sans", mono: "Space Mono" },
     style: { bg: "#fafafa", fg: "#0a0a0a", accent: "#facc15", muted: "#a8a8a8" },
     collection: "minimal",
-  },
-  {
-    id: "editorial-dark",
-    name: "Editorial Dark",
-    description: "High-contrast dark theme with bold serif headings. Ideal for fashion and commercial photographers.",
-    category: "Editorial",
-    tags: ["Dark", "Fashion", "Commercial"],
-    href: null,
-    seed: 37,
-    fonts: { serif: "Freight Display", sans: "Neue Haas Grotesk", mono: "Input Mono" },
-    style: { bg: "#0e0e0e", fg: "#f5f5f5", accent: "#dddddd", muted: "#666666" },
-  },
-  {
-    id: "magazine",
-    name: "Magazine",
-    description: "A multi-column, editorial magazine layout. Dense and expressive, perfect for storytellers.",
-    category: "Magazine",
-    tags: ["Editorial", "Multi-column", "Story"],
-    href: null,
-    seed: 63,
-    fonts: { serif: "Canela", sans: "Söhne", mono: "Pitch" },
-    style: { bg: "#f5f0e8", fg: "#1a1a1a", accent: "#dc2626", muted: "#8a8a8a" },
-  },
-  {
-    id: "grid-pure",
-    name: "Grid Pure",
-    description: "A full-bleed masonry grid with a single fixed navigation. Lets the work speak for itself.",
-    category: "Grid",
-    tags: ["Minimal", "Grid", "Full-bleed"],
-    href: null,
-    seed: 88,
-    fonts: { serif: "Domaine", sans: "Inter", mono: "Berkeley Mono" },
-    style: { bg: "#ffffff", fg: "#0a0a0a", accent: "#000000", muted: "#cccccc" },
-  },
-  {
-    id: "story",
-    name: "Story",
-    description: "Vertical scroll narrative with immersive full-screen images and a flowing text column.",
-    category: "Story",
-    tags: ["Narrative", "Documentary", "Long-form"],
-    href: null,
-    seed: 110,
-    fonts: { serif: "Tiempos", sans: "Aktiv Grotesk", mono: "Fira Code" },
-    style: { bg: "#1a1a1a", fg: "#ffffff", accent: "#aaaaaa", muted: "#555555" },
-  },
-  {
-    id: "editorial-sand",
-    name: "Editorial Sand",
-    description: "Warm neutral tones with a classic editorial grid. Great for fine-art and portrait work.",
-    category: "Editorial",
-    tags: ["Warm tones", "Fine Art", "Portrait"],
-    href: null,
-    seed: 154,
-    fonts: { serif: "EB Garamond", sans: "GT Walsheim", mono: "Inconsolata" },
-    style: { bg: "#fafaf8", fg: "#0a0a0a", accent: "#c9a89a", muted: "#a09890" },
-    collection: "atelier",
   },
   {
     id: "brooklyn",
@@ -186,33 +137,6 @@ const LINKS_TEMPLATES: LinksTemplate[] = [
     bg: "#111111", fg: "#f5f5f5", sub: "#666666",
     btnStyle: "square", btnBg: "#f5f5f5", btnFg: "#111111", font: "Space Grotesk",
   },
-  {
-    id: "links-sand",
-    name: "Sand",
-    description: "Warm off-white palette with rounded buttons. Approachable and elegant for lifestyle photographers.",
-    tags: ["Warm", "Lifestyle", "Soft"],
-    available: false,
-    bg: "#f5f0e8", fg: "#2d2420", sub: "#9e8e7e",
-    btnStyle: "rounded", btnBg: "#2d2420", btnFg: "#f5f0e8", font: "Cormorant Garamond",
-  },
-  {
-    id: "links-gradient",
-    name: "Gradient",
-    description: "Dark gradient background with glowing pill buttons. Modern, social-native look.",
-    tags: ["Modern", "Social", "Glow"],
-    available: false,
-    bg: "#0d0d1a", fg: "#f0f0ff", sub: "#6060a0",
-    btnStyle: "pill", btnBg: "#fad502", btnFg: "#0d0d1a", font: "Inter",
-  },
-  {
-    id: "links-photo",
-    name: "Immersive",
-    description: "Full-bleed background photo with frosted-glass buttons overlaid. Striking and unique.",
-    tags: ["Photo", "Full-bleed", "Glass"],
-    available: false,
-    bg: "#1a1a1a", fg: "#ffffff", sub: "#aaaaaa",
-    btnStyle: "outline", btnBg: "rgba(255,255,255,0.12)", btnFg: "#ffffff", font: "Helvetica Neue",
-  },
 ];
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -259,22 +183,6 @@ const DELIVERY_TEMPLATES: DeliveryTemplate[] = [
     tags: ["Dark", "Fashion", "Editorial"],
     available: true,
     accent: "#111111", fg: "#ffffff", sub: "#666666",
-  },
-  {
-    id: "delivery-cinematic",
-    name: "Cinematic",
-    description: "Dark dramatic tones with warm film undertones. Ideal for wedding and lifestyle galleries.",
-    tags: ["Dark", "Wedding", "Cinematic"],
-    available: false,
-    accent: "#1a1209", fg: "#e8dcc8", sub: "#7a6a50",
-  },
-  {
-    id: "delivery-editorial",
-    name: "Editorial",
-    description: "Magazine-style layout with oversized type and neutral linen palette. Elevated and timeless.",
-    tags: ["Magazine", "Fine Art", "Neutral"],
-    available: false,
-    accent: "#f0ede8", fg: "#1a1a1a", sub: "#7a7065",
   },
 ];
 
@@ -398,30 +306,24 @@ function UseStageButton({ stage, onUse }: {
 
 /* ── Collection preview modal (device + page selector) ─────── */
 
-type Device = "mobile" | "tablet" | "desktop";
 type PageType = "portfolio" | "links" | "delivery";
-
-const DEVICE_DIMS: Record<Device, { w: number; h: number; label: string }> = {
-  mobile:  { w: 390,  h: 780,  label: "375px"  },
-  tablet:  { w: 820,  h: 1100, label: "768px"  },
-  desktop: { w: 1280, h: 800,  label: "1280px" },
-};
-
-function DeviceIcon({ d }: { d: Device }) {
-  if (d === "mobile") return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>;
-  if (d === "tablet") return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>;
-  return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>;
-}
 
 function CollectionPreviewModal({ c, initialPage = "portfolio", onClose }: {
   c: TemplateCollection; initialPage?: PageType; onClose: () => void;
 }) {
-  const [device, setDevice] = useState<Device>("desktop");
+  const isSmall = useIsSmallScreen();
+  const [device, setDevice] = useState<Device>(isSmall ? "mobile" : "desktop");
   const [page, setPage]     = useState<PageType>(initialPage);
   const [loading, setLoading] = useState(true);
 
   const currentPage = c.pages.find((p) => p.type === page);
   const url         = currentPage?.href ?? null;
+
+  /* If the screen shrinks below the threshold, force mobile. */
+  useEffect(() => {
+    if (isSmall && device !== "mobile") setDevice("mobile");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSmall]);
 
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -477,24 +379,7 @@ function CollectionPreviewModal({ c, initialPage = "portfolio", onClose }: {
         </div>
 
         {/* Right: device selector */}
-        <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
-          {(["mobile", "tablet", "desktop"] as Device[]).map((d) => {
-            const active = device === d;
-            return (
-              <button
-                key={d}
-                onClick={() => setDevice(d)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-sans text-xs font-medium transition-colors ${
-                  active ? "bg-white text-[#111]" : "text-white/60 hover:text-white"
-                }`}
-                title={DEVICE_DIMS[d].label}
-              >
-                <DeviceIcon d={d} />
-                <span className="hidden sm:inline capitalize">{d}</span>
-              </button>
-            );
-          })}
-        </div>
+        <DevicePicker device={device} onChange={setDevice} isSmall={isSmall} />
       </div>
 
       {/* Preview viewport */}
@@ -1487,6 +1372,8 @@ function CollectionTag({ name }: { name: string }) {
 }
 
 function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: number; featured?: boolean }) {
+  const [previewOpen, setPreviewOpen] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.05 }}
@@ -1503,10 +1390,10 @@ function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: nu
         <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-250 bg-black/40">
           {t.href ? (
             <>
-              <Link href={t.href} target="_blank"
+              <button onClick={() => setPreviewOpen(true)}
                 className="flex items-center gap-1.5 px-3.5 py-2 bg-white text-[#111] font-sans text-[11px] font-semibold rounded-md hover:bg-yellow transition-colors">
                 <ArrowIcon /> Preview
-              </Link>
+              </button>
               {t.editorHref && (
                 <Link href={t.editorHref}
                   className="flex items-center gap-1.5 px-3.5 py-2 bg-yellow text-[#111] font-sans text-[11px] font-bold rounded-md hover:bg-yellow/90 transition-colors">
@@ -1551,12 +1438,12 @@ function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: nu
         <div className="pt-2 border-t border-[var(--border)] flex items-center gap-2">
           {t.href ? (
             <>
-              <Link href={t.href} target="_blank"
+              <button onClick={() => setPreviewOpen(true)}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
               >
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 Preview
-              </Link>
+              </button>
               <Link href={t.editorHref ?? "#"}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
               >
@@ -1570,6 +1457,23 @@ function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: nu
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {previewOpen && t.href && (
+          <DevicePreviewModal
+            url={t.href}
+            title={t.name}
+            subtitle={`Portfolio · ${t.category}`}
+            accentChip={
+              <span className="inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-sm" style={{ background: t.style.accent, border: `1px solid ${t.style.fg}30` }} />
+                Theme
+              </span>
+            }
+            onClose={() => setPreviewOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -1588,6 +1492,7 @@ function btnRadius(style: LinksTemplate["btnStyle"]) {
 function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
   const r = btnRadius(t.btnStyle);
   const isOutline = t.btnStyle === "outline";
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   return (
     <motion.div
@@ -1642,12 +1547,12 @@ function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
           {t.available ? (
             <>
               {t.href ? (
-                <Link href={t.href} target="_blank"
+                <button onClick={() => setPreviewOpen(true)}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   Preview
-                </Link>
+                </button>
               ) : (
                 <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-dashed border-[var(--border)] text-[var(--fg-muted)] opacity-50 cursor-not-allowed">
                   No preview
@@ -1666,6 +1571,23 @@ function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {previewOpen && t.href && (
+          <DevicePreviewModal
+            url={t.href}
+            title={t.name}
+            subtitle="Links page"
+            accentChip={
+              <span className="inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-sm" style={{ background: t.btnBg, border: `1px solid ${t.fg}30` }} />
+                Theme
+              </span>
+            }
+            onClose={() => setPreviewOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -1678,6 +1600,7 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
   /* Build a generated preview style from the template's existing color tokens.
      accent = page background, fg = text, fg accents are derived as muted tint. */
   const previewStyle: PreviewStyle = { bg: t.accent, fg: t.fg, accent: t.fg, muted: t.sub };
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   return (
     <motion.div
@@ -1695,10 +1618,10 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
           {t.available ? (
             <>
               {t.href && (
-                <Link href={t.href} target="_blank"
+                <button onClick={() => setPreviewOpen(true)}
                   className="flex items-center gap-1.5 px-3.5 py-2 bg-white text-[#111] font-sans text-[11px] font-semibold rounded-md hover:bg-yellow transition-colors">
                   <ArrowIcon /> Preview
-                </Link>
+                </button>
               )}
               <Link href="/dashboard/delivery"
                 className="flex items-center gap-1.5 px-3.5 py-2 bg-yellow text-[#111] font-sans text-[11px] font-bold rounded-md hover:bg-yellow/90 transition-colors">
@@ -1747,12 +1670,12 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
           {t.available ? (
             <>
               {t.href ? (
-                <Link href={t.href} target="_blank"
+                <button onClick={() => setPreviewOpen(true)}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   Preview
-                </Link>
+                </button>
               ) : (
                 <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-dashed border-[var(--border)] text-[var(--fg-muted)] opacity-50 cursor-not-allowed">
                   No preview
@@ -1771,6 +1694,23 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {previewOpen && t.href && (
+          <DevicePreviewModal
+            url={t.href}
+            title={t.name}
+            subtitle="Delivery gallery"
+            accentChip={
+              <span className="inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-sm" style={{ background: t.accent, border: `1px solid ${t.fg}30` }} />
+                Theme
+              </span>
+            }
+            onClose={() => setPreviewOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
