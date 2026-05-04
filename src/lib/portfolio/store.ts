@@ -33,6 +33,11 @@ interface PortfolioContentStore {
   addPhoto:     (portfolioId: string, parent: { categoryId?: string; folderId?: string }, src: string, title?: string) => string;
   setPhotoVis:  (portfolioId: string, photoId: string, v: Visibility) => void;
   removePhoto:  (portfolioId: string, photoId: string) => void;
+
+  /* Reorder */
+  reorderCategories:        (portfolioId: string, ids: string[]) => void;
+  reorderFolderPhotos:      (portfolioId: string, folderId: string, ids: string[]) => void;
+  reorderCategoryPhotos:    (portfolioId: string, categoryId: string, ids: string[]) => void;
 }
 
 /* Helper — produce a fresh content object for portfolios with no entry yet */
@@ -236,6 +241,34 @@ export const usePortfolioContentStore = create<PortfolioContentStore>()(
         );
         return {
           byPortfolio: { ...s.byPortfolio, [portfolioId]: { ...c, photos, folders, categories } },
+        };
+      }),
+
+      /* ── Reorder ── */
+      reorderCategories: (portfolioId, ids) => set((s) => {
+        const c = ensureContent(s.byPortfolio, portfolioId);
+        return { byPortfolio: { ...s.byPortfolio, [portfolioId]: { ...c, categoryIds: ids } } };
+      }),
+
+      reorderFolderPhotos: (portfolioId, folderId, ids) => set((s) => {
+        const c = ensureContent(s.byPortfolio, portfolioId);
+        const fol = c.folders[folderId]; if (!fol) return s;
+        return {
+          byPortfolio: {
+            ...s.byPortfolio,
+            [portfolioId]: { ...c, folders: { ...c.folders, [folderId]: { ...fol, photoIds: ids } } },
+          },
+        };
+      }),
+
+      reorderCategoryPhotos: (portfolioId, categoryId, ids) => set((s) => {
+        const c = ensureContent(s.byPortfolio, portfolioId);
+        const cat = c.categories[categoryId]; if (!cat) return s;
+        return {
+          byPortfolio: {
+            ...s.byPortfolio,
+            [portfolioId]: { ...c, categories: { ...c.categories, [categoryId]: { ...cat, directPhotoIds: ids } } },
+          },
         };
       }),
     }),
