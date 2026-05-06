@@ -135,11 +135,13 @@ export default function HalcyonPortfolioPage() {
         .hp-foot .mark em{font-style:italic}
         .hp-foot .links{display:flex;gap:24px}
 
-        .hp-drawer{position:fixed;inset:0;z-index:50;background:${t.bg};display:flex;align-items:center;padding:48px 64px;transform:translateX(-100%);transition:transform .55s cubic-bezier(0.76,0,0.24,1)}
+        /* Drawer: menu owns the space, image is a smaller accent on the side. */
+        .hp-drawer{position:fixed;inset:0;z-index:50;background:${t.bg};display:flex;align-items:center;gap:64px;padding:64px;transform:translateX(-100%);transition:transform .55s cubic-bezier(0.76,0,0.24,1)}
         .hp-drawer.open{transform:translateX(0)}
-        .hp-drawer .col-l{width:55%}
-        .hp-drawer .col-r{width:45%;height:80%;background:url('${data.projects[0]!.cover}') center/cover}
-        @media(max-width:780px){.hp-drawer{padding:32px}.hp-drawer .col-l{width:100%}.hp-drawer .col-r{display:none}}
+        .hp-drawer .col-l{flex:1;min-width:0;max-width:720px}
+        .hp-drawer .col-r{flex-shrink:0;width:300px;aspect-ratio:3/4;max-height:60vh;background:url('${data.projects[0]!.cover}') center/cover;border:1px solid ${t.line}}
+        @media(max-width:980px){.hp-drawer{padding:48px}.hp-drawer .col-r{width:220px}}
+        @media(max-width:780px){.hp-drawer{padding:32px}.hp-drawer .col-l{flex:1;width:100%}.hp-drawer .col-r{display:none}}
         .hp-drawer ul{list-style:none}
         .hp-drawer li{padding:18px 0;border-bottom:1px solid ${t.line};font-family:${HL_FONTS.serif};font-size:48px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:padding .35s ease,color .35s ease}
         .hp-drawer li:hover{padding-left:16px;font-style:italic;color:${t.accent}}
