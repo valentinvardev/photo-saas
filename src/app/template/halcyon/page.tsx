@@ -139,11 +139,15 @@ export default function HalcyonPortfolioPage() {
         .hp-detail-title em{font-style:italic}
         .hp-detail-info{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#ffffff;display:grid;gap:8px;text-align:right;min-width:220px}
         .hp-detail-info .row{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(255,255,255,0.4);padding-bottom:6px}
-        .hp-detail-grid{padding:64px 32px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
-        .hp-detail-grid .item{position:relative;cursor:pointer;overflow:hidden}
-        .hp-detail-grid .item img{width:100%;height:100%;object-fit:cover;transition:transform .9s cubic-bezier(0.22,1,0.36,1)}
+        /* Masonry — preserves each photo's native aspect ratio (portrait,
+           square, more vertical) without forced cropping. Column-based so
+           heights auto-balance; tighter padding than the old span-12 grid. */
+        .hp-detail-grid{padding:48px 32px;column-count:3;column-gap:14px}
+        @media(max-width:1100px){.hp-detail-grid{column-count:2}}
+        @media(max-width:640px){.hp-detail-grid{column-count:1}}
+        .hp-detail-grid .item{break-inside:avoid;margin-bottom:14px;position:relative;cursor:pointer;overflow:hidden;background:${t.raised}}
+        .hp-detail-grid .item img{width:100%;height:auto;display:block;transition:transform .9s cubic-bezier(0.22,1,0.36,1)}
         .hp-detail-grid .item:hover img{transform:scale(1.04)}
-        @media(max-width:780px){.hp-detail-grid .item{grid-column:span 12 !important;height:300px !important}}
         .hp-detail-back{position:fixed;top:24px;left:32px;z-index:41}
         .hp-detail-close{position:fixed;top:24px;right:32px;z-index:41;width:44px;height:44px;border-radius:50%;border:1px solid ${t.line};background:${t.raised};color:${t.fg};cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:${HL_FONTS.mono};font-size:14px;transition:all .25s ease}
         .hp-detail-close:hover{background:${t.fg};color:${t.bg};border-color:${t.fg};transform:rotate(90deg)}
@@ -346,23 +350,12 @@ export default function HalcyonPortfolioPage() {
             </div>
           </div>
           <div className="hp-detail-grid">
-            {project.photos.map((ph, i) => {
-              const layouts = [
-                { gridColumn: "span 7", height: 380 },
-                { gridColumn: "span 5", height: 380 },
-                { gridColumn: "span 4", height: 280 },
-                { gridColumn: "span 8", height: 280 },
-                { gridColumn: "span 6", height: 340 },
-                { gridColumn: "span 6", height: 340 },
-              ];
-              const s = layouts[i % layouts.length]!;
-              return (
-                <div key={ph.id} className="item" style={s} onClick={() => setLightbox({ photos: project.photos, index: i })}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ph.src} alt={ph.title} />
-                </div>
-              );
-            })}
+            {project.photos.map((ph, i) => (
+              <div key={ph.id} className="item" onClick={() => setLightbox({ photos: project.photos, index: i })}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={ph.src} alt={ph.title} loading="lazy" />
+              </div>
+            ))}
           </div>
         </motion.div>
       )}
