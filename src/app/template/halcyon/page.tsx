@@ -19,6 +19,8 @@ export default function HalcyonPortfolioPage() {
   const [showAllWorks,  setShowAllWorks]  = useState(false);
   const [indexPhotoIdx, setIndexPhotoIdx] = useState(0);
   const [drawerPhotoIdx,setDrawerPhotoIdx]= useState(0);
+  const [contactTab,    setContactTab]    = useState<"letter" | "whatsapp">("letter");
+  const [waMsg,         setWaMsg]         = useState("Hola Lior, me gustaría hablar contigo sobre una sesión. Mi proyecto es ");
 
   /* Cycle the floating index thumbnail through that project's photos. */
   useEffect(() => {
@@ -197,6 +199,19 @@ export default function HalcyonPortfolioPage() {
         .hp-contact-form input:focus,.hp-contact-form textarea:focus{border-color:${t.accent}}
         .hp-contact-form textarea{resize:none;min-height:120px;font-family:${HL_FONTS.sans}}
         .hp-contact-actions{display:flex;justify-content:space-between;align-items:center;margin-top:32px;flex-wrap:wrap;gap:12px}
+        .hp-contact-tabs{display:inline-flex;gap:0;margin:0 auto 32px;border:1px solid ${t.line};border-radius:999px;padding:4px;background:${t.raised}}
+        .hp-contact-tab{background:transparent;border:0;cursor:pointer;padding:10px 22px;border-radius:999px;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted};transition:all .25s ease;display:inline-flex;align-items:center;gap:8px}
+        .hp-contact-tab.on{background:${t.fg};color:${t.bg}}
+        .hp-contact-tab:not(.on):hover{color:${t.fg}}
+        .hp-wa{max-width:520px;margin:0 auto;text-align:left;display:grid;gap:18px}
+        .hp-wa textarea{background:transparent;border:1px solid ${t.line};color:${t.fg};font-family:${HL_FONTS.sans};font-size:14px;line-height:1.6;padding:18px;outline:none;resize:vertical;min-height:160px;transition:border-color .2s ease}
+        .hp-wa textarea:focus{border-color:${t.accent}}
+        .hp-wa-actions{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+        .hp-wa-num{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase}
+        .hp-wa-num b{color:${t.fg};font-weight:400;letter-spacing:0.04em}
+        .hp-wa-send{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;background:#25D366;color:#0E0D0B;border:0;cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:transform .25s ease,filter .25s ease;text-decoration:none}
+        .hp-wa-send:hover{transform:translateY(-2px);filter:brightness(1.05)}
+        .hp-wa-send svg{width:16px;height:16px}
 
         .hp-foot{display:flex;justify-content:space-between;align-items:center;padding:32px;border-top:1px solid ${t.line};color:${t.muted};flex-wrap:wrap;gap:16px}
         .hp-foot .mark{font-family:${HL_FONTS.serif};font-size:18px;color:${t.fg}}
@@ -388,16 +403,44 @@ export default function HalcyonPortfolioPage() {
         <div className="hl-eyebrow" style={{ marginBottom: 24 }}>Available for 2025 commissions</div>
         <h2>Begin a <em>conversation.</em></h2>
         <p className="tag">Tell me about the day, the room, the people. The best work always starts with a long letter and a slow reply.</p>
-        <form className="hp-contact-form" onSubmit={(e) => e.preventDefault()}>
-          <input placeholder="Your name" />
-          <input placeholder="Email" type="email" />
-          <input placeholder="Project · date · place" />
-          <textarea placeholder="A few sentences about what you have in mind." />
-          <div className="hp-contact-actions">
-            <span className="hl-mono" style={{ color: t.muted }}>or write to studio@halcyon.photo</span>
-            <button type="submit" className="hl-btn hl-btn-accent">Send letter →</button>
+
+        <div className="hp-contact-tabs" role="tablist">
+          <button role="tab" aria-selected={contactTab === "letter"}   className={`hp-contact-tab ${contactTab === "letter"   ? "on" : ""}`} onClick={() => setContactTab("letter")}>Letter</button>
+          <button role="tab" aria-selected={contactTab === "whatsapp"} className={`hp-contact-tab ${contactTab === "whatsapp" ? "on" : ""}`} onClick={() => setContactTab("whatsapp")}>WhatsApp</button>
+        </div>
+
+        {contactTab === "letter" && (
+          <form className="hp-contact-form" onSubmit={(e) => e.preventDefault()}>
+            <input placeholder="Your name" />
+            <input placeholder="Email" type="email" />
+            <input placeholder="Project · date · place" />
+            <textarea placeholder="A few sentences about what you have in mind." />
+            <div className="hp-contact-actions">
+              <span className="hl-mono" style={{ color: t.muted }}>or write to studio@halcyon.photo</span>
+              <button type="submit" className="hl-btn hl-btn-accent">Send letter →</button>
+            </div>
+          </form>
+        )}
+
+        {contactTab === "whatsapp" && (
+          <div className="hp-wa">
+            <textarea value={waMsg} onChange={(e) => setWaMsg(e.target.value)} />
+            <div className="hp-wa-actions">
+              <span className="hp-wa-num">WhatsApp · <b>+351 912 000 000</b></span>
+              <a
+                className="hp-wa-send"
+                href={`https://wa.me/351912000000?text=${encodeURIComponent(waMsg)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-18.5A8.5 8.5 0 0 0 4.59 16.32L4 20l3.793-1.057A8.5 8.5 0 1 0 12 3.5z"/>
+                </svg>
+                Enviar
+              </a>
+            </div>
           </div>
-        </form>
+        )}
       </section>
 
       <footer className="hp-foot">
