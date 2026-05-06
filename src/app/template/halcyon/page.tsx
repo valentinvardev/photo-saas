@@ -43,9 +43,9 @@ export default function HalcyonPortfolioPage() {
     <div className="hl-root" style={{ minHeight: "100dvh", position: "relative", overflow: "hidden" }}>
       <style>{hlBaseCss(t)}</style>
       <style>{`
-        .hp-nav{position:absolute;top:0;left:0;right:0;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:24px 32px;mix-blend-mode:difference;color:${t.fg}}
-        .hp-mark{font-family:${HL_FONTS.serif};font-size:22px;letter-spacing:-0.02em}
-        .hp-mark em{font-style:italic;font-weight:400}
+        .hp-nav{position:absolute;top:0;left:0;right:0;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:24px 32px;color:${t.fg};text-shadow:0 1px 16px rgba(0,0,0,0.55)}
+        .hp-mark{font-family:${HL_FONTS.serif};font-size:24px;letter-spacing:-0.02em;font-weight:400;color:${t.fg};padding:6px 14px;border-radius:999px;background:rgba(14,13,11,0.32);backdrop-filter:blur(10px);border:1px solid rgba(239,234,224,0.18)}
+        .hp-mark em{font-style:italic;font-weight:400;color:${t.accent}}
         .hp-burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:transparent;border:0;padding:8px}
         .hp-burger span{display:block;width:22px;height:1px;background:${t.fg};transition:transform .3s ease}
         .hp-burger:hover span:first-child{transform:translateX(-3px)}
@@ -53,7 +53,7 @@ export default function HalcyonPortfolioPage() {
 
         .hp-cover{position:relative;height:780px;overflow:hidden}
         .hp-cover-img{position:absolute;inset:0;background:url('${data.projects[1]!.cover}') center/cover}
-        .hp-cover-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.4) 0%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 60%,rgba(14,13,11,0.7) 100%)}
+        .hp-cover-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.35) 0%,rgba(14,13,11,0) 22%,rgba(14,13,11,0) 45%,rgba(14,13,11,0.55) 75%,rgba(14,13,11,0.92) 100%)}
         .hp-cover-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;gap:48px;flex-wrap:wrap}
         .hp-cover-title{font-family:${HL_FONTS.serif};font-size:140px;line-height:0.92;letter-spacing:-0.04em;font-weight:400}
         .hp-cover-title em{font-style:italic;font-weight:400}
@@ -70,7 +70,7 @@ export default function HalcyonPortfolioPage() {
         .hp-index-row{display:grid;grid-template-columns:60px 1fr 200px 120px 32px;gap:24px;align-items:center;padding:28px 0;border-bottom:1px solid ${t.line};cursor:pointer;position:relative;transition:padding .35s cubic-bezier(0.22,1,0.36,1)}
         .hp-index-row:hover{padding-left:18px}
         .hp-index-row .no{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;color:${t.muted}}
-        .hp-index-row .ti{font-family:${HL_FONTS.serif};font-size:54px;line-height:1;letter-spacing:-0.02em;font-weight:400;transition:font-style .3s ease,transform .35s cubic-bezier(0.22,1,0.36,1)}
+        .hp-index-row .ti{font-family:${HL_FONTS.serif};font-size:54px;line-height:1;letter-spacing:-0.02em;font-weight:400;transition:transform .22s cubic-bezier(0.22,1,0.36,1),color .15s ease}
         .hp-index-row:hover .ti{font-style:italic;transform:translateX(8px)}
         .hp-index-row .ta{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.1em;color:${t.muted};text-transform:uppercase}
         .hp-index-row .yr{font-family:${HL_FONTS.mono};font-size:11px;color:${t.muted};text-align:right}
@@ -82,7 +82,7 @@ export default function HalcyonPortfolioPage() {
           .hp-index-row .ta,.hp-index-row .yr{display:none}
         }
 
-        .hp-thumb-float{position:absolute;width:280px;height:360px;pointer-events:none;z-index:5;opacity:0;transition:opacity .25s ease}
+        .hp-thumb-float{position:absolute;width:240px;height:300px;pointer-events:none;z-index:5;opacity:0;transition:opacity .2s ease,transform .25s cubic-bezier(0.22,1,0.36,1)}
         .hp-thumb-float.show{opacity:1}
         .hp-thumb-float img{width:100%;height:100%;object-fit:cover}
 
@@ -131,7 +131,7 @@ export default function HalcyonPortfolioPage() {
         @keyframes hpFade{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         .hp-detail-hero{position:relative;height:680px;overflow:hidden}
         .hp-detail-hero img{width:100%;height:100%;object-fit:cover}
-        .hp-detail-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.5) 0%,rgba(14,13,11,0) 40%,rgba(14,13,11,0.6) 100%)}
+        .hp-detail-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.25) 0%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 50%,rgba(14,13,11,0.6) 78%,rgba(14,13,11,0.94) 100%)}
         .hp-detail-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;gap:48px;color:${t.fg};flex-wrap:wrap}
         .hp-detail-title{font-family:${HL_FONTS.serif};font-size:120px;line-height:0.95;letter-spacing:-0.03em;font-weight:400}
         @media(max-width:780px){.hp-detail-title{font-size:56px}}
@@ -212,8 +212,10 @@ export default function HalcyonPortfolioPage() {
           const r = e.currentTarget.getBoundingClientRect();
           const el = document.getElementById("hp-thumb-float");
           if (el) {
-            el.style.left = `${e.clientX - r.left + 30}px`;
-            el.style.top  = `${e.clientY - r.top - 180}px`;
+            /* Position the preview to the right of the cursor, vertically
+               centered on it. Image is 300px tall → top offset = -150 */
+            el.style.left = `${e.clientX - r.left + 24}px`;
+            el.style.top  = `${e.clientY - r.top - 150}px`;
           }
         }}
       >
@@ -319,7 +321,7 @@ export default function HalcyonPortfolioPage() {
 
       {project && (
         <div className="hp-detail">
-          <button className="hl-btn hp-detail-back" onClick={() => setActiveProject(null)}>← Back to index</button>
+          <button className="hl-btn hl-btn-accent hp-detail-back" onClick={() => setActiveProject(null)}>← Back to home</button>
           <button className="hp-detail-close" onClick={() => setActiveProject(null)} aria-label="Close project"><span>✕</span></button>
           <div className="hp-detail-hero">
             {/* eslint-disable-next-line @next/next/no-img-element */}
