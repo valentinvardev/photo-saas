@@ -80,31 +80,41 @@ export default function HalcyonPortfolioPage() {
     <div className="hl-root" style={{ minHeight: "100dvh", position: "relative", overflow: "hidden" }}>
       <style>{hlBaseCss(t)}</style>
       <style>{`
-        .hp-nav{position:absolute;top:0;left:0;right:0;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:24px 32px;color:${t.fg};text-shadow:0 1px 16px rgba(0,0,0,0.55)}
-        .hp-mark{font-family:${HL_FONTS.serif};font-size:24px;letter-spacing:-0.02em;font-weight:400;color:${t.fg};padding:6px 14px;border-radius:999px;background:rgba(14,13,11,0.32);backdrop-filter:blur(10px);border:1px solid rgba(239,234,224,0.18)}
-        .hp-mark em{font-style:italic;font-weight:400;color:${t.accent}}
+        .hp-nav{position:absolute;top:0;left:0;right:0;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:28px 32px;color:${t.fg}}
+        .hp-mark{display:inline-flex;flex-direction:column;align-items:center;gap:2px;color:${t.fg};line-height:1;text-shadow:0 1px 24px rgba(0,0,0,0.55)}
+        .hp-mark .wm{font-family:${HL_FONTS.serif};font-size:28px;letter-spacing:-0.02em;font-weight:400;display:flex;align-items:center;gap:8px}
+        .hp-mark .wm em{font-style:italic;font-weight:400}
+        .hp-mark .wm .glyph{width:6px;height:6px;border-radius:50%;border:1px solid ${t.fg};display:inline-block}
+        .hp-mark .sub{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.32em;text-transform:uppercase;opacity:0.7;margin-top:4px}
         .hp-burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:transparent;border:0;padding:8px}
-        .hp-burger span{display:block;width:22px;height:1px;background:${t.fg};transition:transform .3s ease}
+        .hp-burger span{display:block;width:22px;height:1px;background:${t.fg};transition:transform .3s ease;box-shadow:0 1px 8px rgba(0,0,0,0.55)}
         .hp-burger:hover span:first-child{transform:translateX(-3px)}
         .hp-burger:hover span:last-child{transform:translateX(3px)}
 
         .hp-cover{position:relative;height:780px;overflow:hidden}
-        .hp-cover-img{position:absolute;inset:0;background:url('${data.projects[1]!.cover}') center/cover}
-        .hp-cover-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.35) 0%,rgba(14,13,11,0) 22%,rgba(14,13,11,0) 45%,rgba(14,13,11,0.55) 75%,rgba(14,13,11,0.92) 100%)}
+        .hp-cover-img{position:absolute;inset:0;background:url('${data.projects[2]!.cover}') center/cover}
+        /* Two layered gradients: stronger top scrim so nav reads, plus the
+           bottom darkening that anchors the title. */
+        .hp-cover-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.78) 0%,rgba(14,13,11,0.42) 14%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 50%,rgba(14,13,11,0.55) 75%,rgba(14,13,11,0.95) 100%)}
         .hp-cover-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;gap:48px;flex-wrap:wrap}
         .hp-cover-title{font-family:${HL_FONTS.serif};font-size:140px;line-height:0.92;letter-spacing:-0.04em;font-weight:400}
         .hp-cover-title em{font-style:italic;font-weight:400}
-        @media(max-width:780px){.hp-cover-title{font-size:88px}}
-        /* Scroll hint: a single dot drifts down a thin track and resets,
-           more refined than the previous line-scale loop. */
+        @media(max-width:780px){
+          .hp-cover{height:560px}
+          .hp-cover-title{font-size:72px}
+          .hp-cover-meta{bottom:32px;left:20px;right:20px;gap:20px}
+          .hp-nav{padding:18px 20px}
+        }
+        /* Scroll hint: dot drifts upward (against the page-flow), a small
+           counter-cue. Track lives below the resting position. */
         .hp-scroll-hint{display:flex;flex-direction:column;align-items:center;gap:10px;color:${t.fg}}
         .hp-scroll-hint .track{position:relative;width:1px;height:44px;background:rgba(239,234,224,0.22);overflow:hidden}
-        .hp-scroll-hint .track::after{content:"";position:absolute;left:-1.5px;top:0;width:4px;height:4px;border-radius:50%;background:${t.fg};animation:hpScrollDot 1.8s infinite cubic-bezier(0.22,1,0.36,1)}
+        .hp-scroll-hint .track::after{content:"";position:absolute;left:-1.5px;bottom:0;width:4px;height:4px;border-radius:50%;background:${t.fg};animation:hpScrollDot 1.8s infinite cubic-bezier(0.22,1,0.36,1)}
         @keyframes hpScrollDot{
-          0%   { transform: translateY(-6px); opacity: 0 }
+          0%   { transform: translateY(6px);  opacity: 0 }
           18%  { opacity: 1 }
           82%  { opacity: 1 }
-          100% { transform: translateY(46px); opacity: 0 }
+          100% { transform: translateY(-46px); opacity: 0 }
         }
 
         .hp-section-label{display:flex;align-items:center;gap:14px;padding:0 32px;margin:96px 0 32px;color:${t.muted}}
@@ -139,7 +149,7 @@ export default function HalcyonPortfolioPage() {
         .hp-allphotos .eyebrow{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:${t.fg};opacity:0.75;margin-bottom:24px}
         .hp-allphotos h2{font-family:${HL_FONTS.serif};font-size:120px;line-height:0.9;letter-spacing:-0.035em;font-weight:400;color:${t.fg}}
         .hp-allphotos h2 em{font-style:italic}
-        .hp-allphotos .sub{font-family:${HL_FONTS.serif};font-size:18px;line-height:1.55;color:${t.fg};opacity:0.85;max-width:460px;margin-top:24px;font-style:italic}
+        .hp-allphotos .sub{font-family:${HL_FONTS.sans};font-size:15px;line-height:1.6;color:${t.fg};opacity:0.85;max-width:460px;margin-top:24px}
         .hp-allphotos .meta{display:flex;gap:32px;margin-top:32px;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:${t.fg};opacity:0.7}
         .hp-allphotos .meta b{display:block;font-family:${HL_FONTS.serif};font-style:italic;font-size:28px;letter-spacing:-0.01em;font-weight:400;color:${t.fg};opacity:1;margin-bottom:6px;text-transform:none}
         .hp-allphotos .cta{display:inline-flex;align-items:center;gap:16px;padding:22px 32px;background:${t.bg};color:${t.fg};border:0;cursor:pointer;font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.18em;text-transform:uppercase;transition:transform .3s cubic-bezier(0.22,1,0.36,1),background .3s ease}
@@ -265,7 +275,10 @@ export default function HalcyonPortfolioPage() {
         <button className="hp-burger" onClick={() => setNavOpen(true)} aria-label="Open menu">
           <span></span><span></span><span></span>
         </button>
-        <div className="hp-mark">Halcyon<em> Studio</em></div>
+        <div className="hp-mark">
+          <div className="wm"><span className="glyph" aria-hidden /><span>Halcyon</span></div>
+          <div className="sub">Studio · Lisbon</div>
+        </div>
         <span aria-hidden style={{ width: 38 }} />{/* spacer to keep mark centered */}
       </div>
 
@@ -452,7 +465,6 @@ export default function HalcyonPortfolioPage() {
           exit={{ opacity: 0, y: 32, scale: 0.97, transition: { duration: 0.32, ease: [0.76, 0, 0.24, 1] } }}
           transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
         >
-          <button className="hl-btn hl-btn-accent hp-detail-back" onClick={() => setActiveProject(null)}>← Back to home</button>
           <button className="hp-detail-close" onClick={() => setActiveProject(null)} aria-label="Close project"><span>✕</span></button>
           <div className="hp-detail-hero">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -489,7 +501,6 @@ export default function HalcyonPortfolioPage() {
           exit={{ opacity: 0, y: 32, scale: 0.97, transition: { duration: 0.32, ease: [0.76, 0, 0.24, 1] } }}
           transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
         >
-          <button className="hl-btn hp-detail-back" style={{ position: "absolute", top: 24, left: 32 }} onClick={() => setGalleryOpen(false)}>← Close</button>
           <button className="hp-detail-close" style={{ position: "absolute" }} onClick={() => setGalleryOpen(false)} aria-label="Close gallery"><span>✕</span></button>
           <div className="hp-gallery-head">
             <h2>Every <em>photograph,</em><br />in one room.</h2>
