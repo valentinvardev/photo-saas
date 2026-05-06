@@ -78,10 +78,33 @@ export default function HalcyonPortfolioPage() {
 
   const project = data.projects.find((p) => p.id === activeProject);
 
+  const Socials = () => (
+    <div className="hp-socials">
+      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <rect x="3" y="3" width="18" height="18" rx="5" />
+          <circle cx="12" cy="12" r="4" />
+          <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" />
+        </svg>
+      </a>
+      <a href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="X">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/>
+        </svg>
+      </a>
+      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M13.5 22v-9h3l.5-4h-3.5V6.5c0-1.16.32-1.95 2-1.95H17V1.14C16.66 1.1 15.41 1 13.96 1 10.92 1 8.83 2.86 8.83 6.16V9H6v4h2.83v9h4.67Z"/>
+        </svg>
+      </a>
+    </div>
+  );
+
   return (
     <div className="hl-root" style={{ minHeight: "100dvh", position: "relative", overflow: "hidden" }}>
       <style>{hlBaseCss(t)}</style>
       <style>{`
+        html{scroll-behavior:smooth}
         .hp-nav{position:sticky;top:0;left:0;right:0;z-index:30;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:18px 32px;color:${t.fg};background:${t.accent};border-bottom:1px solid rgba(14,13,11,0.18)}
         .hp-nav .nav-spacer{}
         .hp-mark{display:inline-flex;flex-direction:column;align-items:center;gap:2px;color:${t.fg};line-height:1;justify-self:center}
@@ -213,6 +236,12 @@ export default function HalcyonPortfolioPage() {
         .hp-wa-send{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;background:#25D366;color:#0E0D0B;border:0;cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:transform .25s ease,filter .25s ease;text-decoration:none}
         .hp-wa-send:hover{transform:translateY(-2px);filter:brightness(1.05)}
         .hp-wa-send svg{width:16px;height:16px}
+
+        .hp-socials{display:inline-flex;gap:10px}
+        .hp-socials a{width:38px;height:38px;border-radius:50%;border:1px solid ${t.line};color:${t.muted};display:inline-flex;align-items:center;justify-content:center;transition:color .25s ease,border-color .25s ease,background .25s ease}
+        .hp-socials a:hover{color:${t.bg};background:${t.fg};border-color:${t.fg}}
+        .hp-socials a svg{width:15px;height:15px}
+        .hp-about-actions{display:flex;align-items:center;gap:24px;margin-top:32px;flex-wrap:wrap}
 
         .hp-foot{display:flex;justify-content:space-between;align-items:center;padding:32px;border-top:1px solid ${t.line};color:${t.muted};flex-wrap:wrap;gap:16px}
         .hp-foot .mark{font-family:${HL_FONTS.serif};font-size:18px;color:${t.fg}}
@@ -397,10 +426,14 @@ export default function HalcyonPortfolioPage() {
         <div>
           <h2>Pictures to <em>live with,</em><br />not scroll past.</h2>
           <p>{data.brand.bio}</p>
+          <div className="hp-about-actions">
+            <a href="#contact" className="hl-btn hl-btn-accent">Contact <span>↓</span></a>
+            <Socials />
+          </div>
         </div>
       </section>
 
-      <section className="hp-contact">
+      <section id="contact" className="hp-contact">
         <div className="hl-eyebrow" style={{ marginBottom: 24 }}>Available for 2025 commissions</div>
         <h2>Begin a <em>conversation.</em></h2>
         <p className="tag">Tell me about the day, the room, the people. The best work always starts with a long letter and a slow reply.</p>
@@ -448,11 +481,11 @@ export default function HalcyonPortfolioPage() {
         <div className="mark">Halcyon<em> Studio</em></div>
         <div className="hl-mono">© MMXXIV · All photographs © Lior Avni</div>
         <div className="links hl-mono">
-          <a className="hl-link" href="#">Instagram</a>
           <a className="hl-link" href="#">Journal</a>
           <a className="hl-link" href="#">Print Shop</a>
           <a className="hl-link" href="#">Colophon</a>
         </div>
+        <Socials />
       </footer>
 
       <div className={`hp-drawer ${navOpen ? "open" : ""}`} onMouseLeave={() => setDrawerHoverId(null)}>
