@@ -232,7 +232,7 @@ export default function HalcyonPortfolioPage() {
         .hp-detail-hero img{width:100%;height:100%;object-fit:cover}
         /* Warm tint scrim — multiplied orange wash unifies the cover with the
            palette and lifts contrast for the title + meta. */
-        .hp-detail-hero::before{content:"";position:absolute;inset:0;background:${t.accent};mix-blend-mode:multiply;opacity:0.42;z-index:1;pointer-events:none}
+        .hp-detail-hero::before{content:"";position:absolute;inset:0;background:${t.accent};mix-blend-mode:multiply;opacity:0.55;z-index:1;pointer-events:none}
         .hp-detail-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.35) 0%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 45%,rgba(14,13,11,0.7) 75%,rgba(14,13,11,0.96) 100%);z-index:2}
         .hp-detail-hero .hp-detail-meta{z-index:3 !important}
         .hp-detail-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;gap:48px;color:#ffffff;flex-wrap:wrap;z-index:2}
