@@ -122,14 +122,18 @@ export default function HalcyonPortfolioPage() {
 
         .hp-index{padding:0 32px;border-top:1px solid ${t.line};position:relative}
         .hp-index-row{display:grid;grid-template-columns:60px 1fr 200px 120px 32px;gap:24px;align-items:center;padding:28px 0;border-bottom:1px solid ${t.line};cursor:pointer;position:relative;transition:padding .35s cubic-bezier(0.22,1,0.36,1)}
-        .hp-index-row:hover{padding-left:18px}
         .hp-index-row .no{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;color:${t.muted}}
         .hp-index-row .ti{font-family:${HL_FONTS.serif};font-size:54px;line-height:1;letter-spacing:-0.02em;font-weight:400;transition:transform .22s cubic-bezier(0.22,1,0.36,1),color .15s ease}
-        .hp-index-row:hover .ti{font-style:italic;transform:translateX(8px)}
         .hp-index-row .ta{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.1em;color:${t.muted};text-transform:uppercase}
         .hp-index-row .yr{font-family:${HL_FONTS.mono};font-size:11px;color:${t.muted};text-align:right}
         .hp-index-row .ar{justify-self:end;color:${t.muted};transition:transform .35s ease,color .35s ease}
-        .hp-index-row:hover .ar{transform:translateX(6px);color:${t.accent}}
+        /* Hover-only flourishes: italic + slide kick in only on devices that
+           actually have a cursor. On touch, none of this animates. */
+        @media (hover:hover) and (pointer:fine){
+          .hp-index-row:hover{padding-left:18px}
+          .hp-index-row:hover .ti{font-style:italic;transform:translateX(8px)}
+          .hp-index-row:hover .ar{transform:translateX(6px);color:${t.accent}}
+        }
         @media(max-width:780px){
           .hp-index-row{grid-template-columns:40px 1fr 24px;gap:12px}
           .hp-index-row .ti{font-size:30px}
@@ -138,6 +142,7 @@ export default function HalcyonPortfolioPage() {
 
         .hp-thumb-float{position:absolute;width:240px;height:300px;pointer-events:none;z-index:5;opacity:0;transition:opacity .2s ease,transform .25s cubic-bezier(0.22,1,0.36,1);overflow:hidden;background:${t.raised}}
         .hp-thumb-float.show{opacity:1}
+        @media (hover:none){.hp-thumb-float{display:none}}
         .hp-thumb-float img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:hpThumbImg .55s cubic-bezier(0.22,1,0.36,1) both}
         @keyframes hpThumbImg{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
 
@@ -207,7 +212,7 @@ export default function HalcyonPortfolioPage() {
         .hp-drawer .col-r img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:hpDrawerImg .6s cubic-bezier(0.22,1,0.36,1) both}
         .hp-drawer .col-r .label{position:absolute;left:0;right:0;bottom:0;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${t.fg};padding:14px 18px;background:rgba(14,13,11,0.85);backdrop-filter:blur(10px);border-top:1px solid rgba(239,234,224,0.08);display:flex;justify-content:space-between;align-items:center;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease}
         .hp-drawer .col-r.has-hover .label{opacity:1;transform:translateY(0)}
-        .hp-drawer .col-r .label em{font-family:${HL_FONTS.serif};font-style:italic;font-size:14px;color:${t.accent};letter-spacing:0;text-transform:none}
+        .hp-drawer .col-r .label em{font-family:${HL_FONTS.serif};font-style:italic;font-size:14px;color:${t.fg};letter-spacing:0;text-transform:none}
         @keyframes hpDrawerImg{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
         @media(max-width:1280px){.hp-drawer .col-r{width:440px}}
         @media(max-width:1100px){.hp-drawer .col-r{width:360px}}
@@ -217,8 +222,8 @@ export default function HalcyonPortfolioPage() {
         .hp-drawer li{padding:18px 0;border-bottom:1px solid ${t.line};font-family:${HL_FONTS.serif};font-size:48px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:padding .35s ease,color .35s ease}
         .hp-drawer li:hover{padding-left:16px;font-style:italic;color:${t.accent}}
         .hp-drawer li .n{font-family:${HL_FONTS.mono};font-size:11px;color:${t.muted};font-style:normal}
-        .hp-drawer li .all-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid ${t.line};color:${t.accent};transition:all .25s ease}
-        .hp-drawer li:hover .all-icon{border-color:${t.accent};background:${t.accent};color:${t.bg}}
+        .hp-drawer li .all-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid ${t.line};border-radius:50%;color:${t.fg};transition:all .25s ease}
+        .hp-drawer li:hover .all-icon{border-color:${t.fg};background:${t.fg};color:${t.bg};transform:translateX(4px)}
         .hp-drawer-close{position:absolute;top:24px;right:32px;background:transparent;border:0;color:${t.fg};cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase}
 
         .hp-detail{position:fixed;inset:0;z-index:40;background:${t.bg};overflow-y:auto;animation:hpFade .6s cubic-bezier(0.22,1,0.36,1)}
@@ -374,14 +379,6 @@ export default function HalcyonPortfolioPage() {
         <div>
           <h2>Pictures to <em>live with,</em><br />not scroll past.</h2>
           <p>{data.brand.bio}</p>
-          <div className="hp-about-stats">
-            {data.brand.stats.map((s) => (
-              <div key={s.label}>
-                <div className="v">{s.value}</div>
-                <div className="l">{s.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -433,11 +430,9 @@ export default function HalcyonPortfolioPage() {
             >
               <span>All photographs</span>
               <span className="all-icon" aria-hidden>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="3"  y="3"  width="8" height="8" rx="1" />
-                  <rect x="13" y="3"  width="8" height="8" rx="1" />
-                  <rect x="3"  y="13" width="8" height="8" rx="1" />
-                  <rect x="13" y="13" width="8" height="8" rx="1" />
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14" />
+                  <path d="M13 6l6 6-6 6" />
                 </svg>
               </span>
             </li>
