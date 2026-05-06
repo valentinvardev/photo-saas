@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { HL_TOKENS, HL_FONTS, HL_PORTFOLIO, HL_PHOTOS, hlBaseCss, type HlPhoto } from "~/lib/halcyon/data";
 
 type Lightbox = { photos: (HlPhoto & { projectTitle?: string })[]; index: number } | null;
@@ -66,7 +67,7 @@ export default function HalcyonPortfolioPage() {
         .hp-section-label .dot{width:6px;height:6px;border-radius:50%;background:${t.accent}}
         .hp-section-label hr{flex:1;border:0;border-top:1px solid ${t.line}}
 
-        .hp-index{padding:0 32px;border-top:1px solid ${t.line}}
+        .hp-index{padding:0 32px;border-top:1px solid ${t.line};position:relative}
         .hp-index-row{display:grid;grid-template-columns:60px 1fr 200px 120px 32px;gap:24px;align-items:center;padding:28px 0;border-bottom:1px solid ${t.line};cursor:pointer;position:relative;transition:padding .35s cubic-bezier(0.22,1,0.36,1)}
         .hp-index-row:hover{padding-left:18px}
         .hp-index-row .no{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;color:${t.muted}}
@@ -129,15 +130,15 @@ export default function HalcyonPortfolioPage() {
 
         .hp-detail{position:fixed;inset:0;z-index:40;background:${t.bg};overflow-y:auto;animation:hpFade .6s cubic-bezier(0.22,1,0.36,1)}
         @keyframes hpFade{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-        .hp-detail-hero{position:relative;height:680px;overflow:hidden}
+        .hp-detail-hero{position:relative;height:520px;overflow:hidden}
         .hp-detail-hero img{width:100%;height:100%;object-fit:cover}
-        .hp-detail-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.25) 0%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 50%,rgba(14,13,11,0.6) 78%,rgba(14,13,11,0.94) 100%)}
-        .hp-detail-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;gap:48px;color:${t.fg};flex-wrap:wrap}
-        .hp-detail-title{font-family:${HL_FONTS.serif};font-size:120px;line-height:0.95;letter-spacing:-0.03em;font-weight:400}
+        .hp-detail-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.25) 0%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 45%,rgba(14,13,11,0.65) 75%,rgba(14,13,11,0.96) 100%);z-index:1}
+        .hp-detail-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;gap:48px;color:#ffffff;flex-wrap:wrap;z-index:2}
+        .hp-detail-title{font-family:${HL_FONTS.serif};font-size:104px;line-height:0.95;letter-spacing:-0.03em;font-weight:400;color:#ffffff;text-shadow:0 2px 24px rgba(0,0,0,0.45)}
         @media(max-width:780px){.hp-detail-title{font-size:56px}}
         .hp-detail-title em{font-style:italic}
-        .hp-detail-info{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:${t.fg};opacity:0.85;display:grid;gap:8px;text-align:right;min-width:220px}
-        .hp-detail-info .row{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(239,234,224,0.18);padding-bottom:6px}
+        .hp-detail-info{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#ffffff;display:grid;gap:8px;text-align:right;min-width:220px}
+        .hp-detail-info .row{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(255,255,255,0.4);padding-bottom:6px}
         .hp-detail-grid{padding:64px 32px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
         .hp-detail-grid .item{position:relative;cursor:pointer;overflow:hidden}
         .hp-detail-grid .item img{width:100%;height:100%;object-fit:cover;transition:transform .9s cubic-bezier(0.22,1,0.36,1)}
@@ -319,8 +320,16 @@ export default function HalcyonPortfolioPage() {
         <div className="col-r" />
       </div>
 
+      <AnimatePresence>
       {project && (
-        <div className="hp-detail">
+        <motion.div
+          key="hp-detail"
+          className="hp-detail"
+          initial={{ opacity: 0, y: 24, scale: 0.985 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 32, scale: 0.97, transition: { duration: 0.32, ease: [0.76, 0, 0.24, 1] } }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+        >
           <button className="hl-btn hl-btn-accent hp-detail-back" onClick={() => setActiveProject(null)}>← Back to home</button>
           <button className="hp-detail-close" onClick={() => setActiveProject(null)} aria-label="Close project"><span>✕</span></button>
           <div className="hp-detail-hero">
@@ -339,12 +348,12 @@ export default function HalcyonPortfolioPage() {
           <div className="hp-detail-grid">
             {project.photos.map((ph, i) => {
               const layouts = [
-                { gridColumn: "span 7", height: 520 },
-                { gridColumn: "span 5", height: 520 },
-                { gridColumn: "span 4", height: 380 },
-                { gridColumn: "span 8", height: 380 },
-                { gridColumn: "span 6", height: 460 },
-                { gridColumn: "span 6", height: 460 },
+                { gridColumn: "span 7", height: 380 },
+                { gridColumn: "span 5", height: 380 },
+                { gridColumn: "span 4", height: 280 },
+                { gridColumn: "span 8", height: 280 },
+                { gridColumn: "span 6", height: 340 },
+                { gridColumn: "span 6", height: 340 },
               ];
               const s = layouts[i % layouts.length]!;
               return (
@@ -355,8 +364,9 @@ export default function HalcyonPortfolioPage() {
               );
             })}
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {galleryOpen && (
         <div className="hp-gallery">
