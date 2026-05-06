@@ -15,6 +15,11 @@ export default function HalcyonPortfolioPage() {
   const [galleryOpen,   setGalleryOpen]   = useState(false);
   const [lightbox,      setLightbox]      = useState<Lightbox>(null);
   const [hoverIdx,      setHoverIdx]      = useState(-1);
+  const [showAllWorks,  setShowAllWorks]  = useState(false);
+
+  const VISIBLE_WORKS = 3;
+  const visibleProjects = showAllWorks ? data.projects : data.projects.slice(0, VISIBLE_WORKS);
+  const hiddenCount     = data.projects.length - VISIBLE_WORKS;
 
   const allPhotos = useMemo(
     () => data.projects.flatMap((p) => p.photos.map((ph) => ({ ...ph, projectTitle: p.title }))),
@@ -59,9 +64,17 @@ export default function HalcyonPortfolioPage() {
         .hp-cover-title{font-family:${HL_FONTS.serif};font-size:140px;line-height:0.92;letter-spacing:-0.04em;font-weight:400}
         .hp-cover-title em{font-style:italic;font-weight:400}
         @media(max-width:780px){.hp-cover-title{font-size:88px}}
-        .hp-scroll-hint{display:flex;flex-direction:column;align-items:center;gap:6px;color:${t.fg}}
-        .hp-scroll-hint .line{width:1px;height:36px;background:${t.fg};opacity:0.5;animation:hpScrollLine 2.4s infinite ease-in-out}
-        @keyframes hpScrollLine{0%{transform:scaleY(0.2);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}50.01%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0.2);transform-origin:bottom}}
+        /* Scroll hint: a single dot drifts down a thin track and resets,
+           more refined than the previous line-scale loop. */
+        .hp-scroll-hint{display:flex;flex-direction:column;align-items:center;gap:10px;color:${t.fg}}
+        .hp-scroll-hint .track{position:relative;width:1px;height:44px;background:rgba(239,234,224,0.22);overflow:hidden}
+        .hp-scroll-hint .track::after{content:"";position:absolute;left:-1.5px;top:0;width:4px;height:4px;border-radius:50%;background:${t.accent};animation:hpScrollDot 1.8s infinite cubic-bezier(0.22,1,0.36,1)}
+        @keyframes hpScrollDot{
+          0%   { transform: translateY(-6px); opacity: 0 }
+          18%  { opacity: 1 }
+          82%  { opacity: 1 }
+          100% { transform: translateY(46px); opacity: 0 }
+        }
 
         .hp-section-label{display:flex;align-items:center;gap:14px;padding:0 32px;margin:96px 0 32px;color:${t.muted}}
         .hp-section-label .dot{width:6px;height:6px;border-radius:50%;background:${t.accent}}
@@ -88,10 +101,12 @@ export default function HalcyonPortfolioPage() {
         .hp-thumb-float img{width:100%;height:100%;object-fit:cover}
 
         .hp-cta-row{display:flex;justify-content:space-between;align-items:center;padding:48px 32px 0;flex-wrap:wrap;gap:16px}
+        .hp-view-all-row{display:flex;justify-content:center;padding:32px 32px 0;animation:hpFadeUp .35s cubic-bezier(0.22,1,0.36,1)}
+        @keyframes hpFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-        .hp-about{display:grid;grid-template-columns:1fr 1.2fr;gap:64px;padding:0 32px;align-items:center}
-        @media(max-width:780px){.hp-about{grid-template-columns:1fr;gap:32px}}
-        .hp-about-portrait{aspect-ratio:3/4;background:url('${HL_PHOTOS.portraits![2]!.src}') center/cover;background-color:${t.raised}}
+        .hp-about{display:grid;grid-template-columns:280px 1fr;gap:64px;padding:0 32px;align-items:center}
+        @media(max-width:780px){.hp-about{grid-template-columns:1fr;gap:32px}.hp-about-portrait{max-width:240px}}
+        .hp-about-portrait{aspect-ratio:1/1;background:url('${HL_PHOTOS.portraits![2]!.src}') center/cover;background-color:${t.raised};width:100%}
         .hp-about h2{font-family:${HL_FONTS.serif};font-size:72px;line-height:0.95;letter-spacing:-0.03em;margin-bottom:24px;font-weight:400}
         .hp-about h2 em{font-style:italic}
         .hp-about p{font-size:16px;line-height:1.7;color:${t.fg};max-width:520px}
@@ -183,23 +198,20 @@ export default function HalcyonPortfolioPage() {
           <span></span><span></span><span></span>
         </button>
         <div className="hp-mark">Halcyon<em> Studio</em></div>
-        <div className="hl-mono" style={{ color: t.fg, opacity: 0.85 }}>Lisbon · NYC · 24°</div>
+        <span aria-hidden style={{ width: 38 }} />{/* spacer to keep mark centered */}
       </div>
 
       <section className="hp-cover">
         <div className="hp-cover-img" />
         <div className="hp-cover-meta">
           <div>
-            <div className="hl-eyebrow" style={{ color: t.fg, opacity: 0.7, marginBottom: 24 }}>
-              <span style={{ color: t.accent }}>●</span>&nbsp;&nbsp;Photographs, 2014 — 2024
-            </div>
             <h1 className="hp-cover-title">
               The light<br />keeps <em>arriving.</em>
             </h1>
           </div>
           <div className="hp-scroll-hint">
-            <span className="hl-mono" style={{ color: t.fg, opacity: 0.7 }}>Scroll</span>
-            <div className="line" />
+            <span className="hl-mono" style={{ color: t.fg, opacity: 0.75, letterSpacing: "0.18em" }}>Scroll</span>
+            <div className="track" />
           </div>
         </div>
       </section>
@@ -230,7 +242,7 @@ export default function HalcyonPortfolioPage() {
             <img src={data.projects[hoverIdx]!.cover} alt="" />
           )}
         </div>
-        {data.projects.map((p, i) => (
+        {visibleProjects.map((p, i) => (
           <div
             key={p.id}
             className="hp-index-row"
@@ -245,6 +257,15 @@ export default function HalcyonPortfolioPage() {
           </div>
         ))}
       </div>
+
+      {/* View all works (only when there's more to show) */}
+      {hiddenCount > 0 && !showAllWorks && (
+        <div className="hp-view-all-row">
+          <button className="hl-btn hl-btn-accent" onClick={() => setShowAllWorks(true)}>
+            View all {data.projects.length} works <span>↓</span>
+          </button>
+        </div>
+      )}
 
       <div className="hp-cta-row">
         <span className="hl-mono" style={{ color: t.muted }}>Or browse by photograph</span>
@@ -366,13 +387,7 @@ export default function HalcyonPortfolioPage() {
           <button className="hl-btn hp-detail-back" style={{ position: "absolute", top: 24, left: 32 }} onClick={() => setGalleryOpen(false)}>← Close</button>
           <button className="hp-detail-close" style={{ position: "absolute" }} onClick={() => setGalleryOpen(false)} aria-label="Close gallery"><span>✕</span></button>
           <div className="hp-gallery-head">
-            <div>
-              <div className="hl-eyebrow" style={{ marginBottom: 16 }}>The Archive · 2014–2024</div>
-              <h2>Every <em>photograph,</em><br />in one room.</h2>
-            </div>
-            <div className="hl-mono" style={{ color: t.muted, textAlign: "right" }}>
-              {allPhotos.length} frames<br />Across {data.projects.length} stories
-            </div>
+            <h2>Every <em>photograph,</em><br />in one room.</h2>
           </div>
           <div className="hp-mason">
             {allPhotos.map((ph, i) => (
