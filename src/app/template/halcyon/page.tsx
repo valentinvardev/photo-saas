@@ -264,8 +264,7 @@ export default function HalcyonPortfolioPage() {
         @media(max-width:980px){.hp-drawer{padding:48px}.hp-drawer .col-r{width:300px}}
         @media(max-width:780px){.hp-drawer{padding:32px}.hp-drawer .col-l{flex:1;width:100%}.hp-drawer .col-r{display:none}}
         .hp-drawer ul{list-style:none}
-        .hp-drawer li{padding:18px 0;border-bottom:1px solid ${t.line};font-family:${HL_FONTS.serif};font-size:48px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:padding .35s ease,color .35s ease}
-        .hp-drawer li:hover{padding-left:16px;font-style:italic;color:${t.accent}}
+        .hp-drawer li{padding:16px 0;border-bottom:1px solid ${t.line};font-family:${HL_FONTS.serif};font-size:36px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
         .hp-drawer li .n{font-family:${HL_FONTS.mono};font-size:11px;color:${t.muted};font-style:normal}
         .hp-drawer li .all-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid ${t.line};border-radius:50%;color:${t.fg};transition:all .25s ease}
         .hp-drawer li:hover .all-icon{border-color:${t.fg};background:${t.fg};color:${t.bg};transform:translateX(4px)}
