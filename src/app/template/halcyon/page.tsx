@@ -104,9 +104,12 @@ export default function HalcyonPortfolioPage() {
         .hp-view-all-row{display:flex;justify-content:center;padding:32px 32px 0;animation:hpFadeUp .35s cubic-bezier(0.22,1,0.36,1)}
         @keyframes hpFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-        .hp-about{display:grid;grid-template-columns:280px 1fr;gap:64px;padding:0 32px;align-items:center}
-        @media(max-width:780px){.hp-about{grid-template-columns:1fr;gap:32px}.hp-about-portrait{max-width:240px}}
-        .hp-about-portrait{aspect-ratio:1/1;background:url('${HL_PHOTOS.portraits![2]!.src}') center/cover;background-color:${t.raised};width:100%}
+        /* Equal-height row: portrait stretches to match the heading +
+           bio + stats column. Padding-bottom keeps the next section's
+           border-top off the stats' bottom border. */
+        .hp-about{display:grid;grid-template-columns:320px 1fr;gap:64px;padding:0 32px 96px;align-items:stretch}
+        @media(max-width:780px){.hp-about{grid-template-columns:1fr;gap:32px;padding-bottom:64px}.hp-about-portrait{aspect-ratio:1/1 !important;max-width:280px;min-height:0 !important}}
+        .hp-about-portrait{background:url('${HL_PHOTOS.portraits![2]!.src}') center/cover;background-color:${t.raised};width:100%;min-height:480px}
         .hp-about h2{font-family:${HL_FONTS.serif};font-size:72px;line-height:0.95;letter-spacing:-0.03em;margin-bottom:24px;font-weight:400}
         .hp-about h2 em{font-style:italic}
         .hp-about p{font-size:16px;line-height:1.7;color:${t.fg};max-width:520px}
