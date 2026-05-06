@@ -82,19 +82,20 @@ export default function HalcyonPortfolioPage() {
     <div className="hl-root" style={{ minHeight: "100dvh", position: "relative", overflow: "hidden" }}>
       <style>{hlBaseCss(t)}</style>
       <style>{`
-        .hp-nav{position:absolute;top:0;left:0;right:0;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:28px 32px;color:${t.fg}}
-        .hp-mark{display:inline-flex;flex-direction:column;align-items:center;gap:2px;color:${t.fg};line-height:1;text-shadow:0 1px 24px rgba(0,0,0,0.55)}
-        .hp-mark .wm{font-family:${HL_FONTS.serif};font-size:28px;letter-spacing:-0.02em;font-weight:400;display:flex;align-items:center;gap:8px}
+        .hp-nav{position:sticky;top:0;left:0;right:0;z-index:30;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:18px 32px;color:${t.fg};background:${t.accent};border-bottom:1px solid rgba(14,13,11,0.18)}
+        .hp-nav .nav-spacer{}
+        .hp-mark{display:inline-flex;flex-direction:column;align-items:center;gap:2px;color:${t.fg};line-height:1;justify-self:center}
+        .hp-mark .wm{font-family:${HL_FONTS.serif};font-size:26px;letter-spacing:-0.02em;font-weight:400;display:flex;align-items:center;gap:8px}
         .hp-mark .wm em{font-style:italic;font-weight:400}
         .hp-mark .wm .glyph{width:6px;height:6px;border-radius:50%;border:1px solid ${t.fg};display:inline-block}
-        .hp-mark .sub{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.32em;text-transform:uppercase;opacity:0.7;margin-top:4px}
-        .hp-burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:transparent;border:0;padding:8px}
-        .hp-burger span{display:block;width:22px;height:1px;background:${t.fg};transition:transform .3s ease;box-shadow:0 1px 8px rgba(0,0,0,0.55)}
+        .hp-mark .sub{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.32em;text-transform:uppercase;opacity:0.85;margin-top:4px}
+        .hp-burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:transparent;border:0;padding:8px;justify-self:end}
+        .hp-burger span{display:block;width:22px;height:1px;background:${t.fg};transition:transform .3s ease}
         .hp-burger:hover span:first-child{transform:translateX(-3px)}
         .hp-burger:hover span:last-child{transform:translateX(3px)}
 
-        .hp-cover{position:relative;height:780px;overflow:hidden}
-        .hp-cover-img{position:absolute;inset:0;background:url('${data.projects[2]!.cover}') center/cover}
+        .hp-cover{position:relative;height:720px;overflow:hidden}
+        .hp-cover-img{position:absolute;inset:0;background:url('${data.projects[3]!.cover}') center/cover}
         /* Two layered gradients: stronger top scrim so nav reads, plus the
            bottom darkening that anchors the title. */
         .hp-cover-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.78) 0%,rgba(14,13,11,0.42) 14%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 50%,rgba(14,13,11,0.55) 75%,rgba(14,13,11,0.95) 100%)}
@@ -294,14 +295,14 @@ export default function HalcyonPortfolioPage() {
       `}</style>
 
       <div className="hp-nav">
-        <button className="hp-burger" onClick={() => setNavOpen(true)} aria-label="Open menu">
-          <span></span><span></span><span></span>
-        </button>
+        <span className="nav-spacer" aria-hidden />
         <div className="hp-mark">
           <div className="wm"><span className="glyph" aria-hidden /><span>Halcyon</span></div>
           <div className="sub">Studio · Lisbon</div>
         </div>
-        <span aria-hidden style={{ width: 38 }} />{/* spacer to keep mark centered */}
+        <button className="hp-burger" onClick={() => setNavOpen(true)} aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
       </div>
 
       <section className="hp-cover">
