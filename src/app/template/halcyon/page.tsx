@@ -15,7 +15,38 @@ export default function HalcyonPortfolioPage() {
   const [galleryOpen,   setGalleryOpen]   = useState(false);
   const [lightbox,      setLightbox]      = useState<Lightbox>(null);
   const [hoverIdx,      setHoverIdx]      = useState(-1);
+  const [drawerHoverId, setDrawerHoverId] = useState<string | null>(null);
   const [showAllWorks,  setShowAllWorks]  = useState(false);
+  const [indexPhotoIdx, setIndexPhotoIdx] = useState(0);
+  const [drawerPhotoIdx,setDrawerPhotoIdx]= useState(0);
+
+  /* Cycle the floating index thumbnail through that project's photos. */
+  useEffect(() => {
+    setIndexPhotoIdx(0);
+    if (hoverIdx < 0) return;
+    const proj = data.projects[hoverIdx];
+    if (!proj || proj.photos.length <= 1) return;
+    const id = setInterval(() => setIndexPhotoIdx((p) => (p + 1) % proj.photos.length), 1100);
+    return () => clearInterval(id);
+  }, [hoverIdx, data.projects]);
+
+  /* Same for the drawer image — cycle while a menu item is hovered. */
+  useEffect(() => {
+    setDrawerPhotoIdx(0);
+    if (!drawerHoverId) return;
+    const proj = data.projects.find((p) => p.id === drawerHoverId);
+    if (!proj || proj.photos.length <= 1) return;
+    const id = setInterval(() => setDrawerPhotoIdx((p) => (p + 1) % proj.photos.length), 1100);
+    return () => clearInterval(id);
+  }, [drawerHoverId, data.projects]);
+
+  /* What image the drawer should show right now */
+  const drawerProject = drawerHoverId ? data.projects.find((p) => p.id === drawerHoverId) : null;
+  const drawerImageSrc = drawerProject ? drawerProject.photos[drawerPhotoIdx % drawerProject.photos.length]!.src : data.projects[0]!.cover;
+
+  /* What image the index float should show */
+  const indexProject = hoverIdx >= 0 ? data.projects[hoverIdx] : null;
+  const indexImageSrc = indexProject ? indexProject.photos[indexPhotoIdx % indexProject.photos.length]!.src : null;
 
   const VISIBLE_WORKS = 3;
   const visibleProjects = showAllWorks ? data.projects : data.projects.slice(0, VISIBLE_WORKS);
@@ -96,9 +127,10 @@ export default function HalcyonPortfolioPage() {
           .hp-index-row .ta,.hp-index-row .yr{display:none}
         }
 
-        .hp-thumb-float{position:absolute;width:240px;height:300px;pointer-events:none;z-index:5;opacity:0;transition:opacity .2s ease,transform .25s cubic-bezier(0.22,1,0.36,1)}
+        .hp-thumb-float{position:absolute;width:240px;height:300px;pointer-events:none;z-index:5;opacity:0;transition:opacity .2s ease,transform .25s cubic-bezier(0.22,1,0.36,1);overflow:hidden;background:${t.raised}}
         .hp-thumb-float.show{opacity:1}
-        .hp-thumb-float img{width:100%;height:100%;object-fit:cover}
+        .hp-thumb-float img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:hpThumbImg .55s cubic-bezier(0.22,1,0.36,1) both}
+        @keyframes hpThumbImg{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
 
         .hp-cta-row{display:flex;justify-content:space-between;align-items:center;padding:48px 32px 0;flex-wrap:wrap;gap:16px}
         .hp-view-all-row{display:flex;justify-content:center;padding:32px 32px 0;animation:hpFadeUp .35s cubic-bezier(0.22,1,0.36,1)}
@@ -135,17 +167,26 @@ export default function HalcyonPortfolioPage() {
         .hp-foot .mark em{font-style:italic}
         .hp-foot .links{display:flex;gap:24px}
 
-        /* Drawer: menu owns the space, image is a smaller accent on the side. */
+        /* Drawer: menu owns the left side, big poster image on the right
+           that swaps to the hovered project's photos with a crossfade. */
         .hp-drawer{position:fixed;inset:0;z-index:50;background:${t.bg};display:flex;align-items:center;gap:64px;padding:64px;transform:translateX(-100%);transition:transform .55s cubic-bezier(0.76,0,0.24,1)}
         .hp-drawer.open{transform:translateX(0)}
-        .hp-drawer .col-l{flex:1;min-width:0;max-width:720px}
-        .hp-drawer .col-r{flex-shrink:0;width:300px;aspect-ratio:3/4;max-height:60vh;background:url('${data.projects[0]!.cover}') center/cover;border:1px solid ${t.line}}
-        @media(max-width:980px){.hp-drawer{padding:48px}.hp-drawer .col-r{width:220px}}
+        .hp-drawer .col-l{flex:1;min-width:0;max-width:640px}
+        .hp-drawer .col-r{flex-shrink:0;width:420px;aspect-ratio:3/4;max-height:78vh;position:relative;border:1px solid ${t.line};overflow:hidden;background:${t.raised}}
+        .hp-drawer .col-r img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:hpDrawerImg .6s cubic-bezier(0.22,1,0.36,1) both}
+        .hp-drawer .col-r .label{position:absolute;left:14px;bottom:14px;right:14px;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${t.fg};padding:8px 12px;background:rgba(14,13,11,0.55);backdrop-filter:blur(8px);display:flex;justify-content:space-between;align-items:center;opacity:0;transition:opacity .3s ease}
+        .hp-drawer .col-r.has-hover .label{opacity:1}
+        .hp-drawer .col-r .label em{font-family:${HL_FONTS.serif};font-style:italic;font-size:13px;color:${t.accent};letter-spacing:0;text-transform:none}
+        @keyframes hpDrawerImg{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
+        @media(max-width:1100px){.hp-drawer .col-r{width:340px}}
+        @media(max-width:980px){.hp-drawer{padding:48px}.hp-drawer .col-r{width:280px}}
         @media(max-width:780px){.hp-drawer{padding:32px}.hp-drawer .col-l{flex:1;width:100%}.hp-drawer .col-r{display:none}}
         .hp-drawer ul{list-style:none}
         .hp-drawer li{padding:18px 0;border-bottom:1px solid ${t.line};font-family:${HL_FONTS.serif};font-size:48px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:padding .35s ease,color .35s ease}
         .hp-drawer li:hover{padding-left:16px;font-style:italic;color:${t.accent}}
         .hp-drawer li .n{font-family:${HL_FONTS.mono};font-size:11px;color:${t.muted};font-style:normal}
+        .hp-drawer li .all-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid ${t.line};color:${t.accent};transition:all .25s ease}
+        .hp-drawer li:hover .all-icon{border-color:${t.accent};background:${t.accent};color:${t.bg}}
         .hp-drawer-close{position:absolute;top:24px;right:32px;background:transparent;border:0;color:${t.fg};cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase}
 
         .hp-detail{position:fixed;inset:0;z-index:40;background:${t.bg};overflow-y:auto;animation:hpFade .6s cubic-bezier(0.22,1,0.36,1)}
@@ -242,9 +283,9 @@ export default function HalcyonPortfolioPage() {
         }}
       >
         <div id="hp-thumb-float" className={`hp-thumb-float ${hoverIdx >= 0 ? "show" : ""}`}>
-          {hoverIdx >= 0 && data.projects[hoverIdx] && (
+          {indexImageSrc && (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={data.projects[hoverIdx]!.cover} alt="" />
+            <img key={indexImageSrc} src={indexImageSrc} alt="" />
           )}
         </div>
         {visibleProjects.map((p, i) => (
@@ -330,24 +371,47 @@ export default function HalcyonPortfolioPage() {
         </div>
       </footer>
 
-      <div className={`hp-drawer ${navOpen ? "open" : ""}`}>
+      <div className={`hp-drawer ${navOpen ? "open" : ""}`} onMouseLeave={() => setDrawerHoverId(null)}>
         <button className="hp-drawer-close" onClick={() => setNavOpen(false)}>Close ✕</button>
         <div className="col-l">
           <div className="hl-eyebrow" style={{ marginBottom: 32 }}>Index</div>
           <ul>
             {data.projects.map((p) => (
-              <li key={p.id} onClick={() => { setActiveProject(p.id); setNavOpen(false); }}>
+              <li
+                key={p.id}
+                onMouseEnter={() => setDrawerHoverId(p.id)}
+                onClick={() => { setActiveProject(p.id); setNavOpen(false); }}
+              >
                 <span>{p.title}</span>
                 <span className="n">{p.no} · {p.year}</span>
               </li>
             ))}
-            <li onClick={() => { setGalleryOpen(true); setNavOpen(false); }}>
+            <li
+              onMouseEnter={() => setDrawerHoverId(null)}
+              onClick={() => { setGalleryOpen(true); setNavOpen(false); }}
+            >
               <span>All photographs</span>
-              <span className="n">↗</span>
+              <span className="all-icon" aria-hidden>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="3"  y="3"  width="8" height="8" rx="1" />
+                  <rect x="13" y="3"  width="8" height="8" rx="1" />
+                  <rect x="3"  y="13" width="8" height="8" rx="1" />
+                  <rect x="13" y="13" width="8" height="8" rx="1" />
+                </svg>
+              </span>
             </li>
           </ul>
         </div>
-        <div className="col-r" />
+        <div className={`col-r ${drawerHoverId ? "has-hover" : ""}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img key={drawerImageSrc} src={drawerImageSrc} alt="" />
+          {drawerProject && (
+            <div className="label">
+              <em>{drawerProject.title}</em>
+              <span>{(drawerPhotoIdx % drawerProject.photos.length) + 1} / {drawerProject.photos.length}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       <AnimatePresence>
