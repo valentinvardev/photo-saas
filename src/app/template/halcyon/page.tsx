@@ -479,12 +479,7 @@ export default function HalcyonPortfolioPage() {
 
       <footer className="hp-foot">
         <div className="mark">Halcyon<em> Studio</em></div>
-        <div className="hl-mono">© MMXXIV · All photographs © Lior Avni</div>
-        <div className="links hl-mono">
-          <a className="hl-link" href="#">Journal</a>
-          <a className="hl-link" href="#">Print Shop</a>
-          <a className="hl-link" href="#">Colophon</a>
-        </div>
+        <div className="hl-mono">© 2024 · All photographs © Lior Avni</div>
         <Socials />
       </footer>
 
