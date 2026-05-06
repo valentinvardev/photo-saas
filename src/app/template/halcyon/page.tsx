@@ -99,7 +99,7 @@ export default function HalcyonPortfolioPage() {
            more refined than the previous line-scale loop. */
         .hp-scroll-hint{display:flex;flex-direction:column;align-items:center;gap:10px;color:${t.fg}}
         .hp-scroll-hint .track{position:relative;width:1px;height:44px;background:rgba(239,234,224,0.22);overflow:hidden}
-        .hp-scroll-hint .track::after{content:"";position:absolute;left:-1.5px;top:0;width:4px;height:4px;border-radius:50%;background:${t.accent};animation:hpScrollDot 1.8s infinite cubic-bezier(0.22,1,0.36,1)}
+        .hp-scroll-hint .track::after{content:"";position:absolute;left:-1.5px;top:0;width:4px;height:4px;border-radius:50%;background:${t.fg};animation:hpScrollDot 1.8s infinite cubic-bezier(0.22,1,0.36,1)}
         @keyframes hpScrollDot{
           0%   { transform: translateY(-6px); opacity: 0 }
           18%  { opacity: 1 }
@@ -108,7 +108,6 @@ export default function HalcyonPortfolioPage() {
         }
 
         .hp-section-label{display:flex;align-items:center;gap:14px;padding:0 32px;margin:96px 0 32px;color:${t.muted}}
-        .hp-section-label .dot{width:6px;height:6px;border-radius:50%;background:${t.accent}}
         .hp-section-label hr{flex:1;border:0;border-top:1px solid ${t.line}}
 
         .hp-index{padding:0 32px;border-top:1px solid ${t.line};position:relative}
@@ -132,8 +131,29 @@ export default function HalcyonPortfolioPage() {
         .hp-thumb-float img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:hpThumbImg .55s cubic-bezier(0.22,1,0.36,1) both}
         @keyframes hpThumbImg{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
 
-        .hp-cta-row{display:flex;justify-content:space-between;align-items:center;padding:48px 32px 0;flex-wrap:wrap;gap:16px}
         .hp-view-all-row{display:flex;justify-content:center;padding:32px 32px 0;animation:hpFadeUp .35s cubic-bezier(0.22,1,0.36,1)}
+
+        /* Hero feature: bold orange banner that really sells the gallery */
+        .hp-allphotos{margin:96px 32px 0;padding:80px 64px;background:${t.accent};color:${t.fg};position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:48px;align-items:end}
+        .hp-allphotos::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 120% at 100% 0%,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0) 55%);pointer-events:none}
+        .hp-allphotos .eyebrow{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:${t.fg};opacity:0.75;margin-bottom:24px}
+        .hp-allphotos h2{font-family:${HL_FONTS.serif};font-size:120px;line-height:0.9;letter-spacing:-0.035em;font-weight:400;color:${t.fg}}
+        .hp-allphotos h2 em{font-style:italic}
+        .hp-allphotos .sub{font-family:${HL_FONTS.serif};font-size:18px;line-height:1.55;color:${t.fg};opacity:0.85;max-width:460px;margin-top:24px;font-style:italic}
+        .hp-allphotos .meta{display:flex;gap:32px;margin-top:32px;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:${t.fg};opacity:0.7}
+        .hp-allphotos .meta b{display:block;font-family:${HL_FONTS.serif};font-style:italic;font-size:28px;letter-spacing:-0.01em;font-weight:400;color:${t.fg};opacity:1;margin-bottom:6px;text-transform:none}
+        .hp-allphotos .cta{display:inline-flex;align-items:center;gap:16px;padding:22px 32px;background:${t.bg};color:${t.fg};border:0;cursor:pointer;font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.18em;text-transform:uppercase;transition:transform .3s cubic-bezier(0.22,1,0.36,1),background .3s ease}
+        .hp-allphotos .cta:hover{transform:translateY(-3px);background:${t.fg};color:${t.bg}}
+        .hp-allphotos .cta .ico{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:${t.accent};color:${t.fg};font-size:16px;transition:transform .3s ease,background .3s ease}
+        .hp-allphotos .cta:hover .ico{transform:rotate(-12deg);background:${t.bg};color:${t.fg}}
+        @media(max-width:980px){
+          .hp-allphotos{grid-template-columns:1fr;padding:56px 32px;align-items:start}
+          .hp-allphotos h2{font-size:72px}
+        }
+        @media(max-width:640px){
+          .hp-allphotos{margin:64px 16px 0;padding:48px 24px}
+          .hp-allphotos h2{font-size:54px}
+        }
         @keyframes hpFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
         /* Equal-height row: portrait stretches to match the heading +
@@ -145,11 +165,12 @@ export default function HalcyonPortfolioPage() {
         .hp-about h2{font-family:${HL_FONTS.serif};font-size:72px;line-height:0.95;letter-spacing:-0.03em;margin-bottom:24px;font-weight:400}
         .hp-about h2 em{font-style:italic}
         .hp-about p{font-size:16px;line-height:1.7;color:${t.fg};max-width:520px}
-        .hp-about-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:48px;border-top:1px solid ${t.line};border-bottom:1px solid ${t.line};max-width:520px}
-        .hp-about-stats > div{padding:20px 0;border-right:1px solid ${t.line}}
-        .hp-about-stats > div:last-child{border-right:0}
-        .hp-about-stats .v{font-family:${HL_FONTS.serif};font-size:36px;line-height:1;font-weight:400}
-        .hp-about-stats .l{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase;margin-top:8px}
+        .hp-about-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:48px;border-top:1px solid ${t.line};border-bottom:1px solid ${t.line};max-width:560px}
+        .hp-about-stats > div{padding:24px 20px;border-right:1px solid ${t.line}}
+        .hp-about-stats > div:first-child{padding-left:0}
+        .hp-about-stats > div:last-child{padding-right:0;border-right:0}
+        .hp-about-stats .v{font-family:${HL_FONTS.serif};font-size:34px;line-height:1;font-weight:400}
+        .hp-about-stats .l{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase;margin-top:10px;white-space:nowrap}
 
         .hp-contact{padding:120px 32px;text-align:center;border-top:1px solid ${t.line}}
         .hp-contact h2{font-family:${HL_FONTS.serif};font-size:96px;line-height:1;letter-spacing:-0.03em;font-weight:400;margin-bottom:24px}
@@ -172,14 +193,15 @@ export default function HalcyonPortfolioPage() {
         .hp-drawer{position:fixed;inset:0;z-index:50;background:${t.bg};display:flex;align-items:center;gap:64px;padding:64px;transform:translateX(-100%);transition:transform .55s cubic-bezier(0.76,0,0.24,1)}
         .hp-drawer.open{transform:translateX(0)}
         .hp-drawer .col-l{flex:1;min-width:0;max-width:640px}
-        .hp-drawer .col-r{flex-shrink:0;width:420px;aspect-ratio:3/4;max-height:78vh;position:relative;border:1px solid ${t.line};overflow:hidden;background:${t.raised}}
+        .hp-drawer .col-r{flex-shrink:0;width:540px;aspect-ratio:3/4;max-height:84vh;position:relative;border:1px solid ${t.line};overflow:hidden;background:${t.raised}}
         .hp-drawer .col-r img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:hpDrawerImg .6s cubic-bezier(0.22,1,0.36,1) both}
-        .hp-drawer .col-r .label{position:absolute;left:14px;bottom:14px;right:14px;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${t.fg};padding:8px 12px;background:rgba(14,13,11,0.55);backdrop-filter:blur(8px);display:flex;justify-content:space-between;align-items:center;opacity:0;transition:opacity .3s ease}
-        .hp-drawer .col-r.has-hover .label{opacity:1}
-        .hp-drawer .col-r .label em{font-family:${HL_FONTS.serif};font-style:italic;font-size:13px;color:${t.accent};letter-spacing:0;text-transform:none}
+        .hp-drawer .col-r .label{position:absolute;left:0;right:0;bottom:0;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${t.fg};padding:14px 18px;background:rgba(14,13,11,0.85);backdrop-filter:blur(10px);border-top:1px solid rgba(239,234,224,0.08);display:flex;justify-content:space-between;align-items:center;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease}
+        .hp-drawer .col-r.has-hover .label{opacity:1;transform:translateY(0)}
+        .hp-drawer .col-r .label em{font-family:${HL_FONTS.serif};font-style:italic;font-size:14px;color:${t.accent};letter-spacing:0;text-transform:none}
         @keyframes hpDrawerImg{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
-        @media(max-width:1100px){.hp-drawer .col-r{width:340px}}
-        @media(max-width:980px){.hp-drawer{padding:48px}.hp-drawer .col-r{width:280px}}
+        @media(max-width:1280px){.hp-drawer .col-r{width:440px}}
+        @media(max-width:1100px){.hp-drawer .col-r{width:360px}}
+        @media(max-width:980px){.hp-drawer{padding:48px}.hp-drawer .col-r{width:300px}}
         @media(max-width:780px){.hp-drawer{padding:32px}.hp-drawer .col-l{flex:1;width:100%}.hp-drawer .col-r{display:none}}
         .hp-drawer ul{list-style:none}
         .hp-drawer li{padding:18px 0;border-bottom:1px solid ${t.line};font-family:${HL_FONTS.serif};font-size:48px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:padding .35s ease,color .35s ease}
@@ -263,7 +285,6 @@ export default function HalcyonPortfolioPage() {
       </section>
 
       <div className="hp-section-label hl-mono">
-        <span className="dot" />
         <span>Selected Work</span>
         <hr />
         <span>{String(data.projects.length).padStart(2, "0")} Projects</span>
@@ -313,15 +334,24 @@ export default function HalcyonPortfolioPage() {
         </div>
       )}
 
-      <div className="hp-cta-row">
-        <span className="hl-mono" style={{ color: t.muted }}>Or browse by photograph</span>
-        <button className="hl-btn" onClick={() => setGalleryOpen(true)}>
-          View all 184 photographs <span style={{ color: t.accent }}>↗</span>
+      <section className="hp-allphotos">
+        <div>
+          <div className="eyebrow">Browse the full archive</div>
+          <h2>Every <em>photograph,</em><br />in one room.</h2>
+          <p className="sub">Twelve years of weddings, editorial and quiet rooms — gathered together. Open the archive and wander.</p>
+          <div className="meta">
+            <div><b>184</b>Photographs</div>
+            <div><b>{data.projects.length}</b>Projects</div>
+            <div><b>2014–2024</b>Span</div>
+          </div>
+        </div>
+        <button className="cta" onClick={() => setGalleryOpen(true)}>
+          Open the archive
+          <span className="ico" aria-hidden>↗</span>
         </button>
-      </div>
+      </section>
 
       <div className="hp-section-label hl-mono">
-        <span className="dot" />
         <span>About</span>
         <hr />
         <span>Lior Avni · b. 1989</span>
@@ -343,9 +373,7 @@ export default function HalcyonPortfolioPage() {
       </section>
 
       <section className="hp-contact">
-        <div className="hl-eyebrow" style={{ marginBottom: 24 }}>
-          <span style={{ color: t.accent }}>●</span>&nbsp;&nbsp;Available for 2025 commissions
-        </div>
+        <div className="hl-eyebrow" style={{ marginBottom: 24 }}>Available for 2025 commissions</div>
         <h2>Begin a <em>conversation.</em></h2>
         <p className="tag">Tell me about the day, the room, the people. The best work always starts with a long letter and a slow reply.</p>
         <form className="hp-contact-form" onSubmit={(e) => e.preventDefault()}>
@@ -374,7 +402,7 @@ export default function HalcyonPortfolioPage() {
       <div className={`hp-drawer ${navOpen ? "open" : ""}`} onMouseLeave={() => setDrawerHoverId(null)}>
         <button className="hp-drawer-close" onClick={() => setNavOpen(false)}>Close ✕</button>
         <div className="col-l">
-          <div className="hl-eyebrow" style={{ marginBottom: 32 }}>Index</div>
+          <div className="hl-eyebrow" style={{ marginBottom: 32 }}>My work</div>
           <ul>
             {data.projects.map((p) => (
               <li
@@ -451,8 +479,16 @@ export default function HalcyonPortfolioPage() {
       )}
       </AnimatePresence>
 
+      <AnimatePresence>
       {galleryOpen && (
-        <div className="hp-gallery">
+        <motion.div
+          key="hp-gallery"
+          className="hp-gallery"
+          initial={{ opacity: 0, y: 24, scale: 0.985 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 32, scale: 0.97, transition: { duration: 0.32, ease: [0.76, 0, 0.24, 1] } }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+        >
           <button className="hl-btn hp-detail-back" style={{ position: "absolute", top: 24, left: 32 }} onClick={() => setGalleryOpen(false)}>← Close</button>
           <button className="hp-detail-close" style={{ position: "absolute" }} onClick={() => setGalleryOpen(false)} aria-label="Close gallery"><span>✕</span></button>
           <div className="hp-gallery-head">
@@ -467,8 +503,9 @@ export default function HalcyonPortfolioPage() {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {lightbox && lightbox.photos[lightbox.index] && (
         <div className="hp-lb" onClick={(e) => { if (e.target === e.currentTarget) setLightbox(null); }}>
