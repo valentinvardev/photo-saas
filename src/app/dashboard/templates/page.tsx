@@ -82,6 +82,19 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     style: { bg: "#f0ebe3", fg: "#18181b", accent: "#d9544a", muted: "#9a9088" },
     collection: "petal",
   },
+  {
+    id: "halcyon",
+    name: "Halcyon",
+    description: "Editorial warm-dark portfolio with burnt-sienna accent, Instrument Serif italics, and a typographic project index that reveals a hover thumbnail.",
+    category: "Editorial",
+    tags: ["Editorial", "Warm", "Italic"],
+    href: "/template/halcyon",
+    seed: 600,
+    new: true,
+    fonts: { serif: "Instrument Serif", sans: "Geist", mono: "Geist Mono" },
+    style: { bg: "#0E0D0B", fg: "#EFEAE0", accent: "#C2410C", muted: "#8A8378" },
+    collection: "halcyon",
+  },
 ];
 
 const PORTFOLIO_CATEGORIES: PortfolioCategory[] = ["All", "Minimal", "Editorial", "Magazine", "Story", "Grid"];
@@ -109,6 +122,17 @@ type LinksTemplate = {
 };
 
 const LINKS_TEMPLATES: LinksTemplate[] = [
+  {
+    id: "links-halcyon",
+    name: "Halcyon",
+    description: "Warm-dark single-screen hub with marquee strip, framed avatar, italic name, and accent-led link stack. Matches the Halcyon portfolio.",
+    tags: ["Editorial", "Warm", "Italic"],
+    available: true, new: true,
+    bg: "#0E0D0B", fg: "#EFEAE0", sub: "#8A8378",
+    btnStyle: "square", btnBg: "#C2410C", btnFg: "#EFEAE0", font: "Geist",
+    href: "/template/halcyon/links",
+    collection: "Halcyon",
+  },
   {
     id: "links-brooklyn",
     name: "Brooklyn",
@@ -159,6 +183,16 @@ type DeliveryTemplate = {
 };
 
 const DELIVERY_TEMPLATES: DeliveryTemplate[] = [
+  {
+    id: "delivery-halcyon",
+    name: "Halcyon",
+    description: "Magazine-paced client gallery with curtain-reveal password gate, sectioned chapters, italic chapter heads, and burnt-sienna favorites.",
+    tags: ["Editorial", "Warm", "Italic"],
+    available: true, new: true,
+    accent: "#1A1815", fg: "#EFEAE0", sub: "#8A8378",
+    href: "/template/halcyon/delivery",
+    collection: "Halcyon",
+  },
   {
     id: "delivery-brooklyn",
     name: "Brooklyn",
@@ -215,6 +249,18 @@ const COLLECTIONS: TemplateCollection[] = [
       { type: "portfolio", href: "/template/brooklyn",          seed: 10  },
       { type: "links",     href: "/template/brooklyn/links",    seed: 82  },
       { type: "delivery",  href: "/template/brooklyn/delivery", seed: 93  },
+    ],
+  },
+  {
+    id: "halcyon",
+    name: "Halcyon",
+    description: "Editorial warm-dark with burnt-sienna accents and Instrument Serif italics. A typographic project index, a curtain-reveal delivery gate, and a marquee-led links page — three pages cut from the same cloth.",
+    accentColor: "#C2410C",
+    accentText:  "#EFEAE0",
+    pages: [
+      { type: "portfolio", href: "/template/halcyon",          seed: 600 },
+      { type: "links",     href: "/template/halcyon/links",    seed: 601 },
+      { type: "delivery",  href: "/template/halcyon/delivery", seed: 602 },
     ],
   },
   {
