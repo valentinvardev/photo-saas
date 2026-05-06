@@ -248,8 +248,7 @@ export default function HalcyonPortfolioPage() {
         @media(max-width:1100px){.hp-detail-grid{column-count:2}}
         @media(max-width:640px){.hp-detail-grid{column-count:1}}
         .hp-detail-grid .item{break-inside:avoid;margin-bottom:14px;position:relative;cursor:pointer;overflow:hidden;background:${t.raised}}
-        .hp-detail-grid .item img{width:100%;height:auto;display:block;transition:transform .9s cubic-bezier(0.22,1,0.36,1)}
-        .hp-detail-grid .item:hover img{transform:scale(1.04)}
+        .hp-detail-grid .item img{width:100%;height:auto;display:block}
         .hp-detail-back{position:fixed;top:24px;left:32px;z-index:41}
         .hp-detail-close{position:fixed;top:24px;right:32px;z-index:41;width:44px;height:44px;border-radius:50%;border:1px solid ${t.line};background:${t.raised};color:${t.fg};cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:${HL_FONTS.mono};font-size:14px;transition:all .25s ease}
         .hp-detail-close:hover{background:${t.fg};color:${t.bg};border-color:${t.fg};transform:rotate(90deg)}
@@ -264,8 +263,7 @@ export default function HalcyonPortfolioPage() {
         @media(max-width:1100px){.hp-mason{column-count:3}}
         @media(max-width:680px){.hp-mason{column-count:2;column-gap:8px}}
         .hp-mason .cell{break-inside:avoid;margin-bottom:18px;cursor:pointer;overflow:hidden;position:relative}
-        .hp-mason .cell img{width:100%;display:block;transition:opacity .3s ease}
-        .hp-mason .cell:hover img{opacity:0.85}
+        .hp-mason .cell img{width:100%;display:block}
         .hp-mason .cell .cap{position:absolute;left:12px;bottom:12px;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:${t.fg};background:rgba(14,13,11,0.7);padding:4px 8px;opacity:0;transition:opacity .25s ease}
         .hp-mason .cell:hover .cap{opacity:1}
 
