@@ -51,17 +51,6 @@ function NewPortfolioTile({ onClick }: { onClick: () => void }) {
           </span>
         </motion.div>
 
-        {/* Subtle animated dot trail at the bottom */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-          {[0, 1, 2].map((i) => (
-            <motion.span
-              key={i}
-              className="w-1 h-1 rounded-full bg-[var(--fg-muted)] group-hover:bg-yellow transition-colors"
-              animate={{ opacity: [0.2, 0.6, 0.2] }}
-              transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
-            />
-          ))}
-        </div>
       </div>
 
       {/* Body */}

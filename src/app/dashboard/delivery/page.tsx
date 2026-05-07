@@ -194,41 +194,46 @@ function NewDeliveryTile({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className="group flex flex-col border border-dashed border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-yellow hover:bg-yellow/5 transition-all duration-200 text-left"
     >
-      {/* Cover area — animated package + download glyph */}
-      <div className="relative h-36 flex items-center justify-center bg-[var(--bg-subtle)] group-hover:bg-yellow/5 transition-colors">
-        <motion.div
-          animate={{ y: [0, -2, 0] }}
-          transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
-          whileHover={{ scale: 1.18 }}
-          className="relative text-[var(--fg-muted)] group-hover:text-yellow transition-colors"
+      {/* Cover area — paper plane gliding across a dashed flight path */}
+      <div className="relative h-36 flex items-center justify-center bg-[var(--bg-subtle)] group-hover:bg-yellow/5 transition-colors overflow-hidden">
+        {/* Dashed flight arc behind the plane */}
+        <svg
+          className="absolute inset-0 w-full h-full text-[var(--fg-muted)] group-hover:text-yellow transition-colors"
+          viewBox="0 0 200 144" preserveAspectRatio="none" fill="none"
+          aria-hidden
         >
-          {/* Package + download arrow glyph */}
-          <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
-            {/* back box, dimmed */}
-            <path d="M10 18l14 -7 14 7v14l-14 7-14-7z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" opacity="0.3" />
-            {/* fold lines */}
-            <path d="M10 18l14 7 14-7" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" opacity="0.45" />
-            <line x1="24" y1="25" x2="24" y2="39" stroke="currentColor" strokeWidth="2" opacity="0.45" />
-            {/* small horizon-line "photo" inside */}
-            <line x1="19" y1="22" x2="29" y2="22" stroke="currentColor" strokeWidth="1.5" opacity="0.55" />
+          <path
+            d="M14 110 Q 70 30, 186 32"
+            stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"
+            strokeDasharray="3 5" opacity="0.45"
+          />
+        </svg>
+
+        <motion.div
+          /* gentle glide forward then nudge back */
+          animate={{ x: [-4, 6, -4], y: [2, -2, 2], rotate: [-2, 2, -2] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          whileHover={{ scale: 1.18 }}
+          className="relative text-[var(--fg)] group-hover:text-yellow transition-colors"
+        >
+          {/* Paper plane — clean line + a folded crease for depth */}
+          <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+            <path
+              d="M44 6 L4 22 L20 27 L26 42 L44 6 Z"
+              stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"
+              fill="var(--bg-card)"
+            />
+            <path
+              d="M44 6 L20 27 L26 42"
+              stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"
+              opacity="0.55"
+            />
           </svg>
           {/* + badge top-right */}
           <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-yellow text-[#111] flex items-center justify-center shadow-sm">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </span>
         </motion.div>
-
-        {/* Animated dot trail — implies "delivering" */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-          {[0, 1, 2].map((i) => (
-            <motion.span
-              key={i}
-              className="w-1 h-1 rounded-full bg-[var(--fg-muted)] group-hover:bg-yellow transition-colors"
-              animate={{ opacity: [0.2, 0.6, 0.2] }}
-              transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
-            />
-          ))}
-        </div>
       </div>
 
       {/* Body — match the height of a real delivery card so the row stays even */}
