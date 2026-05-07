@@ -29,14 +29,16 @@ export default function HalcyonDeliveryPage() {
 
   function tryUnlock(e?: React.FormEvent) {
     e?.preventDefault?.();
-    if (pwd.trim().toLowerCase() === data.password) {
-      setCurtain(true);
-      setTimeout(() => setUnlocked(true), 550);
-      setTimeout(() => setCurtain(false), 1100);
-    } else {
+    /* Demo gate: any non-empty input unlocks. Real validation happens
+       server-side once the page is wired to a real client gallery. */
+    if (!pwd.trim()) {
       setShake(true);
       setTimeout(() => setShake(false), 500);
+      return;
     }
+    setCurtain(true);
+    setTimeout(() => setUnlocked(true), 550);
+    setTimeout(() => setCurtain(false), 1100);
   }
   function toggleFav(id: string) { setFavs((f) => { const n = new Set(f); n.has(id) ? n.delete(id) : n.add(id); return n; }); }
   function toggleSel(id: string) { setSel ((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; }); }

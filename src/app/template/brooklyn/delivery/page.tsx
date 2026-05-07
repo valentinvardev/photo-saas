@@ -122,14 +122,16 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
   const [shake, setShake] = useState(false);
 
   function attempt() {
-    if (value.toLowerCase() === CLIENT_PASSWORD) {
-      onUnlock();
-    } else {
+    /* Demo gate: any non-empty input unlocks. Real validation happens
+       server-side once the page is wired to a real client gallery. */
+    if (!value.trim()) {
       setError(true);
       setShake(true);
       setTimeout(() => setShake(false), 500);
       setTimeout(() => setError(false), 2000);
+      return;
     }
+    onUnlock();
   }
 
   return (

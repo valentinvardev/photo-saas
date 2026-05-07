@@ -20,6 +20,14 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
     : 0;
   const cover = page.coverUrl || `https://picsum.photos/seed/${page.coverSeed}/600/300?grayscale`;
   const tpl = TEMPLATES.find((t) => t.id === page.template);
+  /* Preview URL points at the actual template route so users see the
+     real template they picked, not a generic placeholder. Falls back
+     to /d/<id> for templates without a dedicated showcase route. */
+  const TEMPLATE_PREVIEW_URLS: Record<string, string> = {
+    halcyon:  "/template/halcyon/delivery",
+    brooklyn: "/template/brooklyn/delivery",
+  };
+  const previewUrl = TEMPLATE_PREVIEW_URLS[page.template] ?? `/d/${page.id}`;
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -157,7 +165,7 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
       <AnimatePresence>
         {previewOpen && (
           <DevicePreviewModal
-            url={`/d/${page.id}`}
+            url={previewUrl}
             title={page.client}
             subtitle={page.title}
             accentChip={tpl && (
