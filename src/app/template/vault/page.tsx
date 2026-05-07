@@ -388,11 +388,11 @@ const VT_CSS = `
 @media (max-width:760px){ .vt-toc-cat-row{ grid-template-columns: 40px 1fr auto } .vt-toc-dots, .vt-toc-meta{ display:none } .vt-toc-folder-btn{ grid-template-columns: 50px 1fr auto } .vt-toc-folder .vt-toc-fnote{ display:none } }
 
 .vt-chapter{ border-bottom:1px solid var(--vt-line) }
-.vt-ch-cover{ position:relative; height:min(80dvh,760px); width:100%; overflow:hidden; isolation:isolate; color:#F0EADA; display:grid; align-items:end; padding: 0 clamp(28px,4vw,56px) clamp(36px,6vh,72px) }
-.vt-ch-cover-img{ position:absolute; inset:0; z-index:-1; background:#222 }
-.vt-ch-cover-img img{ width:100%; height:100%; object-fit:cover }
-.vt-ch-cover-tint{ position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.1) 30%, rgba(0,0,0,.4) 55%, rgba(0,0,0,.92) 100%) }
-.vt-ch-cover-text{ position:relative; z-index:1; max-width:740px; display:flex; flex-direction:column; gap:14px; text-shadow: 0 2px 24px rgba(0,0,0,.55) }
+.vt-ch-cover{ position:relative; height:min(80dvh,760px); width:100%; overflow:hidden; isolation:isolate; color:#F0EADA; display:grid; align-items:end; padding: 0 clamp(28px,4vw,56px) clamp(36px,6vh,72px); background:#222 }
+.vt-root .vt-chapter .vt-ch-cover-img{ position:absolute; inset:0; z-index:0; background:#222 }
+.vt-root .vt-chapter .vt-ch-cover-img img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover }
+.vt-ch-cover-tint{ position:absolute; inset:0; z-index:1; background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.1) 30%, rgba(0,0,0,.45) 60%, rgba(0,0,0,.95) 100%) }
+.vt-ch-cover-text{ position:relative; z-index:2; max-width:740px; display:flex; flex-direction:column; gap:14px }
 .vt-ch-name{ margin:0; font-size:clamp(56px,14vw,220px); line-height:.85; color:#F4F0E6 }
 .vt-ch-summary{ display:flex; flex-direction:column; max-width:50ch }
 .vt-ch-summary p{ margin:0; font-size:18px; line-height:1.5; color:#F4F0E6; font-family:var(--vt-sans); font-weight:400 }

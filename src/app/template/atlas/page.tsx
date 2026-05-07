@@ -382,8 +382,9 @@ const ATP_CSS = `
 @media (max-width:700px){ .atp-top{ padding:12px 14px; gap:8px } .atp-top-name{ font-size:18px } .atp-top-cta{ padding:7px 11px; font-size:10px } }
 @media (max-width:420px){ .atp-top-brand .at-mark{ display:none } }
 
-.atp-cover{ position:relative; min-height:100vh; min-height:100dvh; width:100%; display:grid; align-items:end; padding-top:64px; color:#fff; isolation:isolate }
-.atp-cover-img{ position:absolute; inset:0; z-index:-1 }
+.atp-cover{ position:relative; min-height:100vh; min-height:100dvh; width:100%; display:grid; align-items:end; padding-top:64px; color:#fff; isolation:isolate; background:var(--at-fg) }
+.atp-root .atp-cover .atp-cover-img{ position:absolute; inset:0; z-index:0 }
+.atp-root .atp-cover .atp-cover-img img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover }
 .atp-cover-tint{ position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.2) 30%, rgba(0,0,0,.2) 55%, rgba(0,0,0,.85) 100%) }
 .atp-cover-grid{ position:relative; z-index:1; display:grid; grid-template-rows: auto 1fr auto; grid-template-areas: "eye" "title" "foot"; width:100%; padding: clamp(70px,12vh,110px) clamp(20px,4vw,56px) clamp(30px,6vh,56px); min-height:100vh; min-height:100dvh }
 .atp-cover-eye{ grid-area:eye }
