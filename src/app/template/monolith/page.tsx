@@ -80,7 +80,7 @@ export default function MonolithPortfolioPage() {
 
         .mp-hero{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid ${t.line}}
         .mp-hero-l{padding:64px 32px 48px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid ${t.line}}
-        .mp-hero h1{font-family:${MN_FONTS.display};font-weight:800;font-size:128px;letter-spacing:-0.05em;line-height:0.88;color:${t.fg}}
+        .mp-hero h1{font-family:${MN_FONTS.display};font-weight:800;font-size:clamp(44px, 11vw, 128px);letter-spacing:-0.05em;line-height:0.88;color:${t.fg};word-break:break-word;overflow-wrap:break-word;hyphens:auto}
         .mp-hero h1 .ac{color:${t.accent}}
         .mp-hero h1 sup{font-size:16px;vertical-align:super;font-weight:500;letter-spacing:0;color:${t.muted}}
         .mp-hero-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:48px;padding-top:24px;border-top:1px solid ${t.line}}
@@ -93,9 +93,13 @@ export default function MonolithPortfolioPage() {
         @media(max-width:980px){
           .mp-hero{grid-template-columns:1fr}
           .mp-hero-l{padding:40px 20px;border-right:0;border-bottom:1px solid ${t.line}}
-          .mp-hero h1{font-size:72px}
           .mp-hero-meta{grid-template-columns:repeat(2,1fr);gap:16px}
           .mp-hero-r{min-height:320px}
+        }
+        @media(max-width:520px){
+          .mp-hero h1 sup{font-size:11px}
+          .mp-hero-meta .v{font-size:22px}
+          .mp-hero-meta{margin-top:32px;padding-top:18px}
         }
 
         .mp-tagbar{display:flex;align-items:center;gap:12px;padding:16px 28px;border-bottom:1px solid ${t.line};overflow-x:auto}
