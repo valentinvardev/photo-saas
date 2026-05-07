@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ATLAS_U, ATLAS_PROJECTS, AT_FONTS } from "~/lib/atlas/data";
+import { ATLAS_U, ATLAS_PROJECTS, ATLAS_RATIOS, AT_FONTS } from "~/lib/atlas/data";
 
 export default function AtlasPortfolioPage() {
-  const [navOpen, setNavOpen] = useState(false);
-  const [hovered, setHovered] = useState<string | null>(null);
-  const [cursor,  setCursor]  = useState({ x: 0, y: 0 });
+  const [navOpen, setNavOpen]   = useState(false);
+  const [hovered, setHovered]   = useState<string | null>(null);
+  const [cursor,  setCursor]    = useState({ x: 0, y: 0 });
+  const [active,  setActive]    = useState<string | null>(null);
+  const [waOpen,  setWaOpen]    = useState(false);
+  const [waMsg,   setWaMsg]     = useState("Hi Atlas — I'd like to talk about a project. ");
+  const [lightbox, setLightbox] = useState<{ photos: string[]; idx: number } | null>(null);
   const indexRef = useRef<HTMLDivElement>(null);
+  const project = ATLAS_PROJECTS.find((p) => p.id === active);
 
   function onMove(e: React.MouseEvent) {
     if (!indexRef.current) return;
@@ -15,21 +20,40 @@ export default function AtlasPortfolioPage() {
     setCursor({ x: e.clientX - r.left, y: e.clientY - r.top });
   }
 
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        if (lightbox) setLightbox(null);
+        else if (waOpen) setWaOpen(false);
+        else if (active) setActive(null);
+        else if (navOpen) setNavOpen(false);
+      }
+      if (lightbox) {
+        if (e.key === "ArrowRight") setLightbox((l) => l && ({ ...l, idx: (l.idx + 1) % l.photos.length }));
+        if (e.key === "ArrowLeft")  setLightbox((l) => l && ({ ...l, idx: (l.idx - 1 + l.photos.length) % l.photos.length }));
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox, waOpen, active, navOpen]);
+
   return (
     <div className="atp-root">
       <style>{ATP_CSS}</style>
 
-      {/* fixed top chrome — hamburger + meta */}
+      {/* fixed top chrome — hamburger + brand wordmark + contact */}
       <header className="atp-top">
         <button className="atp-hamb" aria-label="menu" onClick={() => setNavOpen(true)}>
-          <span></span><span></span>
+          <span></span><span></span><span></span>
         </button>
-        <div className="atp-top-mark">
+        <div className="atp-top-brand">
           <span className="at-mark">a</span>
-          <span style={{ fontFamily: AT_FONTS.mono, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", marginLeft: 10 }}>
-            Atlas Studio<span style={{ opacity: 0.45, marginLeft: 8 }}>est. 2018</span>
+          <span className="atp-top-name">
+            <span style={{ fontFamily: AT_FONTS.display, fontStyle: "italic", fontWeight: 400 }}>atlas</span>
+            <span style={{ fontFamily: AT_FONTS.display, fontWeight: 600, marginLeft: 4 }}>studio.</span>
           </span>
         </div>
+        <a href="#contact" className="atp-top-cta">Contact <span className="atp-top-cta-dot">●</span></a>
       </header>
 
       {/* Cover */}
@@ -80,6 +104,7 @@ export default function AtlasPortfolioPage() {
               key={p.id}
               className={`atp-row ${hovered === p.id ? "is-hover" : ""} ${hovered && hovered !== p.id ? "is-dim" : ""}`}
               onMouseEnter={() => setHovered(p.id)}
+              onClick={() => setActive(p.id)}
             >
               <span className="atp-row-no">{p.no}</span>
               <span className="atp-row-title">
@@ -173,7 +198,7 @@ export default function AtlasPortfolioPage() {
       </section>
 
       {/* Contact */}
-      <section className="atp-contact">
+      <section id="contact" className="atp-contact">
         <div className="atp-contact-eye">
           <span className="at-mono">(05) Make something</span>
         </div>
@@ -184,18 +209,31 @@ export default function AtlasPortfolioPage() {
           <span style={{ color: "var(--at-accent)" }}>the feeling.</span>
         </h2>
         <div className="atp-contact-grid">
-          {[
-            { eye: "email",      val: "hello@atlas.studio",     href: "mailto:hello@atlas.studio" },
-            { eye: "instagram",  val: "@atlas.studio",          href: "#" },
-            { eye: "book a call",val: "cal.com/atlas/intro",    href: "#" },
-            { eye: "brief",      val: "Send a project brief",   href: "#" },
-          ].map((c) => (
-            <a key={c.eye} className="atp-contact-row" href={c.href}>
-              <span className="at-mono" style={{ color: "var(--at-muted)" }}>{c.eye}</span>
-              <span className="atp-contact-val">{c.val}</span>
-              <span className="atp-contact-arrow">↗</span>
-            </a>
-          ))}
+          <a className="atp-contact-row" href="mailto:hello@atlas.studio">
+            <span className="at-mono" style={{ color: "var(--at-muted)" }}>email</span>
+            <span className="atp-contact-val">hello@atlas.studio</span>
+            <span className="atp-contact-arrow">↗</span>
+          </a>
+          <a className="atp-contact-row" href="#" target="_blank" rel="noopener noreferrer">
+            <span className="at-mono" style={{ color: "var(--at-muted)" }}>instagram</span>
+            <span className="atp-contact-val">@atlas.studio</span>
+            <span className="atp-contact-arrow">↗</span>
+          </a>
+          <button type="button" className="atp-contact-row atp-contact-wa" onClick={() => setWaOpen(true)}>
+            <span className="at-mono" style={{ color: "var(--at-muted)" }}>whatsapp</span>
+            <span className="atp-contact-val" style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style={{ color: "#25D366" }} aria-hidden>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-18.5A8.5 8.5 0 0 0 4.59 16.32L4 20l3.793-1.057A8.5 8.5 0 1 0 12 3.5z"/>
+              </svg>
+              Chat on WhatsApp
+            </span>
+            <span className="atp-contact-arrow">→</span>
+          </button>
+          <a className="atp-contact-row" href="#">
+            <span className="at-mono" style={{ color: "var(--at-muted)" }}>brief</span>
+            <span className="atp-contact-val">Send a project brief</span>
+            <span className="atp-contact-arrow">↗</span>
+          </a>
         </div>
       </section>
 
@@ -244,6 +282,80 @@ export default function AtlasPortfolioPage() {
           </footer>
         </aside>
       </div>
+
+      {/* Project detail — visualizer for the clicked project */}
+      {project && (
+        <div className="atp-detail">
+          <header className="atp-detail-bar">
+            <div className="atp-detail-l">
+              <span className="at-mono" style={{ color: "var(--at-muted)" }}>{project.no} / {project.kind}</span>
+              <span className="at-mono" style={{ color: "var(--at-muted)" }}>{project.place} · {project.year}</span>
+            </div>
+            <div className="atp-detail-c" style={{ fontFamily: AT_FONTS.display, fontWeight: 500 }}>{project.title}<em style={{ fontStyle: "italic", color: "var(--at-muted)", marginLeft: 8 }}>— {project.subtitle}</em></div>
+            <button className="atp-detail-x" onClick={() => setActive(null)} aria-label="Close project">✕</button>
+          </header>
+          <div className="atp-detail-hero at-imgwrap">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={ATLAS_U(project.cover, 2200)} alt={project.title} />
+          </div>
+          <div className="atp-detail-grid">
+            {project.photos.map((pid, i) => (
+              <figure key={pid + i} className="atp-detail-cell" style={{ aspectRatio: ATLAS_RATIOS[pid] || 4/5 }} onClick={() => setLightbox({ photos: project.photos, idx: i })}>
+                <div className="at-imgwrap" style={{ width: "100%", height: "100%" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={ATLAS_U(pid, 1200)} alt="" loading="lazy" />
+                </div>
+                <figcaption className="at-mono atp-detail-cap">{String(i + 1).padStart(3, "0")} / {String(project.photos.length).padStart(3, "0")}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox (project detail) */}
+      {lightbox && lightbox.photos[lightbox.idx] && (
+        <div className="atp-lb" onClick={(e) => { if (e.target === e.currentTarget) setLightbox(null); }}>
+          <header className="atp-lb-head">
+            <span className="at-mono">{String(lightbox.idx + 1).padStart(3, "0")} / {String(lightbox.photos.length).padStart(3, "0")}</span>
+            <button className="atp-lb-x" onClick={() => setLightbox(null)}>Close ✕</button>
+          </header>
+          <button className="atp-lb-arrow l" onClick={() => setLightbox((l) => l && ({ ...l, idx: (l.idx - 1 + l.photos.length) % l.photos.length }))}>←</button>
+          <button className="atp-lb-arrow r" onClick={() => setLightbox((l) => l && ({ ...l, idx: (l.idx + 1) % l.photos.length }))}>→</button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="atp-lb-img" src={ATLAS_U(lightbox.photos[lightbox.idx]!, 1800)} alt="" />
+        </div>
+      )}
+
+      {/* WhatsApp modal */}
+      {waOpen && (
+        <div className="atp-wa" onClick={(e) => { if (e.target === e.currentTarget) setWaOpen(false); }}>
+          <div className="atp-wa-card">
+            <header className="atp-wa-head">
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="#25D366" aria-hidden>
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-18.5A8.5 8.5 0 0 0 4.59 16.32L4 20l3.793-1.057A8.5 8.5 0 1 0 12 3.5z"/>
+                </svg>
+                <div>
+                  <div style={{ fontFamily: AT_FONTS.display, fontWeight: 500, fontSize: 22, letterSpacing: "-.02em" }}>Chat on WhatsApp</div>
+                  <div className="at-mono" style={{ color: "var(--at-muted)" }}>+33 6 12 34 56 78 · usually replies in 24h</div>
+                </div>
+              </div>
+              <button className="atp-wa-x" onClick={() => setWaOpen(false)} aria-label="close">✕</button>
+            </header>
+            <textarea className="atp-wa-msg" value={waMsg} onChange={(e) => setWaMsg(e.target.value)} rows={5} />
+            <a
+              className="atp-wa-send"
+              href={`https://wa.me/33612345678?text=${encodeURIComponent(waMsg)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setWaOpen(false)}
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden><path d="M2 21l1.65-3.8A8.5 8.5 0 1 1 7.05 21L2 21z" opacity=".25"/><path d="M21 12a9 9 0 1 1-3.5-7.07"/></svg>
+              Open WhatsApp
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -257,16 +369,22 @@ const ATP_CSS = `
 .atp-root .at-mark.invert{ background:var(--at-bg); color:var(--at-fg) }
 .atp-root .at-hr{ border:0; height:1px; background:var(--at-line); margin:0 }
 
-.atp-top{ position:fixed; top:0; left:0; right:0; z-index:40; display:flex; align-items:center; justify-content:space-between; padding:14px 22px; background:var(--at-fg); color:var(--at-bg); border-bottom:1px solid var(--at-fg) }
-.atp-hamb{ width:38px; height:38px; border:1px solid rgba(239,234,224,.35); border-radius:999px; background:transparent; color:var(--at-bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; transition:background .25s ease, border-color .25s ease }
+.atp-top{ position:fixed; top:0; left:0; right:0; z-index:40; display:grid; grid-template-columns: auto 1fr auto; align-items:center; gap:14px; padding:14px 22px; background:var(--at-fg); color:var(--at-bg); border-bottom:1px solid var(--at-fg) }
+.atp-hamb{ width:38px; height:38px; border:1px solid rgba(239,234,224,.35); border-radius:999px; background:transparent; color:var(--at-bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; cursor:pointer; transition:background .25s ease, border-color .25s ease }
 .atp-hamb span{ display:block; width:14px; height:1px; background:currentColor }
 .atp-hamb:hover{ background:rgba(239,234,224,.1); border-color:rgba(239,234,224,.7) }
-.atp-top-mark{ display:flex; align-items:center }
-@media (max-width:700px){ .atp-top{ padding:12px 16px } }
+.atp-top-brand{ display:flex; align-items:center; gap:12px; justify-self:center }
+.atp-top-brand .at-mark{ background:var(--at-bg); color:var(--at-fg) }
+.atp-top-name{ font-size:22px; letter-spacing:-.025em; line-height:1; color:var(--at-bg) }
+.atp-top-cta{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border:1px solid rgba(239,234,224,.35); border-radius:999px; color:var(--at-bg); font-family:var(--at-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; transition:background .25s ease, border-color .25s ease }
+.atp-top-cta:hover{ background:rgba(239,234,224,.1); border-color:var(--at-bg) }
+.atp-top-cta-dot{ color:var(--at-accent); font-size:10px; line-height:1 }
+@media (max-width:700px){ .atp-top{ padding:12px 14px; gap:8px } .atp-top-name{ font-size:18px } .atp-top-cta{ padding:7px 11px; font-size:10px } }
+@media (max-width:420px){ .atp-top-brand .at-mark{ display:none } }
 
 .atp-cover{ position:relative; min-height:100vh; min-height:100dvh; width:100%; display:grid; align-items:end; padding-top:64px; color:#fff; isolation:isolate }
 .atp-cover-img{ position:absolute; inset:0; z-index:-1 }
-.atp-cover-tint{ position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 60%, rgba(0,0,0,.6) 100%), linear-gradient(180deg, rgba(14,14,14,0) 50%, rgba(14,14,14,.35) 100%) }
+.atp-cover-tint{ position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.2) 30%, rgba(0,0,0,.2) 55%, rgba(0,0,0,.85) 100%) }
 .atp-cover-grid{ position:relative; z-index:1; display:grid; grid-template-rows: auto 1fr auto; grid-template-areas: "eye" "title" "foot"; width:100%; padding: clamp(70px,12vh,110px) clamp(20px,4vw,56px) clamp(30px,6vh,56px); min-height:100vh; min-height:100dvh }
 .atp-cover-eye{ grid-area:eye }
 .atp-cover-title{ grid-area:title; align-self:end; margin:0; font-family:var(--at-display); font-weight:500; line-height:.92; letter-spacing:-0.045em; font-size: clamp(48px, 11vw, 180px); display:flex; flex-wrap:wrap; gap: 0 .25em }
@@ -284,7 +402,7 @@ const ATP_CSS = `
 
 .atp-index{ position:relative; padding-bottom: clamp(40px,8vh,100px) }
 .atp-list{ list-style:none; margin:0; padding:0 clamp(20px,4vw,56px); border-top:1px solid var(--at-line) }
-.atp-row{ display:grid; grid-template-columns: 50px 1fr 140px 180px 80px 30px; gap:18px; align-items:center; padding:26px 0; cursor:default; border-bottom:1px solid var(--at-line); transition:opacity .35s var(--at-reveal), padding .35s var(--at-reveal), color .25s ease }
+.atp-row{ display:grid; grid-template-columns: 50px 1fr 140px 180px 80px 30px; gap:18px; align-items:center; padding:26px 0; cursor:pointer; border-bottom:1px solid var(--at-line); transition:opacity .35s var(--at-reveal), padding .35s var(--at-reveal), color .25s ease; color:var(--at-fg) }
 .atp-row.is-dim{ opacity:.32 }
 .atp-row.is-hover{ padding-left:14px; color:var(--at-fg) }
 .atp-row-no{ font-family:var(--at-mono); font-size:11px; letter-spacing:.08em; color:var(--at-muted) }
@@ -361,4 +479,41 @@ const ATP_CSS = `
 .atp-nav-sublist{ list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:10px }
 .atp-nav-sublist li{ display:grid; grid-template-columns:40px 1fr; gap:12px; font-family:var(--at-sans); font-size:18px; color:var(--at-muted) }
 .atp-nav-foot{ margin-top:auto; padding-top:18px; border-top:1px solid var(--at-line); display:flex; justify-content:space-between; align-items:baseline; font-size:14px }
+
+/* PROJECT DETAIL */
+.atp-detail{ position:fixed; inset:0; z-index:80; background:var(--at-bg); color:var(--at-fg); overflow-y:auto; animation: atp-fade .4s var(--at-reveal) }
+@keyframes atp-fade{ from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none} }
+.atp-detail-bar{ position:sticky; top:0; z-index:5; display:grid; grid-template-columns: 1fr auto auto; gap:14px; align-items:center; padding:18px 24px; background:var(--at-bg); border-bottom:1px solid var(--at-line) }
+.atp-detail-l{ display:flex; gap:14px; flex-wrap:wrap }
+.atp-detail-c{ font-size: clamp(20px,2.4vw,32px); letter-spacing:-.02em; line-height:1; justify-self:center; text-align:center }
+.atp-detail-x{ appearance:none; border:1px solid var(--at-line); background:transparent; color:var(--at-fg); width:38px; height:38px; border-radius:999px; cursor:pointer; transition:background .2s ease, color .2s ease }
+.atp-detail-x:hover{ background:var(--at-fg); color:var(--at-bg); border-color:var(--at-fg) }
+.atp-detail-hero{ height: clamp(280px, 50vh, 560px); border-bottom:1px solid var(--at-line) }
+.atp-detail-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; padding:24px clamp(16px,4vw,40px) clamp(48px,10vh,96px) }
+.atp-detail-cell{ position:relative; margin:0; cursor:zoom-in; overflow:hidden; background:var(--at-raised) }
+.atp-detail-cap{ position:absolute; left:10px; bottom:10px; background:var(--at-bg); padding:5px 8px; color:var(--at-muted); font-size:9px; letter-spacing:.08em }
+@media (max-width:760px){ .atp-detail-grid{ grid-template-columns: 1fr } .atp-detail-c{ display:none } }
+
+/* LIGHTBOX */
+.atp-lb{ position:fixed; inset:0; z-index:100; background:rgba(11,11,11,.96); display:flex; align-items:center; justify-content:center }
+.atp-lb-head{ position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:1px solid rgba(239,234,224,.12); color:#EFEAE0; font-family:var(--at-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase }
+.atp-lb-x{ background:transparent; border:0; color:inherit; cursor:pointer; font-family:var(--at-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase }
+.atp-lb-img{ max-width:84vw; max-height:78vh; object-fit:contain; box-shadow:0 30px 80px rgba(0,0,0,.5) }
+.atp-lb-arrow{ position:fixed; top:50%; transform:translateY(-50%); width:48px; height:48px; border-radius:999px; border:1px solid rgba(239,234,224,.18); background:transparent; color:#EFEAE0; cursor:pointer; font-family:var(--at-display); font-size:22px }
+.atp-lb-arrow:hover{ background:rgba(239,234,224,.08) }
+.atp-lb-arrow.l{ left:24px } .atp-lb-arrow.r{ right:24px }
+
+/* CONTACT WHATSAPP ROW */
+.atp-contact-wa{ appearance:none; border:0; background:transparent; cursor:pointer; text-align:left; font:inherit; color:inherit; width:100% }
+
+/* WHATSAPP MODAL */
+.atp-wa{ position:fixed; inset:0; z-index:120; background:rgba(11,11,11,.6); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:20px; animation: atp-fade .25s ease }
+.atp-wa-card{ width:min(480px, 100%); background:var(--at-bg); border:1px solid var(--at-line); padding:24px; display:flex; flex-direction:column; gap:18px; box-shadow:0 30px 80px rgba(0,0,0,.3) }
+.atp-wa-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px }
+.atp-wa-x{ appearance:none; border:1px solid var(--at-line); background:transparent; color:var(--at-fg); width:32px; height:32px; border-radius:999px; cursor:pointer; flex-shrink:0; transition:background .2s ease, color .2s ease }
+.atp-wa-x:hover{ background:var(--at-fg); color:var(--at-bg); border-color:var(--at-fg) }
+.atp-wa-msg{ width:100%; background:var(--at-raised); border:1px solid var(--at-line); color:var(--at-fg); padding:16px; font-family:var(--at-sans); font-size:14px; line-height:1.55; resize:vertical; outline:none; min-height:120px; transition:border-color .2s ease }
+.atp-wa-msg:focus{ border-color:var(--at-fg) }
+.atp-wa-send{ display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:16px 22px; background:#25D366; color:#062417; font-family:var(--at-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:700; transition:filter .2s ease, transform .2s ease; text-decoration:none }
+.atp-wa-send:hover{ filter:brightness(1.05); transform:translateY(-1px) }
 `;

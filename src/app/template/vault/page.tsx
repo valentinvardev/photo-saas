@@ -9,6 +9,7 @@ export default function VaultPortfolioPage() {
   const D = { brand: VAULT_BRAND, categories: VAULT_CATEGORIES, totals: VAULT_TOTALS };
   const [chapter,  setChapter]  = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<Lightbox>(null);
+  const [navOpen,  setNavOpen]  = useState(false);
   const chaptersRef = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
@@ -37,16 +38,52 @@ export default function VaultPortfolioPage() {
 
       <header className="vt-top">
         <div className="vt-top-l">
-          <span className="vt-disp" style={{ fontSize: 22 }}>VAULT</span>
-          <span className="vt-mono" style={{ marginLeft: 12, color: "var(--vt-muted)" }}>{D.brand.edition}</span>
+          <button className="vt-hamb" aria-label="menu" onClick={() => setNavOpen(true)}>
+            <span></span><span></span><span></span>
+          </button>
+          <span className="vt-disp vt-top-mark">VAULT</span>
+          <span className="vt-mono vt-top-edition" style={{ color: "var(--vt-muted)" }}>{D.brand.edition}</span>
         </div>
         <div className="vt-top-c vt-mono">
           {chapter ? <>Chapter <strong style={{ color: "var(--vt-fg)" }}>{chapter}</strong> of {String(D.totals.categories).padStart(2, "0")}</> : <>An archive</>}
         </div>
-        <div className="vt-top-r vt-mono">
-          {D.brand.photographer} <span style={{ color: "var(--vt-muted)", margin: "0 8px" }}>·</span> {D.brand.based}
+        <div className="vt-top-r">
+          <span className="vt-mono vt-top-author" style={{ color: "var(--vt-muted)" }}>
+            {D.brand.photographer} <span style={{ color: "var(--vt-muted)", margin: "0 8px" }}>·</span> {D.brand.based}
+          </span>
+          <a href="#vt-toc" className="vt-top-cta vt-mono">Contact</a>
         </div>
       </header>
+
+      {/* Mobile / desktop slide-in nav */}
+      <div className={`vt-nav ${navOpen ? "is-open" : ""}`} aria-hidden={!navOpen}>
+        <div className="vt-nav-bg" onClick={() => setNavOpen(false)} />
+        <aside className="vt-nav-panel">
+          <header className="vt-nav-head">
+            <span className="vt-disp" style={{ fontSize: 22 }}>VAULT</span>
+            <button className="vt-nav-x" onClick={() => setNavOpen(false)} aria-label="close">✕</button>
+          </header>
+          <ol className="vt-nav-list">
+            {D.categories.map((cat) => (
+              <li key={cat.id}>
+                <button onClick={() => { setNavOpen(false); scrollToCat(cat.id); }}>
+                  <span className="vt-mono" style={{ color: "var(--vt-muted)" }}>{cat.no}</span>
+                  <span className="vt-disp">{cat.name}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+          <hr style={{ border: 0, borderTop: "1px solid var(--vt-line)", margin: 0 }} />
+          <ol className="vt-nav-sublist">
+            <li><button onClick={() => { setNavOpen(false); document.getElementById("vt-toc")?.scrollIntoView({ behavior: "smooth" }); }}><span className="vt-mono">→</span><span>Index of contents</span></button></li>
+            <li><button onClick={() => setNavOpen(false)}><span className="vt-mono">→</span><span>Contact the studio</span></button></li>
+          </ol>
+          <footer className="vt-nav-foot">
+            <span className="vt-mono" style={{ color: "var(--vt-muted)" }}>{D.brand.based}</span>
+            <span className="vt-mono" style={{ color: "var(--vt-accent)" }}>{D.brand.edition}</span>
+          </footer>
+        </aside>
+      </div>
 
       {/* COVER */}
       <section className="vt-cover">
@@ -277,11 +314,35 @@ const VT_CSS = `
 .vt-root ::selection{ background:var(--vt-accent); color:var(--vt-bg) }
 
 .vt-top{ position:fixed; top:0; left:0; right:0; height:48px; z-index:60; display:grid; grid-template-columns: 1fr 1fr 1fr; align-items:center; padding: 0 22px; background:var(--vt-bg); border-bottom:1px solid var(--vt-line) }
-.vt-top-l{ display:flex; align-items:baseline; gap:12px }
+.vt-top-l{ display:flex; align-items:center; gap:12px }
 .vt-top-c{ text-align:center; color:var(--vt-muted) }
 .vt-top-c strong{ color:var(--vt-fg); margin:0 2px }
-.vt-top-r{ text-align:right; color:var(--vt-muted) }
-@media (max-width:760px){ .vt-top{ grid-template-columns: 1fr auto; height:44px } .vt-top-c{ display:none } }
+.vt-top-r{ text-align:right; display:flex; align-items:center; justify-content:flex-end; gap:14px }
+.vt-top-mark{ font-size:22px; line-height:1 }
+.vt-hamb{ width:30px; height:30px; border:0; background:transparent; cursor:pointer; display:none; flex-direction:column; align-items:center; justify-content:center; gap:5px; color:var(--vt-fg); padding:0 }
+.vt-hamb span{ display:block; width:18px; height:1px; background:currentColor }
+.vt-top-cta{ display:inline-flex; align-items:center; padding:7px 14px; background:var(--vt-fg); color:var(--vt-bg); transition:background .25s ease; text-decoration:none }
+.vt-top-cta:hover{ background:var(--vt-accent) }
+@media (max-width:900px){ .vt-top-edition{ display:none } .vt-top-author{ display:none } .vt-hamb{ display:flex } }
+@media (max-width:760px){ .vt-top{ grid-template-columns: auto 1fr auto; height:44px; padding:0 14px } .vt-top-c{ display:none } .vt-top-mark{ font-size:18px } }
+
+/* SLIDE-IN NAV */
+.vt-nav{ position:fixed; inset:0; z-index:90; pointer-events:none }
+.vt-nav.is-open{ pointer-events:auto }
+.vt-nav-bg{ position:absolute; inset:0; background:rgba(14,12,10,.5); opacity:0; transition:opacity .5s var(--vt-ease) }
+.vt-nav.is-open .vt-nav-bg{ opacity:1 }
+.vt-nav-panel{ position:absolute; left:0; top:0; bottom:0; width:min(420px, 92vw); background:var(--vt-bg); padding:18px 22px; transform:translateX(-100%); transition:transform .5s var(--vt-ease); display:flex; flex-direction:column; gap:18px; border-right:1px solid var(--vt-line) }
+.vt-nav.is-open .vt-nav-panel{ transform:translateX(0) }
+.vt-nav-head{ display:flex; align-items:center; justify-content:space-between; padding-bottom:14px; border-bottom:1px solid var(--vt-line) }
+.vt-nav-x{ appearance:none; border:1px solid var(--vt-line); background:transparent; width:34px; height:34px; cursor:pointer; color:var(--vt-fg) }
+.vt-nav-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px }
+.vt-nav-list button{ width:100%; appearance:none; border:0; background:transparent; cursor:pointer; text-align:left; display:grid; grid-template-columns: 50px 1fr; gap:14px; align-items:baseline; padding:14px 4px; color:var(--vt-fg); border-bottom:1px solid var(--vt-line); transition:padding .25s var(--vt-ease), color .2s ease }
+.vt-nav-list button:hover{ padding-left:14px; color:var(--vt-accent) }
+.vt-nav-list .vt-disp{ font-size:30px; line-height:.95 }
+.vt-nav-sublist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px }
+.vt-nav-sublist button{ width:100%; appearance:none; border:0; background:transparent; cursor:pointer; text-align:left; display:grid; grid-template-columns: 24px 1fr; gap:12px; padding:10px 4px; color:var(--vt-muted); transition:color .2s ease, padding .2s ease }
+.vt-nav-sublist button:hover{ color:var(--vt-accent); padding-left:8px }
+.vt-nav-foot{ margin-top:auto; padding-top:14px; border-top:1px solid var(--vt-line); display:flex; justify-content:space-between }
 
 .vt-cover{ min-height: calc(100vh - 48px); padding: clamp(28px,4vw,56px); border-bottom:1px solid var(--vt-line); display:flex; flex-direction:column; justify-content:stretch }
 .vt-cover-grid{ flex:1; display:grid; grid-template-columns: 1.2fr 1fr; gap: clamp(28px,5vw,80px); align-items:stretch }
@@ -330,11 +391,11 @@ const VT_CSS = `
 .vt-ch-cover{ position:relative; height:min(80dvh,760px); width:100%; overflow:hidden; isolation:isolate; color:#F0EADA; display:grid; align-items:end; padding: 0 clamp(28px,4vw,56px) clamp(36px,6vh,72px) }
 .vt-ch-cover-img{ position:absolute; inset:0; z-index:-1; background:#222 }
 .vt-ch-cover-img img{ width:100%; height:100%; object-fit:cover }
-.vt-ch-cover-tint{ position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0) 60%, rgba(0,0,0,.7) 100%) }
-.vt-ch-cover-text{ position:relative; z-index:1; max-width:740px; display:flex; flex-direction:column; gap:14px }
-.vt-ch-name{ margin:0; font-size:clamp(56px,14vw,220px); line-height:.85; color:#F0EADA }
+.vt-ch-cover-tint{ position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.1) 30%, rgba(0,0,0,.4) 55%, rgba(0,0,0,.92) 100%) }
+.vt-ch-cover-text{ position:relative; z-index:1; max-width:740px; display:flex; flex-direction:column; gap:14px; text-shadow: 0 2px 24px rgba(0,0,0,.55) }
+.vt-ch-name{ margin:0; font-size:clamp(56px,14vw,220px); line-height:.85; color:#F4F0E6 }
 .vt-ch-summary{ display:flex; flex-direction:column; max-width:50ch }
-.vt-ch-summary p{ margin:0; font-size:18px; line-height:1.5; color:rgba(244,240,230,.85); font-family:var(--vt-sans); font-weight:400 }
+.vt-ch-summary p{ margin:0; font-size:18px; line-height:1.5; color:#F4F0E6; font-family:var(--vt-sans); font-weight:400 }
 .vt-ch-foliage{ position:absolute; right:clamp(28px,4vw,56px); top:clamp(24px,4vh,40px); font-size: clamp(96px,22vw,360px); line-height:.8; color:rgba(255,255,255,.18); pointer-events:none }
 
 .vt-folders{ padding: clamp(48px,8vh,90px) 0; display:flex; flex-direction:column; gap: clamp(56px,9vh,100px) }
