@@ -266,11 +266,13 @@ const VD_CSS = `
 @media (max-width:760px){ .vt-top{ grid-template-columns: 1fr auto; height:44px } .vt-top-c{ display:none } }
 
 /* GATE */
-.vd-gate{ position:relative; min-height:100dvh; isolation:isolate; color:#F0EADA; padding: 22px clamp(20px,4vw,56px); display:grid; grid-template-rows: auto 1fr auto }
+.vd-gate{ position:relative; min-height:100dvh; isolation:isolate; color:#F0EADA; padding: 22px clamp(20px,4vw,56px); display:grid; grid-template-rows: auto 1fr auto; background:#0E0C0A }
 .vd-gate.is-shake{ animation: vd-shake .55s var(--vt-ease) }
 @keyframes vd-shake{ 10%,90%{transform:translateX(-2px)} 30%,50%,70%{transform:translateX(-8px)} 40%,60%{transform:translateX(8px)} }
-.vd-gate-bg{ position:absolute; inset:0; z-index:-1; background:#222 }
-.vd-gate-tint{ position:absolute; inset:0; background: radial-gradient(120% 80% at 50% 50%, rgba(0,0,0,.2), rgba(0,0,0,.75)) }
+.vd-root .vd-gate .vd-gate-bg{ position:absolute; inset:0; z-index:0; background:#222 }
+.vd-root .vd-gate .vd-gate-bg img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter: saturate(.85) contrast(1.02) }
+.vd-gate-tint{ position:absolute; inset:0; z-index:1; background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.7) 100%), radial-gradient(120% 80% at 50% 50%, rgba(0,0,0,.35), rgba(0,0,0,.85)) }
+.vd-root .vd-gate .vd-gate-top, .vd-root .vd-gate .vd-gate-card, .vd-root .vd-gate .vd-gate-foot{ position:relative; z-index:2 }
 .vd-gate-top{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap }
 .vd-gate-card{ align-self:center; justify-self:center; width:min(640px,94vw); text-align:center; display:flex; flex-direction:column; gap:14px; padding:48px 32px; background:rgba(20,18,15,.55); backdrop-filter:blur(28px) saturate(140%); -webkit-backdrop-filter:blur(28px) saturate(140%); border:1px solid rgba(244,240,230,.18) }
 .vd-gate-title{ margin:0; font-size: clamp(56px,11vw,120px); display:flex; flex-direction:column; align-items:center; line-height:.85 }

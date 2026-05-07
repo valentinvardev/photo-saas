@@ -104,7 +104,12 @@ export default function VaultPortfolioPage() {
             </div>
             <a href="#vt-toc" className="vt-cover-cta">
               <span className="vt-mono">Read the index</span>
-              <span style={{ fontFamily: "var(--vt-display)", fontSize: 30, marginLeft: 14 }}>↓</span>
+              <span aria-hidden style={{ marginLeft: 14, display: "inline-flex" }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="13 6 19 12 13 18" />
+                </svg>
+              </span>
             </a>
           </div>
           <div className="vt-cover-r">
@@ -113,9 +118,6 @@ export default function VaultPortfolioPage() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={VT_U(D.categories[0]!.cover, 1400)} alt="" />
               </div>
-              <figcaption className="vt-mono">
-                <span style={{ color: "var(--vt-accent)" }}>Plate i</span> · {D.categories[0]!.folders[0]!.name}, {D.categories[0]!.folders[0]!.date}
-              </figcaption>
             </figure>
           </div>
         </div>

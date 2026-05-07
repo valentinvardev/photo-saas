@@ -266,15 +266,28 @@ export default function AtlasPortfolioPage() {
             <button className="atp-nav-x" onClick={() => setNavOpen(false)} aria-label="close">✕</button>
           </header>
           <ol className="atp-nav-list">
-            {[["00","Index"],["01","Marais"],["02","Rue Saint"],["03","Low Tide"],["04","The Hours"],["05","Noctambule"]].map(([n, t]) => (
-              <li key={n}><span className="at-mono">{n}</span><span style={{ fontFamily: AT_FONTS.display }}>{t}</span><span className="atp-nav-arrow">↗</span></li>
+            <li onClick={() => { setNavOpen(false); document.getElementById("index")?.scrollIntoView({ behavior: "smooth" }); }}>
+              <span className="at-mono">00</span><span style={{ fontFamily: AT_FONTS.display }}>Index</span><span className="atp-nav-arrow">↗</span>
+            </li>
+            {ATLAS_PROJECTS.map((p) => (
+              <li key={p.id} onClick={() => { setNavOpen(false); setActive(p.id); }}>
+                <span className="at-mono">{p.no}</span>
+                <span style={{ fontFamily: AT_FONTS.display }}>{p.title}</span>
+                <span className="atp-nav-arrow">↗</span>
+              </li>
             ))}
           </ol>
           <hr className="at-hr" />
           <ol className="atp-nav-sublist">
-            <li><span className="at-mono">06</span><span>Studio</span></li>
-            <li><span className="at-mono">07</span><span>Contact</span></li>
-            <li><span className="at-mono">08</span><span>Journal</span></li>
+            <li onClick={() => { setNavOpen(false); document.querySelector(".atp-about")?.scrollIntoView({ behavior: "smooth" }); }}>
+              <span className="at-mono">06</span><span>Studio</span>
+            </li>
+            <li onClick={() => { setNavOpen(false); document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); }}>
+              <span className="at-mono">07</span><span>Contact</span>
+            </li>
+            <li onClick={() => setNavOpen(false)}>
+              <span className="at-mono">08</span><span>Journal</span>
+            </li>
           </ol>
           <footer className="atp-nav-foot">
             <div className="at-mono" style={{ color: "var(--at-muted)" }}>open for</div>
@@ -300,11 +313,9 @@ export default function AtlasPortfolioPage() {
           </div>
           <div className="atp-detail-grid">
             {project.photos.map((pid, i) => (
-              <figure key={pid + i} className="atp-detail-cell" style={{ aspectRatio: ATLAS_RATIOS[pid] || 4/5 }} onClick={() => setLightbox({ photos: project.photos, idx: i })}>
-                <div className="at-imgwrap" style={{ width: "100%", height: "100%" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ATLAS_U(pid, 1200)} alt="" loading="lazy" />
-                </div>
+              <figure key={pid + i} className="atp-detail-cell" onClick={() => setLightbox({ photos: project.photos, idx: i })}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={ATLAS_U(pid, 1200)} alt="" loading="lazy" style={{ width: "100%", height: "auto", display: "block", aspectRatio: ATLAS_RATIOS[pid] || 4/5, objectFit: "cover" }} />
                 <figcaption className="at-mono atp-detail-cap">{String(i + 1).padStart(3, "0")} / {String(project.photos.length).padStart(3, "0")}</figcaption>
               </figure>
             ))}
@@ -490,10 +501,11 @@ const ATP_CSS = `
 .atp-detail-x{ appearance:none; border:1px solid var(--at-line); background:transparent; color:var(--at-fg); width:38px; height:38px; border-radius:999px; cursor:pointer; transition:background .2s ease, color .2s ease }
 .atp-detail-x:hover{ background:var(--at-fg); color:var(--at-bg); border-color:var(--at-fg) }
 .atp-detail-hero{ height: clamp(280px, 50vh, 560px); border-bottom:1px solid var(--at-line) }
-.atp-detail-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; padding:24px clamp(16px,4vw,40px) clamp(48px,10vh,96px) }
-.atp-detail-cell{ position:relative; margin:0; cursor:zoom-in; overflow:hidden; background:var(--at-raised) }
+.atp-detail-grid{ column-count:3; column-gap:14px; padding:24px clamp(16px,4vw,40px) clamp(48px,10vh,96px) }
+.atp-detail-cell{ position:relative; margin:0 0 14px; cursor:zoom-in; overflow:hidden; background:var(--at-raised); break-inside:avoid; display:block }
 .atp-detail-cap{ position:absolute; left:10px; bottom:10px; background:var(--at-bg); padding:5px 8px; color:var(--at-muted); font-size:9px; letter-spacing:.08em }
-@media (max-width:760px){ .atp-detail-grid{ grid-template-columns: 1fr } .atp-detail-c{ display:none } }
+@media (max-width:1100px){ .atp-detail-grid{ column-count:2 } }
+@media (max-width:560px){ .atp-detail-grid{ column-count:1 } .atp-detail-c{ display:none } }
 
 /* LIGHTBOX */
 .atp-lb{ position:fixed; inset:0; z-index:100; background:rgba(11,11,11,.96); display:flex; align-items:center; justify-content:center }
