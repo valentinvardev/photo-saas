@@ -43,10 +43,12 @@ export const useDeliveryStore = create<DeliveryStore>()(
     }),
     {
       name: "frame-delivery-pages",
-      version: 2,
+      version: 3,
       /* v2: cinematic and editorial templates removed — map old values
          to the closest visual replacements so previously-saved client
-         pages keep rendering. */
+         pages keep rendering.
+         v3: example pages reseeded to showcase the four real templates
+         (Halcyon, Brooklyn, Minimal, Vogue). */
       migrate: (persisted, version) => {
         const state = persisted as { pages?: DeliveryPage[] } | undefined;
         if (!state?.pages) return state as DeliveryStore;
@@ -57,6 +59,9 @@ export const useDeliveryStore = create<DeliveryStore>()(
             if (t === "editorial") return { ...p, template: "minimal" };
             return p;
           });
+        }
+        if (version < 3) {
+          state.pages = INITIAL_PAGES;
         }
         return state as DeliveryStore;
       },
