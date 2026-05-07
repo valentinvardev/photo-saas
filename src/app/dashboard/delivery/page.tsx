@@ -185,6 +185,62 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
+   NEW DELIVERY TILE — first cell in the grid, mirrors NewPortfolioTile
+══════════════════════════════════════════════════════════════════════════ */
+
+function NewDeliveryTile({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="group flex flex-col border border-dashed border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-yellow hover:bg-yellow/5 transition-all duration-200 text-left"
+    >
+      {/* Cover area — animated package + download glyph */}
+      <div className="relative h-36 flex items-center justify-center bg-[var(--bg-subtle)] group-hover:bg-yellow/5 transition-colors">
+        <motion.div
+          animate={{ y: [0, -2, 0] }}
+          transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+          whileHover={{ scale: 1.18 }}
+          className="relative text-[var(--fg-muted)] group-hover:text-yellow transition-colors"
+        >
+          {/* Package + download arrow glyph */}
+          <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
+            {/* back box, dimmed */}
+            <path d="M10 18l14 -7 14 7v14l-14 7-14-7z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" opacity="0.3" />
+            {/* fold lines */}
+            <path d="M10 18l14 7 14-7" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" opacity="0.45" />
+            <line x1="24" y1="25" x2="24" y2="39" stroke="currentColor" strokeWidth="2" opacity="0.45" />
+            {/* small horizon-line "photo" inside */}
+            <line x1="19" y1="22" x2="29" y2="22" stroke="currentColor" strokeWidth="1.5" opacity="0.55" />
+          </svg>
+          {/* + badge top-right */}
+          <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-yellow text-[#111] flex items-center justify-center shadow-sm">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </motion.div>
+
+        {/* Animated dot trail — implies "delivering" */}
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              key={i}
+              className="w-1 h-1 rounded-full bg-[var(--fg-muted)] group-hover:bg-yellow transition-colors"
+              animate={{ opacity: [0.2, 0.6, 0.2] }}
+              transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Body — match the height of a real delivery card so the row stays even */}
+      <div className="p-3 flex flex-col flex-1 gap-2 justify-center">
+        <div className="font-sans font-bold text-[var(--fg)] text-xs">New delivery</div>
+        <div className="font-mono text-[10px] text-[var(--fg-muted)]">Send a fresh client gallery</div>
+      </div>
+    </button>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
    NEW PAGE MODAL
 ══════════════════════════════════════════════════════════════════════════ */
 
@@ -271,25 +327,14 @@ export default function DeliveryPagesPage() {
 
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
-        <div>
-          <h1 className="font-sans font-black text-[var(--fg)] text-xl">Delivery</h1>
-          <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">
-            <span className="text-green-400">{counts.active} active</span>
-            {counts.draft > 0 && <> · <span>{counts.draft} draft{counts.draft > 1 ? "s" : ""}</span></>}
-            {counts.expired > 0 && <> · <span className="text-red-400">{counts.expired} expired</span></>}
-          </p>
-        </div>
-        <button
-          onClick={() => setShowNew(true)}
-          className="btn-primary flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-sans font-bold text-sm"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          New delivery
-        </button>
+      {/* Header — title + counts only; new-delivery action lives in the grid */}
+      <div className="mb-6">
+        <h1 className="font-sans font-black text-[var(--fg)] text-xl">Delivery</h1>
+        <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">
+          <span className="text-green-400">{counts.active} active</span>
+          {counts.draft > 0 && <> · <span>{counts.draft} draft{counts.draft > 1 ? "s" : ""}</span></>}
+          {counts.expired > 0 && <> · <span className="text-red-400">{counts.expired} expired</span></>}
+        </p>
       </div>
 
       {/* Grid */}
@@ -310,6 +355,7 @@ export default function DeliveryPagesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          <NewDeliveryTile onClick={() => setShowNew(true)} />
           {pages.map((p) => (
             <DeliveryCard key={p.id} page={p} />
           ))}
