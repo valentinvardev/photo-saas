@@ -26,6 +26,7 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
   const TEMPLATE_PREVIEW_URLS: Record<string, string> = {
     halcyon:  "/template/halcyon/delivery",
     brooklyn: "/template/brooklyn/delivery",
+    minimal:  "/template/minimal/delivery",
   };
   const previewUrl = TEMPLATE_PREVIEW_URLS[page.template] ?? `/d/${page.id}`;
   const [previewOpen, setPreviewOpen] = useState(false);

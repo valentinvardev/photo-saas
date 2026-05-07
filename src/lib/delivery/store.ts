@@ -43,7 +43,7 @@ export const useDeliveryStore = create<DeliveryStore>()(
     }),
     {
       name: "frame-delivery-pages",
-      version: 4,
+      version: 5,
       /* v2: cinematic and editorial templates removed — map old values
          to the closest visual replacements so previously-saved client
          pages keep rendering.
@@ -60,7 +60,7 @@ export const useDeliveryStore = create<DeliveryStore>()(
             return p;
           });
         }
-        if (version < 4) {
+        if (version < 5) {
           /* Reseed examples so each card uses a template that actually
              has a delivery page route, with template-relevant covers. */
           state.pages = INITIAL_PAGES;

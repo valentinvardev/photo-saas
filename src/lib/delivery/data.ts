@@ -69,7 +69,6 @@ export const DEFAULT_BRANDING = {
 const HALCYON_WEDDING_COVER  = "https://images.unsplash.com/photo-1519741497674-611481863552?w=1400&q=70";
 const HALCYON_PORTRAIT_COVER = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=1200&q=70";
 const BROOKLYN_COVER_DARK    = "https://picsum.photos/seed/10/1200/800";
-const BROOKLYN_COVER_URBAN   = "https://picsum.photos/seed/144/1200/800";
 
 export const INITIAL_PAGES: DeliveryPage[] = [
   {
@@ -103,14 +102,14 @@ export const INITIAL_PAGES: DeliveryPage[] = [
     ...DEFAULT_BRANDING, logoText: "EMMA K.",
   },
   {
-    id: "dp4", title: "Editorial — Spring", client: "Issue 04",
-    status: "draft", photoCount: 84, photoSeeds: [22,23,24,25,26,27,28,29], coverSeed: 144, coverUrl: BROOKLYN_COVER_URBAN,
+    id: "dp4", title: "Halberg & Park — Wedding", client: "Halberg & Park",
+    status: "draft", photoCount: 124, photoSeeds: [10, 71, 82, 93, 100, 111, 144, 155], coverSeed: 401, coverUrl: "https://picsum.photos/seed/82/1200/800",
     views: 0, lastViewed: null, createdAt: "Apr 8, 2026", expiresAt: null,
-    passwordEnabled: false, password: "", whitelistEnabled: true, whitelist: ["editor@issue04.com"],
-    mode: "gift", selectionLimit: 0, pricePerPhoto: 0, priceFullGallery: 0,
-    watermark: false, downloadRes: "full", proofingEnabled: true,
-    template: "brooklyn", layout: "grid", welcomeMessage: "Final assets for the Spring issue. Pull what you need.", showUpsellBanner: false,
-    ...DEFAULT_BRANDING, logoText: "ISSUE 04",
+    passwordEnabled: true, password: "halberg", whitelistEnabled: false, whitelist: [],
+    mode: "selection", selectionLimit: 40, pricePerPhoto: 0, priceFullGallery: 0,
+    watermark: true, downloadRes: "choice", proofingEnabled: false,
+    template: "minimal", layout: "grid", welcomeMessage: "A small selection from your day. Pick your 40 favourites — we'll print them.", showUpsellBanner: false,
+    ...DEFAULT_BRANDING, logoText: "STUDIO MN",
   },
 ];
 

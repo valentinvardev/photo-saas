@@ -210,6 +210,8 @@ const DELIVERY_TEMPLATES: DeliveryTemplate[] = [
     tags: ["Minimal", "Portrait", "Fine Art"],
     available: true, new: true,
     accent: "#f5f5f5", fg: "#111111", sub: "#888888",
+    href: "/template/minimal/delivery",
+    collection: "Minimal",
   },
   {
     id: "delivery-vogue",
