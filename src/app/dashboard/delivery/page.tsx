@@ -27,6 +27,7 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
     halcyon:  "/template/halcyon/delivery",
     brooklyn: "/template/brooklyn/delivery",
     minimal:  "/template/minimal/delivery",
+    monolith: "/template/monolith/delivery",
   };
   const previewUrl = TEMPLATE_PREVIEW_URLS[page.template] ?? `/d/${page.id}`;
   const [previewOpen, setPreviewOpen] = useState(false);

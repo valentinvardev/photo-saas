@@ -95,6 +95,19 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     style: { bg: "#0E0D0B", fg: "#EFEAE0", accent: "#C2410C", muted: "#8A8378" },
     collection: "halcyon",
   },
+  {
+    id: "monolith",
+    name: "Monolith",
+    description: "Sans-first brutal-modernist portfolio. Bricolage Grotesque display, lava accent, mosaic 12-col grid that sums every row, and a sticky three-column nav.",
+    category: "Grid",
+    tags: ["Grid", "Bold", "Sans"],
+    href: "/template/monolith",
+    seed: 700,
+    new: true,
+    fonts: { serif: "Bricolage Grotesque", sans: "Geist", mono: "Geist Mono" },
+    style: { bg: "#F5F4F1", fg: "#0A0A0A", accent: "#FF4015", muted: "#6B6B68" },
+    collection: "monolith",
+  },
 ];
 
 const PORTFOLIO_CATEGORIES: PortfolioCategory[] = ["All", "Minimal", "Editorial", "Magazine", "Story", "Grid"];
@@ -143,6 +156,17 @@ const LINKS_TEMPLATES: LinksTemplate[] = [
     btnStyle: "square", btnBg: "#E8382C", btnFg: "#0D0D0D", font: "Space Grotesk",
     href: "/template/brooklyn/links",
     collection: "Brooklyn",
+  },
+  {
+    id: "links-monolith",
+    name: "Monolith",
+    description: "Sans-first numbered link cards with lava accent on the primary action. Pulse-dot status bar, framed avatar, and a divided stats row.",
+    tags: ["Grid", "Bold", "Sans"],
+    available: true, new: true,
+    bg: "#F5F4F1", fg: "#0A0A0A", sub: "#6B6B68",
+    btnStyle: "square", btnBg: "#FF4015", btnFg: "#FFFFFF", font: "Bricolage Grotesque",
+    href: "/template/monolith/links",
+    collection: "Monolith",
   },
   {
     id: "links-clean",
@@ -204,6 +228,16 @@ const DELIVERY_TEMPLATES: DeliveryTemplate[] = [
     collection: "Brooklyn",
   },
   {
+    id: "delivery-monolith",
+    name: "Monolith",
+    description: "Two-pane authentication gate, big numbered chapters, four-column strict grid, shift-click multi-select, and a lava floating action bar.",
+    tags: ["Grid", "Utility", "Sans"],
+    available: true, new: true,
+    accent: "#FF4015", fg: "#0A0A0A", sub: "#6B6B68",
+    href: "/template/monolith/delivery",
+    collection: "Monolith",
+  },
+  {
     id: "delivery-minimal",
     name: "Minimal",
     description: "Clean white space, serif headings, and a strict grid. Lets your photography take center stage.",
@@ -263,6 +297,18 @@ const COLLECTIONS: TemplateCollection[] = [
       { type: "portfolio", href: "/template/halcyon",          seed: 600 },
       { type: "links",     href: "/template/halcyon/links",    seed: 601 },
       { type: "delivery",  href: "/template/halcyon/delivery", seed: 602 },
+    ],
+  },
+  {
+    id: "monolith",
+    name: "Monolith",
+    description: "Sans-first brutal-modernist suite. Bricolage Grotesque display, lava accent, mosaic 12-col grid, two-pane authentication gate, and numbered link cards — three pages cut from one architecture.",
+    accentColor: "#FF4015",
+    accentText:  "#FFFFFF",
+    pages: [
+      { type: "portfolio", href: "/template/monolith",          seed: 700 },
+      { type: "links",     href: "/template/monolith/links",    seed: 701 },
+      { type: "delivery",  href: "/template/monolith/delivery", seed: 702 },
     ],
   },
   {
