@@ -63,10 +63,18 @@ export const DEFAULT_BRANDING = {
   fontFamily: "Inter, sans-serif",
 };
 
+/* Cover URLs lifted from the actual template asset banks so each
+   example card looks like a real shoot from that template, not a
+   random placeholder. */
+const HALCYON_WEDDING_COVER  = "https://images.unsplash.com/photo-1519741497674-611481863552?w=1400&q=70";
+const HALCYON_PORTRAIT_COVER = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=1200&q=70";
+const BROOKLYN_COVER_DARK    = "https://picsum.photos/seed/10/1200/800";
+const BROOKLYN_COVER_URBAN   = "https://picsum.photos/seed/144/1200/800";
+
 export const INITIAL_PAGES: DeliveryPage[] = [
   {
     id: "dp1", title: "Wedding Gallery", client: "Margot & Auden",
-    status: "active", photoCount: 247, photoSeeds: [10,11,12,13,14,15,16,17,18,19,20,21], coverSeed: 401, coverUrl: "",
+    status: "active", photoCount: 247, photoSeeds: [10,11,12,13,14,15,16,17,18,19,20,21], coverSeed: 401, coverUrl: HALCYON_WEDDING_COVER,
     views: 12, lastViewed: "2 hours ago", createdAt: "Apr 2, 2026", expiresAt: "May 2, 2026",
     passwordEnabled: true,  password: "lisbon", whitelistEnabled: false, whitelist: [],
     mode: "selection", selectionLimit: 30, pricePerPhoto: 0, priceFullGallery: 0,
@@ -76,7 +84,7 @@ export const INITIAL_PAGES: DeliveryPage[] = [
   },
   {
     id: "dp2", title: "Album Cover Shoot", client: "Morrison Photo",
-    status: "active", photoCount: 24, photoSeeds: [10,11,12,13,14,15,16,17,18,19,20,21], coverSeed: 10, coverUrl: "",
+    status: "active", photoCount: 24, photoSeeds: [10,11,12,13,14,15,16,17,18,19,20,21], coverSeed: 10, coverUrl: BROOKLYN_COVER_DARK,
     views: 47, lastViewed: "yesterday", createdAt: "Apr 12, 2026", expiresAt: "Jun 12, 2026",
     passwordEnabled: true,  password: "morrison2026", whitelistEnabled: false, whitelist: [],
     mode: "direct", selectionLimit: 0, pricePerPhoto: 0, priceFullGallery: 0,
@@ -86,23 +94,23 @@ export const INITIAL_PAGES: DeliveryPage[] = [
   },
   {
     id: "dp3", title: "Portrait Session", client: "Emma K.",
-    status: "active", photoCount: 48, photoSeeds: [30,31,32,33,34,35], coverSeed: 403, coverUrl: "",
+    status: "active", photoCount: 48, photoSeeds: [30,31,32,33,34,35], coverSeed: 403, coverUrl: HALCYON_PORTRAIT_COVER,
     views: 34, lastViewed: "3 days ago", createdAt: "Apr 1, 2026", expiresAt: "May 1, 2026",
     passwordEnabled: false, password: "", whitelistEnabled: false, whitelist: [],
     mode: "direct", selectionLimit: 0, pricePerPhoto: 12, priceFullGallery: 399,
     watermark: true, downloadRes: "full", proofingEnabled: false,
-    template: "minimal", layout: "grid", welcomeMessage: "Hi Emma! Your portraits are ready. Purchase individual photos or grab the full set.", showUpsellBanner: true,
+    template: "halcyon", layout: "masonry", welcomeMessage: "Hi Emma! Your portraits are ready. Purchase individual photos or grab the full set.", showUpsellBanner: true,
     ...DEFAULT_BRANDING, logoText: "EMMA K.",
   },
   {
-    id: "dp4", title: "Spring '26 Campaign", client: "Nike Brand",
-    status: "draft", photoCount: 84, photoSeeds: [22,23,24,25,26,27,28,29], coverSeed: 402, coverUrl: "",
+    id: "dp4", title: "Editorial — Spring", client: "Issue 04",
+    status: "draft", photoCount: 84, photoSeeds: [22,23,24,25,26,27,28,29], coverSeed: 144, coverUrl: BROOKLYN_COVER_URBAN,
     views: 0, lastViewed: null, createdAt: "Apr 8, 2026", expiresAt: null,
-    passwordEnabled: false, password: "", whitelistEnabled: true, whitelist: ["brand@nike.com", "creative@nike.com"],
+    passwordEnabled: false, password: "", whitelistEnabled: true, whitelist: ["editor@issue04.com"],
     mode: "gift", selectionLimit: 0, pricePerPhoto: 0, priceFullGallery: 0,
     watermark: false, downloadRes: "full", proofingEnabled: true,
-    template: "vogue", layout: "grid", welcomeMessage: "Here are the final assets from the Spring '26 campaign.", showUpsellBanner: false,
-    ...DEFAULT_BRANDING, logoText: "STUDIO",
+    template: "brooklyn", layout: "grid", welcomeMessage: "Final assets for the Spring issue. Pull what you need.", showUpsellBanner: false,
+    ...DEFAULT_BRANDING, logoText: "ISSUE 04",
   },
 ];
 
