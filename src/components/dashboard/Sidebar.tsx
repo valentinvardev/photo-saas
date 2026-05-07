@@ -114,7 +114,17 @@ function MoonIcon() {
   );
 }
 
+function HomeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 11l9-8 9 8" />
+      <path d="M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10" />
+    </svg>
+  );
+}
+
 const navMain = [
+  { label: "Home",      href: "/dashboard",            icon: HomeIcon, exact: true },
   { label: "Gallery",   href: "/dashboard/gallery",   icon: GalleryIcon },
   { label: "Portfolio",  href: "/dashboard/portfolio",  icon: PortfolioIcon },
   { label: "Templates", href: "/dashboard/templates",  icon: TemplatesIcon },
@@ -134,9 +144,9 @@ function ProfileIcon() {
   );
 }
 
-function NavItem({ label, href, icon: Icon, soon }: { label: string; href: string; icon: () => React.ReactNode; soon?: boolean }) {
+function NavItem({ label, href, icon: Icon, soon, exact }: { label: string; href: string; icon: () => React.ReactNode; soon?: boolean; exact?: boolean }) {
   const pathname = usePathname();
-  const active = pathname.startsWith(href);
+  const active = exact ? pathname === href : pathname.startsWith(href);
 
   if (soon) {
     return (

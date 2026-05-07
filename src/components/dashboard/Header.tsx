@@ -73,6 +73,7 @@ function LogoutIcon() {
 
 /* ── Page title map ─────────────────────────────────────── */
 const PAGE_TITLES: Record<string, string> = {
+  "/dashboard":           "Home",
   "/dashboard/gallery":   "Gallery",
   "/dashboard/portfolio": "Portfolio",
   "/dashboard/templates": "Templates",
