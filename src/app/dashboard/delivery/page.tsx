@@ -115,37 +115,38 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
           </div>
         </div>
 
-        {/* CTA row — Copy link (with success state) + Edit */}
+        {/* CTA row — Copy link (with templates-style success state) + Edit */}
         <div className="flex items-center gap-1.5 mt-auto">
           <button
             onClick={handleCopyLink}
             aria-live="polite"
-            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md font-sans text-[10px] font-medium border transition-all duration-300 overflow-hidden
-              ${copied
-                ? "border-emerald-500/60 bg-emerald-500/15 text-emerald-500"
-                : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"}`}
+            className="flex-1 relative h-7 rounded-md overflow-hidden"
           >
             <AnimatePresence mode="wait" initial={false}>
               {copied ? (
                 <motion.span
                   key="copied"
-                  initial={{ opacity: 0, y: 6, scale: 0.92 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -6, scale: 0.92 }}
-                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex items-center gap-1.5"
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-0 flex items-center justify-center gap-1.5 rounded-md text-white font-sans text-[10px] font-bold"
+                  style={{ background: "#16a34a" }}
                 >
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Link copied
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <motion.path d="M20 6L9 17l-5-5"
+                      initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.42, ease: "easeOut" }}
+                    />
+                  </svg>
+                  Copied
                 </motion.span>
               ) : (
                 <motion.span
                   key="copy"
-                  initial={{ opacity: 0, y: 6, scale: 0.92 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -6, scale: 0.92 }}
-                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex items-center gap-1.5"
+                  initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18 }}
+                  className="absolute inset-0 flex items-center justify-center gap-1.5 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                   Copy link
