@@ -700,6 +700,152 @@ function CollectionModal({ c, onClose, onPreview }: { c: TemplateCollection; onC
   );
 }
 
+/* ── Brand identity data — palette + typography per collection ── */
+
+type Identity = {
+  bg: string; raised: string; fg: string; muted: string; line: string; accent: string;
+  display: string;            // header/display family
+  displayWeight: number;
+  displayItalic?: boolean;
+  sans: string;               // body family
+  mono: string;               // meta family
+  tagline: string;            // a short italic-display sample line
+};
+
+const IDENTITIES: Record<string, Identity> = {
+  brooklyn: { bg: "#0D0D0D", raised: "#161616", fg: "#F0EFE9", muted: "#7A7A7A", line: "#1F1F1F", accent: "#E8382C",
+    display: "'DM Serif Display', Georgia, serif", displayWeight: 400, displayItalic: true,
+    sans: "'Space Grotesk', system-ui, sans-serif", mono: "'Space Mono', ui-monospace, monospace",
+    tagline: "Urban, all hours" },
+  halcyon:  { bg: "#0E0D0B", raised: "#1A1815", fg: "#EFEAE0", muted: "#8A8378", line: "#2C2925", accent: "#C2410C",
+    display: "'Instrument Serif', Georgia, serif", displayWeight: 400, displayItalic: true,
+    sans: "'Geist', system-ui, sans-serif", mono: "'Geist Mono', ui-monospace, monospace",
+    tagline: "The light keeps arriving" },
+  monolith: { bg: "#F5F4F1", raised: "#FFFFFF", fg: "#0A0A0A", muted: "#6B6B68", line: "#1F1F1E", accent: "#FF4015",
+    display: "'Bricolage Grotesque', system-ui, sans-serif", displayWeight: 800,
+    sans: "'Geist', system-ui, sans-serif", mono: "'Geist Mono', ui-monospace, monospace",
+    tagline: "Photographs that work" },
+  atlas:    { bg: "#EFEAE0", raised: "#E4DDCB", fg: "#0E0E0E", muted: "#6E6A60", line: "#D5CDB9", accent: "#2235FF",
+    display: "'Bricolage Grotesque', system-ui, sans-serif", displayWeight: 500, displayItalic: true,
+    sans: "'Geist', system-ui, sans-serif", mono: "'Geist Mono', ui-monospace, monospace",
+    tagline: "Photographer at large" },
+  vault:    { bg: "#F4F0E6", raised: "#ECE5D2", fg: "#1A1714", muted: "#857C68", line: "#D6CCB6", accent: "#A8462E",
+    display: "'Anton', 'Impact', sans-serif", displayWeight: 400,
+    sans: "'Manrope', system-ui, sans-serif", mono: "'JetBrains Mono', ui-monospace, monospace",
+    tagline: "AN ARCHIVE OF PICTURES" },
+  petal:    { bg: "#f0ebe3", raised: "#faf6ee", fg: "#18181b", muted: "#71717a", line: "#e4dfd5", accent: "#d9544a",
+    display: "'Cormorant Garamond', Georgia, serif", displayWeight: 500, displayItalic: true,
+    sans: "'DM Sans', system-ui, sans-serif", mono: "ui-monospace, monospace",
+    tagline: "Soft mornings, slow light" },
+  atelier:  { bg: "#f3eee2", raised: "#faf6ec", fg: "#2a2520", muted: "#9c8e7a", line: "#dfd5c1", accent: "#c9a89a",
+    display: "'Cormorant Garamond', Georgia, serif", displayWeight: 500, displayItalic: true,
+    sans: "'DM Sans', system-ui, sans-serif", mono: "ui-monospace, monospace",
+    tagline: "Timeless, never trendy" },
+};
+
+/* Brand identity cover — shown on each collection card.
+   Palette swatches + a typographic specimen, rendered in the collection's
+   actual fonts and colors. Web fonts are loaded once via a single <link>. */
+function BrandIdentity({ id, name }: { id: string; name: string }) {
+  const i = IDENTITIES[id];
+  if (!i) return null;
+
+  return (
+    <div
+      className="relative w-full h-full overflow-hidden flex flex-col"
+      style={{ background: i.bg, color: i.fg }}
+    >
+      {/* webfonts — single link, browser de-dupes between cards */}
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,800&family=Anton&family=Manrope:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,500;1,400&family=JetBrains+Mono&display=swap" />
+
+      {/* edition / studio strip */}
+      <div className="flex items-center justify-between px-5 pt-4" style={{ color: i.muted }}>
+        <span style={{ fontFamily: i.mono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          {name} · Identity
+        </span>
+        <span style={{ fontFamily: i.mono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          06 / Vol. 1
+        </span>
+      </div>
+
+      {/* Display name — the headline grade, styled in the collection's voice */}
+      <div className="flex-1 flex items-center justify-center px-5 py-4">
+        <div
+          style={{
+            fontFamily: i.display,
+            fontWeight: i.displayWeight,
+            fontStyle: i.displayItalic ? "italic" : "normal",
+            fontSize: "clamp(46px, 8vw, 96px)",
+            lineHeight: 0.9,
+            letterSpacing: i.displayWeight >= 700 ? "-0.04em" : "-0.02em",
+            color: i.fg,
+            textTransform: id === "vault" ? "uppercase" : "none",
+            textAlign: "center",
+          }}
+        >
+          {name}<span style={{ color: i.accent }}>.</span>
+        </div>
+      </div>
+
+      {/* Tagline — a short specimen line in italic display */}
+      <div className="px-5">
+        <div
+          style={{
+            fontFamily: i.display,
+            fontStyle: i.displayItalic ? "italic" : "normal",
+            fontWeight: i.displayWeight >= 700 ? 500 : i.displayWeight,
+            fontSize: 18,
+            lineHeight: 1.2,
+            color: i.muted,
+            textAlign: "center",
+          }}
+        >
+          {i.tagline}
+        </div>
+      </div>
+
+      {/* Type stack row */}
+      <div className="grid grid-cols-3 gap-0 mx-5 mt-4 border-t border-b" style={{ borderColor: i.line }}>
+        {[
+          { tag: "Display", sample: "Aa", font: i.display, weight: i.displayWeight, italic: i.displayItalic },
+          { tag: "Sans",    sample: "Aa", font: i.sans,    weight: 500 },
+          { tag: "Mono",    sample: "Aa", font: i.mono,    weight: 400 },
+        ].map((t, k) => (
+          <div key={t.tag} className="flex flex-col items-center justify-center gap-1 py-3"
+            style={{ borderRight: k < 2 ? `1px solid ${i.line}` : "none" }}>
+            <span style={{ fontFamily: t.font, fontWeight: t.weight, fontStyle: t.italic ? "italic" : "normal", fontSize: 28, lineHeight: 1, color: i.fg }}>
+              {t.sample}
+            </span>
+            <span style={{ fontFamily: i.mono, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: i.muted }}>
+              {t.tag}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Palette swatches */}
+      <div className="flex h-9 mx-5 mt-4 mb-5">
+        {[
+          { c: i.accent, label: "AC" },
+          { c: i.fg,     label: "FG" },
+          { c: i.muted,  label: "MT" },
+          { c: i.raised, label: "RS" },
+          { c: i.bg,     label: "BG" },
+        ].map((s, k) => (
+          <div key={k} className="flex-1 relative" style={{ background: s.c, border: k === 4 ? `1px solid ${i.line}` : "none" }}>
+            <span
+              className="absolute left-1.5 bottom-1"
+              style={{ fontFamily: i.mono, fontSize: 8, letterSpacing: "0.14em", color: s.c === i.bg || s.c === i.raised ? i.muted : "rgba(255,255,255,0.85)" }}
+            >
+              {s.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── Collection card ─────────────────────────────────────────── */
 
 function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) {
@@ -725,24 +871,13 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
           onClick={() => setModalOpen(true)}
           className="relative overflow-hidden border border-[var(--border)] bg-[var(--bg-card)] flex items-center gap-3 p-4 active:bg-[var(--bg-subtle)] transition-colors cursor-pointer"
         >
-          <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: c.accentColor }} />
-          <div className="pl-2 flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-2xl font-bold leading-none select-none" style={{ color: c.accentColor + "40" }}>{String(index + 1).padStart(2, "0")}</span>
-              <div>
-                <h3 className="font-sans font-black text-[var(--fg)] text-base leading-none">{c.name}</h3>
-                <span className="font-mono text-[9px] uppercase tracking-wider" style={{ color: c.accentColor }}>Collection</span>
-              </div>
-            </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-sans font-black text-[var(--fg)] text-base leading-none">{c.name}</h3>
+            <span className="font-mono text-[9px] uppercase tracking-wider text-[var(--fg-muted)] mt-1 inline-block">Collection</span>
           </div>
-          {/* Mini previews */}
-          <div className="flex gap-1 shrink-0">
-            {c.pages.map((page) => (
-              <div key={page.type} className="relative overflow-hidden rounded-md" style={{ width: 40, height: 54 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`https://picsum.photos/seed/${page.seed}/80/108`} alt="" className="w-full h-full object-cover" style={{ filter: page.href ? "brightness(0.85)" : "grayscale(1) opacity(0.3)" }} />
-              </div>
-            ))}
+          {/* Identity preview */}
+          <div className="shrink-0 overflow-hidden border border-[var(--border)]" style={{ width: 96, height: 64 }}>
+            <BrandIdentity id={c.id} name={c.name} />
           </div>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-[var(--fg-muted)]"><path d="M9 18l6-6-6-6"/></svg>
         </motion.div>
@@ -755,7 +890,7 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
     );
   }
 
-  /* Desktop — full horizontal card */
+  /* Desktop — horizontal card with brand identity cover on the right */
   return (
     <>
       <motion.div
@@ -768,39 +903,29 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
           boxShadow: hovered ? "0 8px 32px rgba(0,0,0,0.1)" : "none",
         }}
       >
-        {/* Accent bar */}
-        <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: c.accentColor }} />
-
-        <div className="flex pl-4">
+        <div className="flex">
           {/* ── Left: info ── */}
-          <div className="flex-1 min-w-0 py-6 pr-8 flex flex-col gap-4 justify-between">
-            <div className="flex items-baseline gap-3">
-              <span className="font-mono text-5xl font-bold leading-none select-none" style={{ color: c.accentColor + "28" }}>
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <div>
-                <h3 className="font-sans font-black text-[var(--fg)] text-2xl leading-none tracking-tight">{c.name}</h3>
-                <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: c.accentColor }}>Collection</span>
-              </div>
+          <div className="flex-1 min-w-0 py-6 px-6 flex flex-col gap-4 justify-between">
+            <div>
+              <h3 className="font-sans font-black text-[var(--fg)] text-2xl leading-none tracking-tight">{c.name}</h3>
+              <span className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mt-2 inline-block">Collection</span>
             </div>
 
             <p className="font-sans text-xs text-[var(--fg-muted)] leading-relaxed max-w-sm">{c.description}</p>
 
-            {/* Page buttons */}
+            {/* Page buttons — unified neutral chip styling, not template-tinted */}
             <div className="flex gap-2 flex-wrap">
               {c.pages.map((page) => (
                 page.href ? (
                   <button key={page.type} onClick={() => setPreviewOpen(page.type as PageType)}
-                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-3 py-1.5 rounded-lg border transition-colors hover:brightness-105"
-                    style={{ background: c.accentColor + "18", borderColor: c.accentColor + "40", color: c.accentColor }}
+                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
                   >
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="text-emerald-500"><path d="M20 6L9 17l-5-5"/></svg>
                     {PAGE_LABELS[page.type]}
                   </button>
                 ) : (
                   <span key={page.type}
-                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-3 py-1.5 rounded-lg border"
-                    style={{ borderColor: "var(--border)", color: "var(--fg-muted)", opacity: 0.45 }}
+                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg-muted)] opacity-45"
                   >
                     <LockIcon /> {PAGE_LABELS[page.type]}
                   </span>
@@ -823,38 +948,9 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
             </div>
           </div>
 
-          {/* ── Right: live theme preview (50%) ── */}
-          <div className="relative w-1/2 shrink-0 overflow-hidden hidden md:block" style={{ minHeight: 280 }}>
-            {/* Accent strip on the left edge of the preview */}
-            <div className="absolute top-0 bottom-0 left-0 w-1 z-10" style={{ background: c.accentColor }} />
-
-            {c.pages[0]?.href ? (
-              <LivePreviewThumbnail
-                url={c.pages[0].href}
-                baseWidth={1280}
-                className="absolute inset-0 transition-transform duration-700"
-                style={{ transform: hovered ? "scale(1.04)" : "scale(1)", transformOrigin: "center" }}
-              />
-            ) : (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={`https://picsum.photos/seed/${c.pages[0]?.seed ?? 10}/1200/900`}
-                alt={`${c.name} theme preview`}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
-                style={{ transform: hovered ? "scale(1.04)" : "scale(1)" }}
-              />
-            )}
-
-            {/* Subtle vignette so the preview blends with the card on the left */}
-            <div className="absolute inset-0 pointer-events-none"
-              style={{ background: "linear-gradient(to right, var(--bg-card) 0%, transparent 12%)" }} />
-
-            <div className="absolute bottom-3 right-3 z-10">
-              <span className="font-mono text-[8px] uppercase tracking-widest px-2 py-1 rounded backdrop-blur-md"
-                style={{ background: "rgba(0,0,0,0.55)", color: "#fff" }}>
-                Live preview
-              </span>
-            </div>
+          {/* ── Right: brand identity cover (50%) ── */}
+          <div className="relative w-1/2 shrink-0 overflow-hidden hidden md:block" style={{ minHeight: 320 }}>
+            <BrandIdentity id={c.id} name={c.name} />
           </div>
         </div>
       </motion.div>
@@ -2028,13 +2124,13 @@ export default function TemplatesPage() {
         </AnimatePresence>
       </div>
 
-      {/* Banners */}
+      {/* Banners — collections banner hides itself on the Collections tab */}
       <AnimatePresence>
-        {bannerVisible && (
+        {bannerVisible && productType !== "collections" && (
           <TemplateBanner
             key="banner-collections"
             onDismiss={() => setBannerVisible(false)}
-            onBrowse={() => { setBannerVisible(false); setProductType("collections"); }}
+            onBrowse={() => { setProductType("collections"); }}
           />
         )}
         {styleBannerVisible && (
