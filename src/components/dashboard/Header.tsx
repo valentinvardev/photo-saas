@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "~/components/providers/ThemeProvider";
 import { useCart } from "~/lib/cart";
 import { CartPanel } from "~/components/dashboard/CartPanel";
+import { DevicePreviewModal } from "~/components/dashboard/DevicePreviewModal";
 
 /* ── Icons ─────────────────────────────────────────────── */
 function SearchIcon() {
@@ -337,6 +338,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
   const [searchTab, setSearchTab] = useState<SearchTab>("templates");
   const [tplFilter, setTplFilter] = useState<TplFilter>("All");
   const [tplDetail, setTplDetail] = useState<Tpl | null>(null);
+  const [tplPreview, setTplPreview] = useState<Tpl | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [origin, setOrigin] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
 
@@ -527,10 +529,10 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                   {tplDetail ? (
                     /* Detail view — shown when a template card is selected */
                     <div className="flex flex-col h-full">
-                      <div className="flex items-center gap-2 px-4 py-2 border-b border-[var(--border-subtle)]">
+                      <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border-subtle)]">
                         <button
                           onClick={() => setTplDetail(null)}
-                          className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-[var(--border)] bg-[var(--bg-subtle)] hover:border-[var(--fg-muted)] hover:bg-[var(--bg-card)] transition-colors font-mono text-[10px] uppercase tracking-widest text-[var(--fg)]"
                         >
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
                           Back to templates
@@ -595,21 +597,18 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                           </div>
                         </div>
                         <div className="flex gap-2 pt-1">
-                          <Link
-                            href={tplDetail.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={closeAll}
+                          <button
+                            type="button"
+                            onClick={() => setTplPreview(tplDetail)}
                             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-[var(--border)] bg-[var(--bg-card)] hover:border-[var(--fg-muted)] font-sans text-xs font-medium text-[var(--fg)] transition-colors"
                           >
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             Preview
-                          </Link>
+                          </button>
                           <Link
                             href={tplDetail.href}
                             onClick={closeAll}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md font-sans text-xs font-bold transition-colors"
-                            style={{ background: tplDetail.accent, color: "#fff" }}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md font-sans text-xs font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
                           >
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                             Use template
@@ -707,7 +706,12 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                           </div>
                           <span className="flex flex-col gap-1.5 shrink-0">
                             <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md bg-yellow text-[#111]">
-                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <line x1="19" y1="8" x2="19" y2="14"/>
+                                <line x1="22" y1="11" x2="16" y2="11"/>
+                              </svg>
                               Connect
                             </span>
                             <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md border border-[var(--border)] text-[var(--fg-muted)]">
@@ -777,6 +781,24 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
             </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Device-framed preview lightbox — opens from the template detail view */}
+      <AnimatePresence>
+        {tplPreview && (
+          <DevicePreviewModal
+            url={tplPreview.href}
+            title={`${tplPreview.name} ${tplPreview.type}`}
+            subtitle={tplPreview.subtitle}
+            accentChip={
+              <span className="inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-sm" style={{ background: tplPreview.accent }} />
+                {tplPreview.name}
+              </span>
+            }
+            onClose={() => setTplPreview(null)}
+          />
         )}
       </AnimatePresence>
 
