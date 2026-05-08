@@ -353,12 +353,13 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
   const unread  = NOTIFICATIONS.filter((n) => n.unread).length;
   const balance = "$124.50";
 
-  /* close dropdowns on outside click */
+  /* close notif/profile dropdowns on outside click. The search modal is
+     fixed-positioned and handles its own backdrop click — we'd close it
+     on every click inside the modal if we used a ref test here. */
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (notifRef.current && !notifRef.current.contains(e.target as Node))   setNotifOpen(false);
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
-      if (searchRef.current && !searchRef.current.contains(e.target as Node))  setSearchOpen(false);
     }
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
