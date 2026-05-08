@@ -706,7 +706,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                             </div>
                           </div>
                           <span className="flex flex-col gap-1.5 shrink-0">
-                            <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md bg-[var(--fg)] text-[var(--bg)]">
+                            <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md bg-yellow text-[#111]">
                               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                               Connect
                             </span>
