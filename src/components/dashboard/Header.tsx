@@ -320,6 +320,19 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
 
   const [searchTab, setSearchTab] = useState<SearchTab>("templates");
   const [tplFilter, setTplFilter] = useState<TplFilter>("All");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [origin, setOrigin] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+
+  const closeAll = () => { setSearchOpen(false); setSearchQuery(""); };
+
+  function openSearch() {
+    if (inputRef.current) {
+      const r = inputRef.current.getBoundingClientRect();
+      setOrigin({ x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height });
+    }
+    setSearchOpen(true);
+  }
+  const tabIndex = searchTab === "templates" ? 0 : searchTab === "social" ? 1 : 2;
 
   /* Filter each interface by the shared query — case-insensitive. */
   const q = searchQuery.trim().toLowerCase();
@@ -388,12 +401,13 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
           <SearchIcon />
         </span>
         <input
+          ref={inputRef}
           type="text"
           value={searchQuery}
           placeholder="Search anything — templates, pages, people…"
-          onFocus={() => { setSearchFocused(true); setSearchOpen(true); }}
+          onFocus={() => { setSearchFocused(true); openSearch(); }}
           onBlur={() => setSearchFocused(false)}
-          onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
+          onChange={(e) => { setSearchQuery(e.target.value); if (!searchOpen) openSearch(); }}
           className="w-full pl-8 pr-3 py-1.5 text-xs font-sans bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg text-[var(--fg)] placeholder:text-[var(--fg-muted)] outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition-all"
         />
         <kbd className="hidden sm:block absolute right-2.5 top-1/2 -translate-y-1/2 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-card)] border border-[var(--border)] px-1 py-0.5 rounded pointer-events-none">
@@ -404,34 +418,37 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
 
       {/* Universal search overlay — full-page backdrop blur, three interfaces */}
       <AnimatePresence>
-        {searchOpen && (() => {
-          const closeAll = () => { setSearchOpen(false); setSearchQuery(""); };
-          return (
-        <motion.div
-          key="search-overlay"
-          initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-          animate={{ opacity: 1, backdropFilter: "blur(20px) saturate(140%)" }}
-          exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-50 flex flex-col items-center pt-16 sm:pt-24 px-4"
-          style={{
-            background: "color-mix(in srgb, var(--bg) 55%, transparent)",
-            backdropFilter: "blur(20px) saturate(140%)",
-            WebkitBackdropFilter: "blur(20px) saturate(140%)",
-          }}
-          onClick={(e) => { if (e.target === e.currentTarget) closeAll(); }}
-        >
+        {searchOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.97 }}
-            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-3xl rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden flex flex-col"
+            key="search-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 z-50 flex flex-col items-center pt-16 sm:pt-24 px-4"
             style={{
-              background: "color-mix(in srgb, var(--bg-card) 92%, transparent)",
-              maxHeight: "min(78vh, 720px)",
+              background: "color-mix(in srgb, var(--bg) 55%, transparent)",
+              backdropFilter: "blur(20px) saturate(140%)",
+              WebkitBackdropFilter: "blur(20px) saturate(140%)",
             }}
+            onClick={(e) => { if (e.target === e.currentTarget) closeAll(); }}
           >
+            {/* Modal card — animation springs from the search bar's screen coordinates */}
+            <motion.div
+              initial={origin
+                ? { opacity: 0, x: origin.x - (typeof window !== "undefined" ? window.innerWidth / 2 : 0), y: origin.y - (typeof window !== "undefined" ? Math.min(window.innerHeight * 0.78, 720) / 2 : 0) - (typeof window !== "undefined" && window.innerWidth >= 640 ? 96 : 64), scale: origin.h / 360, transformOrigin: "top center" }
+                : { opacity: 0, y: -16, scale: 0.96 }}
+              animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              exit={origin
+                ? { opacity: 0, x: origin.x - (typeof window !== "undefined" ? window.innerWidth / 2 : 0), y: origin.y - (typeof window !== "undefined" ? Math.min(window.innerHeight * 0.78, 720) / 2 : 0) - (typeof window !== "undefined" && window.innerWidth >= 640 ? 96 : 64), scale: origin.h / 360, transformOrigin: "top center" }
+                : { opacity: 0, y: -8, scale: 0.97 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              className="relative w-full max-w-3xl rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden flex flex-col"
+              style={{
+                background: "color-mix(in srgb, var(--bg-card) 92%, transparent)",
+                maxHeight: "min(78vh, 720px)",
+              }}
+            >
             {/* Search input — autofocused inside the modal */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-subtle)]">
               <span className="text-[var(--fg-muted)]"><SearchIcon /></span>
@@ -479,10 +496,16 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
             </div>
 
             {/* Tab content */}
-            <div className="flex-1 overflow-y-auto">
-              {/* ── Templates interface ───────────────────────────── */}
-              {searchTab === "templates" && (
-                <div className="p-4">
+            {/* Three sliding panels — one per interface, joined as a single track */}
+            <div className="flex-1 overflow-hidden">
+              <motion.div
+                className="flex h-full"
+                style={{ width: "300%" }}
+                animate={{ x: `${-tabIndex * (100 / 3)}%` }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {/* ── Templates panel ───────────────────────────── */}
+                <div className="w-1/3 h-full overflow-y-auto p-4">
                   <div className="flex flex-wrap items-center gap-1 mb-3">
                     {TEMPLATE_TYPES.map((f) => (
                       <button
@@ -538,11 +561,9 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                     </div>
                   )}
                 </div>
-              )}
 
-              {/* ── Social interface ─────────────────────────────── */}
-              {searchTab === "social" && (
-                <div className="p-4">
+                {/* ── Social panel ─────────────────────────────── */}
+                <div className="w-1/3 h-full overflow-y-auto p-4">
                   {peopleMatches.length === 0 ? (
                     <div className="px-2 py-12 text-center font-sans text-xs text-[var(--fg-muted)]">No people match &ldquo;{searchQuery}&rdquo;</div>
                   ) : (
@@ -577,11 +598,9 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                     </div>
                   )}
                 </div>
-              )}
 
-              {/* ── Navigate interface ───────────────────────────── */}
-              {searchTab === "navigate" && (
-                <div className="p-2">
+                {/* ── Navigate panel ───────────────────────────── */}
+                <div className="w-1/3 h-full overflow-y-auto p-2">
                   {actionMatches.length === 0 ? (
                     <div className="px-2 py-12 text-center font-sans text-xs text-[var(--fg-muted)]">No pages match &ldquo;{searchQuery}&rdquo;</div>
                   ) : (
@@ -624,7 +643,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                     })
                   )}
                 </div>
-              )}
+              </motion.div>
             </div>
 
             {/* Foot strip */}
@@ -636,10 +655,9 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
               </span>
               <span>Universal search</span>
             </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-          );
-        })()}
+        )}
       </AnimatePresence>
 
       {/* Spacer */}
