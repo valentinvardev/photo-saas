@@ -71,6 +71,71 @@ function LogoutIcon() {
   );
 }
 
+/* ── Universal search index ─────────────────────────────── */
+
+type SearchKind = "template" | "page" | "person";
+type SearchItem = { kind: SearchKind; group: string; title: string; sub?: string; href: string; mark?: string; accent?: string };
+
+const SEARCH_INDEX: SearchItem[] = [
+  /* Templates — portfolio */
+  { kind: "template", group: "Portfolio templates", title: "Halcyon",   sub: "Editorial · warm dark · Instrument Serif",    href: "/template/halcyon",                accent: "#C2410C", mark: "H" },
+  { kind: "template", group: "Portfolio templates", title: "Brooklyn",  sub: "Urban dark · red accent · Space Grotesk",     href: "/template/brooklyn",               accent: "#E8382C", mark: "B" },
+  { kind: "template", group: "Portfolio templates", title: "Monolith",  sub: "Sans-first · brutal · Bricolage Grotesque",   href: "/template/monolith",               accent: "#FF4015", mark: "M" },
+  { kind: "template", group: "Portfolio templates", title: "Atlas",     sub: "Cobalt · cursor index · cream paper",         href: "/template/atlas",                  accent: "#2235FF", mark: "A" },
+  { kind: "template", group: "Portfolio templates", title: "Vault",     sub: "Paper archive · Anton · book layout",         href: "/template/vault",                  accent: "#A8462E", mark: "V" },
+  { kind: "template", group: "Portfolio templates", title: "Minimal",   sub: "Clean white · serif italic · strict grid",    href: "/templates/minimal-bw",            accent: "#111111", mark: "Mn" },
+  /* Templates — links */
+  { kind: "template", group: "Link pages",          title: "Halcyon Links",   sub: "Marquee · italic name · square buttons", href: "/template/halcyon/links",   accent: "#C2410C" },
+  { kind: "template", group: "Link pages",          title: "Brooklyn Links",  sub: "Urban marquee · red CTA",                href: "/template/brooklyn/links",  accent: "#E8382C" },
+  { kind: "template", group: "Link pages",          title: "Monolith Links",  sub: "Numbered cards · lava primary",          href: "/template/monolith/links",  accent: "#FF4015" },
+  { kind: "template", group: "Link pages",          title: "Atlas Links",     sub: "Italic marquee · cobalt accent",          href: "/template/atlas/links",     accent: "#2235FF" },
+  { kind: "template", group: "Link pages",          title: "Vault Links",     sub: "Paper hub · Anton · terracotta",          href: "/template/vault/links",     accent: "#A8462E" },
+  /* Templates — delivery */
+  { kind: "template", group: "Delivery pages",      title: "Halcyon Delivery",   sub: "Curtain reveal · sectioned chapters",  href: "/template/halcyon/delivery",   accent: "#C2410C" },
+  { kind: "template", group: "Delivery pages",      title: "Brooklyn Delivery",  sub: "Dark gallery · red downloads",         href: "/template/brooklyn/delivery",  accent: "#E8382C" },
+  { kind: "template", group: "Delivery pages",      title: "Minimal Delivery",   sub: "White paper · 4-col strict",           href: "/template/minimal/delivery",   accent: "#111111" },
+  { kind: "template", group: "Delivery pages",      title: "Monolith Delivery",  sub: "Two-pane gate · numbered chapters",    href: "/template/monolith/delivery",  accent: "#FF4015" },
+  { kind: "template", group: "Delivery pages",      title: "Atlas Delivery",     sub: "Cobalt curtain · masonry gallery",     href: "/template/atlas/delivery",     accent: "#2235FF" },
+  { kind: "template", group: "Delivery pages",      title: "Vault Delivery",     sub: "Paper archive · sectioned plates",     href: "/template/vault/delivery",     accent: "#A8462E" },
+  /* Dashboard pages */
+  { kind: "page", group: "Workspace", title: "Home",       sub: "Dashboard overview",      href: "/dashboard"            },
+  { kind: "page", group: "Workspace", title: "Gallery",    sub: "All photos & folders",    href: "/dashboard/gallery"    },
+  { kind: "page", group: "Workspace", title: "Portfolio",  sub: "Manage your sites",       href: "/dashboard/portfolio"  },
+  { kind: "page", group: "Workspace", title: "Templates",  sub: "Browse all collections",  href: "/dashboard/templates"  },
+  { kind: "page", group: "Workspace", title: "Links",      sub: "Your links page",         href: "/dashboard/links"      },
+  { kind: "page", group: "Workspace", title: "Delivery",   sub: "Client galleries",        href: "/dashboard/delivery"   },
+  { kind: "page", group: "Workspace", title: "Domain",     sub: "Custom domain & DNS",     href: "/dashboard/domain"     },
+  { kind: "page", group: "Workspace", title: "Profile",    sub: "Your profile page",       href: "/dashboard/profile"    },
+  { kind: "page", group: "Workspace", title: "Settings",   sub: "Account & preferences",   href: "/dashboard/settings"   },
+  /* People (mock) */
+  { kind: "person", group: "People",  title: "Sofia Chen",     sub: "sofia@example.com · Pro",        href: "/dashboard/profile" },
+  { kind: "person", group: "People",  title: "Lior Avni",      sub: "Halcyon · Lisbon",                href: "#"                  },
+  { kind: "person", group: "People",  title: "Yara Sokol",     sub: "Monolith · Berlin",               href: "#"                  },
+  { kind: "person", group: "People",  title: "Felix Marchand", sub: "Atlas Studio · Paris/Lisbon",     href: "#"                  },
+  { kind: "person", group: "People",  title: "Ines Aurelio",   sub: "Vault · Lisbon/Paris",            href: "#"                  },
+  { kind: "person", group: "People",  title: "Margot & Auden", sub: "Recent client · wedding",         href: "#"                  },
+  { kind: "person", group: "People",  title: "Emma K.",        sub: "Recent client · portrait",        href: "#"                  },
+];
+
+function GroupIcon({ kind }: { kind: SearchKind }) {
+  if (kind === "template") return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" />
+      <rect x="14" y="11" width="7" height="9" rx="1" /><rect x="3" y="13" width="7" height="8" rx="1" />
+    </svg>
+  );
+  if (kind === "person") return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" />
+    </svg>
+  );
+}
+
 /* ── Page title map ─────────────────────────────────────── */
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard":           "Home",
@@ -244,11 +309,30 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
   const { items: cartItems, open: cartOpen, setOpen: setCartOpen } = useCart();
 
   const [searchFocused, setSearchFocused] = useState(false);
-  const [notifOpen, setNotifOpen]         = useState(false);
-  const [profileOpen, setProfileOpen]     = useState(false);
+  const [searchQuery,   setSearchQuery]   = useState("");
+  const [searchOpen,    setSearchOpen]    = useState(false);
+  const [notifOpen,     setNotifOpen]     = useState(false);
+  const [profileOpen,   setProfileOpen]   = useState(false);
 
+  const searchRef  = useRef<HTMLDivElement>(null);
   const notifRef   = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  /* Filter the universal index by query — case-insensitive across title/sub/group. */
+  const searchResults = (() => {
+    const q = searchQuery.trim().toLowerCase();
+    const items = q
+      ? SEARCH_INDEX.filter((it) => it.title.toLowerCase().includes(q) || (it.sub ?? "").toLowerCase().includes(q) || it.group.toLowerCase().includes(q))
+      : SEARCH_INDEX.slice(0, 10); // empty state — first 10 popular items
+    /* group preserving SEARCH_INDEX order */
+    const groups: { group: string; items: SearchItem[] }[] = [];
+    items.forEach((it) => {
+      const g = groups.find((x) => x.group === it.group);
+      if (g) g.items.push(it);
+      else groups.push({ group: it.group, items: [it] });
+    });
+    return { groups, total: items.length };
+  })();
 
   const title   = PAGE_TITLES[pathname] ?? "Dashboard";
   const unread  = NOTIFICATIONS.filter((n) => n.unread).length;
@@ -259,10 +343,23 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
     function handler(e: MouseEvent) {
       if (notifRef.current && !notifRef.current.contains(e.target as Node))   setNotifOpen(false);
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
+      if (searchRef.current && !searchRef.current.contains(e.target as Node))  setSearchOpen(false);
     }
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  /* Esc closes the search panel */
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape" && searchOpen) {
+        setSearchOpen(false);
+        setSearchQuery("");
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [searchOpen]);
 
   return (
     <header className="h-14 shrink-0 flex items-center gap-3 px-4 border-b border-[var(--border)] bg-[var(--bg-card)]">
@@ -283,21 +380,109 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
       {/* Page title — desktop */}
       <h1 className="hidden lg:block font-sans font-semibold text-[var(--fg)] text-sm shrink-0">{title}</h1>
 
-      {/* Search */}
-      <div className={`relative flex-1 max-w-xs transition-all duration-200 ${searchFocused ? "max-w-sm" : ""}`}>
+      {/* Universal search */}
+      <div ref={searchRef} className={`relative flex-1 max-w-xs transition-all duration-200 ${searchFocused ? "max-w-sm" : ""}`}>
         <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] pointer-events-none">
           <SearchIcon />
         </span>
         <input
           type="text"
-          placeholder="Search photos, folders…"
-          onFocus={() => setSearchFocused(true)}
+          value={searchQuery}
+          placeholder="Search anything — templates, pages, people…"
+          onFocus={() => { setSearchFocused(true); setSearchOpen(true); }}
           onBlur={() => setSearchFocused(false)}
+          onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
           className="w-full pl-8 pr-3 py-1.5 text-xs font-sans bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg text-[var(--fg)] placeholder:text-[var(--fg-muted)] outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition-all"
         />
         <kbd className="hidden sm:block absolute right-2.5 top-1/2 -translate-y-1/2 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-card)] border border-[var(--border)] px-1 py-0.5 rounded pointer-events-none">
           ⌘K
         </kbd>
+
+        {searchOpen && (
+          <div
+            className="absolute left-0 right-0 top-full mt-2 z-50 rounded-xl border border-[var(--border)] shadow-[var(--shadow-lg)] overflow-hidden"
+            style={{
+              minWidth: 360,
+              background: "color-mix(in srgb, var(--bg-card) 86%, transparent)",
+              backdropFilter: "blur(18px) saturate(160%)",
+              WebkitBackdropFilter: "blur(18px) saturate(160%)",
+            }}
+          >
+            {/* Header strip */}
+            <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--border-subtle)]">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">
+                {searchQuery.trim() ? `${searchResults.total} result${searchResults.total === 1 ? "" : "s"}` : "Suggested"}
+              </span>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
+            {/* Results */}
+            <div className="max-h-[420px] overflow-y-auto">
+              {searchResults.total === 0 ? (
+                <div className="px-4 py-8 text-center font-sans text-xs text-[var(--fg-muted)]">
+                  No matches for &ldquo;<span className="text-[var(--fg)]">{searchQuery}</span>&rdquo;
+                </div>
+              ) : (
+                searchResults.groups.map((g) => (
+                  <div key={g.group} className="py-1.5">
+                    <div className="px-3 pt-2 pb-1 font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">{g.group}</div>
+                    {g.items.map((it) => {
+                      const close = () => { setSearchOpen(false); setSearchQuery(""); };
+                      const inner = (
+                        <>
+                          {/* Mark / icon */}
+                          {it.kind === "template" && it.accent ? (
+                            <span
+                              className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center font-sans text-[11px] font-bold"
+                              style={{ background: it.accent, color: "#fff" }}
+                            >
+                              {it.mark ?? it.title.charAt(0)}
+                            </span>
+                          ) : it.kind === "person" ? (
+                            <span className="shrink-0 w-7 h-7 rounded-full bg-yellow/20 text-yellow flex items-center justify-center font-sans text-[11px] font-bold">
+                              {it.title.split(" ").map((p) => p.charAt(0)).slice(0, 2).join("")}
+                            </span>
+                          ) : (
+                            <span className="shrink-0 w-7 h-7 rounded-md bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] flex items-center justify-center">
+                              <GroupIcon kind={it.kind} />
+                            </span>
+                          )}
+                          <span className="flex-1 min-w-0">
+                            <span className="block font-sans text-xs font-semibold text-[var(--fg)] truncate">{it.title}</span>
+                            {it.sub && <span className="block font-mono text-[10px] text-[var(--fg-muted)] truncate">{it.sub}</span>}
+                          </span>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-[var(--fg-muted)]">
+                            <path d="M9 18l6-6-6-6" />
+                          </svg>
+                        </>
+                      );
+                      const cls = "w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-[var(--bg-subtle)] transition-colors";
+                      const key = `${g.group}-${it.title}`;
+                      return it.href.startsWith("#") ? (
+                        <button key={key} type="button" onClick={close} className={cls}>{inner}</button>
+                      ) : (
+                        <Link key={key} href={it.href} onClick={close} className={cls}>{inner}</Link>
+                      );
+                    })}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Foot */}
+            <div className="flex items-center justify-between px-3 py-2 border-t border-[var(--border-subtle)] font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">
+              <span>↵ open · esc close</span>
+              <span>Universal search</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Spacer */}
