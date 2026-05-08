@@ -107,6 +107,22 @@ const PEOPLE_INDEX: Person[] = [
   { id: "morrison", name: "Morrison Photo", role: "Album cover client",          location: "London",          mutual: 0,  href: "#", tone: "#E8382C" },
 ];
 
+/* Per-action icon — drives the navigate panel so each row reads at a glance. */
+const NAV_ICONS: Record<string, React.ReactNode> = {
+  "qa-home":      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/></svg>,
+  "qa-gallery":   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
+  "qa-portfolio": <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>,
+  "qa-templates": <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="11" width="7" height="9" rx="1"/><rect x="3" y="13" width="7" height="8" rx="1"/></svg>,
+  "qa-delivery":  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>,
+  "qa-links":     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="4" rx="2"/><rect x="3" y="10" width="18" height="4" rx="2"/><rect x="3" y="16" width="18" height="4" rx="2"/></svg>,
+  "qa-domain":    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>,
+  "qa-settings":  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
+  "qa-profile":   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+  "qa-new-del":   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M16 16h6m-3-3v6"/><path d="M21 12V8.4a2 2 0 00-2-2h-4l-2-2H6a2 2 0 00-2 2v10.6a2 2 0 002 2h6"/></svg>,
+  "qa-upload":    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
+  "qa-new-port":  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M16 16h6m-3-3v6"/><circle cx="11" cy="11" r="8"/><line x1="3" y1="11" x2="19" y2="11"/></svg>,
+};
+
 type QuickAction = { id: string; label: string; sub: string; href: string; kbd?: string; group: "Workspace" | "Create" };
 const QUICK_ACTIONS: QuickAction[] = [
   { id: "qa-home",       label: "Home",          sub: "Dashboard overview",      href: "/dashboard",           kbd: "G H", group: "Workspace" },
@@ -320,10 +336,11 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
 
   const [searchTab, setSearchTab] = useState<SearchTab>("templates");
   const [tplFilter, setTplFilter] = useState<TplFilter>("All");
+  const [tplDetail, setTplDetail] = useState<Tpl | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [origin, setOrigin] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
 
-  const closeAll = () => { setSearchOpen(false); setSearchQuery(""); };
+  const closeAll = () => { setSearchOpen(false); setSearchQuery(""); setTplDetail(null); };
 
   function openSearch() {
     if (inputRef.current) {
@@ -405,7 +422,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
           ref={inputRef}
           type="text"
           value={searchQuery}
-          placeholder="Search anything — templates, pages, people…"
+          placeholder="Search anything"
           onFocus={() => { setSearchFocused(true); openSearch(); }}
           onBlur={() => setSearchFocused(false)}
           onChange={(e) => { setSearchQuery(e.target.value); if (!searchOpen) openSearch(); }}
@@ -457,7 +474,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                 autoFocus
                 type="text"
                 value={searchQuery}
-                placeholder={searchTab === "templates" ? "Search templates, palettes, fonts…" : searchTab === "social" ? "Search people, studios, clients…" : "Jump to a page or run an action…"}
+                placeholder="Search anything"
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 bg-transparent text-sm font-sans text-[var(--fg)] placeholder:text-[var(--fg-muted)] outline-none"
               />
@@ -506,59 +523,157 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
                 {/* ── Templates panel ───────────────────────────── */}
-                <div className="w-1/3 h-full overflow-y-auto p-4">
-                  <div className="flex flex-wrap items-center gap-1 mb-3">
-                    {TEMPLATE_TYPES.map((f) => (
-                      <button
-                        key={f}
-                        onClick={() => setTplFilter(f)}
-                        className={`font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md transition-colors ${tplFilter === f ? "bg-[var(--fg)] text-[var(--bg)]" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}
-                      >
-                        {f}
-                      </button>
-                    ))}
-                  </div>
-                  {tplMatches.length === 0 ? (
-                    <div className="px-2 py-12 text-center font-sans text-xs text-[var(--fg-muted)]">No templates match &ldquo;{searchQuery}&rdquo;</div>
-                  ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {tplMatches.map((t) => (
-                        <Link
-                          key={t.id}
-                          href={t.href}
-                          onClick={closeAll}
-                          className="group block rounded-lg overflow-hidden border border-[var(--border)] hover:border-[var(--fg-muted)] transition-all"
+                <div className="w-1/3 h-full overflow-y-auto">
+                  {tplDetail ? (
+                    /* Detail view — shown when a template card is selected */
+                    <div className="flex flex-col h-full">
+                      <div className="flex items-center gap-2 px-4 py-2 border-b border-[var(--border-subtle)]">
+                        <button
+                          onClick={() => setTplDetail(null)}
+                          className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
                         >
-                          <div
-                            className="relative h-32 flex items-center justify-center px-3"
-                            style={{ background: t.bg, color: t.fg }}
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+                          Back to templates
+                        </button>
+                      </div>
+                      {/* Big brand specimen */}
+                      <div
+                        className="relative flex flex-col items-center justify-center px-6 py-10 border-b border-[var(--border-subtle)]"
+                        style={{ background: tplDetail.bg, color: tplDetail.fg }}
+                      >
+                        <span
+                          className="absolute top-3 left-3 px-1.5 py-0.5 rounded font-mono text-[9px] uppercase tracking-widest"
+                          style={{ background: tplDetail.accent, color: "#fff" }}
+                        >
+                          {tplDetail.type}
+                        </span>
+                        <span
+                          style={{
+                            fontFamily: tplDetail.display,
+                            fontStyle: tplDetail.displayItalic ? "italic" : "normal",
+                            fontWeight: tplDetail.displayWeight ?? 500,
+                            fontSize: 64,
+                            letterSpacing: (tplDetail.displayWeight ?? 500) >= 700 ? "-0.04em" : "-0.02em",
+                            lineHeight: 1,
+                            textTransform: tplDetail.display.includes("Anton") ? "uppercase" : "none",
+                          }}
+                        >
+                          {tplDetail.name}<span style={{ color: tplDetail.accent }}>.</span>
+                        </span>
+                        <span
+                          className="mt-3 font-mono text-[10px] uppercase tracking-widest"
+                          style={{ color: tplDetail.fg, opacity: 0.6 }}
+                        >
+                          {tplDetail.subtitle}
+                        </span>
+                      </div>
+                      {/* Meta + actions */}
+                      <div className="px-4 py-4 space-y-4">
+                        <div>
+                          <div className="font-sans text-base font-bold text-[var(--fg)]">{tplDetail.name} {tplDetail.type}</div>
+                          <p className="font-sans text-xs text-[var(--fg-muted)] leading-relaxed mt-1">
+                            {tplDetail.subtitle}. A coherent {tplDetail.type.toLowerCase()} interface drawn from the {tplDetail.name} collection — share a single visual identity across your portfolio, links page and delivery galleries.
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {tplDetail.tags.map((tag) => (
+                            <span key={tag} className="font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--fg-muted)]">{tag}</span>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-3 gap-0 border border-[var(--border)] rounded-md overflow-hidden">
+                          <div className="px-3 py-2 border-r border-[var(--border)]">
+                            <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">Display</div>
+                            <div className="font-sans text-xs text-[var(--fg)] truncate" style={{ fontFamily: tplDetail.display }}>{tplDetail.display.replace(/['"]/g, "").split(",")[0]}</div>
+                          </div>
+                          <div className="px-3 py-2 border-r border-[var(--border)]">
+                            <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">Mono</div>
+                            <div className="font-sans text-xs text-[var(--fg)] truncate" style={{ fontFamily: tplDetail.mono }}>{tplDetail.mono.replace(/['"]/g, "").split(",")[0]}</div>
+                          </div>
+                          <div className="px-3 py-2 flex items-center gap-1.5">
+                            <span className="w-3 h-3 rounded-sm" style={{ background: tplDetail.accent }} />
+                            <span className="font-mono text-[10px] text-[var(--fg-muted)]">{tplDetail.accent}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 pt-1">
+                          <Link
+                            href={tplDetail.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={closeAll}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-[var(--border)] bg-[var(--bg-card)] hover:border-[var(--fg-muted)] font-sans text-xs font-medium text-[var(--fg)] transition-colors"
                           >
-                            <span
-                              style={{
-                                fontFamily: t.display,
-                                fontStyle: t.displayItalic ? "italic" : "normal",
-                                fontWeight: t.displayWeight ?? 500,
-                                fontSize: 36,
-                                letterSpacing: (t.displayWeight ?? 500) >= 700 ? "-0.04em" : "-0.02em",
-                                lineHeight: 1,
-                                textTransform: t.display.includes("Anton") ? "uppercase" : "none",
-                              }}
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview
+                          </Link>
+                          <Link
+                            href={tplDetail.href}
+                            onClick={closeAll}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md font-sans text-xs font-bold transition-colors"
+                            style={{ background: tplDetail.accent, color: "#fff" }}
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Use template
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Grid view */
+                    <div className="p-4">
+                      <div className="flex flex-wrap items-center gap-1 mb-3">
+                        {TEMPLATE_TYPES.map((f) => (
+                          <button
+                            key={f}
+                            onClick={() => setTplFilter(f)}
+                            className={`font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md transition-colors ${tplFilter === f ? "bg-[var(--fg)] text-[var(--bg)]" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}
+                          >
+                            {f}
+                          </button>
+                        ))}
+                      </div>
+                      {tplMatches.length === 0 ? (
+                        <div className="px-2 py-12 text-center font-sans text-xs text-[var(--fg-muted)]">No templates match &ldquo;{searchQuery}&rdquo;</div>
+                      ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {tplMatches.map((t) => (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => setTplDetail(t)}
+                              className="group block rounded-lg overflow-hidden border border-[var(--border)] hover:border-[var(--fg-muted)] transition-all text-left"
                             >
-                              {t.name}<span style={{ color: t.accent }}>.</span>
-                            </span>
-                            <span
-                              className="absolute top-2 left-2 px-1.5 py-0.5 rounded font-mono text-[9px] uppercase tracking-widest"
-                              style={{ background: t.accent, color: "#fff" }}
-                            >
-                              {t.type}
-                            </span>
-                          </div>
-                          <div className="px-3 py-2.5 bg-[var(--bg-card)]">
-                            <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{t.name} {t.type}</div>
-                            <div className="font-mono text-[10px] text-[var(--fg-muted)] truncate mt-0.5">{t.subtitle}</div>
-                          </div>
-                        </Link>
-                      ))}
+                              <div
+                                className="relative h-32 flex items-center justify-center px-3"
+                                style={{ background: t.bg, color: t.fg }}
+                              >
+                                <span
+                                  style={{
+                                    fontFamily: t.display,
+                                    fontStyle: t.displayItalic ? "italic" : "normal",
+                                    fontWeight: t.displayWeight ?? 500,
+                                    fontSize: 36,
+                                    letterSpacing: (t.displayWeight ?? 500) >= 700 ? "-0.04em" : "-0.02em",
+                                    lineHeight: 1,
+                                    textTransform: t.display.includes("Anton") ? "uppercase" : "none",
+                                  }}
+                                >
+                                  {t.name}<span style={{ color: t.accent }}>.</span>
+                                </span>
+                                <span
+                                  className="absolute top-2 left-2 px-1.5 py-0.5 rounded font-mono text-[9px] uppercase tracking-widest"
+                                  style={{ background: t.accent, color: "#fff" }}
+                                >
+                                  {t.type}
+                                </span>
+                              </div>
+                              <div className="px-3 py-2.5 bg-[var(--bg-card)]">
+                                <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{t.name} {t.type}</div>
+                                <div className="font-mono text-[10px] text-[var(--fg-muted)] truncate mt-0.5">{t.subtitle}</div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -591,8 +706,14 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                             </div>
                           </div>
                           <span className="flex flex-col gap-1.5 shrink-0">
-                            <span className="font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md bg-[var(--fg)] text-[var(--bg)]">Follow</span>
-                            <span className="font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md border border-[var(--border)] text-[var(--fg-muted)]">Message</span>
+                            <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md bg-[var(--fg)] text-[var(--bg)]">
+                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                              Connect
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md border border-[var(--border)] text-[var(--fg-muted)]">
+                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                              Message
+                            </span>
                           </span>
                         </button>
                       ))}
@@ -619,9 +740,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                               className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[var(--bg-subtle)] transition-colors"
                             >
                               <span className="shrink-0 w-8 h-8 rounded-md bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] flex items-center justify-center">
-                                {g === "Create" ? (
-                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                ) : (
+                                {NAV_ICONS[a.id] ?? (
                                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><polyline points="3 12 9 12 11 9 13 15 15 12 21 12"/></svg>
                                 )}
                               </span>
