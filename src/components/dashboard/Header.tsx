@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "~/components/providers/ThemeProvider";
@@ -402,17 +403,29 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
       </div>
 
       {/* Universal search overlay — full-page backdrop blur, three interfaces */}
-      {searchOpen && (
-        <div
+      <AnimatePresence>
+        {searchOpen && (() => {
+          const closeAll = () => { setSearchOpen(false); setSearchQuery(""); };
+          return (
+        <motion.div
+          key="search-overlay"
+          initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+          animate={{ opacity: 1, backdropFilter: "blur(20px) saturate(140%)" }}
+          exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-0 z-50 flex flex-col items-center pt-16 sm:pt-24 px-4"
           style={{
             background: "color-mix(in srgb, var(--bg) 55%, transparent)",
             backdropFilter: "blur(20px) saturate(140%)",
             WebkitBackdropFilter: "blur(20px) saturate(140%)",
           }}
-          onClick={(e) => { if (e.target === e.currentTarget) { setSearchOpen(false); setSearchQuery(""); } }}
+          onClick={(e) => { if (e.target === e.currentTarget) closeAll(); }}
         >
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: -16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.97 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
             className="relative w-full max-w-3xl rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden flex flex-col"
             style={{
               background: "color-mix(in srgb, var(--bg-card) 92%, transparent)",
@@ -435,7 +448,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
               )}
               <kbd className="font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded">esc</kbd>
               <button
-                onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                onClick={closeAll}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors"
                 aria-label="Close"
               >
@@ -489,7 +502,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                         <Link
                           key={t.id}
                           href={t.href}
-                          onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                          onClick={closeAll}
                           className="group block rounded-lg overflow-hidden border border-[var(--border)] hover:border-[var(--fg-muted)] transition-all"
                         >
                           <div
@@ -535,7 +548,12 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {peopleMatches.map((p) => (
-                        <div key={p.id} className="flex items-center gap-3 p-3 rounded-lg border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors">
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={closeAll}
+                          className="flex items-center gap-3 p-3 rounded-lg border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors text-left"
+                        >
                           <span
                             className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-sans text-xs font-bold"
                             style={{ background: p.tone + "22", color: p.tone, border: `1px solid ${p.tone}40` }}
@@ -550,11 +568,11 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                               {p.mutual && p.mutual > 0 ? <><span>·</span><span>{p.mutual} mutual</span></> : null}
                             </div>
                           </div>
-                          <div className="flex flex-col gap-1.5 shrink-0">
-                            <button className="font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md bg-[var(--fg)] text-[var(--bg)] hover:opacity-90 transition-opacity">Follow</button>
-                            <button className="font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">Message</button>
-                          </div>
-                        </div>
+                          <span className="flex flex-col gap-1.5 shrink-0">
+                            <span className="font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md bg-[var(--fg)] text-[var(--bg)]">Follow</span>
+                            <span className="font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md border border-[var(--border)] text-[var(--fg-muted)]">Message</span>
+                          </span>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -577,7 +595,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                             <Link
                               key={a.id}
                               href={a.href}
-                              onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                              onClick={closeAll}
                               className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[var(--bg-subtle)] transition-colors"
                             >
                               <span className="shrink-0 w-8 h-8 rounded-md bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] flex items-center justify-center">
@@ -618,9 +636,11 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
               </span>
               <span>Universal search</span>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        </motion.div>
+          );
+        })()}
+      </AnimatePresence>
 
       {/* Spacer */}
       <div className="flex-1" />
