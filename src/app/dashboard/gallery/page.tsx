@@ -219,19 +219,38 @@ function DragOverlay({
 }
 
 /* ── Full-screen lightbox ── */
-function ImageModal({ file, onClose }: { file: GFile; onClose: () => void }) {
+function ImageModal({ files, index, onIndex, onClose }: { files: GFile[]; index: number; onIndex: (i: number) => void; onClose: () => void }) {
+  const file = files[index]!;
   const [zoom, setZoom]       = useState(1);
   const [offset, setOffset]   = useState({ x: 0, y: 0 });
   const [isDragging, setDrag] = useState(false);
   const dragRef               = useRef({ sx: 0, sy: 0, ox: 0, oy: 0 });
   const containerRef          = useRef<HTMLDivElement>(null);
+  const touchStartX           = useRef(0);
+
+  const resetView = useCallback(() => { setZoom(1); setOffset({ x: 0, y: 0 }); }, []);
+  const prev = useCallback(() => { if (index > 0)              { onIndex(index - 1); resetView(); } }, [index, onIndex, resetView]);
+  const next = useCallback(() => { if (index < files.length-1) { onIndex(index + 1); resetView(); } }, [index, files.length, onIndex, resetView]);
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape")     onClose();
+      if (e.key === "ArrowRight") next();
+      if (e.key === "ArrowLeft")  prev();
+    };
     window.addEventListener("keydown", handler);
     document.body.style.overflow = "hidden";
     return () => { window.removeEventListener("keydown", handler); document.body.style.overflow = ""; };
-  }, [onClose]);
+  }, [onClose, prev, next]);
+
+  // Touch swipe — only when not zoomed
+  const onTouchStart = (e: React.TouchEvent) => { if (zoom <= 1 && e.touches[0]) touchStartX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (zoom > 1) return;
+    const t = e.changedTouches[0]; if (!t) return;
+    const dx = touchStartX.current - t.clientX;
+    if (Math.abs(dx) > 40) { if (dx > 0) next(); else prev(); }
+  };
 
   useEffect(() => {
     const el = containerRef.current;
@@ -255,11 +274,12 @@ function ImageModal({ file, onClose }: { file: GFile; onClose: () => void }) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
       className="fixed inset-0 z-50 flex flex-col bg-black select-none">
       {/* Top bar */}
       <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
         <button className="pointer-events-auto text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10" onClick={onClose}><I.Back /></button>
-        <span className="font-mono text-[11px] text-white/40 truncate max-w-xs">{file.name}</span>
+        <span className="font-mono text-[11px] text-white/40 truncate max-w-xs">{file.name} · {index + 1} / {files.length}</span>
         <div className="flex items-center gap-1 pointer-events-auto">
           <button className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"><I.Share /></button>
           <button className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-red-400 hover:bg-white/10 transition-colors"><I.Trash /></button>
@@ -286,6 +306,24 @@ function ImageModal({ file, onClose }: { file: GFile; onClose: () => void }) {
         )}
       </div>
 
+      {/* Prev / Next arrows */}
+      {index > 0 && (
+        <button onClick={prev}
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 transition-colors"
+          aria-label="Previous"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+      )}
+      {index < files.length - 1 && (
+        <button onClick={next}
+          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 transition-colors"
+          aria-label="Next"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      )}
+
       {/* Bottom bar */}
       <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-5 py-3 bg-gradient-to-t from-black/80 to-transparent pointer-events-none">
         <span className="font-mono text-[10px] text-white/35">{file.size} · {file.w}×{file.h}px · {file.date}</span>
@@ -308,7 +346,7 @@ export default function GalleryPage() {
   const [selected, setSelected]         = useState<Set<string>>(new Set());
   const [search, setSearch]             = useState("");
   const [extDragCount, setExtDragCount] = useState(0);
-  const [previewFile, setPreviewFile]   = useState<GFile | null>(null);
+  const [previewIdx, setPreviewIdx]     = useState<number | null>(null);
 
   /* Folder rename state */
   const [editFolderId, setEditFolderId]         = useState<string | null>(null);
@@ -611,7 +649,7 @@ export default function GalleryPage() {
               onDragEnd={onFileDragEnd}
               className="relative aspect-square overflow-hidden cursor-pointer group bg-[var(--bg-subtle)]"
               style={{ boxShadow: selected.has(file.id) ? "inset 0 0 0 2px #fad502" : "none" }}
-              onClick={() => { if (selected.size > 0) toggleSel(file.id); else setPreviewFile(file); }}
+              onClick={() => { if (selected.size > 0) toggleSel(file.id); else setPreviewIdx(filtered.indexOf(file)); }}
             >
               {file.type !== "raw" && file.type !== "tiff" ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -714,7 +752,7 @@ export default function GalleryPage() {
                 onDragStart={(e) => onFileDragStart(e, file)}
                 onDragEnd={onFileDragEnd}
                 className={`grid grid-cols-[auto_auto_1fr_auto_auto_auto] items-center gap-3 px-3 py-2 border-b border-[var(--border)] last:border-0 hover:bg-[var(--bg-subtle)] cursor-pointer transition-colors group ${selected.has(file.id) ? "bg-yellow/5" : ""}`}
-                onClick={() => setPreviewFile(file)}
+                onClick={() => setPreviewIdx(filtered.indexOf(file))}
               >
                 <div onClick={(e) => e.stopPropagation()}><Checkbox id={file.id} /></div>
                 {file.type !== "raw" && file.type !== "tiff" ? (
@@ -786,7 +824,9 @@ export default function GalleryPage() {
 
       {/* Lightbox */}
       <AnimatePresence>
-        {previewFile && <ImageModal file={previewFile} onClose={() => setPreviewFile(null)} />}
+        {previewIdx !== null && previewIdx >= 0 && previewIdx < filtered.length && (
+          <ImageModal files={filtered} index={previewIdx} onIndex={setPreviewIdx} onClose={() => setPreviewIdx(null)} />
+        )}
       </AnimatePresence>
     </div>
   );
