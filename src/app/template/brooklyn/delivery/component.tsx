@@ -579,7 +579,7 @@ function Gallery({
         transition: "box-shadow 0.2s",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px clamp(12px, 4vw, 48px)", flexWrap: "wrap" }}>
-          <div style={{ display: "flex", border: `1px solid ${t.line}` }}>
+          <div style={{ display: "flex", border: `1px solid ${t.btnBg}` }}>
             <FilterPill active={filter === "all"} onClick={() => setFilter("all")} accent={t.accent} muted={t.muted} fg={t.fg} mono={fMono}>
               <EditableText fieldPath="labels.filterAll" value={lbl(page, "filterAll", "All")}
                 onChange={setLbl(set, page, "filterAll")} as="span" fontSlot={3}
@@ -608,7 +608,7 @@ function Gallery({
             <button
               onClick={() => selectAllVisible(visibleIndices)}
               style={{
-                background: "none", border: `1px solid ${t.line}`, color: t.muted,
+                background: "none", border: `1px solid ${t.btnBg}`, color: t.fg,
                 fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
                 padding: "6px 12px", cursor: isEditor ? "default" : "pointer",
               }}
@@ -675,7 +675,7 @@ function Gallery({
                     margin: 0,
                   }}
                 />
-                <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", color: t.muted, textTransform: "uppercase" }} data-font-slot={3}>
+                <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", color: t.accent, textTransform: "uppercase" }} data-font-slot={3}>
                   {indices.length} photos
                 </span>
                 <EditableText
@@ -685,7 +685,8 @@ function Gallery({
                   as="p" multiline fontSlot={2} hideIfEmpty
                   style={{
                     flexBasis: "100%", fontFamily: fSans, fontSize: 12,
-                    fontWeight: 300, color: t.muted, margin: "4px 0 0", lineHeight: 1.6,
+                    fontWeight: 400, color: t.fg,
+                    margin: "4px 0 0", lineHeight: 1.6,
                   }}
                 />
 
@@ -779,9 +780,8 @@ function Gallery({
           </div>
           <nav style={{ display: "flex", gap: 20, fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase" }}>
             {[
-              { key: "footerLink1", fallback: "Print shop" },
-              { key: "footerLink2", fallback: "Contact" },
-              { key: "footerLink3", fallback: "Instagram" },
+              { key: "footerLink1", fallback: "Contact" },
+              { key: "footerLink2", fallback: "Instagram" },
             ].map(({ key, fallback }) => (
               <EditableText
                 key={key}
@@ -824,7 +824,7 @@ function Gallery({
               <button
                 onClick={() => setSelected(new Set())}
                 style={{
-                  background: "none", border: `1px solid ${t.line}`, color: t.muted,
+                  background: "none", border: `1px solid ${t.btnBg}`, color: t.fg,
                   fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
                   padding: "8px 12px", cursor: "pointer",
                 }}
@@ -876,7 +876,7 @@ function EmptyFavorites({ onClear, fSerif, fSans, fMono, t }: { onClear: () => v
         Tap the heart on any photo to mark it as a favorite.
       </p>
       <button onClick={onClear} style={{
-        background: "none", border: `1px solid ${t.line}`, color: t.fg,
+        background: "none", border: `1px solid ${t.btnBg}`, color: t.fg,
         fontFamily: fMono, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase",
         padding: "10px 18px", cursor: "pointer", marginTop: 8,
       }}>Browse all photos →</button>
@@ -1115,7 +1115,7 @@ function BrooklynLightbox({
         padding: "12px 16px", borderBottom: `1px solid ${theme.line}`, flexShrink: 0, gap: 8,
       }}>
         <button onClick={onClose} style={{
-          background: "none", border: `1px solid ${theme.line}`, cursor: "pointer", color: theme.muted,
+          background: "none", border: `1px solid ${theme.btnBg}`, cursor: "pointer", color: theme.fg,
           fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase",
           padding: "7px 12px", display: "inline-flex", alignItems: "center", gap: 6,
         }}>
@@ -1137,8 +1137,8 @@ function BrooklynLightbox({
             aria-label={isFav ? "Remove favorite" : "Mark favorite"}
             style={{
               background: isFav ? theme.accent : "none",
-              border: `1px solid ${isFav ? theme.accent : theme.line}`,
-              color: isFav ? theme.btnFg : theme.muted,
+              border: `1px solid ${theme.btnBg}`,
+              color: isFav ? theme.btnFg : theme.fg,
               cursor: "pointer", padding: "7px 10px",
               display: "inline-flex", alignItems: "center", gap: 6,
             }}
