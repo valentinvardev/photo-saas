@@ -9,6 +9,7 @@ import {
 } from "~/lib/delivery/data";
 import { useDeliveryStore } from "~/lib/delivery/store";
 import { PreviewFrame } from "./GalleryView";
+import { EditModeProvider } from "./editable";
 
 /* ══════════════════════════════════════════════════════════════════════════
    SHARED HELPERS
@@ -39,15 +40,6 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
   return <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)] mb-2">{children}</p>;
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-3">
-      <h3 className="font-sans font-bold text-[var(--fg)] text-xs uppercase tracking-wider">{title}</h3>
-      {children}
-    </div>
-  );
-}
-
 function ColorRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   return (
@@ -70,8 +62,55 @@ function ColorRow({ label, value, onChange }: { label: string; value: string; on
   );
 }
 
+/* Accordion section — collapsible, with field highlighting */
+function Accordion({
+  id, title, count, isOpen, onToggle, isActive, children,
+}: {
+  id: string; title: string; count?: string; isOpen: boolean; onToggle: () => void; isActive?: boolean; children: React.ReactNode;
+}) {
+  return (
+    <div data-section={id}
+      className={`border-b border-[var(--border)] transition-colors ${isActive ? "bg-yellow/5" : ""}`}
+    >
+      <button onClick={onToggle}
+        className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${isActive ? "text-[var(--fg)]" : "hover:bg-[var(--bg-subtle)]"}`}
+      >
+        <div className="flex items-center gap-2">
+          <span className={`font-sans font-bold text-xs uppercase tracking-wider ${isActive ? "text-[var(--fg)]" : "text-[var(--fg)]"}`}>{title}</span>
+          {count && <span className="font-mono text-[10px] text-[var(--fg-muted)]">{count}</span>}
+        </div>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+          className={`text-[var(--fg-muted)] transition-transform ${isOpen ? "rotate-90" : ""}`}>
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            style={{ overflow: "hidden" }}
+          >
+            <div className="px-4 pb-4 pt-1 space-y-4">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* Map editable fields → which accordion section they live in */
+const FIELD_TO_SECTION: Record<string, string> = {
+  title:          "content",
+  client:         "content",
+  welcomeMessage: "content",
+  logoText:       "branding",
+  logoUrl:        "branding",
+  coverUrl:       "branding",
+};
+
 /* ══════════════════════════════════════════════════════════════════════════
-   IMAGE PICKERS
+   IMAGE PICKERS — kept as-is
 ══════════════════════════════════════════════════════════════════════════ */
 
 function SinglePhotoPicker({ value, onSelect, onClose }: { value: string; onSelect: (url: string) => void; onClose: () => void }) {
@@ -223,7 +262,6 @@ function ImageButton({ value, onChange, placeholder = "Select from gallery" }: {
   );
 }
 
-/* Multi-photo gallery picker for the Deliverable Gallery */
 function GalleryModal({ page, onSave, onClose }: { page: DeliveryPage; onSave: (seeds: number[]) => void; onClose: () => void }) {
   const [selected, setSelected] = useState<Set<number>>(new Set(page.photoSeeds));
 
@@ -424,17 +462,108 @@ function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; 
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   TAB CONTENT
+   SECTION PANELS
 ══════════════════════════════════════════════════════════════════════════ */
-
-type TabId = "page" | "access" | "monetize";
 
 type Setter = <K extends keyof DeliveryPage>(k: K, v: DeliveryPage[K]) => void;
 
-function PageTab({ page, set, onOpenGallery }: { page: DeliveryPage; set: Setter; onOpenGallery: () => void }) {
+function TemplatePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
   const [showTemplates, setShowTemplates] = useState(false);
   const current = TEMPLATES.find((t) => t.id === page.template)!;
+  return (
+    <>
+      <button onClick={() => setShowTemplates(true)}
+        className="w-full flex items-center gap-3 px-3 py-2.5 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors rounded-lg"
+      >
+        <div className="w-8 h-8 rounded-lg shrink-0 border border-[var(--border)]" style={{ background: current.accent }} />
+        <div className="flex-1 text-left min-w-0">
+          <div className="font-sans text-sm font-semibold text-[var(--fg)]">{current.label}</div>
+          <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{current.desc}</div>
+        </div>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <AnimatePresence>
+        {showTemplates && (
+          <TemplateModal current={page.template} onSelect={(t) => set("template", t)} onClose={() => setShowTemplates(false)} />
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
 
+function ContentPanel({ page, set, focusedField, fieldRefs }: {
+  page: DeliveryPage; set: Setter; focusedField: string | null;
+  fieldRefs: React.MutableRefObject<Record<string, HTMLElement | null>>;
+}) {
+  return (
+    <>
+      <div ref={(el) => { fieldRefs.current.title = el; }}>
+        <FieldLabel>Title</FieldLabel>
+        <input value={page.title} onChange={(e) => set("title", e.target.value)}
+          className={`w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border rounded-lg px-3 py-2 outline-none transition-colors ${focusedField === "title" ? "border-yellow" : "border-[var(--border)] focus:border-yellow"}`} />
+      </div>
+      <div ref={(el) => { fieldRefs.current.client = el; }}>
+        <FieldLabel>Client</FieldLabel>
+        <input value={page.client} onChange={(e) => set("client", e.target.value)}
+          className={`w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border rounded-lg px-3 py-2 outline-none transition-colors ${focusedField === "client" ? "border-yellow" : "border-[var(--border)] focus:border-yellow"}`} />
+      </div>
+      <div ref={(el) => { fieldRefs.current.welcomeMessage = el; }}>
+        <FieldLabel>Welcome message</FieldLabel>
+        <textarea value={page.welcomeMessage} onChange={(e) => set("welcomeMessage", e.target.value)} rows={3}
+          className={`w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border rounded-lg px-3 py-2.5 outline-none transition-colors resize-none ${focusedField === "welcomeMessage" ? "border-yellow" : "border-[var(--border)] focus:border-yellow"}`}
+          placeholder="Write a personal message to your client…"
+        />
+        <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1">Shown on the cover</p>
+      </div>
+    </>
+  );
+}
+
+function BrandingPanel({ page, set, focusedField, fieldRefs }: {
+  page: DeliveryPage; set: Setter; focusedField: string | null;
+  fieldRefs: React.MutableRefObject<Record<string, HTMLElement | null>>;
+}) {
+  return (
+    <>
+      <div ref={(el) => { fieldRefs.current.logoText = el; }}>
+        <FieldLabel>Logo mode</FieldLabel>
+        <div className="flex gap-1 mb-2">
+          {([
+            { id: "none", label: "None" },
+            { id: "text", label: "Text" },
+            { id: "image", label: "Image" },
+            { id: "image+text", label: "Both" },
+          ] as { id: LogoMode; label: string }[]).map((opt) => (
+            <button key={opt.id} onClick={() => set("logoMode", opt.id)}
+              className={`flex-1 py-1.5 rounded-lg font-sans text-[11px] transition-colors border ${
+                page.logoMode === opt.id
+                  ? "border-yellow bg-yellow/10 text-[var(--fg)]"
+                  : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-col gap-2">
+          {(page.logoMode === "text" || page.logoMode === "image+text") && (
+            <input value={page.logoText} onChange={(e) => set("logoText", e.target.value)} placeholder="STUDIO"
+              className={`w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border rounded-lg px-3 py-2 outline-none transition-colors ${focusedField === "logoText" ? "border-yellow" : "border-[var(--border)] focus:border-yellow"}`} />
+          )}
+          {(page.logoMode === "image" || page.logoMode === "image+text") && (
+            <ImageButton value={page.logoUrl} onChange={(u) => set("logoUrl", u)} placeholder="Upload logo" />
+          )}
+        </div>
+      </div>
+      <div ref={(el) => { fieldRefs.current.coverUrl = el; }}>
+        <FieldLabel>Cover image</FieldLabel>
+        <ImageButton value={page.coverUrl} onChange={(u) => set("coverUrl", u)} placeholder="Use template default" />
+      </div>
+    </>
+  );
+}
+
+function ColorsPanel({ page, set }: { page: DeliveryPage; set: Setter }) {
   function toggleCustomColors() {
     if (!page.customColors) {
       const ts = TEMPLATE_STYLES[page.template];
@@ -446,214 +575,130 @@ function PageTab({ page, set, onOpenGallery }: { page: DeliveryPage; set: Setter
     }
     set("customColors", !page.customColors);
   }
-
   return (
-    <div className="space-y-6">
-      <Section title="Page info">
+    <>
+      <div className="flex items-center justify-between">
         <div>
-          <FieldLabel>Title</FieldLabel>
-          <input value={page.title} onChange={(e) => set("title", e.target.value)}
-            className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors" />
+          <span className="font-sans text-sm font-medium text-[var(--fg)]">Custom colors</span>
+          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Override the template defaults</p>
         </div>
-        <div>
-          <FieldLabel>Client</FieldLabel>
-          <input value={page.client} onChange={(e) => set("client", e.target.value)}
-            className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors" />
+        <Toggle checked={page.customColors} onChange={toggleCustomColors} />
+      </div>
+      {page.customColors && (
+        <div className="flex flex-col gap-2 p-3 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
+          <ColorRow label="Background"  value={page.colorBg}     onChange={(v) => set("colorBg", v)} />
+          <ColorRow label="Text"        value={page.colorFg}     onChange={(v) => set("colorFg", v)} />
+          <ColorRow label="Accent"      value={page.colorAccent} onChange={(v) => set("colorAccent", v)} />
+          <ColorRow label="Button bg"   value={page.colorBtnBg}  onChange={(v) => set("colorBtnBg", v)} />
+          <ColorRow label="Button text" value={page.colorBtnFg}  onChange={(v) => set("colorBtnFg", v)} />
         </div>
-        <div>
-          <FieldLabel>Deliverable gallery</FieldLabel>
-          <button onClick={onOpenGallery}
-            className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors rounded-lg"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-            </svg>
-            <span className="font-sans text-sm text-[var(--fg)] flex-1 text-left">
-              {page.photoSeeds.length > 0 ? `${page.photoSeeds.length} photos selected` : "Select photos"}
-            </span>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
-      </Section>
+      )}
+    </>
+  );
+}
 
-      <Section title="Design">
-        <div>
-          <FieldLabel>Template</FieldLabel>
-          <button onClick={() => setShowTemplates(true)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors rounded-lg"
-          >
-            <div className="w-8 h-8 rounded-lg shrink-0 border border-[var(--border)]" style={{ background: current.accent }} />
-            <div className="flex-1 text-left min-w-0">
-              <div className="font-sans text-sm font-semibold text-[var(--fg)]">{current.label}</div>
-              <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{current.desc}</div>
-            </div>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-          <AnimatePresence>
-            {showTemplates && (
-              <TemplateModal current={page.template} onSelect={(t) => set("template", t)} onClose={() => setShowTemplates(false)} />
-            )}
-          </AnimatePresence>
-
-          {/* Edit website — opens the visual builder for the delivery page */}
-          <a
-            href={`/editor/delivery/${page.id}`}
-            className="mt-2 group w-full flex items-center gap-3 px-3 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border)] hover:border-yellow hover:bg-yellow/5 transition-colors rounded-lg"
-          >
-            <div className="w-8 h-8 rounded-lg shrink-0 bg-[var(--bg-card)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)] group-hover:text-yellow transition-colors">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-            </div>
-            <div className="flex-1 text-left min-w-0">
-              <div className="font-sans text-sm font-semibold text-[var(--fg)]">Edit website</div>
-              <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">Open in the visual builder for full control</div>
-            </div>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] group-hover:text-yellow shrink-0">
-              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
-          </a>
-        </div>
-        <div>
-          <FieldLabel>Cover image</FieldLabel>
-          <ImageButton value={page.coverUrl} onChange={(u) => set("coverUrl", u)} placeholder="Use template default" />
-        </div>
-        <div>
-          <FieldLabel>Logo</FieldLabel>
-          <div className="flex gap-1 mb-2">
-            {([
-              { id: "none", label: "None" },
-              { id: "text", label: "Text" },
-              { id: "image", label: "Image" },
-              { id: "image+text", label: "Both" },
-            ] as { id: LogoMode; label: string }[]).map((opt) => (
-              <button key={opt.id} onClick={() => set("logoMode", opt.id)}
-                className={`flex-1 py-1.5 rounded-lg font-sans text-[11px] transition-colors border ${
-                  page.logoMode === opt.id
-                    ? "border-yellow bg-yellow/10 text-[var(--fg)]"
-                    : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-          <div className="flex flex-col gap-2">
-            {(page.logoMode === "text" || page.logoMode === "image+text") && (
-              <input value={page.logoText} onChange={(e) => set("logoText", e.target.value)} placeholder="STUDIO"
-                className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors" />
-            )}
-            {(page.logoMode === "image" || page.logoMode === "image+text") && (
-              <ImageButton value={page.logoUrl} onChange={(u) => set("logoUrl", u)} placeholder="Upload logo" />
-            )}
-          </div>
-        </div>
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <FieldLabel>Custom colors</FieldLabel>
-            <Toggle checked={page.customColors} onChange={toggleCustomColors} />
-          </div>
-          {page.customColors && (
-            <div className="flex flex-col gap-2 p-3 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
-              <ColorRow label="Background"  value={page.colorBg}     onChange={(v) => set("colorBg", v)} />
-              <ColorRow label="Text"        value={page.colorFg}     onChange={(v) => set("colorFg", v)} />
-              <ColorRow label="Accent"      value={page.colorAccent} onChange={(v) => set("colorAccent", v)} />
-              <ColorRow label="Button bg"   value={page.colorBtnBg}  onChange={(v) => set("colorBtnBg", v)} />
-              <ColorRow label="Button text" value={page.colorBtnFg}  onChange={(v) => set("colorBtnFg", v)} />
-            </div>
-          )}
-        </div>
-        <div>
-          <FieldLabel>Font family</FieldLabel>
-          <select value={page.fontFamily} onChange={(e) => set("fontFamily", e.target.value)}
-            className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors"
-            style={{ fontFamily: page.fontFamily }}
-          >
-            {DELIVERY_FONTS.map((f) => (
-              <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.label}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <FieldLabel>Photo layout</FieldLabel>
-          <div className="flex gap-2">
-            {([
-              { id: "grid",    label: "Grid",    icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg> },
-              { id: "masonry", label: "Masonry", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="8" height="11" rx="1"/><rect x="13" y="3" width="8" height="7" rx="1"/><rect x="3" y="17" width="8" height="4" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg> },
-            ] as { id: LayoutStyle; label: string; icon: React.ReactNode }[]).map((opt) => (
-              <button key={opt.id} onClick={() => set("layout", opt.id)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border font-sans text-xs font-medium transition-all ${
-                  page.layout === opt.id
-                    ? "border-yellow bg-yellow/10 text-[var(--fg)]"
-                    : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
-                }`}
-              >
-                {opt.icon} {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <FieldLabel>Welcome message</FieldLabel>
-          <textarea value={page.welcomeMessage} onChange={(e) => set("welcomeMessage", e.target.value)} rows={3}
-            className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2.5 outline-none focus:border-yellow transition-colors resize-none"
-            placeholder="Write a personal message to your client…"
-          />
-          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1">Shown on the cover</p>
-        </div>
-      </Section>
+function TypographyPanel({ page, set }: { page: DeliveryPage; set: Setter }) {
+  return (
+    <div>
+      <FieldLabel>Font family</FieldLabel>
+      <select value={page.fontFamily} onChange={(e) => set("fontFamily", e.target.value)}
+        className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors"
+        style={{ fontFamily: page.fontFamily }}
+      >
+        {DELIVERY_FONTS.map((f) => (
+          <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.label}</option>
+        ))}
+      </select>
+      <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1.5">
+        Uses the template's typography by default. Pick one to override.
+      </p>
     </div>
   );
 }
 
-function AccessTab({ page, set }: { page: DeliveryPage; set: Setter }) {
+function PhotosPanel({ page, set, onOpenGallery }: { page: DeliveryPage; set: Setter; onOpenGallery: () => void }) {
+  return (
+    <>
+      <div>
+        <FieldLabel>Deliverable gallery</FieldLabel>
+        <button onClick={onOpenGallery}
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors rounded-lg"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <span className="font-sans text-sm text-[var(--fg)] flex-1 text-left">
+            {page.photoSeeds.length > 0 ? `${page.photoSeeds.length} photos selected` : "Select photos"}
+          </span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div>
+        <FieldLabel>Photo layout</FieldLabel>
+        <div className="flex gap-2">
+          {([
+            { id: "grid",    label: "Grid",    icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg> },
+            { id: "masonry", label: "Masonry", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="8" height="11" rx="1"/><rect x="13" y="3" width="8" height="7" rx="1"/><rect x="3" y="17" width="8" height="4" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg> },
+          ] as { id: LayoutStyle; label: string; icon: React.ReactNode }[]).map((opt) => (
+            <button key={opt.id} onClick={() => set("layout", opt.id)}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border font-sans text-xs font-medium transition-all ${
+                page.layout === opt.id
+                  ? "border-yellow bg-yellow/10 text-[var(--fg)]"
+                  : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
+              }`}
+            >
+              {opt.icon} {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function AccessPanel({ page, set }: { page: DeliveryPage; set: Setter }) {
   const genPassword = () => {
     const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
     set("password", Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join(""));
   };
   const [emailDraft, setEmailDraft] = useState("");
-
   return (
-    <div className="space-y-6">
-      <Section title="Password">
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="font-sans text-sm font-medium text-[var(--fg)]">Password protection</span>
-            <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Require a password to view the gallery</p>
-          </div>
-          <Toggle checked={page.passwordEnabled} onChange={() => set("passwordEnabled", !page.passwordEnabled)} />
+    <>
+      <div className="flex items-center justify-between">
+        <div>
+          <span className="font-sans text-sm font-medium text-[var(--fg)]">Password protection</span>
+          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Require a password to view</p>
         </div>
-        {page.passwordEnabled && (
-          <div className="flex gap-2">
-            <input value={page.password} onChange={(e) => set("password", e.target.value)}
-              className="flex-1 font-mono text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors"
-              placeholder="Enter password"
-            />
-            <button onClick={genPassword} className="shrink-0 px-3 py-2 rounded-lg border border-[var(--border)] font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
-              Generate
-            </button>
-          </div>
-        )}
-      </Section>
+        <Toggle checked={page.passwordEnabled} onChange={() => set("passwordEnabled", !page.passwordEnabled)} />
+      </div>
+      {page.passwordEnabled && (
+        <div className="flex gap-2">
+          <input value={page.password} onChange={(e) => set("password", e.target.value)}
+            className="flex-1 font-mono text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors"
+            placeholder="Enter password"
+          />
+          <button onClick={genPassword} className="shrink-0 px-3 py-2 rounded-lg border border-[var(--border)] font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
+            Generate
+          </button>
+        </div>
+      )}
 
-      <Section title="Expiration">
+      <div className="pt-2 border-t border-[var(--border)]">
         <FieldLabel>Expiration date</FieldLabel>
         <input type="date" value={page.expiresAt ?? ""} onChange={(e) => set("expiresAt", e.target.value || null)}
           className="w-full font-mono text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors" />
-        <p className="font-sans text-[11px] text-[var(--fg-muted)]">Gallery becomes inaccessible after this date</p>
-      </Section>
+      </div>
 
-      <Section title="Whitelist">
+      <div className="pt-2 border-t border-[var(--border)]">
         <div className="flex items-center justify-between">
           <div>
             <span className="font-sans text-sm font-medium text-[var(--fg)]">Client whitelist</span>
-            <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Restrict access to specific emails</p>
+            <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Restrict to specific emails</p>
           </div>
           <Toggle checked={page.whitelistEnabled} onChange={() => set("whitelistEnabled", !page.whitelistEnabled)} />
         </div>
         {page.whitelistEnabled && (
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 mt-3">
             {page.whitelist.map((email, i) => (
               <div key={i} className="flex items-center gap-2">
                 <span className="flex-1 font-mono text-xs text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 truncate">{email}</span>
@@ -677,32 +722,30 @@ function AccessTab({ page, set }: { page: DeliveryPage; set: Setter }) {
             </div>
           </div>
         )}
-      </Section>
-    </div>
+      </div>
+    </>
   );
 }
 
-function MonetizeTab({ page, set }: { page: DeliveryPage; set: Setter }) {
+function MonetizePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
   const photoCount = page.photoSeeds.length || page.photoCount;
   const suggestedGalleryPrice = page.pricePerPhoto > 0 ? Math.round(page.pricePerPhoto * photoCount * 0.6) : 0;
   const savings = page.pricePerPhoto > 0 && photoCount > 0
     ? Math.round((1 - page.priceFullGallery / (page.pricePerPhoto * photoCount)) * 100)
     : 0;
-
   return (
-    <div className="space-y-6">
-      <Section title="Delivery mode">
+    <>
+      <div>
+        <FieldLabel>Mode</FieldLabel>
         <div className="flex flex-col gap-2">
           {([
             { id: "gift",      label: "Gift / Free",    desc: "Client downloads at no cost" },
-            { id: "direct",    label: "Direct Sale",     desc: "Clients buy individually or as bundle" },
-            { id: "selection", label: "Selection Mode",  desc: "Client picks favorites from a paid contract" },
+            { id: "direct",    label: "Direct Sale",    desc: "Buy individually or as bundle" },
+            { id: "selection", label: "Selection Mode", desc: "Pick favorites from a paid contract" },
           ] as { id: DeliveryMode; label: string; desc: string }[]).map((opt) => (
             <button key={opt.id} onClick={() => set("mode", opt.id)}
               className={`flex items-start gap-3 px-3 py-3 rounded-xl border text-left transition-all ${
-                page.mode === opt.id
-                  ? "border-yellow bg-yellow/5"
-                  : "border-[var(--border)] hover:border-[var(--fg-muted)]"
+                page.mode === opt.id ? "border-yellow bg-yellow/5" : "border-[var(--border)] hover:border-[var(--fg-muted)]"
               }`}
             >
               <span className={`mt-0.5 w-3.5 h-3.5 rounded-full border-2 shrink-0 flex items-center justify-center ${page.mode === opt.id ? "border-yellow" : "border-[var(--fg-muted)]"}`}>
@@ -715,10 +758,10 @@ function MonetizeTab({ page, set }: { page: DeliveryPage; set: Setter }) {
             </button>
           ))}
         </div>
-      </Section>
+      </div>
 
       {page.mode === "direct" && (
-        <Section title="Pricing">
+        <>
           <div>
             <FieldLabel>Price per photo</FieldLabel>
             <div className="relative">
@@ -752,58 +795,57 @@ function MonetizeTab({ page, set }: { page: DeliveryPage; set: Setter }) {
             </div>
             <Toggle checked={page.showUpsellBanner} onChange={() => set("showUpsellBanner", !page.showUpsellBanner)} />
           </div>
-        </Section>
+        </>
       )}
 
       {page.mode === "selection" && (
-        <Section title="Selection limit">
+        <div>
+          <FieldLabel>Selection limit</FieldLabel>
           <div className="flex items-center gap-3">
             <input type="range" min={1} max={200} value={page.selectionLimit}
               onChange={(e) => set("selectionLimit", Number(e.target.value))}
               className="flex-1 accent-yellow" />
             <span className="font-mono text-sm font-bold text-[var(--fg)] w-16 text-right">{page.selectionLimit}</span>
           </div>
-          <p className="font-sans text-[11px] text-[var(--fg-muted)]">Client can heart up to {page.selectionLimit} photos</p>
-        </Section>
+          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1">Client can heart up to {page.selectionLimit} photos</p>
+        </div>
       )}
 
-      <Section title="Downloads & Privacy">
+      <div className="pt-3 border-t border-[var(--border)]">
+        <FieldLabel>Download resolution</FieldLabel>
+        <div className="flex gap-2">
+          {([
+            { id: "full",   label: "Full res" },
+            { id: "web",    label: "Web only" },
+            { id: "choice", label: "Client's choice" },
+          ] as { id: "full" | "web" | "choice"; label: string }[]).map((opt) => (
+            <button key={opt.id} onClick={() => set("downloadRes", opt.id)}
+              className={`flex-1 py-2 rounded-xl border font-sans text-xs font-medium transition-all ${
+                page.downloadRes === opt.id
+                  ? "border-yellow bg-yellow/10 text-[var(--fg)]"
+                  : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
         <div>
-          <FieldLabel>Download resolution</FieldLabel>
-          <div className="flex gap-2">
-            {([
-              { id: "full",   label: "Full res" },
-              { id: "web",    label: "Web only" },
-              { id: "choice", label: "Client's choice" },
-            ] as { id: "full" | "web" | "choice"; label: string }[]).map((opt) => (
-              <button key={opt.id} onClick={() => set("downloadRes", opt.id)}
-                className={`flex-1 py-2 rounded-xl border font-sans text-xs font-medium transition-all ${
-                  page.downloadRes === opt.id
-                    ? "border-yellow bg-yellow/10 text-[var(--fg)]"
-                    : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
+          <span className="font-sans text-sm font-medium text-[var(--fg)]">Watermark previews</span>
+          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Add watermark to preview images</p>
         </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="font-sans text-sm font-medium text-[var(--fg)]">Watermark previews</span>
-            <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Add watermark to preview images</p>
-          </div>
-          <Toggle checked={page.watermark} onChange={() => set("watermark", !page.watermark)} />
+        <Toggle checked={page.watermark} onChange={() => set("watermark", !page.watermark)} />
+      </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <span className="font-sans text-sm font-medium text-[var(--fg)]">Proofing mode</span>
+          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Clients can leave comments per photo</p>
         </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="font-sans text-sm font-medium text-[var(--fg)]">Proofing mode</span>
-            <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Clients can leave comments per photo</p>
-          </div>
-          <Toggle checked={page.proofingEnabled} onChange={() => set("proofingEnabled", !page.proofingEnabled)} />
-        </div>
-      </Section>
-    </div>
+        <Toggle checked={page.proofingEnabled} onChange={() => set("proofingEnabled", !page.proofingEnabled)} />
+      </div>
+    </>
   );
 }
 
@@ -811,11 +853,7 @@ function MonetizeTab({ page, set }: { page: DeliveryPage; set: Setter }) {
    BUILDER ROOT
 ══════════════════════════════════════════════════════════════════════════ */
 
-const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
-  { id: "page",     label: "Page",     icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> },
-  { id: "access",   label: "Access",   icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> },
-  { id: "monetize", label: "Monetize", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
-];
+type SectionId = "template" | "content" | "branding" | "colors" | "typography" | "photos" | "access" | "monetize";
 
 export function DeliveryBuilder({ pageId }: { pageId: string }) {
   const router = useRouter();
@@ -824,11 +862,13 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
   const hydrated = useDeliveryStore((s) => s.hydrated);
 
   const [page, setPage] = useState<DeliveryPage | null>(storePage ?? null);
-  const [tab, setTab] = useState<TabId>("page");
+  const [openSections, setOpenSections] = useState<Set<SectionId>>(new Set(["content", "branding"]));
+  const [activeField, setActiveField] = useState<string | null>(null);
   const [showGallery, setShowGallery] = useState(false);
+  const [showCoverPicker, setShowCoverPicker] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
 
-  // Sync from store when it loads
   useEffect(() => {
     if (storePage && !page) setPage(storePage);
   }, [storePage, page]);
@@ -837,6 +877,30 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
     setPage((prev) => prev ? { ...prev, [key]: value } : prev);
     setDirty(true);
   }, []);
+
+  /* When a field is focused in the canvas, open its section and scroll it into view */
+  const focusField = useCallback((fieldPath: string) => {
+    setActiveField(fieldPath);
+    const sectionId = FIELD_TO_SECTION[fieldPath] as SectionId | undefined;
+    if (sectionId) {
+      setOpenSections((prev) => {
+        if (prev.has(sectionId)) return prev;
+        const next = new Set(prev); next.add(sectionId); return next;
+      });
+      requestAnimationFrame(() => {
+        const el = fieldRefs.current[fieldPath];
+        if (el?.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
+  }, []);
+
+  const toggleSection = (id: SectionId) => {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
 
   const handleSave = () => {
     if (!page) return;
@@ -858,6 +922,7 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
   }
 
   const status = STATUS_META[page.status];
+  const activeSection = activeField ? FIELD_TO_SECTION[activeField] : null;
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[var(--bg)]">
@@ -902,42 +967,65 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
         </div>
       </div>
 
-      {/* Body: sidebar with tabs + canvas */}
+      {/* Body: accordion sidebar + live canvas */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-[360px] shrink-0 flex flex-col border-r border-[var(--border)] bg-[var(--bg-card)]">
-          {/* Tab bar */}
-          <div className="flex border-b border-[var(--border)] shrink-0">
-            {TABS.map((t) => (
-              <button key={t.id} onClick={() => setTab(t.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-3 font-sans text-xs font-medium transition-all border-b-2 -mb-px ${
-                  tab === t.id
-                    ? "border-yellow text-[var(--fg)]"
-                    : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"
-                }`}
-              >
-                {t.icon}
-                {t.label}
-              </button>
-            ))}
-          </div>
-          {/* Tab content */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {tab === "page"     && <PageTab     page={page} set={set} onOpenGallery={() => setShowGallery(true)} />}
-            {tab === "access"   && <AccessTab   page={page} set={set} />}
-            {tab === "monetize" && <MonetizeTab page={page} set={set} />}
-          </div>
+        <div className="w-[360px] shrink-0 flex flex-col border-r border-[var(--border)] bg-[var(--bg-card)] overflow-y-auto">
+          <Accordion id="template" title="Template" count={TEMPLATES.find((t) => t.id === page.template)?.label}
+            isOpen={openSections.has("template")} onToggle={() => toggleSection("template")}
+          >
+            <TemplatePanel page={page} set={set} />
+          </Accordion>
+          <Accordion id="content" title="Content"
+            isOpen={openSections.has("content")} onToggle={() => toggleSection("content")} isActive={activeSection === "content"}
+          >
+            <ContentPanel page={page} set={set} focusedField={activeField} fieldRefs={fieldRefs} />
+          </Accordion>
+          <Accordion id="branding" title="Branding"
+            isOpen={openSections.has("branding")} onToggle={() => toggleSection("branding")} isActive={activeSection === "branding"}
+          >
+            <BrandingPanel page={page} set={set} focusedField={activeField} fieldRefs={fieldRefs} />
+          </Accordion>
+          <Accordion id="colors" title="Colors" count={page.customColors ? "custom" : "default"}
+            isOpen={openSections.has("colors")} onToggle={() => toggleSection("colors")}
+          >
+            <ColorsPanel page={page} set={set} />
+          </Accordion>
+          <Accordion id="typography" title="Typography"
+            isOpen={openSections.has("typography")} onToggle={() => toggleSection("typography")}
+          >
+            <TypographyPanel page={page} set={set} />
+          </Accordion>
+          <Accordion id="photos" title="Photos" count={`${page.photoSeeds.length || page.photoCount}`}
+            isOpen={openSections.has("photos")} onToggle={() => toggleSection("photos")}
+          >
+            <PhotosPanel page={page} set={set} onOpenGallery={() => setShowGallery(true)} />
+          </Accordion>
+          <Accordion id="access" title="Access" count={page.passwordEnabled ? "protected" : "public"}
+            isOpen={openSections.has("access")} onToggle={() => toggleSection("access")}
+          >
+            <AccessPanel page={page} set={set} />
+          </Accordion>
+          <Accordion id="monetize" title="Monetize" count={page.mode}
+            isOpen={openSections.has("monetize")} onToggle={() => toggleSection("monetize")}
+          >
+            <MonetizePanel page={page} set={set} />
+          </Accordion>
         </div>
 
-        {/* Canvas */}
+        {/* Live canvas */}
         <div className="flex-1 min-w-0 overflow-hidden">
-          <PreviewFrame page={page} />
+          <EditModeProvider editMode activeField={activeField} focusField={focusField}>
+            <PreviewFrame page={page} set={set} onRequestCoverChange={() => setShowCoverPicker(true)} />
+          </EditModeProvider>
         </div>
       </div>
 
       <AnimatePresence>
         {showGallery && (
           <GalleryModal page={page} onSave={(seeds) => { set("photoSeeds", seeds); set("photoCount", seeds.length); }} onClose={() => setShowGallery(false)} />
+        )}
+        {showCoverPicker && (
+          <SinglePhotoPicker value={page.coverUrl} onSelect={(u) => set("coverUrl", u)} onClose={() => setShowCoverPicker(false)} />
         )}
       </AnimatePresence>
     </div>

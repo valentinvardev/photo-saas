@@ -2,12 +2,20 @@
 
 import { useState } from "react";
 import { ALL_GALLERY_SEEDS, effectiveStyle, type DeliveryPage, type TemplateName } from "~/lib/delivery/data";
+import { EditableText, EditableImage, EditableHoverStyles } from "./editable";
 
 /* ──────────────────────────────────────────────────────────────────────────
    GalleryView — live, per-template preview rendered from DeliveryPage state.
-   Edits in the builder sidebar flow straight into these renderers, so the
-   preview always reflects what the photographer will ship.
+
+   Edit primitives:
+     • Pass `set` from the Builder to enable in-place editing of text fields
+       and image swap on the cover. Omit it for the public delivery page.
+     • Theme overrides cascade through `effectiveStyle(page)` so the same
+       renderer respects either the template's defaults OR the user's custom
+       colors / fontFamily without forking the code.
 ────────────────────────────────────────────────────────────────────────── */
+
+type Setter = <K extends keyof DeliveryPage>(k: K, v: DeliveryPage[K]) => void;
 
 const HALCYON_FONTS = {
   serif: "'Instrument Serif', 'Cormorant Garamond', Georgia, serif",
@@ -36,7 +44,6 @@ const FONTS_HREF =
   "display=swap";
 
 function FontStylesheet() {
-  /* Inline link tag — runs once per preview render, browser de-dupes. */
   return <link rel="stylesheet" href={FONTS_HREF} />;
 }
 
@@ -58,41 +65,66 @@ function selectionMeta(page: DeliveryPage, photoCount: number) {
   return { picked: 3, limit: page.selectionLimit, total: photoCount };
 }
 
+/* Custom-color helpers — when the user has toggled custom colors on, surface
+   them via CSS-var-like overrides so templates that respect them feel branded
+   without breaking the original aesthetic. */
+function themedFontFamily(page: DeliveryPage, fallback: string) {
+  return page.fontFamily && page.fontFamily !== "Inter, sans-serif" ? page.fontFamily : fallback;
+}
+
+interface RendererProps {
+  page: DeliveryPage;
+  isMobile: boolean;
+  set?: Setter;
+  onRequestCoverChange?: () => void;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    HALCYON — warm dark, serif italic, sectioned chapters
 ══════════════════════════════════════════════════════════════════════════ */
 
-function HalcyonPreview({ page, isMobile }: { page: DeliveryPage; isMobile: boolean }) {
-  const t = { bg: "#0E0D0B", fg: "#EFEAE0", muted: "#8A8378", line: "#2C2925", raised: "#1A1815", accent: "#C2410C" };
+function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererProps) {
+  const baseT = { bg: "#0E0D0B", fg: "#EFEAE0", muted: "#8A8378", line: "#2C2925", raised: "#1A1815", accent: "#C2410C" };
+  const ts = effectiveStyle(page);
+  const t = page.customColors ? { ...baseT, bg: ts.bg, fg: ts.fg, accent: ts.accent } : baseT;
   const photos = picks(page);
   const sel = selectionMeta(page, photos.length);
   const [first, second] = page.client.split(/\s*&\s*|\s+y\s+|\s+and\s+/);
+  const fontSans = themedFontFamily(page, HALCYON_FONTS.sans);
 
   return (
-    <div style={{ background: t.bg, color: t.fg, fontFamily: HALCYON_FONTS.sans, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
+    <div style={{ background: t.bg, color: t.fg, fontFamily: fontSans, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
       <FontStylesheet />
+      <EditableHoverStyles />
       <div style={{ height: 3, background: t.accent }} />
 
       {/* Hero */}
-      <div style={{ position: "relative", height: isMobile ? 220 : 360, overflow: "hidden" }}>
+      <EditableImage
+        fieldPath="coverUrl"
+        onRequestChange={onRequestCoverChange}
+        style={{ position: "relative", height: isMobile ? 220 : 360, overflow: "hidden" }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         <div style={{ position: "absolute", inset: 0, background: t.accent, mixBlendMode: "multiply", opacity: 0.55 }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(14,13,11,0.35) 0%,rgba(14,13,11,0) 30%,rgba(14,13,11,0.7) 75%,rgba(14,13,11,0.96) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, padding: isMobile ? "16px 18px" : "24px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between", color: t.fg }}>
-          <div style={{ fontFamily: HALCYON_FONTS.mono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.85 }}>
-            {page.logoText || "HALCYON"}
-          </div>
+          <EditableText
+            fieldPath="logoText" value={page.logoText || "HALCYON"} onChange={set ? (v) => set("logoText", v) : undefined}
+            style={{ fontFamily: HALCYON_FONTS.mono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.85 }}
+          />
           <div>
             <div style={{ fontFamily: HALCYON_FONTS.mono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.8, marginBottom: 6 }}>
-              For {page.client} · {page.photoCount || photos.length} photographs
+              For{" "}
+              <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" />
+              {" · "}{page.photoCount || photos.length} photographs
             </div>
             <h1 style={{ fontFamily: HALCYON_FONTS.serif, fontSize: isMobile ? 36 : 64, lineHeight: 0.95, letterSpacing: "-0.02em", margin: 0, fontWeight: 400 }}>
               {first ?? page.title} <em style={{ fontStyle: "italic", color: t.accent }}>&amp; {second ?? ""}</em>
             </h1>
           </div>
         </div>
-      </div>
+      </EditableImage>
 
       {/* Selection bar */}
       {sel && (
@@ -105,11 +137,14 @@ function HalcyonPreview({ page, isMobile }: { page: DeliveryPage; isMobile: bool
       )}
 
       {/* Welcome */}
-      {page.welcomeMessage && (
+      {(page.welcomeMessage || set) && (
         <div style={{ padding: isMobile ? "20px 18px 0" : "28px 32px 0", maxWidth: 640 }}>
-          <p style={{ fontFamily: HALCYON_FONTS.serif, fontStyle: "italic", fontSize: isMobile ? 14 : 17, lineHeight: 1.55, color: t.fg, margin: 0 }}>
-            {page.welcomeMessage}
-          </p>
+          <EditableText
+            fieldPath="welcomeMessage" value={page.welcomeMessage} onChange={set ? (v) => set("welcomeMessage", v) : undefined}
+            as="p" multiline
+            placeholder={set ? "Write a personal message to your client…" : ""}
+            style={{ fontFamily: HALCYON_FONTS.serif, fontStyle: "italic", fontSize: isMobile ? 14 : 17, lineHeight: 1.55, color: page.welcomeMessage ? t.fg : t.muted, margin: 0 }}
+          />
         </div>
       )}
 
@@ -148,34 +183,45 @@ function HalcyonPreview({ page, isMobile }: { page: DeliveryPage; isMobile: bool
    BROOKLYN — dark + red accent, bold sans
 ══════════════════════════════════════════════════════════════════════════ */
 
-function BrooklynPreview({ page, isMobile }: { page: DeliveryPage; isMobile: boolean }) {
-  const t = { bg: "#0D0D0D", fg: "#F0EFE9", muted: "#7A7A7A", line: "#1F1F1F", raised: "#161616", accent: "#E8382C" };
+function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: RendererProps) {
+  const baseT = { bg: "#0D0D0D", fg: "#F0EFE9", muted: "#7A7A7A", line: "#1F1F1F", raised: "#161616", accent: "#E8382C" };
+  const ts = effectiveStyle(page);
+  const t = page.customColors ? { ...baseT, bg: ts.bg, fg: ts.fg, accent: ts.accent } : baseT;
   const photos = picks(page);
   const sel = selectionMeta(page, photos.length);
+  const fontSans = themedFontFamily(page, BROOKLYN_FONTS.sans);
 
   return (
-    <div style={{ background: t.bg, color: t.fg, fontFamily: BROOKLYN_FONTS.sans, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
+    <div style={{ background: t.bg, color: t.fg, fontFamily: fontSans, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
       <FontStylesheet />
+      <EditableHoverStyles />
       <div style={{ height: 3, background: t.accent }} />
 
-      <div style={{ position: "relative", height: isMobile ? 220 : 360, overflow: "hidden" }}>
+      <EditableImage
+        fieldPath="coverUrl" onRequestChange={onRequestCoverChange}
+        style={{ position: "relative", height: isMobile ? 220 : 360, overflow: "hidden" }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", filter: "contrast(1.05)" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(13,13,13,0.25) 0%,rgba(13,13,13,0) 30%,rgba(13,13,13,0.85) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, padding: isMobile ? "16px 18px" : "24px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div style={{ fontFamily: BROOKLYN_FONTS.mono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }}>
-            {page.logoText || "BROOKLYN"} / Client Gallery
+            <EditableText fieldPath="logoText" value={page.logoText || "BROOKLYN"} onChange={set ? (v) => set("logoText", v) : undefined} as="span" />
+            {" / Client Gallery"}
           </div>
           <div>
             <div style={{ fontFamily: BROOKLYN_FONTS.mono, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: t.muted, marginBottom: 8 }}>
-              {page.client} · {page.photoCount || photos.length} frames
+              <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" />
+              {" · "}{page.photoCount || photos.length} frames
             </div>
-            <h1 style={{ fontWeight: 700, fontSize: isMobile ? 32 : 56, lineHeight: 1, letterSpacing: "-0.03em", margin: 0, textTransform: "uppercase" }}>
-              {page.title}
-            </h1>
+            <EditableText
+              fieldPath="title" value={page.title} onChange={set ? (v) => set("title", v) : undefined}
+              as="h1"
+              style={{ fontWeight: 700, fontSize: isMobile ? 32 : 56, lineHeight: 1, letterSpacing: "-0.03em", margin: 0, textTransform: "uppercase" }}
+            />
           </div>
         </div>
-      </div>
+      </EditableImage>
 
       {sel && (
         <div style={{ background: t.raised, borderBottom: `1px solid ${t.line}`, padding: isMobile ? "10px 16px" : "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
@@ -187,10 +233,13 @@ function BrooklynPreview({ page, isMobile }: { page: DeliveryPage; isMobile: boo
       )}
 
       <div style={{ padding: isMobile ? "18px" : "28px 32px" }}>
-        {page.welcomeMessage && (
-          <p style={{ fontFamily: BROOKLYN_FONTS.sans, fontSize: isMobile ? 13 : 15, lineHeight: 1.55, color: t.fg, margin: "0 0 24px", maxWidth: 600 }}>
-            {page.welcomeMessage}
-          </p>
+        {(page.welcomeMessage || set) && (
+          <EditableText
+            fieldPath="welcomeMessage" value={page.welcomeMessage} onChange={set ? (v) => set("welcomeMessage", v) : undefined}
+            as="p" multiline
+            placeholder={set ? "Write a personal message to your client…" : ""}
+            style={{ fontFamily: BROOKLYN_FONTS.sans, fontSize: isMobile ? 13 : 15, lineHeight: 1.55, color: page.welcomeMessage ? t.fg : t.muted, margin: "0 0 24px", maxWidth: 600, display: "block" }}
+          />
         )}
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 6 }}>
           {photos.map((seed) => (
@@ -217,26 +266,31 @@ function BrooklynPreview({ page, isMobile }: { page: DeliveryPage; isMobile: boo
    MINIMAL — white paper, serif italic, strict grid
 ══════════════════════════════════════════════════════════════════════════ */
 
-function MinimalPreview({ page, isMobile }: { page: DeliveryPage; isMobile: boolean }) {
-  const t = { bg: "#FAFAFA", fg: "#111111", muted: "#888888", line: "#E8E8E8", raised: "#FFFFFF", accent: "#111111" };
+function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererProps) {
+  const baseT = { bg: "#FAFAFA", fg: "#111111", muted: "#888888", line: "#E8E8E8", raised: "#FFFFFF", accent: "#111111" };
+  const ts = effectiveStyle(page);
+  const t = page.customColors ? { ...baseT, bg: ts.bg, fg: ts.fg, accent: ts.accent } : baseT;
   const photos = picks(page);
   const sel = selectionMeta(page, photos.length);
   const [first, second] = page.client.split(/\s*&\s*|\s+y\s+|\s+and\s+/);
+  const fontSans = themedFontFamily(page, MINIMAL_FONTS.sans);
 
   return (
-    <div style={{ background: t.bg, color: t.fg, fontFamily: MINIMAL_FONTS.sans, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
+    <div style={{ background: t.bg, color: t.fg, fontFamily: fontSans, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
       <FontStylesheet />
+      <EditableHoverStyles />
 
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "16px 18px" : "22px 32px", borderBottom: `1px solid ${t.line}`, background: t.raised }}>
         <span style={{ fontFamily: MINIMAL_FONTS.serif, fontSize: 20, letterSpacing: "-0.02em", fontWeight: 500 }}>
-          {page.logoText || "Studio"}<em style={{ fontStyle: "italic", color: t.muted }}> Minimal</em>
+          <EditableText fieldPath="logoText" value={page.logoText || "Studio"} onChange={set ? (v) => set("logoText", v) : undefined} as="span" />
+          <em style={{ fontStyle: "italic", color: t.muted }}> Minimal</em>
         </span>
         <span style={{ fontFamily: MINIMAL_FONTS.mono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: t.muted }}>
-          {page.client}
+          <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" />
         </span>
       </header>
 
-      {/* Hero (text-only, paper) */}
+      {/* Hero (text-only, paper) — clickable to swap cover if cover image is shown elsewhere */}
       <section style={{ padding: isMobile ? "48px 24px 32px" : "72px 32px 48px", textAlign: "center", borderBottom: `1px solid ${t.line}` }}>
         <div style={{ fontFamily: MINIMAL_FONTS.mono, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: t.muted, marginBottom: 18 }}>
           For your eyes only · {page.photoCount || photos.length} photographs
@@ -244,12 +298,26 @@ function MinimalPreview({ page, isMobile }: { page: DeliveryPage; isMobile: bool
         <h1 style={{ fontFamily: MINIMAL_FONTS.serif, fontSize: isMobile ? 44 : 80, lineHeight: 0.95, letterSpacing: "-0.02em", margin: 0, fontWeight: 400 }}>
           {first ?? page.title}{second ? <><br /><em style={{ fontStyle: "italic" }}>&amp; {second}</em></> : null}
         </h1>
-        {page.welcomeMessage && (
-          <p style={{ fontFamily: MINIMAL_FONTS.serif, fontStyle: "italic", fontSize: isMobile ? 14 : 16, lineHeight: 1.55, color: t.muted, maxWidth: 460, margin: "20px auto 0" }}>
-            {page.welcomeMessage}
-          </p>
+        {(page.welcomeMessage || set) && (
+          <EditableText
+            fieldPath="welcomeMessage" value={page.welcomeMessage} onChange={set ? (v) => set("welcomeMessage", v) : undefined}
+            as="p" multiline
+            placeholder={set ? "Write a personal message to your client…" : ""}
+            style={{ fontFamily: MINIMAL_FONTS.serif, fontStyle: "italic", fontSize: isMobile ? 14 : 16, lineHeight: 1.55, color: t.muted, maxWidth: 460, margin: "20px auto 0", display: "block" }}
+          />
         )}
       </section>
+
+      {/* Optional cover image strip — only shown when user has set one */}
+      {(page.coverUrl || set) && (
+        <EditableImage
+          fieldPath="coverUrl" onRequestChange={onRequestCoverChange}
+          style={{ position: "relative", height: isMobile ? 220 : 360, overflow: "hidden", background: t.raised, borderBottom: `1px solid ${t.line}` }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        </EditableImage>
+      )}
 
       {sel && (
         <div style={{ background: t.bg, borderBottom: `1px solid ${t.line}`, padding: isMobile ? "12px 18px" : "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
@@ -293,23 +361,42 @@ function MinimalPreview({ page, isMobile }: { page: DeliveryPage; isMobile: bool
    GENERIC — fallback for vogue (and any future template without a renderer)
 ══════════════════════════════════════════════════════════════════════════ */
 
-function GenericPreview({ page, isMobile }: { page: DeliveryPage; isMobile: boolean }) {
+function GenericPreview({ page, isMobile, set, onRequestCoverChange }: RendererProps) {
   const ts = effectiveStyle(page);
   const photos = picks(page);
 
   return (
     <div className="w-full h-full overflow-y-auto" style={{ background: ts.bg, color: ts.fg, fontFamily: page.fontFamily || "Inter, sans-serif" }}>
-      <div style={{ position: "relative", height: isMobile ? 200 : 320, overflow: "hidden" }}>
+      <EditableHoverStyles />
+      <EditableImage
+        fieldPath="coverUrl" onRequestChange={onRequestCoverChange}
+        style={{ position: "relative", height: isMobile ? 200 : 320, overflow: "hidden" }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.7))" }} />
         <div style={{ position: "absolute", bottom: isMobile ? 16 : 28, left: isMobile ? 16 : 28, right: isMobile ? 16 : 28, color: "#fff" }}>
           <p style={{ fontFamily: "monospace", fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.7, marginBottom: 4 }}>
-            {page.client} · {page.photoCount || photos.length} photos
+            <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" />
+            {" · "}{page.photoCount || photos.length} photos
           </p>
-          <h1 style={{ fontWeight: 900, fontSize: isMobile ? 28 : 48, lineHeight: 1.05, letterSpacing: "-0.02em", margin: 0 }}>{page.title}</h1>
+          <EditableText
+            fieldPath="title" value={page.title} onChange={set ? (v) => set("title", v) : undefined}
+            as="h1"
+            style={{ fontWeight: 900, fontSize: isMobile ? 28 : 48, lineHeight: 1.05, letterSpacing: "-0.02em", margin: 0 }}
+          />
         </div>
-      </div>
+      </EditableImage>
+      {(page.welcomeMessage || set) && (
+        <div style={{ padding: isMobile ? "14px 14px 0" : "28px 28px 0", maxWidth: 600 }}>
+          <EditableText
+            fieldPath="welcomeMessage" value={page.welcomeMessage} onChange={set ? (v) => set("welcomeMessage", v) : undefined}
+            as="p" multiline
+            placeholder={set ? "Write a personal message to your client…" : ""}
+            style={{ fontSize: isMobile ? 13 : 15, lineHeight: 1.55, color: ts.muted, margin: 0 }}
+          />
+        </div>
+      )}
       <div style={{ padding: isMobile ? 14 : 28 }}>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)", gap: 8 }}>
           {photos.map((seed) => (
@@ -352,26 +439,38 @@ function PriceTag({ price, bg, fg, fontFamily }: { price: number; bg: string; fg
    PUBLIC API
 ══════════════════════════════════════════════════════════════════════════ */
 
-const RENDERERS: Record<TemplateName, (props: { page: DeliveryPage; isMobile: boolean }) => React.JSX.Element> = {
+const RENDERERS: Record<TemplateName, (props: RendererProps) => React.JSX.Element> = {
   halcyon:  HalcyonPreview,
   brooklyn: BrooklynPreview,
   minimal:  MinimalPreview,
   vogue:    GenericPreview,
 };
 
-export function GalleryView({ page, viewport = "desktop" }: { page: DeliveryPage; viewport?: "mobile" | "desktop" }) {
+export function GalleryView({
+  page, viewport = "desktop", set, onRequestCoverChange,
+}: {
+  page: DeliveryPage;
+  viewport?: "mobile" | "desktop";
+  set?: Setter;
+  onRequestCoverChange?: () => void;
+}) {
   const isMobile = viewport === "mobile";
   const Renderer = RENDERERS[page.template] ?? GenericPreview;
-  return <Renderer page={page} isMobile={isMobile} />;
+  return <Renderer page={page} isMobile={isMobile} set={set} onRequestCoverChange={onRequestCoverChange} />;
 }
 
-/* Preview frame for builder canvas — desktop browser mockup or mobile phone */
-export function PreviewFrame({ page }: { page: DeliveryPage }) {
+/* Preview frame — browser/phone chrome around the live template */
+export function PreviewFrame({
+  page, set, onRequestCoverChange,
+}: {
+  page: DeliveryPage;
+  set?: Setter;
+  onRequestCoverChange?: () => void;
+}) {
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
 
   return (
     <div className="flex flex-col h-full">
-      {/* Viewport toggle */}
       <div className="flex items-center justify-center gap-1 py-3 border-b border-[var(--border)] shrink-0">
         {(["desktop", "mobile"] as const).map((v) => (
           <button
@@ -411,7 +510,7 @@ export function PreviewFrame({ page }: { page: DeliveryPage }) {
                 </div>
               </div>
               <div style={{ height: 560 }}>
-                <GalleryView page={page} viewport="desktop" />
+                <GalleryView page={page} viewport="desktop" set={set} onRequestCoverChange={onRequestCoverChange} />
               </div>
             </div>
           ) : (
@@ -427,12 +526,11 @@ export function PreviewFrame({ page }: { page: DeliveryPage }) {
                   </div>
                 </div>
                 <div className="absolute inset-0 pt-9">
-                  <GalleryView page={page} viewport="mobile" />
+                  <GalleryView page={page} viewport="mobile" set={set} onRequestCoverChange={onRequestCoverChange} />
                 </div>
               </div>
               <div className="absolute rounded-l-sm" style={{ left: -3, top: 100, width: 3, height: 30, background: "#333" }} />
               <div className="absolute rounded-l-sm" style={{ left: -3, top: 138, width: 3, height: 38, background: "#333" }} />
-              <div className="absolute rounded-r-sm" style={{ right: -3, top: 138, width: 3, height: 56, background: "#333" }} />
             </div>
           )}
         </div>
