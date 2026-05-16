@@ -52,23 +52,25 @@ function RouteRow({ icon, label, hint, prefix, slug, onSlug, locked }: {
   prefix: string; slug: string; onSlug?: (v: string) => void; locked?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-4 px-6 py-4">
-      <div className="shrink-0 w-8 h-8 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)]">
-        {icon}
+    <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 px-4 sm:px-6 py-4">
+      <div className="flex items-start gap-3 flex-1 min-w-0">
+        <div className="shrink-0 w-8 h-8 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)]">
+          {icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-sans text-sm font-medium text-[var(--fg)]">{label}</p>
+          <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">{hint}</p>
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-sans text-sm font-medium text-[var(--fg)]">{label}</p>
-        <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">{hint}</p>
-      </div>
-      <div className="shrink-0 flex items-center bg-[var(--bg)] border border-[var(--border)] rounded-lg overflow-hidden">
-        <span className="font-mono text-xs text-[var(--fg-muted)] pl-3 pr-0.5 select-none whitespace-nowrap">{prefix}</span>
+      <div className="md:shrink-0 flex items-center bg-[var(--bg)] border border-[var(--border)] rounded-lg overflow-hidden min-w-0 ml-11 md:ml-0">
+        <span className="font-mono text-xs text-[var(--fg-muted)] pl-3 pr-0.5 select-none truncate min-w-0">{prefix}</span>
         {locked ? (
-          <span className="font-mono text-xs text-[var(--fg-muted)] italic px-2 py-2 select-none">root</span>
+          <span className="font-mono text-xs text-[var(--fg-muted)] italic px-2 py-2 select-none shrink-0">root</span>
         ) : (
           <input
             value={slug}
             onChange={(e) => onSlug?.(e.target.value.replace(/[^a-z0-9-]/g, "").toLowerCase())}
-            className="font-mono text-xs text-[var(--fg)] bg-transparent outline-none px-2 py-2 w-28 focus:bg-[var(--bg-subtle)] transition-colors"
+            className="font-mono text-xs text-[var(--fg)] bg-transparent outline-none px-2 py-2 w-24 md:w-28 focus:bg-[var(--bg-subtle)] transition-colors shrink-0"
           />
         )}
       </div>
@@ -360,11 +362,16 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
   const previewUrl = PAGE_PREVIEW_URLS[pageId];
   const pageLabel: Record<PageId, string> = { portfolio: "Portfolio", links: "Links page", delivery: "Delivery gallery" };
 
-  return (
-    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden flex gap-0">
+  /* Split the meta string ("Theme · sections · last edited") into chips so
+     it breaks gracefully on narrow viewports instead of forming one long
+     line that wraps mid-word. */
+  const metaChips = meta.split(/\s*·\s*/).filter(Boolean);
 
-      {/* left: live preview in browser chrome */}
-      <div className="shrink-0 w-48 border-r border-[var(--border)] bg-[var(--bg-subtle)] flex flex-col">
+  return (
+    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden flex flex-col sm:flex-row gap-0">
+
+      {/* preview — full width on mobile (16:9 strip), fixed column on sm+ */}
+      <div className="shrink-0 sm:w-44 md:w-48 border-b sm:border-b-0 sm:border-r border-[var(--border)] bg-[var(--bg-subtle)] flex flex-col">
         <div className="flex items-center gap-1 px-2 py-2 border-b border-[var(--border)] bg-[var(--bg-card)]">
           <span className="w-1.5 h-1.5 rounded-full bg-red-400/60" />
           <span className="w-1.5 h-1.5 rounded-full bg-yellow/60" />
@@ -373,16 +380,16 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
         <LivePreviewThumbnail
           url={previewUrl}
           baseWidth={1280}
-          className="flex-1 w-full"
+          className="w-full sm:flex-1 aspect-[16/9] sm:aspect-auto"
         />
       </div>
 
       {/* right: info + actions */}
-      <div className="flex-1 min-w-0 flex flex-col px-5 py-4 gap-3">
+      <div className="flex-1 min-w-0 flex flex-col p-4 sm:px-5 sm:py-4 gap-3">
 
         {/* title row */}
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)] shrink-0 mt-0.5">
+          <div className="w-9 h-9 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)] shrink-0">
             {icon}
           </div>
           <div className="flex-1 min-w-0">
@@ -400,17 +407,25 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
                 {status}
               </button>
             </div>
-            <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">{meta}</p>
+            {/* Meta chips — each fact on its own pill so they wrap cleanly */}
+            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-1.5">
+              {metaChips.map((chip, i) => (
+                <span key={i} className="inline-flex items-center font-sans text-[11px] text-[var(--fg-muted)]">
+                  {i > 0 && <span className="text-[var(--border)] mr-1.5">·</span>}
+                  {chip}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* url row */}
-        <div className="flex items-center gap-2 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg px-3 py-2">
+        <div className="flex items-center gap-2 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg px-3 py-2 min-w-0">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0">
             <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
           </svg>
-          <span className="font-mono text-[11px] text-[var(--fg-muted)] truncate flex-1">{url}</span>
-          <button onClick={copy} className="shrink-0 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
+          <span className="font-mono text-[11px] text-[var(--fg-muted)] truncate flex-1 min-w-0">{url}</span>
+          <button onClick={copy} className="shrink-0 text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors" aria-label="Copy URL">
             {copied
               ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
@@ -418,25 +433,27 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
           </button>
         </div>
 
-        {/* action row */}
+        {/* action row — Preview/Edit are icon-only on phone, full label on sm+ */}
         <div className="flex items-center gap-2 mt-auto">
           <button
             onClick={() => setPreviewOpen(true)}
-            className="font-sans text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"
+            aria-label="Preview"
+            className="font-sans text-xs font-medium p-2 sm:px-3 sm:py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            Preview
+            <span className="hidden sm:inline">Preview</span>
           </button>
           <a
             href={editHref}
-            className="font-sans text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"
+            aria-label="Edit"
+            className="font-sans text-xs font-medium p-2 sm:px-3 sm:py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Edit
+            <span className="hidden sm:inline">Edit</span>
           </a>
           <button
             onClick={onManage}
-            className="ml-auto font-sans text-xs font-semibold px-4 py-1.5 rounded-lg bg-yellow text-[#111] hover:bg-yellow-dark transition-colors flex items-center gap-1.5"
+            className="ml-auto font-sans text-xs font-semibold px-3 sm:px-4 py-1.5 rounded-lg bg-yellow text-[#111] hover:bg-yellow-dark transition-colors flex items-center gap-1.5"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
             Manage
@@ -514,23 +531,23 @@ export default function DomainPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8">
 
-        {/* top bar */}
-        <div className="flex items-center justify-between gap-4">
+        {/* top bar — title and domain pill stack on mobile so neither truncates */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
             <h1 className="font-sans text-xl font-bold text-[var(--fg)]">Domain</h1>
             <p className="font-sans text-sm text-[var(--fg-muted)] mt-0.5">All your public pages, in one place.</p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-4 py-2.5">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="flex items-center gap-2 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-3 sm:px-4 py-2.5 min-w-0 flex-1 sm:flex-initial">
               <span className="w-2 h-2 rounded-full bg-green-400 shrink-0" />
-              <span className="font-mono text-sm text-[var(--fg)]">{activeDomain}</span>
+              <span className="font-mono text-xs sm:text-sm text-[var(--fg)] truncate">{activeDomain}</span>
               {domainChoice === "custom" && (
-                <span className="font-mono text-[9px] font-bold text-yellow bg-yellow/10 border border-yellow/20 px-1.5 py-0.5 rounded-full uppercase tracking-wider ml-1">Pro</span>
+                <span className="font-mono text-[9px] font-bold text-yellow bg-yellow/10 border border-yellow/20 px-1.5 py-0.5 rounded-full uppercase tracking-wider ml-1 shrink-0">Pro</span>
               )}
             </div>
             <button
               onClick={reset}
-              className="font-sans text-xs text-[var(--fg-muted)] border border-[var(--border)] px-3 py-2 rounded-lg hover:text-[var(--fg)] transition-colors"
+              className="shrink-0 font-sans text-xs text-[var(--fg-muted)] border border-[var(--border)] px-3 py-2 rounded-lg hover:text-[var(--fg)] transition-colors"
             >
               Change
             </button>
@@ -611,9 +628,9 @@ export default function DomainPage() {
 
         {/* routes config */}
         <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-[var(--border)]">
+          <div className="px-4 sm:px-6 py-4 border-b border-[var(--border)]">
             <h2 className="font-sans text-sm font-semibold text-[var(--fg)]">URL routes</h2>
-            <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">
+            <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5 break-all">
               Customize the path for each page under <span className="font-mono text-[var(--fg)]">{activeDomain}</span>
             </p>
           </div>
@@ -643,16 +660,16 @@ export default function DomainPage() {
               onSlug={setRouteDelivery}
             />
           </div>
-          <div className="px-6 py-4 border-t border-[var(--border)] bg-[var(--bg-subtle)] flex flex-col gap-1.5">
+          <div className="px-4 sm:px-6 py-4 border-t border-[var(--border)] bg-[var(--bg-subtle)] flex flex-col gap-1.5">
             <p className="font-sans text-[11px] font-semibold text-[var(--fg-muted)] uppercase tracking-wider mb-0.5">Live URLs</p>
             {[
               { label: "Portfolio", path: "" },
               { label: "Links",     path: `/${routeLinks || "links"}` },
               { label: "Delivery",  path: `/${routeDelivery || "d"}/client-name` },
             ].map(({ label, path }) => (
-              <div key={label} className="flex items-center gap-2">
+              <div key={label} className="flex items-baseline gap-2 min-w-0">
                 <span className="font-sans text-[11px] text-[var(--fg-muted)] w-16 shrink-0">{label}</span>
-                <span className="font-mono text-[11px] text-[var(--fg)]">{activeDomain}{path}</span>
+                <span className="font-mono text-[11px] text-[var(--fg)] truncate min-w-0">{activeDomain}{path}</span>
               </div>
             ))}
           </div>
