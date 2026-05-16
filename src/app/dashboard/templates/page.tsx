@@ -97,7 +97,6 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
   },
 ];
 
-const PORTFOLIO_CATEGORIES: PortfolioCategory[] = ["All", "Minimal", "Editorial", "Magazine", "Story", "Grid"];
 
 /* ══════════════════════════════════════════════════════════════════════════
    LINKS TEMPLATES
@@ -511,17 +510,14 @@ function CollectionModal({ c, onClose, onPreview }: { c: TemplateCollection; onC
           <div className="w-10 h-1 rounded-full bg-[var(--border)]" />
         </div>
 
-        {/* Preview images */}
-        <div className="flex gap-2 px-4 py-3 overflow-x-auto">
-          {c.pages.map((page) => (
-            <div key={page.type} className="relative flex-none rounded-xl overflow-hidden" style={{ width: 120, height: 160 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`https://picsum.photos/seed/${page.seed}/240/320`} alt="" className="w-full h-full object-cover" style={{ filter: page.href ? "none" : "grayscale(1) opacity(0.4)" }} />
-              <div className="absolute inset-x-0 bottom-0 px-2 py-1.5" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)" }}>
-                <span className="font-mono text-[8px] uppercase tracking-widest text-white/80">{page.type}</span>
-              </div>
-            </div>
-          ))}
+        {/* Identity representation — full template look at a glance,
+            replacing the generic picsum thumbnails. Photographers see
+            the actual typography, palette and voice before opening
+            individual page previews further down the sheet. */}
+        <div className="px-4 pt-2 pb-3">
+          <div className="overflow-hidden rounded-xl border border-[var(--border)]" style={{ height: 240 }}>
+            <BrandIdentity id={c.id} name={c.name} />
+          </div>
         </div>
 
         {/* Info */}
@@ -592,6 +588,37 @@ const IDENTITIES: Record<string, Identity> = {
     sans: "'DM Sans', system-ui, sans-serif", mono: "ui-monospace, monospace",
     tagline: "Timeless, never trendy" },
 };
+
+/* Compact brand mark — used on mobile collection cards where the full
+   BrandIdentity is too small to read. Shows just the four essentials:
+   background, accent dot, a display letter, and a palette stripe. */
+function MiniBrandMark({ id, name }: { id: string; name: string }) {
+  const i = IDENTITIES[id];
+  if (!i) return null;
+  const initial = name.trim().charAt(0).toUpperCase() || "A";
+  return (
+    <div className="relative w-full h-full flex items-center justify-center" style={{ background: i.bg }}>
+      <span
+        style={{
+          fontFamily: i.display,
+          fontWeight: i.displayWeight,
+          fontStyle: i.displayItalic ? "italic" : "normal",
+          fontSize: 30, lineHeight: 1,
+          letterSpacing: "-0.02em",
+          color: i.fg,
+        }}
+      >
+        {initial}<span style={{ color: i.accent }}>.</span>
+      </span>
+      {/* Bottom palette stripe — 3 dominant colors */}
+      <div className="absolute left-0 right-0 bottom-0 flex h-1.5">
+        <div className="flex-1" style={{ background: i.accent }} />
+        <div className="flex-1" style={{ background: i.fg }} />
+        <div className="flex-1" style={{ background: i.muted }} />
+      </div>
+    </div>
+  );
+}
 
 /* Brand identity cover — shown on each collection card.
    Palette swatches + a typographic specimen, rendered in the collection's
@@ -725,9 +752,9 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
             <h3 className="font-sans font-black text-[var(--fg)] text-base leading-none">{c.name}</h3>
             <span className="font-mono text-[9px] uppercase tracking-wider text-[var(--fg-muted)] mt-1 inline-block">Collection</span>
           </div>
-          {/* Identity preview */}
-          <div className="shrink-0 overflow-hidden border border-[var(--border)]" style={{ width: 96, height: 64 }}>
-            <BrandIdentity id={c.id} name={c.name} />
+          {/* Identity preview — compact, readable at this size */}
+          <div className="shrink-0 overflow-hidden border border-[var(--border)]" style={{ width: 80, height: 64 }}>
+            <MiniBrandMark id={c.id} name={c.name} />
           </div>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-[var(--fg-muted)]"><path d="M9 18l6-6-6-6"/></svg>
         </motion.div>
@@ -1052,25 +1079,106 @@ function StyleBanner({ onDismiss, onOpen }: { onDismiss: () => void; onOpen: () 
 
 /* ── Style wizard modal ─────────────────────────────────────── */
 
+/* Wide font library — searchable by name, filterable by category. Stacks
+   resolve from Google Fonts (loaded inline by the wizard preview) or fall
+   back to system defaults. Adding a font here makes it available in the
+   FontPickerModal automatically. */
 const WIZARD_FONTS = [
-  { id: "cormorant",  label: "Cormorant Garamond", stack: "'Cormorant Garamond', Georgia, serif",       cat: "serif" },
-  { id: "dm-serif",   label: "DM Serif Display",   stack: "'DM Serif Display', Georgia, serif",         cat: "serif" },
-  { id: "playfair",   label: "Playfair Display",   stack: "'Playfair Display', Georgia, serif",         cat: "serif" },
-  { id: "dm-sans",    label: "DM Sans",            stack: "'DM Sans', system-ui, sans-serif",           cat: "sans"  },
-  { id: "space-grot", label: "Space Grotesk",      stack: "'Space Grotesk', system-ui, sans-serif",     cat: "sans"  },
-  { id: "inter",      label: "Inter",              stack: "'Inter', system-ui, sans-serif",             cat: "sans"  },
-  { id: "space-mono", label: "Space Mono",         stack: "'Space Mono', ui-monospace, monospace",      cat: "mono"  },
-  { id: "jetbrains",  label: "JetBrains Mono",     stack: "'JetBrains Mono', ui-monospace, monospace",  cat: "mono"  },
+  // Serif (display / editorial)
+  { id: "cormorant",     label: "Cormorant Garamond", stack: "'Cormorant Garamond', Georgia, serif",  cat: "serif" },
+  { id: "dm-serif",      label: "DM Serif Display",   stack: "'DM Serif Display', Georgia, serif",    cat: "serif" },
+  { id: "playfair",      label: "Playfair Display",   stack: "'Playfair Display', Georgia, serif",    cat: "serif" },
+  { id: "instrument",    label: "Instrument Serif",   stack: "'Instrument Serif', Georgia, serif",    cat: "serif" },
+  { id: "fraunces",      label: "Fraunces",           stack: "'Fraunces', Georgia, serif",            cat: "serif" },
+  { id: "libre-cal",     label: "Libre Caslon",       stack: "'Libre Caslon Text', Georgia, serif",   cat: "serif" },
+  { id: "lora",          label: "Lora",               stack: "'Lora', Georgia, serif",                cat: "serif" },
+  { id: "merriweather",  label: "Merriweather",       stack: "'Merriweather', Georgia, serif",        cat: "serif" },
+  { id: "eb-garamond",   label: "EB Garamond",        stack: "'EB Garamond', Georgia, serif",         cat: "serif" },
+  { id: "crimson",       label: "Crimson Pro",        stack: "'Crimson Pro', Georgia, serif",         cat: "serif" },
+  { id: "spectral",      label: "Spectral",           stack: "'Spectral', Georgia, serif",            cat: "serif" },
+  { id: "anton",         label: "Anton",              stack: "'Anton', Impact, sans-serif",           cat: "serif" },
+  // Sans
+  { id: "dm-sans",       label: "DM Sans",            stack: "'DM Sans', system-ui, sans-serif",      cat: "sans"  },
+  { id: "space-grot",    label: "Space Grotesk",      stack: "'Space Grotesk', system-ui, sans-serif", cat: "sans"  },
+  { id: "inter",         label: "Inter",              stack: "'Inter', system-ui, sans-serif",        cat: "sans"  },
+  { id: "geist",         label: "Geist",              stack: "'Geist', system-ui, sans-serif",        cat: "sans"  },
+  { id: "manrope",       label: "Manrope",            stack: "'Manrope', system-ui, sans-serif",      cat: "sans"  },
+  { id: "archivo",       label: "Archivo",            stack: "'Archivo', system-ui, sans-serif",      cat: "sans"  },
+  { id: "bricolage",     label: "Bricolage Grotesque", stack: "'Bricolage Grotesque', system-ui, sans-serif", cat: "sans" },
+  { id: "host-grotesk",  label: "Host Grotesk",       stack: "'Host Grotesk', system-ui, sans-serif", cat: "sans"  },
+  { id: "ibm-plex-sans", label: "IBM Plex Sans",      stack: "'IBM Plex Sans', system-ui, sans-serif", cat: "sans" },
+  { id: "work-sans",     label: "Work Sans",          stack: "'Work Sans', system-ui, sans-serif",    cat: "sans"  },
+  { id: "rubik",         label: "Rubik",              stack: "'Rubik', system-ui, sans-serif",        cat: "sans"  },
+  { id: "outfit",        label: "Outfit",             stack: "'Outfit', system-ui, sans-serif",       cat: "sans"  },
+  { id: "figtree",       label: "Figtree",            stack: "'Figtree', system-ui, sans-serif",      cat: "sans"  },
+  { id: "syne",          label: "Syne",               stack: "'Syne', system-ui, sans-serif",         cat: "sans"  },
+  { id: "satoshi",       label: "Satoshi",            stack: "'Satoshi', system-ui, sans-serif",      cat: "sans"  },
+  // Mono
+  { id: "space-mono",    label: "Space Mono",         stack: "'Space Mono', ui-monospace, monospace",     cat: "mono"  },
+  { id: "jetbrains",     label: "JetBrains Mono",     stack: "'JetBrains Mono', ui-monospace, monospace", cat: "mono"  },
+  { id: "geist-mono",    label: "Geist Mono",         stack: "'Geist Mono', ui-monospace, monospace",     cat: "mono"  },
+  { id: "ibm-plex-mono", label: "IBM Plex Mono",      stack: "'IBM Plex Mono', ui-monospace, monospace",  cat: "mono"  },
+  { id: "dm-mono",       label: "DM Mono",            stack: "'DM Mono', ui-monospace, monospace",        cat: "mono"  },
+  { id: "fira-mono",     label: "Fira Mono",          stack: "'Fira Mono', ui-monospace, monospace",      cat: "mono"  },
+] as const;
+
+type FontCat = "serif" | "sans" | "mono";
+
+/* Single Google Fonts stylesheet that imports every font in WIZARD_FONTS so
+   previews render with the right typography in the wizard. */
+const WIZARD_FONTS_HREF =
+  "https://fonts.googleapis.com/css2?" +
+  [
+    "Cormorant+Garamond:wght@400;500;600",
+    "DM+Serif+Display",
+    "Playfair+Display:wght@400;500;700",
+    "Instrument+Serif:ital@0;1",
+    "Fraunces:wght@400;500;700",
+    "Libre+Caslon+Text",
+    "Lora:wght@400;600",
+    "Merriweather:wght@400;700",
+    "EB+Garamond:wght@400;500;700",
+    "Crimson+Pro:wght@400;600",
+    "Spectral:wght@400;600",
+    "Anton",
+    "DM+Sans:wght@400;500;700",
+    "Space+Grotesk:wght@400;500;700",
+    "Inter:wght@400;500;700",
+    "Manrope:wght@400;600;700",
+    "Archivo:wght@400;600",
+    "Bricolage+Grotesque:wght@400;600;800",
+    "Host+Grotesk:wght@400;600",
+    "IBM+Plex+Sans:wght@400;600",
+    "Work+Sans:wght@400;600",
+    "Rubik:wght@400;600",
+    "Outfit:wght@400;600",
+    "Figtree:wght@400;600",
+    "Syne:wght@400;700",
+    "Space+Mono:wght@400;700",
+    "JetBrains+Mono:wght@400;600",
+    "IBM+Plex+Mono:wght@400;600",
+    "DM+Mono",
+    "Fira+Mono:wght@400;700",
+  ].map((f) => `family=${f}`).join("&") +
+  "&display=swap";
+
+/* Standard palette presets. The Custom palette below extends this with
+   the same slot structure (bg / fg / accent / muted / btnBg / btnFg) used by
+   the delivery templates, so saved custom palettes map cleanly to template
+   variables. */
+const WIZARD_PALETTES = [
+  { id: "bw",       label: "Black & White",  bg: "#fafafa", fg: "#0a0a0a", accent: "#facc15", muted: "#888888", btnBg: "#0a0a0a", btnFg: "#fafafa" },
+  { id: "noir",     label: "Noir",           bg: "#0a0a0a", fg: "#f5f5f5", accent: "#e8382c", muted: "#666666", btnBg: "#e8382c", btnFg: "#0a0a0a" },
+  { id: "warm",     label: "Warm Cream",     bg: "#faf8f5", fg: "#2a2520", accent: "#c9a89a", muted: "#9a9088", btnBg: "#2a2520", btnFg: "#faf8f5" },
+  { id: "petal",    label: "Petal Pastel",   bg: "#f0ebe3", fg: "#18181b", accent: "#d9544a", muted: "#71717a", btnBg: "#d9544a", btnFg: "#ffffff" },
+  { id: "brooklyn", label: "Brooklyn Red",   bg: "#0d0d0d", fg: "#f0efe9", accent: "#e8382c", muted: "#7a7a7a", btnBg: "#e8382c", btnFg: "#0d0d0d" },
+  { id: "slate",    label: "Cool Slate",     bg: "#f0f4f8", fg: "#1e293b", accent: "#334155", muted: "#64748b", btnBg: "#1e293b", btnFg: "#f0f4f8" },
 ];
 
-const WIZARD_PALETTES = [
-  { id: "bw",       label: "Black & White",  bg: "#fafafa", fg: "#0a0a0a", accent: "#facc15", muted: "#888888" },
-  { id: "noir",     label: "Noir",            bg: "#0a0a0a", fg: "#f5f5f5", accent: "#e8382c", muted: "#666666" },
-  { id: "warm",     label: "Warm Cream",      bg: "#faf8f5", fg: "#2a2520", accent: "#c9a89a", muted: "#9a9088" },
-  { id: "petal",    label: "Petal Pastel",    bg: "#f0ebe3", fg: "#18181b", accent: "#d9544a", muted: "#71717a" },
-  { id: "brooklyn", label: "Brooklyn Red",    bg: "#0d0d0d", fg: "#f0efe9", accent: "#e8382c", muted: "#7a7a7a" },
-  { id: "slate",    label: "Cool Slate",      bg: "#f0f4f8", fg: "#1e293b", accent: "#334155", muted: "#64748b" },
-];
+type Palette = { id: string; label: string; bg: string; fg: string; accent: string; muted: string; btnBg: string; btnFg: string };
+
+const CUSTOM_PALETTES_KEY = "portapic.wizard.customPalettes";
+const DEFAULT_CUSTOM_PALETTE: Palette = { id: "custom-draft", label: "Custom", bg: "#ffffff", fg: "#111111", accent: "#e8382c", muted: "#888888", btnBg: "#111111", btnFg: "#ffffff" };
 
 type WizardState = {
   brandName:  string;
@@ -1078,7 +1186,7 @@ type WizardState = {
   primary:    typeof WIZARD_FONTS[number];
   secondary:  typeof WIZARD_FONTS[number];
   mono:       typeof WIZARD_FONTS[number];
-  palette:    typeof WIZARD_PALETTES[number];
+  palette:    Palette;
 };
 
 function StyleWizardModal({ onClose }: { onClose: () => void }) {
@@ -1086,16 +1194,32 @@ function StyleWizardModal({ onClose }: { onClose: () => void }) {
     brandName: "Sofia Chen",
     logoMode:  "text",
     primary:   WIZARD_FONTS[0]!,
-    secondary: WIZARD_FONTS[3]!,
-    mono:      WIZARD_FONTS[6]!,
+    secondary: WIZARD_FONTS.find((f) => f.id === "dm-sans")!,
+    mono:      WIZARD_FONTS.find((f) => f.id === "space-mono")!,
     palette:   WIZARD_PALETTES[0]!,
   });
+  const [customPalettes, setCustomPalettes] = useState<Palette[]>([]);
+  const [fontPicker, setFontPicker] = useState<null | { slot: "primary" | "secondary" | "mono"; defaultFilter?: FontCat }>(null);
+  const [paletteBuilder, setPaletteBuilder] = useState(false);
+
+  /* Load saved custom palettes from localStorage on mount. */
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(CUSTOM_PALETTES_KEY);
+      if (raw) setCustomPalettes(JSON.parse(raw) as Palette[]);
+    } catch { /* ignore corrupted storage */ }
+  }, []);
+
+  const saveCustomPalettes = (next: Palette[]) => {
+    setCustomPalettes(next);
+    try { localStorage.setItem(CUSTOM_PALETTES_KEY, JSON.stringify(next)); } catch { /* quota or private mode */ }
+  };
 
   useEffect(() => {
-    const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const fn = (e: KeyboardEvent) => { if (e.key === "Escape" && !fontPicker && !paletteBuilder) onClose(); };
     document.addEventListener("keydown", fn);
     return () => document.removeEventListener("keydown", fn);
-  }, [onClose]);
+  }, [onClose, fontPicker, paletteBuilder]);
 
   function patch<K extends keyof WizardState>(key: K, value: WizardState[K]) {
     setState((s) => ({ ...s, [key]: value }));
@@ -1114,6 +1238,10 @@ function StyleWizardModal({ onClose }: { onClose: () => void }) {
         className="relative bg-[var(--bg-card)] border border-[var(--border)] rounded-xl w-full max-w-5xl max-h-[88dvh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Load the full wizard font library once for the previews */}
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link rel="stylesheet" href={WIZARD_FONTS_HREF} />
+
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
           <div>
@@ -1157,50 +1285,33 @@ function StyleWizardModal({ onClose }: { onClose: () => void }) {
               </div>
             </Field>
 
-            {/* Primary font (headings) */}
-            <FontSelect
-              label="Primary font · Headings"
-              value={state.primary}
-              onChange={(f) => patch("primary", f)}
-            />
-
-            {/* Secondary (body) */}
-            <FontSelect
-              label="Secondary font · Body"
-              value={state.secondary}
-              onChange={(f) => patch("secondary", f)}
-            />
-
-            {/* Mono (labels) */}
-            <FontSelect
-              label="Tertiary font · Labels"
-              value={state.mono}
-              onChange={(f) => patch("mono", f)}
-              filterCat="mono"
-            />
+            {/* Font slots — each opens the searchable picker modal */}
+            <FontSlotButton label="Primary font · Headings"  value={state.primary}   onClick={() => setFontPicker({ slot: "primary" })} />
+            <FontSlotButton label="Secondary font · Body"    value={state.secondary} onClick={() => setFontPicker({ slot: "secondary" })} />
+            <FontSlotButton label="Tertiary font · Labels"   value={state.mono}      onClick={() => setFontPicker({ slot: "mono", defaultFilter: "mono" })} />
 
             {/* Palette */}
             <Field label="Color palette">
               <div className="grid grid-cols-2 gap-2">
-                {WIZARD_PALETTES.map((p) => {
-                  const active = state.palette.id === p.id;
-                  return (
-                    <button
-                      key={p.id}
-                      onClick={() => patch("palette", p)}
-                      className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
-                        active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"
-                      }`}
-                    >
-                      <div className="flex gap-0.5 rounded overflow-hidden">
-                        {[p.bg, p.fg, p.accent, p.muted].map((c) => (
-                          <div key={c} className="w-3 h-6" style={{ background: c }} />
-                        ))}
-                      </div>
-                      <span className="font-sans text-[11px] font-medium text-[var(--fg)] truncate flex-1 text-left">{p.label}</span>
-                    </button>
-                  );
-                })}
+                {WIZARD_PALETTES.map((p) => (
+                  <PaletteSwatch key={p.id} p={p} active={state.palette.id === p.id} onClick={() => patch("palette", p)} />
+                ))}
+                {customPalettes.map((p) => (
+                  <PaletteSwatch key={p.id} p={p} active={state.palette.id === p.id} onClick={() => patch("palette", p)} custom
+                    onDelete={() => {
+                      const next = customPalettes.filter((x) => x.id !== p.id);
+                      saveCustomPalettes(next);
+                      if (state.palette.id === p.id) patch("palette", WIZARD_PALETTES[0]!);
+                    }}
+                  />
+                ))}
+                <button
+                  onClick={() => setPaletteBuilder(true)}
+                  className="flex items-center justify-center gap-2 p-2 rounded-lg border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span className="font-sans text-[11px] font-medium">Custom palette</span>
+                </button>
               </div>
             </Field>
           </div>
@@ -1215,6 +1326,33 @@ function StyleWizardModal({ onClose }: { onClose: () => void }) {
             <WireframePreview state={state} />
           </div>
         </div>
+
+        {/* Font picker modal */}
+        <AnimatePresence>
+          {fontPicker && (
+            <FontPickerModal
+              defaultFilter={fontPicker.defaultFilter}
+              current={state[fontPicker.slot].id}
+              onSelect={(f) => { patch(fontPicker.slot, f); setFontPicker(null); }}
+              onClose={() => setFontPicker(null)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Palette builder modal */}
+        <AnimatePresence>
+          {paletteBuilder && (
+            <PaletteBuilderModal
+              onClose={() => setPaletteBuilder(false)}
+              onSave={(p) => {
+                const next = [...customPalettes, p];
+                saveCustomPalettes(next);
+                patch("palette", p);
+                setPaletteBuilder(false);
+              }}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-[var(--border)] shrink-0">
@@ -1251,38 +1389,258 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function FontSelect({ label, value, onChange, filterCat }: {
+/* Button that displays the current font with a large preview and opens
+   the searchable picker on click. */
+function FontSlotButton({ label, value, onClick }: {
   label: string;
   value: typeof WIZARD_FONTS[number];
-  onChange: (f: typeof WIZARD_FONTS[number]) => void;
-  filterCat?: "serif" | "sans" | "mono";
+  onClick: () => void;
 }) {
-  const opts = filterCat ? WIZARD_FONTS.filter((f) => f.cat === filterCat) : WIZARD_FONTS;
   return (
     <Field label={label}>
-      {/* Preview */}
-      <div className="px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)]" style={{ fontFamily: value.stack }}>
-        <span className="text-2xl text-[var(--fg)] font-medium">Aa Bb 123</span>
-      </div>
-      {/* Options grid */}
-      <div className="grid grid-cols-2 gap-1.5">
-        {opts.map((f) => {
-          const active = f.id === value.id;
-          return (
-            <button
-              key={f.id}
-              onClick={() => onChange(f)}
-              className={`px-3 py-2 rounded-lg border text-left transition-all ${
-                active ? "border-yellow ring-2 ring-yellow/30 bg-[var(--bg)]" : "border-[var(--border)] hover:border-[var(--fg-muted)]"
-              }`}
-            >
-              <div style={{ fontFamily: f.stack, fontSize: 14, color: "var(--fg)", lineHeight: 1 }}>Ag</div>
-              <div className="font-mono text-[8px] uppercase tracking-wider text-[var(--fg-muted)] mt-1 truncate">{f.label}</div>
-            </button>
-          );
-        })}
-      </div>
+      <button
+        onClick={onClick}
+        className="flex items-center justify-between gap-3 px-3 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] hover:border-[var(--fg-muted)] transition-colors w-full"
+      >
+        <div className="text-left min-w-0 flex-1">
+          <div style={{ fontFamily: value.stack }} className="text-2xl text-[var(--fg)] font-medium truncate leading-none">
+            {value.label}
+          </div>
+          <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mt-1.5">
+            {value.cat} · click to change
+          </div>
+        </div>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
     </Field>
+  );
+}
+
+/* Searchable font picker — large modal showing every font in WIZARD_FONTS
+   with category filter pills and live previews. */
+function FontPickerModal({
+  current, defaultFilter, onSelect, onClose,
+}: {
+  current: string;
+  defaultFilter?: FontCat;
+  onSelect: (f: typeof WIZARD_FONTS[number]) => void;
+  onClose: () => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [cat, setCat] = useState<FontCat | "all">(defaultFilter ?? "all");
+
+  const filtered = WIZARD_FONTS.filter((f) => {
+    if (cat !== "all" && f.cat !== cat) return false;
+    if (query.trim() && !f.label.toLowerCase().includes(query.toLowerCase())) return false;
+    return true;
+  });
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      className="absolute inset-0 z-10 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.96, y: 12 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 12 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full max-w-2xl max-h-[80dvh] flex flex-col bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header — search + filter pills */}
+        <div className="flex flex-col gap-3 px-5 py-4 border-b border-[var(--border)] shrink-0">
+          <div className="flex items-center justify-between">
+            <h3 className="font-sans font-bold text-[var(--fg)] text-sm leading-none">Choose a font</h3>
+            <button onClick={onClose} className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--fg-muted)]" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input
+              autoFocus value={query} onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name…"
+              className="w-full pl-8 pr-3 py-2 rounded-lg bg-[var(--bg)] border border-[var(--border)] text-[var(--fg)] text-sm font-sans focus:border-yellow focus:outline-none transition-colors"
+            />
+          </div>
+          <div className="flex gap-1">
+            {(["all", "serif", "sans", "mono"] as const).map((c) => (
+              <button
+                key={c}
+                onClick={() => setCat(c)}
+                className={`px-3 py-1.5 rounded-lg font-mono text-[10px] uppercase tracking-widest transition-colors ${
+                  cat === c ? "bg-[var(--fg)] text-[var(--bg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"
+                }`}
+              >
+                {c === "all" ? "All" : c}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Font list */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-3">
+          {filtered.length === 0 ? (
+            <div className="py-16 text-center font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest">No fonts match</div>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              {filtered.map((f) => {
+                const active = f.id === current;
+                return (
+                  <button
+                    key={f.id}
+                    onClick={() => onSelect(f)}
+                    className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg border text-left transition-all ${
+                      active ? "border-yellow bg-yellow/5" : "border-transparent hover:bg-[var(--bg-subtle)]"
+                    }`}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div style={{ fontFamily: f.stack }} className="text-2xl text-[var(--fg)] leading-none truncate">{f.label}</div>
+                      <div style={{ fontFamily: f.stack }} className="text-sm text-[var(--fg-muted)] mt-1.5 truncate">The quick brown fox jumps over the lazy dog</div>
+                    </div>
+                    <span className={`shrink-0 font-mono text-[9px] uppercase tracking-widest ${active ? "text-yellow" : "text-[var(--fg-muted)]"}`}>{f.cat}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* Reusable palette swatch — used for both built-in and custom palettes. */
+function PaletteSwatch({ p, active, onClick, custom, onDelete }: {
+  p: Palette; active: boolean; onClick: () => void;
+  custom?: boolean; onDelete?: () => void;
+}) {
+  return (
+    <div className="relative group">
+      <button
+        onClick={onClick}
+        className={`w-full flex items-center gap-2 p-2 rounded-lg border transition-all ${
+          active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"
+        }`}
+      >
+        <div className="flex gap-0.5 rounded overflow-hidden shrink-0">
+          {[p.bg, p.fg, p.accent, p.muted, p.btnBg].map((c, i) => (
+            <div key={i} className="w-2.5 h-6" style={{ background: c }} />
+          ))}
+        </div>
+        <span className="font-sans text-[11px] font-medium text-[var(--fg)] truncate flex-1 text-left">{p.label}</span>
+      </button>
+      {custom && onDelete && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[var(--bg-card)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-red-500 hover:border-red-500 transition-colors opacity-0 group-hover:opacity-100 flex items-center justify-center"
+          aria-label="Delete palette"
+        >
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* Build a custom palette using the same six slots templates expose
+   (bg / fg / accent / muted / btnBg / btnFg). Saves to localStorage. */
+function PaletteBuilderModal({ onClose, onSave }: { onClose: () => void; onSave: (p: Palette) => void }) {
+  const [draft, setDraft] = useState<Palette>({ ...DEFAULT_CUSTOM_PALETTE });
+  const [name, setName] = useState("");
+
+  const update = (key: keyof Palette, value: string) => setDraft((d) => ({ ...d, [key]: value }));
+  const canSave = name.trim().length > 0;
+
+  const commit = () => {
+    if (!canSave) return;
+    onSave({
+      ...draft,
+      id: `custom-${Date.now()}`,
+      label: name.trim(),
+    });
+  };
+
+  const swatchRow = (key: keyof Palette, labelText: string, hint: string) => (
+    <div className="flex items-center gap-3">
+      <div className="flex-1">
+        <div className="font-sans text-xs font-semibold text-[var(--fg)]">{labelText}</div>
+        <div className="font-sans text-[11px] text-[var(--fg-muted)]">{hint}</div>
+      </div>
+      <label className="relative flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors">
+        <span className="w-5 h-5 rounded border border-black/10" style={{ background: draft[key] as string }} />
+        <input type="color" value={draft[key] as string} onChange={(e) => update(key, e.target.value)}
+          className="absolute inset-0 opacity-0 cursor-pointer" />
+        <span className="font-mono text-[10px] text-[var(--fg)] uppercase w-16">{draft[key] as string}</span>
+      </label>
+    </div>
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      className="absolute inset-0 z-10 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.96, y: 12 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 12 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full max-w-md bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden flex flex-col max-h-[85dvh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
+          <h3 className="font-sans font-bold text-[var(--fg)] text-sm leading-none">New custom palette</h3>
+          <button onClick={onClose} className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div className="overflow-y-auto p-5 flex flex-col gap-4">
+          <Field label="Palette name">
+            <input
+              autoFocus value={name} onChange={(e) => setName(e.target.value)}
+              placeholder="My brand"
+              className="w-full px-3 py-2 rounded-lg bg-[var(--bg)] border border-[var(--border)] text-[var(--fg)] text-sm font-sans focus:border-yellow focus:outline-none transition-colors"
+            />
+          </Field>
+
+          {/* Live preview strip */}
+          <div className="rounded-lg overflow-hidden border border-[var(--border)]" style={{ background: draft.bg }}>
+            <div className="px-4 py-5" style={{ color: draft.fg }}>
+              <div className="font-mono text-[9px] uppercase tracking-widest" style={{ color: draft.muted }}>Preview</div>
+              <div className="font-sans font-bold text-lg mt-1">Your brand name</div>
+              <div className="font-sans text-xs mt-1" style={{ color: draft.muted }}>Soft mornings, slow light.</div>
+              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded font-mono text-[10px] uppercase tracking-widest" style={{ background: draft.btnBg, color: draft.btnFg }}>
+                Download all
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {swatchRow("bg",     "Background",  "Page surface behind everything")}
+            {swatchRow("fg",     "Text",        "Headings + body copy")}
+            {swatchRow("muted",  "Muted",       "Captions, labels, metadata")}
+            {swatchRow("accent", "Accent",      "Highlights, key marks")}
+            {swatchRow("btnBg",  "Button bg",   "Primary CTA fill")}
+            {swatchRow("btnFg",  "Button text", "Primary CTA label")}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-[var(--border)] shrink-0">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">Cancel</button>
+          <button
+            onClick={commit} disabled={!canSave}
+            className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+          >
+            Save palette
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -1900,14 +2258,11 @@ const PRODUCT_TABS: { id: ProductType; label: string; count: number; icon: React
 
 export default function TemplatesPage() {
   const [productType,     setProductType]     = useState<ProductType>("portfolio");
-  const [portfolioFilter, setPortfolioFilter] = useState<PortfolioCategory>("All");
   const [bannerVisible,    setBannerVisible]    = useState(true);
   const [styleBannerVisible, setStyleBannerVisible] = useState(true);
   const [wizardOpen,       setWizardOpen]       = useState(false);
 
-  const filteredPortfolio = portfolioFilter === "All"
-    ? PORTFOLIO_TEMPLATES
-    : PORTFOLIO_TEMPLATES.filter((t) => t.category === portfolioFilter);
+  const filteredPortfolio = PORTFOLIO_TEMPLATES;
 
   return (
     <div className="min-h-full">
@@ -1923,13 +2278,15 @@ export default function TemplatesPage() {
           </div>
         </div>
 
-        {/* Product type tabs */}
-        <div className="flex gap-0 border-b border-[var(--border)] -mb-px">
+        {/* Product type tabs — horizontal-scrollable on narrow viewports so all
+            four destinations stay reachable on phone without wrapping or
+            overflow. Hide the scrollbar visually but keep momentum scrolling. */}
+        <div className="flex gap-0 border-b border-[var(--border)] -mb-px overflow-x-auto -mx-5 px-5 scrollbar-none" style={{ WebkitOverflowScrolling: "touch" }}>
           {PRODUCT_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setProductType(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 font-sans text-sm font-medium border-b-2 transition-colors ${
+              className={`shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-3 font-sans text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 productType === tab.id
                   ? "border-yellow text-[var(--fg)]"
                   : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"
@@ -1943,35 +2300,6 @@ export default function TemplatesPage() {
             </button>
           ))}
         </div>
-
-        {/* Portfolio category filter — only shown in portfolio tab */}
-        <AnimatePresence>
-          {productType === "portfolio" && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="overflow-hidden"
-            >
-              <div className="flex gap-1 flex-wrap py-3">
-                {PORTFOLIO_CATEGORIES.map((cat) => {
-                  const count = cat === "All" ? PORTFOLIO_TEMPLATES.length : PORTFOLIO_TEMPLATES.filter((t) => t.category === cat).length;
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => setPortfolioFilter(cat)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 font-sans text-xs font-medium transition-colors rounded-lg ${
-                        portfolioFilter === cat ? "bg-[var(--fg)] text-[var(--bg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"
-                      }`}
-                    >
-                      {cat}
-                      <span className={`font-mono text-[9px] ${portfolioFilter === cat ? "opacity-60" : "opacity-40"}`}>{count}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       {/* Banners — collections banner hides itself on the Collections tab */}
@@ -2016,18 +2344,11 @@ export default function TemplatesPage() {
           {/* ── Portfolio ── */}
           {productType === "portfolio" && (
             <motion.div key="portfolio" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-              {filteredPortfolio.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {filteredPortfolio.map((t, i) => (
-                    <PortfolioCard key={t.id} t={t} index={i} featured={!!t.featured} />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
-                  <span className="font-sans text-sm text-[var(--fg-muted)]">No templates in this category yet.</span>
-                  <button onClick={() => setPortfolioFilter("All")} className="font-mono text-[10px] text-yellow hover:text-[var(--fg)] transition-colors uppercase tracking-wider">See all →</button>
-                </div>
-              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {filteredPortfolio.map((t, i) => (
+                  <PortfolioCard key={t.id} t={t} index={i} featured={!!t.featured} />
+                ))}
+              </div>
             </motion.div>
           )}
 
