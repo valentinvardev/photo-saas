@@ -523,9 +523,10 @@ function ContentPanel({ page, set, focusedField, fieldRefs }: {
   );
 }
 
-function BrandingPanel({ page, set, focusedField, fieldRefs }: {
+function BrandingPanel({ page, set, focusedField, fieldRefs, onOpenCoverAdjust }: {
   page: DeliveryPage; set: Setter; focusedField: string | null;
   fieldRefs: React.MutableRefObject<Record<string, HTMLElement | null>>;
+  onOpenCoverAdjust: () => void;
 }) {
   return (
     <>
@@ -562,6 +563,20 @@ function BrandingPanel({ page, set, focusedField, fieldRefs }: {
       <div ref={(el) => { fieldRefs.current.coverUrl = el; }}>
         <FieldLabel>Cover image</FieldLabel>
         <ImageButton value={page.coverUrl} onChange={(u) => set("coverUrl", u)} placeholder="Use template default" />
+        {/* Adjust trigger — only useful when fit is "cover" (cropping happens) */}
+        <button
+          onClick={onOpenCoverAdjust}
+          disabled={page.coverFit === "contain"}
+          className="mt-2 w-full flex items-center justify-between px-3 py-2 rounded-lg border border-[var(--border)] hover:border-[var(--fg-muted)] font-sans text-xs text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <span className="flex items-center gap-2">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+            Adjust crop
+          </span>
+          <span className="font-mono text-[10px]">{page.coverPositionY}%</span>
+        </button>
       </div>
       <div>
         <FieldLabel>Cover fit</FieldLabel>
@@ -582,38 +597,6 @@ function BrandingPanel({ page, set, focusedField, fieldRefs }: {
             </button>
           ))}
         </div>
-      </div>
-      <div>
-        <div className="flex items-center justify-between mb-1.5">
-          <FieldLabel>Focal point</FieldLabel>
-          <span className="font-mono text-[10px] text-[var(--fg-muted)]">{page.coverPositionX}% · {page.coverPositionY}%</span>
-        </div>
-        {/* 9-point preset grid */}
-        <div className="grid grid-cols-3 gap-1 p-2 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
-          {[
-            [0,   0],   [50,  0],   [100, 0],
-            [0,   50],  [50,  50],  [100, 50],
-            [0,   100], [50,  100], [100, 100],
-          ].map(([x, y], i) => {
-            const active = page.coverPositionX === x && page.coverPositionY === y;
-            return (
-              <button key={i}
-                onClick={() => { set("coverPositionX", x!); set("coverPositionY", y!); }}
-                className={`aspect-square flex items-center justify-center rounded transition-all ${
-                  active
-                    ? "bg-yellow border border-yellow"
-                    : "bg-[var(--bg-subtle)] border border-[var(--border)] hover:border-[var(--fg-muted)]"
-                }`}
-                aria-label={`Focal point ${x}% ${y}%`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${active ? "bg-[#111]" : "bg-[var(--fg-muted)]"}`} />
-              </button>
-            );
-          })}
-        </div>
-        <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1.5">
-          Pick which part of the image stays visible when cropped.
-        </p>
       </div>
     </>
   );
@@ -815,6 +798,118 @@ function AccessPanel({ page, set }: { page: DeliveryPage; set: Setter }) {
   );
 }
 
+/* Modal — drag-to-adjust the vertical crop position of the cover image.
+   Mirrors how the template will actually render it: same aspect ratio,
+   same objectFit + objectPosition. The slider commits on release so users
+   can fine-tune without thrashing the store. */
+function CoverAdjustModal({ page, set, onClose }: { page: DeliveryPage; set: Setter; onClose: () => void }) {
+  const [y, setY] = useState(page.coverPositionY);
+  const previewSrc = page.coverUrl || `https://picsum.photos/seed/${page.coverSeed}/1600/900`;
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [onClose]);
+
+  const commit = () => { set("coverPositionY", y); onClose(); };
+  const reset  = () => setY(50);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.96, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.96, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 320, damping: 28 }}
+        className="w-full max-w-2xl bg-[var(--bg)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)]">
+          <div>
+            <h3 className="font-sans font-black text-[var(--fg)] text-sm">Adjust cover crop</h3>
+            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">Slide to choose what stays visible when the image is cropped</p>
+          </div>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div className="p-5 flex gap-4">
+          {/* Preview — same aspect the template uses for the cover */}
+          <div className="flex-1 relative overflow-hidden bg-black rounded-lg" style={{ aspectRatio: "16 / 9" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewSrc} alt="" draggable={false}
+              style={{
+                width: "100%", height: "100%",
+                objectFit: "cover",
+                objectPosition: `${page.coverPositionX ?? 50}% ${y}%`,
+                userSelect: "none",
+              }}
+            />
+            {/* Guide lines for rule of thirds */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)",
+              backgroundSize: "calc(100% / 3) calc(100% / 3)", backgroundPosition: "0 0",
+            }} />
+            <div className="absolute top-2 left-2 px-2 py-1 rounded bg-black/55 backdrop-blur-sm font-mono text-[9px] text-white/80 tracking-widest uppercase">Preview</div>
+          </div>
+
+          {/* Vertical slider */}
+          <div className="flex flex-col items-center gap-3 py-2">
+            <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest">Top</span>
+            <div
+              className="relative h-[280px] flex items-center justify-center"
+              style={{ width: 28 }}
+            >
+              <input
+                type="range" min={0} max={100} step={1}
+                value={y}
+                onChange={(e) => setY(Number(e.target.value))}
+                aria-label="Vertical crop position"
+                style={{
+                  /* Rotate a horizontal range -90deg to make it vertical.
+                     Width / height swap visually via the rotation. */
+                  WebkitAppearance: "none", appearance: "none",
+                  width: 280, height: 4, transform: "rotate(-90deg)",
+                  background: `linear-gradient(to right, #fad502 0%, #fad502 ${y}%, var(--bg-subtle) ${y}%, var(--bg-subtle) 100%)`,
+                  borderRadius: 4, outline: "none", cursor: "grab",
+                  accentColor: "#fad502",
+                }}
+              />
+            </div>
+            <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest">Btm</span>
+            <span className="font-mono text-xs text-[var(--fg)] mt-1 font-bold">{y}%</span>
+          </div>
+        </div>
+
+        <div className="px-5 py-3 border-t border-[var(--border)] flex items-center justify-between gap-2">
+          <button onClick={reset}
+            className="font-mono text-[11px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+          >
+            Reset to center
+          </button>
+          <div className="flex gap-2">
+            <button onClick={onClose}
+              className="px-4 py-2 rounded-xl border border-[var(--border)] font-sans text-xs font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+            >
+              Cancel
+            </button>
+            <button onClick={commit}
+              className="px-5 py-2 rounded-xl bg-yellow text-[#111] font-sans font-bold text-xs hover:opacity-90 transition-opacity"
+            >
+              Save crop
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function PasswordCopyPanel({
   page, set, focusedField, fieldRefs, onPreviewPasswordGate,
 }: {
@@ -974,6 +1069,7 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
   const [view, setView] = useState<DeliveryView>("gallery");
   const [showGallery, setShowGallery] = useState(false);
   const [showCoverPicker, setShowCoverPicker] = useState(false);
+  const [showCoverAdjust, setShowCoverAdjust] = useState(false);
   const [dirty, setDirty] = useState(false);
   const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -1094,7 +1190,7 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
           <Accordion id="branding" title="Branding"
             isOpen={openSections.has("branding")} onToggle={() => toggleSection("branding")} isActive={activeSection === "branding"}
           >
-            <BrandingPanel page={page} set={set} focusedField={activeField} fieldRefs={fieldRefs} />
+            <BrandingPanel page={page} set={set} focusedField={activeField} fieldRefs={fieldRefs} onOpenCoverAdjust={() => setShowCoverAdjust(true)} />
           </Accordion>
           <Accordion id="colors" title="Colors" count={page.customColors ? "custom" : "default"}
             isOpen={openSections.has("colors")} onToggle={() => toggleSection("colors")}
@@ -1146,6 +1242,9 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
         )}
         {showCoverPicker && (
           <SinglePhotoPicker value={page.coverUrl} onSelect={(u) => set("coverUrl", u)} onClose={() => setShowCoverPicker(false)} />
+        )}
+        {showCoverAdjust && (
+          <CoverAdjustModal page={page} set={set} onClose={() => setShowCoverAdjust(false)} />
         )}
       </AnimatePresence>
     </div>
