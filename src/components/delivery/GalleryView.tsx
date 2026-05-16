@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { CSSProperties } from "react";
 import { ALL_GALLERY_SEEDS, effectiveStyle, type DeliveryPage, type TemplateName } from "~/lib/delivery/data";
 import { EditableText, EditableImage, EditableHoverStyles, type FontSlot } from "./editable";
+import { BrooklynDelivery } from "~/app/template/brooklyn/delivery/component";
 
 /* ──────────────────────────────────────────────────────────────────────────
    GalleryView — live, per-template preview rendered from DeliveryPage state.
@@ -322,108 +323,6 @@ function HalcyonPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   BROOKLYN — dark + red accent, bold sans
-══════════════════════════════════════════════════════════════════════════ */
-
-function BrooklynPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange }: RendererProps) {
-  const baseT = { bg: "#0D0D0D", fg: "#F0EFE9", muted: "#7A7A7A", line: "#1F1F1F", raised: "#161616", accent: "#E8382C" };
-  const ts = effectiveStyle(page);
-  const t = page.customColors ? { ...baseT, bg: ts.bg, fg: ts.fg, accent: ts.accent } : baseT;
-  const photos = picks(page);
-  /* Brooklyn has no serif — slot 1 maps to its display sans, slot 2 to its body sans. */
-  const fDisplay = fontSlot(page, 1, BROOKLYN_FONTS.sans);
-  const fBody    = fontSlot(page, 2, BROOKLYN_FONTS.sans);
-  const fMono    = fontSlot(page, 3, BROOKLYN_FONTS.mono);
-  const wm = shouldWatermark(page);
-
-  if (view === "password") {
-    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={t} fDisplay={fDisplay} fBody={fBody} fMono={fMono} />;
-  }
-
-  return (
-    <div style={{ background: t.bg, color: t.fg, fontFamily: fBody, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
-      <FontStylesheet />
-      <EditableHoverStyles />
-      <div style={{ height: 3, background: t.accent }} />
-
-      <EditableImage
-        fieldPath="coverUrl" onRequestChange={onRequestCoverChange}
-        style={{ position: "relative", height: isMobile ? 220 : 360, overflow: "hidden" }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={coverFor(page)} alt="" style={coverImgStyle(page, { filter: "contrast(1.05)" })} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(13,13,13,0.25) 0%,rgba(13,13,13,0) 30%,rgba(13,13,13,0.85) 100%)" }} />
-        <div style={{ position: "absolute", inset: 0, padding: isMobile ? "16px 18px" : "24px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
-            <LogoBlock
-              page={page} set={set} fallback="BROOKLYN" fontSlot={3}
-              imageHeight={isMobile ? 16 : 20}
-              textStyle={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }}
-            />
-            {page.logoMode !== "none" && <span>/ Client Gallery</span>}
-            {page.logoMode === "none" && <span>Client Gallery</span>}
-          </div>
-          <div>
-            <div style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: t.muted, marginBottom: 8 }} data-font-slot={3}>
-              <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" fontSlot={3} />
-              {" · "}{page.photoCount || photos.length} frames
-            </div>
-            <EditableText
-              fieldPath="title" value={page.title} onChange={set ? (v) => set("title", v) : undefined}
-              as="h1" fontSlot={1}
-              style={{ fontFamily: fDisplay, fontWeight: 700, fontSize: isMobile ? 32 : 56, lineHeight: 1, letterSpacing: "-0.03em", margin: 0, textTransform: "uppercase" }}
-            />
-          </div>
-        </div>
-      </EditableImage>
-
-      <div style={{ padding: isMobile ? "18px" : "28px 32px" }}>
-        {(page.welcomeMessage || set) && (
-          <EditableText
-            fieldPath="welcomeMessage" value={page.welcomeMessage} onChange={set ? (v) => set("welcomeMessage", v) : undefined}
-            as="p" multiline fontSlot={2}
-            placeholder={set ? "Write a personal message to your client…" : ""}
-            style={{ fontFamily: fBody, fontSize: isMobile ? 13 : 15, lineHeight: 1.55, color: page.welcomeMessage ? t.fg : t.muted, margin: "0 0 24px", maxWidth: 600, display: "block" }}
-          />
-        )}
-        {page.layout === "masonry" ? (
-          <div style={{ columns: isMobile ? 2 : 4, columnGap: 6 }}>
-            {photos.map((seed, i) => (
-              <div key={seed} style={{ breakInside: "avoid", marginBottom: 6, position: "relative", overflow: "hidden", background: t.raised }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photoUrl(seed, 600, 500 + (i % 4) * 100)} alt="" style={{ width: "100%", display: "block" }} />
-                {wm && <Watermark text={page.logoText || "BROOKLYN"} fontFamily={fMono} />}
-                {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg={t.accent} fg={t.bg} fontFamily={fMono} />}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 6 }}>
-            {photos.map((seed) => (
-              <div key={seed} style={{ position: "relative", aspectRatio: "1", overflow: "hidden", background: t.raised }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photoUrl(seed, 600, 600)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                {wm && <Watermark text={page.logoText || "BROOKLYN"} fontFamily={fMono} />}
-                {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg={t.accent} fg={t.bg} fontFamily={fMono} />}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div style={{ padding: isMobile ? "18px" : "24px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-        <LogoBlock
-          page={page} set={set} fallback="BROOKLYN" fontSlot={3}
-          imageHeight={18}
-          textStyle={{ color: t.fg, fontWeight: 700, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}
-        />
-        <span>© {new Date().getFullYear()} · Portapic</span>
-      </div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
    MINIMAL — white paper, serif italic, strict grid
 ══════════════════════════════════════════════════════════════════════════ */
 
@@ -631,9 +530,16 @@ function PriceTag({ price, bg, fg, fontFamily }: { price: number; bg: string; fg
    PUBLIC API
 ══════════════════════════════════════════════════════════════════════════ */
 
+/* Adapter: Brooklyn now has its canonical client gallery in
+   /template/brooklyn/delivery — we render that directly so the editor
+   preview matches exactly what /d/[id] shows. */
+function BrooklynCanonical({ page, view, set, onRequestCoverChange }: RendererProps) {
+  return <BrooklynDelivery page={page} view={view} set={set} onRequestCoverChange={onRequestCoverChange} />;
+}
+
 const RENDERERS: Record<TemplateName, (props: RendererProps) => React.JSX.Element> = {
   halcyon:  HalcyonPreview,
-  brooklyn: BrooklynPreview,
+  brooklyn: BrooklynCanonical,
   minimal:  MinimalPreview,
   vogue:    GenericPreview,
 };
