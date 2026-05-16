@@ -43,7 +43,7 @@ export const useDeliveryStore = create<DeliveryStore>()(
     }),
     {
       name: "frame-delivery-pages",
-      version: 7,
+      version: 8,
       /* Migration history
          v2: cinematic/editorial templates remapped to vogue/minimal.
          v5: example pages reseeded for the four real templates.
@@ -51,7 +51,9 @@ export const useDeliveryStore = create<DeliveryStore>()(
          v7: monetization simplified — "selection" mode removed; selection
              modes remapped to "gift"; selectionLimit/proofingEnabled/
              watermark fields dropped (watermark is now derived from
-             mode === "direct"); password-gate copy fields added. */
+             mode === "direct"); password-gate copy fields added.
+         v8: cover image controls — coverFit + coverPositionX/Y added,
+             defaulting to ("cover", 50, 50). */
       migrate: (persisted, version) => {
         const state = persisted as { pages?: DeliveryPage[] } | undefined;
         if (!state?.pages) return state as DeliveryStore;
@@ -88,6 +90,12 @@ export const useDeliveryStore = create<DeliveryStore>()(
               passwordHint:     "Hint: it was shared with you by email.",
               passwordButtonLabel: "Unlock gallery",
             } as DeliveryPage;
+          });
+        }
+        if (version < 8) {
+          state.pages = state.pages.map((p) => {
+            const defaults: Partial<DeliveryPage> = { coverFit: "cover", coverPositionX: 50, coverPositionY: 50 };
+            return { ...defaults, ...p } as DeliveryPage;
           });
         }
         return state as DeliveryStore;

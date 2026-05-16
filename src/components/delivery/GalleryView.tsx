@@ -61,6 +61,18 @@ function coverFor(page: DeliveryPage) {
   return page.coverUrl || `https://picsum.photos/seed/${page.coverSeed}/1600/900`;
 }
 
+/* Cover image styling: lets photographers crop ("cover") or letterbox
+   ("contain") and adjust the focal point. Falls back to centered cover. */
+function coverImgStyle(page: DeliveryPage, extra: CSSProperties = {}): CSSProperties {
+  return {
+    width: "100%", height: "100%",
+    objectFit: page.coverFit ?? "cover",
+    objectPosition: `${page.coverPositionX ?? 50}% ${page.coverPositionY ?? 50}%`,
+    background: page.coverFit === "contain" ? "#000" : undefined,
+    ...extra,
+  };
+}
+
 /* Watermarks are auto-enabled whenever the photographer is monetising (direct
    sale). For gift / free delivery pages they're off. */
 function shouldWatermark(page: DeliveryPage) {
@@ -227,7 +239,7 @@ function HalcyonPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
         style={{ position: "relative", height: isMobile ? 220 : 360, overflow: "hidden" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <img src={coverFor(page)} alt="" style={coverImgStyle(page)} />
         <div style={{ position: "absolute", inset: 0, background: t.accent, mixBlendMode: "multiply", opacity: 0.55 }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(14,13,11,0.35) 0%,rgba(14,13,11,0) 30%,rgba(14,13,11,0.7) 75%,rgba(14,13,11,0.96) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, padding: isMobile ? "16px 18px" : "24px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between", color: t.fg }}>
@@ -268,16 +280,29 @@ function HalcyonPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
           <hr style={{ flex: 1, border: 0, borderTop: `1px solid ${t.line}` }} />
           <span>{photos.length} frames</span>
         </div>
-        <div style={{ columns: isMobile ? 2 : 3, columnGap: 10 }}>
-          {photos.map((seed, i) => (
-            <div key={seed} style={{ breakInside: "avoid", marginBottom: 10, position: "relative", overflow: "hidden", background: t.raised }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photoUrl(seed, 600, 480 + (i % 4) * 80)} alt="" style={{ width: "100%", display: "block" }} />
-              {wm && <Watermark text={page.logoText || "HALCYON"} fontFamily={fMono} />}
-              {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(14,13,11,0.7)" fg={t.fg} fontFamily={fMono} />}
-            </div>
-          ))}
-        </div>
+        {page.layout === "masonry" ? (
+          <div style={{ columns: isMobile ? 2 : 3, columnGap: 10 }}>
+            {photos.map((seed, i) => (
+              <div key={seed} style={{ breakInside: "avoid", marginBottom: 10, position: "relative", overflow: "hidden", background: t.raised }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl(seed, 600, 480 + (i % 4) * 80)} alt="" style={{ width: "100%", display: "block" }} />
+                {wm && <Watermark text={page.logoText || "HALCYON"} fontFamily={fMono} />}
+                {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(14,13,11,0.7)" fg={t.fg} fontFamily={fMono} />}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)", gap: 10 }}>
+            {photos.map((seed) => (
+              <div key={seed} style={{ position: "relative", aspectRatio: "4/5", overflow: "hidden", background: t.raised }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl(seed, 600, 750)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                {wm && <Watermark text={page.logoText || "HALCYON"} fontFamily={fMono} />}
+                {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(14,13,11,0.7)" fg={t.fg} fontFamily={fMono} />}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Footer */}
@@ -326,7 +351,7 @@ function BrooklynPreview({ page, isMobile, set, view = "gallery", onRequestCover
         style={{ position: "relative", height: isMobile ? 220 : 360, overflow: "hidden" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", filter: "contrast(1.05)" }} />
+        <img src={coverFor(page)} alt="" style={coverImgStyle(page, { filter: "contrast(1.05)" })} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(13,13,13,0.25) 0%,rgba(13,13,13,0) 30%,rgba(13,13,13,0.85) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, padding: isMobile ? "16px 18px" : "24px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
@@ -361,16 +386,29 @@ function BrooklynPreview({ page, isMobile, set, view = "gallery", onRequestCover
             style={{ fontFamily: fBody, fontSize: isMobile ? 13 : 15, lineHeight: 1.55, color: page.welcomeMessage ? t.fg : t.muted, margin: "0 0 24px", maxWidth: 600, display: "block" }}
           />
         )}
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 6 }}>
-          {photos.map((seed) => (
-            <div key={seed} style={{ position: "relative", aspectRatio: "1", overflow: "hidden", background: t.raised }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photoUrl(seed, 600, 600)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              {wm && <Watermark text={page.logoText || "BROOKLYN"} fontFamily={fMono} />}
-              {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg={t.accent} fg={t.bg} fontFamily={fMono} />}
-            </div>
-          ))}
-        </div>
+        {page.layout === "masonry" ? (
+          <div style={{ columns: isMobile ? 2 : 4, columnGap: 6 }}>
+            {photos.map((seed, i) => (
+              <div key={seed} style={{ breakInside: "avoid", marginBottom: 6, position: "relative", overflow: "hidden", background: t.raised }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl(seed, 600, 500 + (i % 4) * 100)} alt="" style={{ width: "100%", display: "block" }} />
+                {wm && <Watermark text={page.logoText || "BROOKLYN"} fontFamily={fMono} />}
+                {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg={t.accent} fg={t.bg} fontFamily={fMono} />}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 6 }}>
+            {photos.map((seed) => (
+              <div key={seed} style={{ position: "relative", aspectRatio: "1", overflow: "hidden", background: t.raised }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl(seed, 600, 600)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                {wm && <Watermark text={page.logoText || "BROOKLYN"} fontFamily={fMono} />}
+                {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg={t.accent} fg={t.bg} fontFamily={fMono} />}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div style={{ padding: isMobile ? "18px" : "24px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
@@ -447,7 +485,7 @@ function MinimalPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
           style={{ position: "relative", height: isMobile ? 220 : 360, overflow: "hidden", background: t.raised, borderBottom: `1px solid ${t.line}` }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          <img src={coverFor(page)} alt="" style={coverImgStyle(page, { display: "block" })} />
         </EditableImage>
       )}
 
@@ -459,16 +497,29 @@ function MinimalPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
           </h2>
           <hr style={{ flex: 1, border: 0, borderTop: `1px solid ${t.line}` }} />
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12 }}>
-          {photos.map((seed) => (
-            <div key={seed} style={{ position: "relative", aspectRatio: "4/5", overflow: "hidden", background: t.raised, border: `1px solid ${t.line}` }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photoUrl(seed, 600, 750)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              {wm && <Watermark text={page.logoText || "STUDIO"} fontFamily={fMono} dark />}
-              {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(255,255,255,0.92)" fg={t.fg} fontFamily={fMono} />}
-            </div>
-          ))}
-        </div>
+        {page.layout === "masonry" ? (
+          <div style={{ columns: isMobile ? 2 : 4, columnGap: 12 }}>
+            {photos.map((seed, i) => (
+              <div key={seed} style={{ breakInside: "avoid", marginBottom: 12, position: "relative", overflow: "hidden", background: t.raised, border: `1px solid ${t.line}` }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl(seed, 600, 600 + (i % 4) * 100)} alt="" style={{ width: "100%", display: "block" }} />
+                {wm && <Watermark text={page.logoText || "STUDIO"} fontFamily={fMono} dark />}
+                {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(255,255,255,0.92)" fg={t.fg} fontFamily={fMono} />}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12 }}>
+            {photos.map((seed) => (
+              <div key={seed} style={{ position: "relative", aspectRatio: "4/5", overflow: "hidden", background: t.raised, border: `1px solid ${t.line}` }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl(seed, 600, 750)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                {wm && <Watermark text={page.logoText || "STUDIO"} fontFamily={fMono} dark />}
+                {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(255,255,255,0.92)" fg={t.fg} fontFamily={fMono} />}
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <footer style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
@@ -510,7 +561,7 @@ function GenericPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
         style={{ position: "relative", height: isMobile ? 200 : 320, overflow: "hidden" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <img src={coverFor(page)} alt="" style={coverImgStyle(page)} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.7))" }} />
         <div style={{ position: "absolute", bottom: isMobile ? 16 : 28, left: isMobile ? 16 : 28, right: isMobile ? 16 : 28, color: "#fff" }}>
           <p style={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.7, marginBottom: 4 }} data-font-slot={3}>
@@ -535,14 +586,25 @@ function GenericPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
         </div>
       )}
       <div style={{ padding: isMobile ? 14 : 28 }}>
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)", gap: 8 }}>
-          {photos.map((seed) => (
-            <div key={seed} style={{ position: "relative", aspectRatio: "1", overflow: "hidden", background: ts.accent }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photoUrl(seed, 600, 600)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </div>
-          ))}
-        </div>
+        {page.layout === "masonry" ? (
+          <div style={{ columns: isMobile ? 2 : 3, columnGap: 8 }}>
+            {photos.map((seed, i) => (
+              <div key={seed} style={{ breakInside: "avoid", marginBottom: 8, position: "relative", overflow: "hidden", background: ts.accent }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl(seed, 600, 500 + (i % 4) * 100)} alt="" style={{ width: "100%", display: "block" }} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)", gap: 8 }}>
+            {photos.map((seed) => (
+              <div key={seed} style={{ position: "relative", aspectRatio: "1", overflow: "hidden", background: ts.accent }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl(seed, 600, 600)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

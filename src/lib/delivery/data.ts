@@ -34,6 +34,11 @@ export interface DeliveryPage {
   layout:           LayoutStyle;
   welcomeMessage:   string;
   showUpsellBanner: boolean;
+  /** How the cover image fits into its container. */
+  coverFit:         "cover" | "contain";
+  /** 0–100 percentages used to set the cover image's CSS object-position. */
+  coverPositionX:   number;
+  coverPositionY:   number;
   // Password gate copy — shown when passwordEnabled is true
   passwordTitle:    string;
   passwordSubtitle: string;
@@ -81,6 +86,9 @@ export const DEFAULT_BRANDING = {
   passwordSubtitle: "Enter the access code to view.",
   passwordHint: "Hint: it was shared with you by email.",
   passwordButtonLabel: "Unlock gallery",
+  coverFit: "cover" as const,
+  coverPositionX: 50,
+  coverPositionY: 50,
 };
 
 /* Cover URLs lifted from the actual template asset banks so each

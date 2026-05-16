@@ -563,6 +563,58 @@ function BrandingPanel({ page, set, focusedField, fieldRefs }: {
         <FieldLabel>Cover image</FieldLabel>
         <ImageButton value={page.coverUrl} onChange={(u) => set("coverUrl", u)} placeholder="Use template default" />
       </div>
+      <div>
+        <FieldLabel>Cover fit</FieldLabel>
+        <div className="flex gap-2">
+          {([
+            { id: "cover",   label: "Fill",  desc: "Crop to fill" },
+            { id: "contain", label: "Fit",   desc: "Show whole image" },
+          ] as { id: "cover" | "contain"; label: string; desc: string }[]).map((opt) => (
+            <button key={opt.id} onClick={() => set("coverFit", opt.id)}
+              className={`flex-1 py-2 rounded-xl border font-sans text-xs font-medium transition-all ${
+                page.coverFit === opt.id
+                  ? "border-yellow bg-yellow/10 text-[var(--fg)]"
+                  : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
+              }`}
+              title={opt.desc}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <FieldLabel>Focal point</FieldLabel>
+          <span className="font-mono text-[10px] text-[var(--fg-muted)]">{page.coverPositionX}% · {page.coverPositionY}%</span>
+        </div>
+        {/* 9-point preset grid */}
+        <div className="grid grid-cols-3 gap-1 p-2 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
+          {[
+            [0,   0],   [50,  0],   [100, 0],
+            [0,   50],  [50,  50],  [100, 50],
+            [0,   100], [50,  100], [100, 100],
+          ].map(([x, y], i) => {
+            const active = page.coverPositionX === x && page.coverPositionY === y;
+            return (
+              <button key={i}
+                onClick={() => { set("coverPositionX", x!); set("coverPositionY", y!); }}
+                className={`aspect-square flex items-center justify-center rounded transition-all ${
+                  active
+                    ? "bg-yellow border border-yellow"
+                    : "bg-[var(--bg-subtle)] border border-[var(--border)] hover:border-[var(--fg-muted)]"
+                }`}
+                aria-label={`Focal point ${x}% ${y}%`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${active ? "bg-[#111]" : "bg-[var(--fg-muted)]"}`} />
+              </button>
+            );
+          })}
+        </div>
+        <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1.5">
+          Pick which part of the image stays visible when cropped.
+        </p>
+      </div>
     </>
   );
 }
