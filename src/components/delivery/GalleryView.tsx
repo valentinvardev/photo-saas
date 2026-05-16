@@ -65,11 +65,11 @@ function selectionMeta(page: DeliveryPage, photoCount: number) {
   return { picked: 3, limit: page.selectionLimit, total: photoCount };
 }
 
-/* Custom-color helpers — when the user has toggled custom colors on, surface
-   them via CSS-var-like overrides so templates that respect them feel branded
-   without breaking the original aesthetic. */
-function themedFontFamily(page: DeliveryPage, fallback: string) {
-  return page.fontFamily && page.fontFamily !== "Inter, sans-serif" ? page.fontFamily : fallback;
+/* Pick a font for a given slot. Empty user value → fall back to the template
+   built-in. Templates use slot 1 for display/headings, 2 for body, 3 for mono. */
+function fontSlot(page: DeliveryPage, slot: 1 | 2 | 3, fallback: string) {
+  const v = slot === 1 ? page.fontFamily1 : slot === 2 ? page.fontFamily2 : page.fontFamily3;
+  return v && v.trim() ? v : fallback;
 }
 
 interface RendererProps {
@@ -90,10 +90,12 @@ function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
   const photos = picks(page);
   const sel = selectionMeta(page, photos.length);
   const [first, second] = page.client.split(/\s*&\s*|\s+y\s+|\s+and\s+/);
-  const fontSans = themedFontFamily(page, HALCYON_FONTS.sans);
+  const fDisplay = fontSlot(page, 1, HALCYON_FONTS.serif);
+  const fBody    = fontSlot(page, 2, HALCYON_FONTS.sans);
+  const fMono    = fontSlot(page, 3, HALCYON_FONTS.mono);
 
   return (
-    <div style={{ background: t.bg, color: t.fg, fontFamily: fontSans, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
+    <div style={{ background: t.bg, color: t.fg, fontFamily: fBody, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
       <FontStylesheet />
       <EditableHoverStyles />
       <div style={{ height: 3, background: t.accent }} />
@@ -111,15 +113,16 @@ function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
         <div style={{ position: "absolute", inset: 0, padding: isMobile ? "16px 18px" : "24px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between", color: t.fg }}>
           <EditableText
             fieldPath="logoText" value={page.logoText || "HALCYON"} onChange={set ? (v) => set("logoText", v) : undefined}
-            style={{ fontFamily: HALCYON_FONTS.mono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.85 }}
+            fontSlot={3}
+            style={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.85 }}
           />
           <div>
-            <div style={{ fontFamily: HALCYON_FONTS.mono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.8, marginBottom: 6 }}>
+            <div style={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.8, marginBottom: 6 }} data-font-slot={3}>
               For{" "}
-              <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" />
+              <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" fontSlot={3} />
               {" · "}{page.photoCount || photos.length} photographs
             </div>
-            <h1 style={{ fontFamily: HALCYON_FONTS.serif, fontSize: isMobile ? 36 : 64, lineHeight: 0.95, letterSpacing: "-0.02em", margin: 0, fontWeight: 400 }}>
+            <h1 style={{ fontFamily: fDisplay, fontSize: isMobile ? 36 : 64, lineHeight: 0.95, letterSpacing: "-0.02em", margin: 0, fontWeight: 400 }} data-font-slot={1}>
               {first ?? page.title} <em style={{ fontStyle: "italic", color: t.accent }}>&amp; {second ?? ""}</em>
             </h1>
           </div>
@@ -129,10 +132,10 @@ function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
       {/* Selection bar */}
       {sel && (
         <div style={{ background: t.raised, borderBottom: `1px solid ${t.line}`, padding: isMobile ? "10px 16px" : "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <div style={{ fontFamily: HALCYON_FONTS.mono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: t.muted }}>
+          <div style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: t.muted }}>
             <span style={{ color: t.fg }}>{sel.picked}</span> / {sel.limit} chosen
           </div>
-          <button style={{ background: t.accent, color: t.fg, border: 0, fontFamily: HALCYON_FONTS.mono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", padding: "8px 14px", cursor: "pointer" }}>Submit</button>
+          <button style={{ background: t.accent, color: t.fg, border: 0, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", padding: "8px 14px", cursor: "pointer" }}>Submit</button>
         </div>
       )}
 
@@ -141,16 +144,16 @@ function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
         <div style={{ padding: isMobile ? "20px 18px 0" : "28px 32px 0", maxWidth: 640 }}>
           <EditableText
             fieldPath="welcomeMessage" value={page.welcomeMessage} onChange={set ? (v) => set("welcomeMessage", v) : undefined}
-            as="p" multiline
+            as="p" multiline fontSlot={1}
             placeholder={set ? "Write a personal message to your client…" : ""}
-            style={{ fontFamily: HALCYON_FONTS.serif, fontStyle: "italic", fontSize: isMobile ? 14 : 17, lineHeight: 1.55, color: page.welcomeMessage ? t.fg : t.muted, margin: 0 }}
+            style={{ fontFamily: fDisplay, fontStyle: "italic", fontSize: isMobile ? 14 : 17, lineHeight: 1.55, color: page.welcomeMessage ? t.fg : t.muted, margin: 0 }}
           />
         </div>
       )}
 
       {/* Section label + photo grid */}
       <div style={{ padding: isMobile ? "18px 18px 32px" : "32px 32px 48px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, color: t.muted, marginBottom: 16, fontFamily: HALCYON_FONTS.mono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, color: t.muted, marginBottom: 16, fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
           <span>The Day</span>
           <hr style={{ flex: 1, border: 0, borderTop: `1px solid ${t.line}` }} />
           <span>{photos.length} frames</span>
@@ -160,20 +163,20 @@ function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
             <div key={seed} style={{ breakInside: "avoid", marginBottom: 10, position: "relative", overflow: "hidden", background: t.raised }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photoUrl(seed, 600, 480 + (i % 4) * 80)} alt="" style={{ width: "100%", display: "block" }} />
-              {page.watermark && <Watermark text={page.logoText || "HALCYON"} fontFamily={HALCYON_FONTS.mono} />}
+              {page.watermark && <Watermark text={page.logoText || "HALCYON"} fontFamily={fMono} />}
               {page.mode === "selection" && <FavBadge accent={t.accent} />}
-              {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(14,13,11,0.7)" fg={t.fg} fontFamily={HALCYON_FONTS.mono} />}
+              {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(14,13,11,0.7)" fg={t.fg} fontFamily={fMono} />}
             </div>
           ))}
         </div>
       </div>
 
       {/* Footer */}
-      <div style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: HALCYON_FONTS.mono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-        <span style={{ fontFamily: HALCYON_FONTS.serif, fontSize: 16, color: t.fg, textTransform: "none", letterSpacing: 0 }}>
+      <div style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+        <span style={{ fontFamily: fDisplay, fontSize: 16, color: t.fg, textTransform: "none", letterSpacing: 0 }}>
           {page.logoText || "Halcyon"}<em style={{ color: t.accent, fontStyle: "italic" }}> Studio</em>
         </span>
-        <span>© {new Date().getFullYear()} · Delivered with FRAME</span>
+        <span>© {new Date().getFullYear()} · Delivered with Portapic</span>
       </div>
     </div>
   );
@@ -189,10 +192,13 @@ function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: Renderer
   const t = page.customColors ? { ...baseT, bg: ts.bg, fg: ts.fg, accent: ts.accent } : baseT;
   const photos = picks(page);
   const sel = selectionMeta(page, photos.length);
-  const fontSans = themedFontFamily(page, BROOKLYN_FONTS.sans);
+  /* Brooklyn has no serif — slot 1 maps to its display sans, slot 2 to its body sans. */
+  const fDisplay = fontSlot(page, 1, BROOKLYN_FONTS.sans);
+  const fBody    = fontSlot(page, 2, BROOKLYN_FONTS.sans);
+  const fMono    = fontSlot(page, 3, BROOKLYN_FONTS.mono);
 
   return (
-    <div style={{ background: t.bg, color: t.fg, fontFamily: fontSans, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
+    <div style={{ background: t.bg, color: t.fg, fontFamily: fBody, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
       <FontStylesheet />
       <EditableHoverStyles />
       <div style={{ height: 3, background: t.accent }} />
@@ -205,19 +211,19 @@ function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: Renderer
         <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", filter: "contrast(1.05)" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(13,13,13,0.25) 0%,rgba(13,13,13,0) 30%,rgba(13,13,13,0.85) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, padding: isMobile ? "16px 18px" : "24px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <div style={{ fontFamily: BROOKLYN_FONTS.mono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }}>
-            <EditableText fieldPath="logoText" value={page.logoText || "BROOKLYN"} onChange={set ? (v) => set("logoText", v) : undefined} as="span" />
+          <div style={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
+            <EditableText fieldPath="logoText" value={page.logoText || "BROOKLYN"} onChange={set ? (v) => set("logoText", v) : undefined} as="span" fontSlot={3} />
             {" / Client Gallery"}
           </div>
           <div>
-            <div style={{ fontFamily: BROOKLYN_FONTS.mono, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: t.muted, marginBottom: 8 }}>
-              <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" />
+            <div style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: t.muted, marginBottom: 8 }} data-font-slot={3}>
+              <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" fontSlot={3} />
               {" · "}{page.photoCount || photos.length} frames
             </div>
             <EditableText
               fieldPath="title" value={page.title} onChange={set ? (v) => set("title", v) : undefined}
-              as="h1"
-              style={{ fontWeight: 700, fontSize: isMobile ? 32 : 56, lineHeight: 1, letterSpacing: "-0.03em", margin: 0, textTransform: "uppercase" }}
+              as="h1" fontSlot={1}
+              style={{ fontFamily: fDisplay, fontWeight: 700, fontSize: isMobile ? 32 : 56, lineHeight: 1, letterSpacing: "-0.03em", margin: 0, textTransform: "uppercase" }}
             />
           </div>
         </div>
@@ -225,10 +231,10 @@ function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: Renderer
 
       {sel && (
         <div style={{ background: t.raised, borderBottom: `1px solid ${t.line}`, padding: isMobile ? "10px 16px" : "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <div style={{ fontFamily: BROOKLYN_FONTS.mono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: t.muted }}>
+          <div style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: t.muted }}>
             <span style={{ color: t.fg }}>{sel.picked}</span> / {sel.limit} selected
           </div>
-          <button style={{ background: t.accent, color: t.bg, border: 0, fontFamily: BROOKLYN_FONTS.mono, fontWeight: 700, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", padding: "8px 14px", cursor: "pointer" }}>Submit selection</button>
+          <button style={{ background: t.accent, color: t.bg, border: 0, fontFamily: fMono, fontWeight: 700, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", padding: "8px 14px", cursor: "pointer" }}>Submit selection</button>
         </div>
       )}
 
@@ -236,9 +242,9 @@ function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: Renderer
         {(page.welcomeMessage || set) && (
           <EditableText
             fieldPath="welcomeMessage" value={page.welcomeMessage} onChange={set ? (v) => set("welcomeMessage", v) : undefined}
-            as="p" multiline
+            as="p" multiline fontSlot={2}
             placeholder={set ? "Write a personal message to your client…" : ""}
-            style={{ fontFamily: BROOKLYN_FONTS.sans, fontSize: isMobile ? 13 : 15, lineHeight: 1.55, color: page.welcomeMessage ? t.fg : t.muted, margin: "0 0 24px", maxWidth: 600, display: "block" }}
+            style={{ fontFamily: fBody, fontSize: isMobile ? 13 : 15, lineHeight: 1.55, color: page.welcomeMessage ? t.fg : t.muted, margin: "0 0 24px", maxWidth: 600, display: "block" }}
           />
         )}
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 6 }}>
@@ -246,17 +252,17 @@ function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: Renderer
             <div key={seed} style={{ position: "relative", aspectRatio: "1", overflow: "hidden", background: t.raised }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photoUrl(seed, 600, 600)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              {page.watermark && <Watermark text={page.logoText || "BROOKLYN"} fontFamily={BROOKLYN_FONTS.mono} />}
+              {page.watermark && <Watermark text={page.logoText || "BROOKLYN"} fontFamily={fMono} />}
               {page.mode === "selection" && <FavBadge accent={t.accent} square />}
-              {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg={t.accent} fg={t.bg} fontFamily={BROOKLYN_FONTS.mono} />}
+              {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg={t.accent} fg={t.bg} fontFamily={fMono} />}
             </div>
           ))}
         </div>
       </div>
 
-      <div style={{ padding: isMobile ? "18px" : "24px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: BROOKLYN_FONTS.mono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+      <div style={{ padding: isMobile ? "18px" : "24px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
         <span style={{ color: t.fg, fontWeight: 700 }}>{page.logoText || "BROOKLYN"}</span>
-        <span>© {new Date().getFullYear()} · FRAME</span>
+        <span>© {new Date().getFullYear()} · Portapic</span>
       </div>
     </div>
   );
@@ -273,42 +279,43 @@ function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
   const photos = picks(page);
   const sel = selectionMeta(page, photos.length);
   const [first, second] = page.client.split(/\s*&\s*|\s+y\s+|\s+and\s+/);
-  const fontSans = themedFontFamily(page, MINIMAL_FONTS.sans);
+  const fDisplay = fontSlot(page, 1, MINIMAL_FONTS.serif);
+  const fBody    = fontSlot(page, 2, MINIMAL_FONTS.sans);
+  const fMono    = fontSlot(page, 3, MINIMAL_FONTS.mono);
 
   return (
-    <div style={{ background: t.bg, color: t.fg, fontFamily: fontSans, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
+    <div style={{ background: t.bg, color: t.fg, fontFamily: fBody, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
       <FontStylesheet />
       <EditableHoverStyles />
 
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "16px 18px" : "22px 32px", borderBottom: `1px solid ${t.line}`, background: t.raised }}>
-        <span style={{ fontFamily: MINIMAL_FONTS.serif, fontSize: 20, letterSpacing: "-0.02em", fontWeight: 500 }}>
-          <EditableText fieldPath="logoText" value={page.logoText || "Studio"} onChange={set ? (v) => set("logoText", v) : undefined} as="span" />
+        <span style={{ fontFamily: fDisplay, fontSize: 20, letterSpacing: "-0.02em", fontWeight: 500 }} data-font-slot={1}>
+          <EditableText fieldPath="logoText" value={page.logoText || "Studio"} onChange={set ? (v) => set("logoText", v) : undefined} as="span" fontSlot={1} />
           <em style={{ fontStyle: "italic", color: t.muted }}> Minimal</em>
         </span>
-        <span style={{ fontFamily: MINIMAL_FONTS.mono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: t.muted }}>
-          <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" />
+        <span style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: t.muted }} data-font-slot={3}>
+          <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" fontSlot={3} />
         </span>
       </header>
 
-      {/* Hero (text-only, paper) — clickable to swap cover if cover image is shown elsewhere */}
+      {/* Hero (text-only, paper) */}
       <section style={{ padding: isMobile ? "48px 24px 32px" : "72px 32px 48px", textAlign: "center", borderBottom: `1px solid ${t.line}` }}>
-        <div style={{ fontFamily: MINIMAL_FONTS.mono, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: t.muted, marginBottom: 18 }}>
+        <div style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: t.muted, marginBottom: 18 }} data-font-slot={3}>
           For your eyes only · {page.photoCount || photos.length} photographs
         </div>
-        <h1 style={{ fontFamily: MINIMAL_FONTS.serif, fontSize: isMobile ? 44 : 80, lineHeight: 0.95, letterSpacing: "-0.02em", margin: 0, fontWeight: 400 }}>
+        <h1 style={{ fontFamily: fDisplay, fontSize: isMobile ? 44 : 80, lineHeight: 0.95, letterSpacing: "-0.02em", margin: 0, fontWeight: 400 }} data-font-slot={1}>
           {first ?? page.title}{second ? <><br /><em style={{ fontStyle: "italic" }}>&amp; {second}</em></> : null}
         </h1>
         {(page.welcomeMessage || set) && (
           <EditableText
             fieldPath="welcomeMessage" value={page.welcomeMessage} onChange={set ? (v) => set("welcomeMessage", v) : undefined}
-            as="p" multiline
+            as="p" multiline fontSlot={1}
             placeholder={set ? "Write a personal message to your client…" : ""}
-            style={{ fontFamily: MINIMAL_FONTS.serif, fontStyle: "italic", fontSize: isMobile ? 14 : 16, lineHeight: 1.55, color: t.muted, maxWidth: 460, margin: "20px auto 0", display: "block" }}
+            style={{ fontFamily: fDisplay, fontStyle: "italic", fontSize: isMobile ? 14 : 16, lineHeight: 1.55, color: t.muted, maxWidth: 460, margin: "20px auto 0", display: "block" }}
           />
         )}
       </section>
 
-      {/* Optional cover image strip — only shown when user has set one */}
       {(page.coverUrl || set) && (
         <EditableImage
           fieldPath="coverUrl" onRequestChange={onRequestCoverChange}
@@ -321,17 +328,17 @@ function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
 
       {sel && (
         <div style={{ background: t.bg, borderBottom: `1px solid ${t.line}`, padding: isMobile ? "12px 18px" : "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <div style={{ fontFamily: MINIMAL_FONTS.mono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: t.muted }}>
+          <div style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: t.muted }}>
             <span style={{ color: t.fg }}>{sel.picked}</span> / {sel.limit} chosen
           </div>
-          <button style={{ background: t.fg, color: t.bg, border: 0, fontFamily: MINIMAL_FONTS.mono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", padding: "8px 18px", cursor: "pointer" }}>Submit</button>
+          <button style={{ background: t.fg, color: t.bg, border: 0, fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", padding: "8px 18px", cursor: "pointer" }}>Submit</button>
         </div>
       )}
 
       <section style={{ padding: isMobile ? "32px 18px" : "48px 32px" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 24 }}>
-          <span style={{ fontFamily: MINIMAL_FONTS.mono, fontSize: 10, letterSpacing: "0.18em", color: t.muted, textTransform: "uppercase" }}>01</span>
-          <h2 style={{ fontFamily: MINIMAL_FONTS.serif, fontSize: isMobile ? 28 : 36, letterSpacing: "-0.02em", lineHeight: 1, margin: 0, fontWeight: 400 }}>
+          <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", color: t.muted, textTransform: "uppercase" }} data-font-slot={3}>01</span>
+          <h2 style={{ fontFamily: fDisplay, fontSize: isMobile ? 28 : 36, letterSpacing: "-0.02em", lineHeight: 1, margin: 0, fontWeight: 400 }} data-font-slot={1}>
             The <em style={{ fontStyle: "italic", color: t.muted }}>Day</em>
           </h2>
           <hr style={{ flex: 1, border: 0, borderTop: `1px solid ${t.line}` }} />
@@ -341,17 +348,17 @@ function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
             <div key={seed} style={{ position: "relative", aspectRatio: "4/5", overflow: "hidden", background: t.raised, border: `1px solid ${t.line}` }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photoUrl(seed, 600, 750)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              {page.watermark && <Watermark text={page.logoText || "STUDIO"} fontFamily={MINIMAL_FONTS.mono} dark />}
+              {page.watermark && <Watermark text={page.logoText || "STUDIO"} fontFamily={fMono} dark />}
               {page.mode === "selection" && <FavBadge accent={t.fg} square />}
-              {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(255,255,255,0.92)" fg={t.fg} fontFamily={MINIMAL_FONTS.mono} />}
+              {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(255,255,255,0.92)" fg={t.fg} fontFamily={fMono} />}
             </div>
           ))}
         </div>
       </section>
 
-      <footer style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: MINIMAL_FONTS.mono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-        <span style={{ fontFamily: MINIMAL_FONTS.serif, fontSize: 16, color: t.fg, textTransform: "none", letterSpacing: 0 }}>{page.logoText || "Studio"} <em style={{ fontStyle: "italic", color: t.muted }}>Minimal</em></span>
-        <span>© {new Date().getFullYear()} · FRAME</span>
+      <footer style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+        <span style={{ fontFamily: fDisplay, fontSize: 16, color: t.fg, textTransform: "none", letterSpacing: 0 }}>{page.logoText || "Studio"} <em style={{ fontStyle: "italic", color: t.muted }}>Minimal</em></span>
+        <span>© {new Date().getFullYear()} · Portapic</span>
       </footer>
     </div>
   );
@@ -364,9 +371,12 @@ function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
 function GenericPreview({ page, isMobile, set, onRequestCoverChange }: RendererProps) {
   const ts = effectiveStyle(page);
   const photos = picks(page);
+  const fDisplay = fontSlot(page, 1, "Inter, sans-serif");
+  const fBody    = fontSlot(page, 2, page.fontFamily || "Inter, sans-serif");
+  const fMono    = fontSlot(page, 3, "monospace");
 
   return (
-    <div className="w-full h-full overflow-y-auto" style={{ background: ts.bg, color: ts.fg, fontFamily: page.fontFamily || "Inter, sans-serif" }}>
+    <div className="w-full h-full overflow-y-auto" style={{ background: ts.bg, color: ts.fg, fontFamily: fBody }}>
       <EditableHoverStyles />
       <EditableImage
         fieldPath="coverUrl" onRequestChange={onRequestCoverChange}
@@ -376,14 +386,14 @@ function GenericPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
         <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.7))" }} />
         <div style={{ position: "absolute", bottom: isMobile ? 16 : 28, left: isMobile ? 16 : 28, right: isMobile ? 16 : 28, color: "#fff" }}>
-          <p style={{ fontFamily: "monospace", fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.7, marginBottom: 4 }}>
-            <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" />
+          <p style={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.7, marginBottom: 4 }} data-font-slot={3}>
+            <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" fontSlot={3} />
             {" · "}{page.photoCount || photos.length} photos
           </p>
           <EditableText
             fieldPath="title" value={page.title} onChange={set ? (v) => set("title", v) : undefined}
-            as="h1"
-            style={{ fontWeight: 900, fontSize: isMobile ? 28 : 48, lineHeight: 1.05, letterSpacing: "-0.02em", margin: 0 }}
+            as="h1" fontSlot={1}
+            style={{ fontFamily: fDisplay, fontWeight: 900, fontSize: isMobile ? 28 : 48, lineHeight: 1.05, letterSpacing: "-0.02em", margin: 0 }}
           />
         </div>
       </EditableImage>
@@ -391,9 +401,9 @@ function GenericPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
         <div style={{ padding: isMobile ? "14px 14px 0" : "28px 28px 0", maxWidth: 600 }}>
           <EditableText
             fieldPath="welcomeMessage" value={page.welcomeMessage} onChange={set ? (v) => set("welcomeMessage", v) : undefined}
-            as="p" multiline
+            as="p" multiline fontSlot={2}
             placeholder={set ? "Write a personal message to your client…" : ""}
-            style={{ fontSize: isMobile ? 13 : 15, lineHeight: 1.55, color: ts.muted, margin: 0 }}
+            style={{ fontFamily: fBody, fontSize: isMobile ? 13 : 15, lineHeight: 1.55, color: ts.muted, margin: 0 }}
           />
         </div>
       )}
@@ -497,19 +507,17 @@ export function PreviewFrame({
         />
         <div className="relative z-10">
           {viewport === "desktop" ? (
-            <div className="rounded-xl overflow-hidden border border-[var(--border)] shadow-2xl bg-[var(--bg-card)]" style={{ width: 760 }}>
-              <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[var(--border)] bg-[var(--bg-subtle)]">
+            <div className="rounded-xl overflow-hidden border border-[var(--border)] shadow-2xl bg-[var(--bg-card)]" style={{ width: 1040 }}>
+              <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border)] bg-[var(--bg-subtle)]">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-400/70" />
                   <div className="w-3 h-3 rounded-full bg-yellow/70" />
                   <div className="w-3 h-3 rounded-full bg-green-400/70" />
                 </div>
-                <div className="flex-1 mx-3 bg-[var(--bg)] border border-[var(--border)] rounded-md px-3 py-1 flex items-center gap-2">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-400 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  <span className="font-mono text-[10px] text-[var(--fg-muted)] truncate">altafoto.com.ar/d/{page.id}</span>
-                </div>
+                <span className="font-mono text-[10px] text-[var(--fg-muted)] tracking-widest uppercase">Portapic</span>
+                <span className="w-12" />
               </div>
-              <div style={{ height: 560 }}>
+              <div style={{ height: 640 }}>
                 <GalleryView page={page} viewport="desktop" set={set} onRequestCoverChange={onRequestCoverChange} />
               </div>
             </div>

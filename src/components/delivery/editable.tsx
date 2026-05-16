@@ -7,28 +7,43 @@
    When the surrounding <EditModeProvider editMode={true}> is on, fields show
    a hover ring and inline edit affordances. When off (the public delivery
    page), they render exactly the same DOM as plain text/img — no extra
-   wrappers, no listeners. The renderer code stays template-agnostic.
+   wrappers, no listeners.
    ────────────────────────────────────────────────────────────────────── */
 
 import { createContext, useContext, useRef, useEffect, useState } from "react";
 import type { CSSProperties, ReactNode, ElementType } from "react";
 
+export type FontSlot = 1 | 2 | 3;
+
 /* ── context ───────────────────────────────────────────────────────── */
 
 interface EditModeShape {
-  editMode:     boolean;
-  activeField:  string | null;
-  focusField:   (path: string) => void;
+  editMode:            boolean;
+  activeField:         string | null;
+  focusField:          (path: string) => void;
+  /** When the user is interacting with a font dropdown in the sidebar,
+   *  every text bound to that slot gets a permanent ring so they can see
+   *  exactly which elements the change will affect. */
+  highlightFontSlot:   FontSlot | null;
 }
 const EditModeContext = createContext<EditModeShape>({
-  editMode: false, activeField: null, focusField: () => {},
+  editMode: false, activeField: null, focusField: () => {}, highlightFontSlot: null,
 });
 
 export function EditModeProvider({
-  editMode, activeField, focusField, children,
+  editMode, activeField, focusField, highlightFontSlot, children,
 }: EditModeShape & { children: ReactNode }) {
   return (
-    <EditModeContext.Provider value={{ editMode, activeField, focusField }}>
+    <EditModeContext.Provider value={{ editMode, activeField, focusField, highlightFontSlot }}>
+      {editMode && highlightFontSlot !== null && (
+        <style>{`
+          [data-font-slot="${highlightFontSlot}"] {
+            outline: 1.5px solid #fad502 !important;
+            outline-offset: 3px !important;
+            transition: outline-color 0.18s ease !important;
+          }
+        `}</style>
+      )}
       {children}
     </EditModeContext.Provider>
   );
@@ -44,40 +59,40 @@ const baseEditableStyle: CSSProperties = {
   outline: "1px dashed transparent",
   outlineOffset: 2,
   transition: "outline-color 0.15s ease, background-color 0.15s ease",
-  cursor: "text",
   position: "relative",
 };
 
-function editableHoverStyle(active: boolean): CSSProperties {
-  return {
-    outlineColor: active ? "#fad502" : "rgba(250,213,2,0.55)",
-    backgroundColor: active ? "rgba(250,213,2,0.1)" : undefined,
-  };
+function editableRing(active: boolean, highlighted: boolean): CSSProperties {
+  if (active) return { outlineColor: "#fad502", outlineStyle: "solid", backgroundColor: "rgba(250,213,2,0.08)" };
+  if (highlighted) return { outlineColor: "#fad502", outlineStyle: "solid" };
+  return {};
 }
 
 /* ── EditableText ─────────────────────────────────────────────────── */
 
 interface EditableTextProps {
-  fieldPath:  string;                              // unique key, ex "title" / "welcomeMessage"
+  fieldPath:  string;
   value:      string;
-  onChange?:  (v: string) => void;                 // optional — when omitted, the field is read-only in edit mode (eg derived data)
-  as?:        ElementType;                         // tag to render (span, h1, p, etc)
+  onChange?:  (v: string) => void;
+  as?:        ElementType;
   style?:     CSSProperties;
   className?: string;
-  multiline?: boolean;                             // textarea-ish behaviour: Enter inserts newline; Esc/blur commits
+  multiline?: boolean;
   placeholder?: string;
+  /** Which template typography slot this element uses (1=display, 2=body, 3=mono).
+   *  When the user opens the matching dropdown in the sidebar this element rings up. */
+  fontSlot?:  FontSlot;
 }
 
 export function EditableText({
   fieldPath, value, onChange, as = "span", style, className,
-  multiline = false, placeholder,
+  multiline = false, placeholder, fontSlot,
 }: EditableTextProps) {
-  const { editMode, activeField, focusField } = useEditMode();
+  const { editMode, activeField, focusField, highlightFontSlot } = useEditMode();
   const ref = useRef<HTMLElement | null>(null);
   const [editing, setEditing] = useState(false);
   const Tag = as as ElementType;
 
-  // Keep DOM text in sync with prop when not editing
   useEffect(() => {
     if (!editing && ref.current && ref.current.textContent !== value) {
       ref.current.textContent = value;
@@ -92,7 +107,8 @@ export function EditableText({
     );
   }
 
-  const isActive = activeField === fieldPath;
+  const isActive = activeField === fieldPath || editing;
+  const isHighlighted = !!fontSlot && highlightFontSlot === fontSlot;
   const canEdit = !!onChange;
 
   const handleFocus = () => {
@@ -123,7 +139,7 @@ export function EditableText({
   return (
     <Tag
       ref={ref}
-      style={{ ...style, ...baseEditableStyle, ...editableHoverStyle(isActive || editing), cursor: canEdit ? "text" : "default" }}
+      style={{ ...style, ...baseEditableStyle, ...editableRing(isActive, isHighlighted), cursor: canEdit ? "text" : "default" }}
       className={className}
       contentEditable={canEdit}
       suppressContentEditableWarning
@@ -132,6 +148,7 @@ export function EditableText({
       onKeyDown={handleKeyDown}
       onClick={(e: React.MouseEvent) => { e.stopPropagation(); focusField(fieldPath); }}
       data-field={fieldPath}
+      data-font-slot={fontSlot}
     >
       {value || placeholder || ""}
     </Tag>
@@ -142,9 +159,9 @@ export function EditableText({
 
 interface EditableImageProps {
   fieldPath:  string;
-  children:   ReactNode;                           // the actual <img> or background div
-  onRequestChange?: () => void;                    // open photo picker
-  label?:     string;                              // hover label, default "Change image"
+  children:   ReactNode;
+  onRequestChange?: () => void;
+  label?:     string;
   style?:     CSSProperties;
   className?: string;
 }
@@ -163,6 +180,10 @@ export function EditableImage({
     );
   }
 
+  /* Click anywhere on the image area triggers the picker — UNLESS a child
+   * (e.g. an overlaid EditableText) stops propagation, which they do.
+   * The "Change image" chip sits in the top-right corner with very low
+   * footprint so it never blocks editing other elements on the image. */
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     focusField(fieldPath);
@@ -171,36 +192,42 @@ export function EditableImage({
 
   return (
     <div
-      style={{ ...style, ...baseEditableStyle, ...editableHoverStyle(isActive), cursor: "pointer" }}
-      className={className}
+      style={{ ...style, ...baseEditableStyle, ...editableRing(isActive, false), cursor: "pointer" }}
+      className={`${className ?? ""} dlv-editable-image`}
       onClick={handleClick}
       data-field={fieldPath}
     >
       {children}
-      {/* Hover overlay */}
-      <div
+      {/* Small corner chip — only shows on direct hover of THIS wrapper.
+          pointer-events: none so it never intercepts clicks on children. */}
+      <span
+        className="dlv-image-chip"
         style={{
-          position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
-          background: "rgba(0,0,0,0.45)", opacity: isActive ? 1 : 0,
+          position: "absolute", top: 8, right: 8, zIndex: 5,
+          background: "rgba(0,0,0,0.65)", color: "#fff",
+          fontFamily: "monospace", fontSize: 9, letterSpacing: "0.16em",
+          textTransform: "uppercase", padding: "4px 8px",
+          opacity: isActive ? 1 : 0,
           transition: "opacity 0.15s ease", pointerEvents: "none",
+          backdropFilter: "blur(4px)",
         }}
-        className="dlv-editable-overlay"
       >
-        <span style={{ background: "#fad502", color: "#111", fontFamily: "monospace", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", padding: "6px 12px", fontWeight: 700 }}>
-          {label}
-        </span>
-      </div>
+        {label}
+      </span>
     </div>
   );
 }
 
-/* ── Hover ring styles (loaded once near root) ─────────────────────── */
+/* ── Global hover styles for editable primitives ──────────────────── */
 
 export function EditableHoverStyles() {
   return (
     <style>{`
-      [data-field]:hover { outline-color: rgba(250,213,2,0.85) !important; }
-      [data-field]:hover .dlv-editable-overlay { opacity: 1 !important; }
+      [data-field]:hover { outline-color: rgba(250,213,2,0.7) !important; outline-style: solid !important; }
+      /* Only show the chip when the image WRAPPER itself is the direct hover
+         target — keep it hidden while hovering an inner editable text/etc. */
+      .dlv-editable-image:hover > .dlv-image-chip { opacity: 1 !important; }
+      .dlv-editable-image:has([data-field]:hover) > .dlv-image-chip { opacity: 0 !important; }
     `}</style>
   );
 }

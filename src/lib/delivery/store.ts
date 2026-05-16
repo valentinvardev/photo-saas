@@ -43,12 +43,14 @@ export const useDeliveryStore = create<DeliveryStore>()(
     }),
     {
       name: "frame-delivery-pages",
-      version: 5,
+      version: 6,
       /* v2: cinematic and editorial templates removed — map old values
          to the closest visual replacements so previously-saved client
          pages keep rendering.
          v3: example pages reseeded to showcase the four real templates
-         (Halcyon, Brooklyn, Minimal, Vogue). */
+         (Halcyon, Brooklyn, Minimal, Vogue).
+         v6: 3-slot typography (fontFamily1/2/3) added, defaulting to
+         template-built-in fonts when empty. */
       migrate: (persisted, version) => {
         const state = persisted as { pages?: DeliveryPage[] } | undefined;
         if (!state?.pages) return state as DeliveryStore;
@@ -64,6 +66,12 @@ export const useDeliveryStore = create<DeliveryStore>()(
           /* Reseed examples so each card uses a template that actually
              has a delivery page route, with template-relevant covers. */
           state.pages = INITIAL_PAGES;
+        }
+        if (version < 6) {
+          state.pages = state.pages.map((p) => {
+            const withDefaults: Partial<DeliveryPage> = { fontFamily1: "", fontFamily2: "", fontFamily3: "" };
+            return { ...withDefaults, ...p } as DeliveryPage;
+          });
         }
         return state as DeliveryStore;
       },

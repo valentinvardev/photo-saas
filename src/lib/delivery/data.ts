@@ -47,7 +47,18 @@ export interface DeliveryPage {
   colorAccent:      string;
   colorBtnBg:       string;
   colorBtnFg:       string;
+  /**
+   * Typography slots — each template renders its display, body and mono
+   * elements using slots 1/2/3 respectively. Empty string = use the
+   * template's built-in default for that slot.
+   *
+   * `fontFamily` is the legacy single-font field kept for store migration;
+   * new code reads `fontFamily1/2/3`.
+   */
   fontFamily:       string;
+  fontFamily1:      string;  // display / headings (template's serif or display sans)
+  fontFamily2:      string;  // body (template's body sans)
+  fontFamily3:      string;  // mono / labels (template's monospace)
 }
 
 export const ALL_GALLERY_SEEDS = Array.from({ length: 48 }, (_, i) => i + 10);
@@ -61,6 +72,9 @@ export const DEFAULT_BRANDING = {
   colorAccent: "#f5f5f5",
   colorBtnBg: "#111111", colorBtnFg: "#ffffff",
   fontFamily: "Inter, sans-serif",
+  fontFamily1: "",
+  fontFamily2: "",
+  fontFamily3: "",
 };
 
 /* Cover URLs lifted from the actual template asset banks so each

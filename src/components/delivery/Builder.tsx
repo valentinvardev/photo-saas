@@ -9,7 +9,7 @@ import {
 } from "~/lib/delivery/data";
 import { useDeliveryStore } from "~/lib/delivery/store";
 import { PreviewFrame } from "./GalleryView";
-import { EditModeProvider } from "./editable";
+import { EditModeProvider, type FontSlot } from "./editable";
 
 /* ══════════════════════════════════════════════════════════════════════════
    SHARED HELPERS
@@ -597,22 +597,54 @@ function ColorsPanel({ page, set }: { page: DeliveryPage; set: Setter }) {
   );
 }
 
-function TypographyPanel({ page, set }: { page: DeliveryPage; set: Setter }) {
+/* One row of the Typography panel — one font slot. Hovering or focusing
+   this control sets `highlightFontSlot` so every text in the canvas bound
+   to the matching slot rings up in yellow. */
+function FontSlotRow({
+  slot, label, description, value, fontKey, set, onHighlight,
+}: {
+  slot: FontSlot; label: string; description: string;
+  value: string; fontKey: "fontFamily1" | "fontFamily2" | "fontFamily3"; set: Setter;
+  onHighlight: (s: FontSlot | null) => void;
+}) {
   return (
-    <div>
-      <FieldLabel>Font family</FieldLabel>
-      <select value={page.fontFamily} onChange={(e) => set("fontFamily", e.target.value)}
+    <div
+      onMouseEnter={() => onHighlight(slot)}
+      onMouseLeave={() => onHighlight(null)}
+    >
+      <div className="flex items-center justify-between mb-1.5">
+        <FieldLabel>{label}</FieldLabel>
+        <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest">Slot {slot}</span>
+      </div>
+      <select
+        value={value}
+        onChange={(e) => set(fontKey, e.target.value)}
+        onFocus={() => onHighlight(slot)}
+        onBlur={() => onHighlight(null)}
         className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors"
-        style={{ fontFamily: page.fontFamily }}
+        style={{ fontFamily: value || undefined }}
       >
+        <option value="" style={{ fontFamily: "inherit" }}>Template default</option>
         {DELIVERY_FONTS.map((f) => (
           <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.label}</option>
         ))}
       </select>
-      <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1.5">
-        Uses the template's typography by default. Pick one to override.
-      </p>
+      <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1">{description}</p>
     </div>
+  );
+}
+
+function TypographyPanel({
+  page, set, onHighlightSlot,
+}: {
+  page: DeliveryPage; set: Setter; onHighlightSlot: (s: FontSlot | null) => void;
+}) {
+  return (
+    <>
+      <FontSlotRow slot={1} label="Display font" description="Headings, hero text, large titles" fontKey="fontFamily1" value={page.fontFamily1} set={set} onHighlight={onHighlightSlot} />
+      <FontSlotRow slot={2} label="Body font"    description="Welcome message, body copy"        fontKey="fontFamily2" value={page.fontFamily2} set={set} onHighlight={onHighlightSlot} />
+      <FontSlotRow slot={3} label="Mono / labels" description="Tags, counters, dates"             fontKey="fontFamily3" value={page.fontFamily3} set={set} onHighlight={onHighlightSlot} />
+    </>
   );
 }
 
@@ -864,6 +896,7 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
   const [page, setPage] = useState<DeliveryPage | null>(storePage ?? null);
   const [openSections, setOpenSections] = useState<Set<SectionId>>(new Set(["content", "branding"]));
   const [activeField, setActiveField] = useState<string | null>(null);
+  const [highlightFontSlot, setHighlightFontSlot] = useState<FontSlot | null>(null);
   const [showGallery, setShowGallery] = useState(false);
   const [showCoverPicker, setShowCoverPicker] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -993,7 +1026,7 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
           <Accordion id="typography" title="Typography"
             isOpen={openSections.has("typography")} onToggle={() => toggleSection("typography")}
           >
-            <TypographyPanel page={page} set={set} />
+            <TypographyPanel page={page} set={set} onHighlightSlot={setHighlightFontSlot} />
           </Accordion>
           <Accordion id="photos" title="Photos" count={`${page.photoSeeds.length || page.photoCount}`}
             isOpen={openSections.has("photos")} onToggle={() => toggleSection("photos")}
@@ -1014,7 +1047,7 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
 
         {/* Live canvas */}
         <div className="flex-1 min-w-0 overflow-hidden">
-          <EditModeProvider editMode activeField={activeField} focusField={focusField}>
+          <EditModeProvider editMode activeField={activeField} focusField={focusField} highlightFontSlot={highlightFontSlot}>
             <PreviewFrame page={page} set={set} onRequestCoverChange={() => setShowCoverPicker(true)} />
           </EditModeProvider>
         </div>
