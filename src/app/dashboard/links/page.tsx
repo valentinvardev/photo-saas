@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useLinksStore } from "~/lib/links/store";
+import { BrooklynLinks } from "~/app/template/brooklyn/links/component";
+import type { LinksPage } from "~/lib/links/data";
 
 /* ══════════════════════════════════════════════════════════════════════════
    TYPES
@@ -1424,7 +1427,10 @@ function LinkTreeView({ links, config }: { links: LinkItem[]; config: PageConfig
   );
 }
 
-function PhoneShell({ links, config }: { links: LinkItem[]; config: PageConfig }) {
+function PhoneShell({ page }: { page: LinksPage }) {
+  /* The preview now renders the canonical BrooklynLinks template directly
+     — the same component the public /l/[id] route uses — so what the
+     photographer edits is exactly what their visitors will see. */
   return (
     <div className="relative" style={{ width: 280, height: 568 }}>
       <div className="absolute inset-0 rounded-[40px] shadow-2xl" style={{ background: "linear-gradient(145deg,#2a2a2a,#1a1a1a)" }} />
@@ -1444,11 +1450,11 @@ function PhoneShell({ links, config }: { links: LinkItem[]; config: PageConfig }
             </svg>
           </div>
         </div>
-        <div className="absolute inset-0">
-          <LinkTreeView links={links} config={config} />
+        <div className="absolute inset-0 pt-7">
+          <BrooklynLinks page={page} />
         </div>
       </div>
-      {/* Buttons */}
+      {/* Side buttons */}
       <div className="absolute rounded-l-sm" style={{ left: -3.5, top: 100, width: 3.5, height: 32, background: "#333" }} />
       <div className="absolute rounded-l-sm" style={{ left: -3.5, top: 144, width: 3.5, height: 40, background: "#333" }} />
       <div className="absolute rounded-l-sm" style={{ left: -3.5, top: 196, width: 3.5, height: 40, background: "#333" }} />
@@ -1462,10 +1468,34 @@ function PhoneShell({ links, config }: { links: LinkItem[]; config: PageConfig }
 ══════════════════════════════════════════════════════════════════════════ */
 
 export default function LinksPage() {
-  const [links,     setLinks]     = useState<LinkItem[]>(DEFAULT_LINKS);
-  const [config,    setConfig]    = useState<PageConfig>(DEFAULT_CONFIG);
+  /* Wire the dashboard to the canonical Zustand store. Local setLinks/setConfig
+     are kept as shims with the SetStateAction signature so the existing tabs
+     keep working without per-callsite rewrites — every update flows into the
+     same page record the public /l/[id] route and the BrooklynLinks template
+     read from. */
+  const page     = useLinksStore((s) => s.page);
+  const update   = useLinksStore((s) => s.update);
+  const hydrated = useLinksStore((s) => s.hydrated);
+
+  const links  = page.links;
+  const config = page as PageConfig;
+
+  const setLinks: React.Dispatch<React.SetStateAction<LinkItem[]>> = (action) => {
+    const next = typeof action === "function"
+      ? (action as (p: LinkItem[]) => LinkItem[])(page.links)
+      : action;
+    update({ links: next });
+  };
+  const setConfig: React.Dispatch<React.SetStateAction<PageConfig>> = (action) => {
+    const next = typeof action === "function"
+      ? (action as (p: PageConfig) => PageConfig)(config)
+      : action;
+    update(next as Partial<LinksPage>);
+  };
+
   const [activeTab, setActiveTab] = useState<"links" | "appearance">("links");
   const [copied,    setCopied]    = useState(false);
+  void hydrated; // store rehydrates synchronously on mount; nothing to gate
 
   const publicUrl = "frame.so/@sofia";
 
@@ -1542,7 +1572,7 @@ export default function LinksPage() {
               }}
             />
             <div className="relative z-10 py-12">
-              <PhoneShell links={links} config={config} />
+              <PhoneShell page={page} />
               <p className="text-center font-mono text-[11px] text-[var(--fg-muted)] mt-5">{publicUrl}</p>
             </div>
           </div>
