@@ -1,6 +1,6 @@
 /* Delivery data — types, constants, defaults */
 
-export type DeliveryMode    = "gift" | "direct" | "selection";
+export type DeliveryMode    = "gift" | "direct";
 export type LayoutStyle     = "grid" | "masonry";
 export type TemplateName    = "minimal" | "vogue" | "brooklyn" | "halcyon";
 export type DeliveryStatus  = "draft" | "active" | "expired";
@@ -26,17 +26,19 @@ export interface DeliveryPage {
   whitelist:        string[];
   // Monetization
   mode:             DeliveryMode;
-  selectionLimit:   number;
   pricePerPhoto:    number;
   priceFullGallery: number;
-  watermark:        boolean;
   downloadRes:      "full" | "web" | "choice";
-  proofingEnabled:  boolean;
   // Aesthetic
   template:         TemplateName;
   layout:           LayoutStyle;
   welcomeMessage:   string;
   showUpsellBanner: boolean;
+  // Password gate copy — shown when passwordEnabled is true
+  passwordTitle:    string;
+  passwordSubtitle: string;
+  passwordHint:     string;
+  passwordButtonLabel: string;
   // Branding
   logoMode:         LogoMode;
   logoText:         string;
@@ -75,6 +77,10 @@ export const DEFAULT_BRANDING = {
   fontFamily1: "",
   fontFamily2: "",
   fontFamily3: "",
+  passwordTitle: "Private gallery",
+  passwordSubtitle: "Enter the access code to view.",
+  passwordHint: "Hint: it was shared with you by email.",
+  passwordButtonLabel: "Unlock gallery",
 };
 
 /* Cover URLs lifted from the actual template asset banks so each
@@ -90,9 +96,9 @@ export const INITIAL_PAGES: DeliveryPage[] = [
     status: "active", photoCount: 247, photoSeeds: [10,11,12,13,14,15,16,17,18,19,20,21], coverSeed: 401, coverUrl: HALCYON_WEDDING_COVER,
     views: 12, lastViewed: "2 hours ago", createdAt: "Apr 2, 2026", expiresAt: "May 2, 2026",
     passwordEnabled: true,  password: "lisbon", whitelistEnabled: false, whitelist: [],
-    mode: "selection", selectionLimit: 30, pricePerPhoto: 0, priceFullGallery: 0,
-    watermark: true, downloadRes: "choice", proofingEnabled: false,
-    template: "halcyon", layout: "masonry", welcomeMessage: "Margot & Auden — thank you for a beautiful day. Browse and pick your 30 favorites.", showUpsellBanner: false,
+    mode: "gift", pricePerPhoto: 0, priceFullGallery: 0,
+    downloadRes: "choice",
+    template: "halcyon", layout: "masonry", welcomeMessage: "Margot & Auden — thank you for a beautiful day. Browse and download your favourites.", showUpsellBanner: false,
     ...DEFAULT_BRANDING, logoText: "HALCYON",
   },
   {
@@ -100,8 +106,8 @@ export const INITIAL_PAGES: DeliveryPage[] = [
     status: "active", photoCount: 24, photoSeeds: [10,11,12,13,14,15,16,17,18,19,20,21], coverSeed: 10, coverUrl: BROOKLYN_COVER_DARK,
     views: 47, lastViewed: "yesterday", createdAt: "Apr 12, 2026", expiresAt: "Jun 12, 2026",
     passwordEnabled: true,  password: "morrison2026", whitelistEnabled: false, whitelist: [],
-    mode: "direct", selectionLimit: 0, pricePerPhoto: 0, priceFullGallery: 0,
-    watermark: false, downloadRes: "full", proofingEnabled: false,
+    mode: "direct", pricePerPhoto: 0, priceFullGallery: 0,
+    downloadRes: "full",
     template: "brooklyn", layout: "grid", welcomeMessage: "Final selects from the album cover shoot.", showUpsellBanner: false,
     ...DEFAULT_BRANDING, logoText: "MORRISON",
   },
@@ -110,8 +116,8 @@ export const INITIAL_PAGES: DeliveryPage[] = [
     status: "active", photoCount: 48, photoSeeds: [30,31,32,33,34,35], coverSeed: 403, coverUrl: HALCYON_PORTRAIT_COVER,
     views: 34, lastViewed: "3 days ago", createdAt: "Apr 1, 2026", expiresAt: "May 1, 2026",
     passwordEnabled: false, password: "", whitelistEnabled: false, whitelist: [],
-    mode: "direct", selectionLimit: 0, pricePerPhoto: 12, priceFullGallery: 399,
-    watermark: true, downloadRes: "full", proofingEnabled: false,
+    mode: "direct", pricePerPhoto: 12, priceFullGallery: 399,
+    downloadRes: "full",
     template: "halcyon", layout: "masonry", welcomeMessage: "Hi Emma! Your portraits are ready. Purchase individual photos or grab the full set.", showUpsellBanner: true,
     ...DEFAULT_BRANDING, logoText: "EMMA K.",
   },
@@ -120,9 +126,9 @@ export const INITIAL_PAGES: DeliveryPage[] = [
     status: "draft", photoCount: 124, photoSeeds: [10, 71, 82, 93, 100, 111, 144, 155], coverSeed: 401, coverUrl: "https://picsum.photos/seed/82/1200/800",
     views: 0, lastViewed: null, createdAt: "Apr 8, 2026", expiresAt: null,
     passwordEnabled: true, password: "halberg", whitelistEnabled: false, whitelist: [],
-    mode: "selection", selectionLimit: 40, pricePerPhoto: 0, priceFullGallery: 0,
-    watermark: true, downloadRes: "choice", proofingEnabled: false,
-    template: "minimal", layout: "grid", welcomeMessage: "A small selection from your day. Pick your 40 favourites — we'll print them.", showUpsellBanner: false,
+    mode: "gift", pricePerPhoto: 0, priceFullGallery: 0,
+    downloadRes: "choice",
+    template: "minimal", layout: "grid", welcomeMessage: "A small selection from your day. Download your favourites — we'll print them.", showUpsellBanner: false,
     ...DEFAULT_BRANDING, logoText: "STUDIO MN",
   },
 ];
@@ -131,8 +137,8 @@ export const DEFAULT_PAGE: Omit<DeliveryPage, "id" | "title" | "client" | "creat
   status: "draft", photoCount: 0, photoSeeds: [], coverSeed: 404, coverUrl: "",
   views: 0, lastViewed: null, expiresAt: null,
   passwordEnabled: false, password: "", whitelistEnabled: false, whitelist: [],
-  mode: "gift", selectionLimit: 20, pricePerPhoto: 15, priceFullGallery: 299,
-  watermark: true, downloadRes: "full", proofingEnabled: false,
+  mode: "gift", pricePerPhoto: 15, priceFullGallery: 299,
+  downloadRes: "full",
   template: "minimal", layout: "grid", welcomeMessage: "", showUpsellBanner: true,
   ...DEFAULT_BRANDING,
 };

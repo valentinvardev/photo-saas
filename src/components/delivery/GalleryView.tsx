@@ -61,9 +61,10 @@ function coverFor(page: DeliveryPage) {
   return page.coverUrl || `https://picsum.photos/seed/${page.coverSeed}/1600/900`;
 }
 
-function selectionMeta(page: DeliveryPage, photoCount: number) {
-  if (page.mode !== "selection") return null;
-  return { picked: 3, limit: page.selectionLimit, total: photoCount };
+/* Watermarks are auto-enabled whenever the photographer is monetising (direct
+   sale). For gift / free delivery pages they're off. */
+function shouldWatermark(page: DeliveryPage) {
+  return page.mode === "direct";
 }
 
 /* Pick a font for a given slot. Empty user value → fall back to the template
@@ -73,11 +74,89 @@ function fontSlot(page: DeliveryPage, slot: 1 | 2 | 3, fallback: string) {
   return v && v.trim() ? v : fallback;
 }
 
+type DeliveryView = "gallery" | "password";
+
 interface RendererProps {
   page: DeliveryPage;
   isMobile: boolean;
+  view?: DeliveryView;
   set?: Setter;
   onRequestCoverChange?: () => void;
+}
+
+/* Shared password gate — rendered when `view === "password"`. Each template
+   passes its own theme tokens and fonts so the gate matches the gallery. */
+function PasswordGate({
+  page, set, isMobile, theme, fDisplay, fMono, fBody,
+}: {
+  page: DeliveryPage; set?: Setter; isMobile: boolean;
+  theme: { bg: string; fg: string; muted: string; accent: string; line: string; raised: string };
+  fDisplay: string; fMono: string; fBody: string;
+}) {
+  return (
+    <div style={{ background: theme.bg, color: theme.fg, fontFamily: fBody, minHeight: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }} className="w-full h-full">
+      <FontStylesheet />
+      <EditableHoverStyles />
+
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "16px 18px" : "22px 32px", borderBottom: `1px solid ${theme.line}` }}>
+        <LogoBlock
+          page={page} set={set} fallback="STUDIO" fontSlot={3}
+          imageHeight={isMobile ? 16 : 20}
+          textStyle={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.2em", textTransform: "uppercase", color: theme.fg }}
+        />
+        <span style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: theme.muted }}>Private</span>
+      </header>
+
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: isMobile ? "32px 24px" : "64px 32px", textAlign: "center", gap: 18 }}>
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: theme.raised, border: `1px solid ${theme.line}`, display: "flex", alignItems: "center", justifyContent: "center", color: theme.accent }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+
+        <EditableText
+          fieldPath="passwordTitle" value={page.passwordTitle} onChange={set ? (v) => set("passwordTitle", v) : undefined}
+          as="h1" fontSlot={1}
+          style={{ fontFamily: fDisplay, fontSize: isMobile ? 32 : 48, lineHeight: 1, margin: 0, fontWeight: 400, letterSpacing: "-0.02em" }}
+        />
+        <EditableText
+          fieldPath="passwordSubtitle" value={page.passwordSubtitle} onChange={set ? (v) => set("passwordSubtitle", v) : undefined}
+          as="p" multiline fontSlot={2}
+          style={{ fontFamily: fBody, fontSize: isMobile ? 13 : 14, lineHeight: 1.5, margin: 0, color: theme.muted, maxWidth: 360 }}
+        />
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 320, marginTop: 8 }}>
+          <input
+            type="password" placeholder="••••••••"
+            readOnly
+            style={{
+              fontFamily: fMono, fontSize: 14, padding: "12px 16px", textAlign: "center",
+              background: theme.raised, border: `1px solid ${theme.line}`, color: theme.fg,
+              letterSpacing: "0.32em", outline: "none",
+            }}
+          />
+          <EditableText
+            fieldPath="passwordButtonLabel" value={page.passwordButtonLabel} onChange={set ? (v) => set("passwordButtonLabel", v) : undefined}
+            as="button" fontSlot={3}
+            style={{
+              fontFamily: fMono, fontSize: 11, padding: "12px 18px",
+              background: theme.accent, color: theme.bg, border: "none",
+              letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700,
+              cursor: "pointer",
+            }}
+          />
+        </div>
+
+        <EditableText
+          fieldPath="passwordHint" value={page.passwordHint} onChange={set ? (v) => set("passwordHint", v) : undefined}
+          as="p" multiline fontSlot={3}
+          style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.14em", color: theme.muted, margin: 0, marginTop: 6 }}
+        />
+      </div>
+
+      <footer style={{ padding: isMobile ? "16px" : "20px 32px", borderTop: `1px solid ${theme.line}`, color: theme.muted, fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", textAlign: "center" }}>
+        Delivered with Portapic · © {new Date().getFullYear()}
+      </footer>
+    </div>
+  );
 }
 
 /* Renders the brand mark honouring page.logoMode (none / text / image /
@@ -120,16 +199,20 @@ function LogoBlock({
    HALCYON — warm dark, serif italic, sectioned chapters
 ══════════════════════════════════════════════════════════════════════════ */
 
-function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererProps) {
+function HalcyonPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange }: RendererProps) {
   const baseT = { bg: "#0E0D0B", fg: "#EFEAE0", muted: "#8A8378", line: "#2C2925", raised: "#1A1815", accent: "#C2410C" };
   const ts = effectiveStyle(page);
   const t = page.customColors ? { ...baseT, bg: ts.bg, fg: ts.fg, accent: ts.accent } : baseT;
   const photos = picks(page);
-  const sel = selectionMeta(page, photos.length);
   const [first, second] = page.client.split(/\s*&\s*|\s+y\s+|\s+and\s+/);
   const fDisplay = fontSlot(page, 1, HALCYON_FONTS.serif);
   const fBody    = fontSlot(page, 2, HALCYON_FONTS.sans);
   const fMono    = fontSlot(page, 3, HALCYON_FONTS.mono);
+  const wm = shouldWatermark(page);
+
+  if (view === "password") {
+    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={t} fDisplay={fDisplay} fBody={fBody} fMono={fMono} />;
+  }
 
   return (
     <div style={{ background: t.bg, color: t.fg, fontFamily: fBody, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
@@ -166,16 +249,6 @@ function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
         </div>
       </EditableImage>
 
-      {/* Selection bar */}
-      {sel && (
-        <div style={{ background: t.raised, borderBottom: `1px solid ${t.line}`, padding: isMobile ? "10px 16px" : "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <div style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: t.muted }}>
-            <span style={{ color: t.fg }}>{sel.picked}</span> / {sel.limit} chosen
-          </div>
-          <button style={{ background: t.accent, color: t.fg, border: 0, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", padding: "8px 14px", cursor: "pointer" }}>Submit</button>
-        </div>
-      )}
-
       {/* Welcome */}
       {(page.welcomeMessage || set) && (
         <div style={{ padding: isMobile ? "20px 18px 0" : "28px 32px 0", maxWidth: 640 }}>
@@ -200,8 +273,7 @@ function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
             <div key={seed} style={{ breakInside: "avoid", marginBottom: 10, position: "relative", overflow: "hidden", background: t.raised }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photoUrl(seed, 600, 480 + (i % 4) * 80)} alt="" style={{ width: "100%", display: "block" }} />
-              {page.watermark && <Watermark text={page.logoText || "HALCYON"} fontFamily={fMono} />}
-              {page.mode === "selection" && <FavBadge accent={t.accent} />}
+              {wm && <Watermark text={page.logoText || "HALCYON"} fontFamily={fMono} />}
               {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(14,13,11,0.7)" fg={t.fg} fontFamily={fMono} />}
             </div>
           ))}
@@ -228,16 +300,20 @@ function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
    BROOKLYN — dark + red accent, bold sans
 ══════════════════════════════════════════════════════════════════════════ */
 
-function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: RendererProps) {
+function BrooklynPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange }: RendererProps) {
   const baseT = { bg: "#0D0D0D", fg: "#F0EFE9", muted: "#7A7A7A", line: "#1F1F1F", raised: "#161616", accent: "#E8382C" };
   const ts = effectiveStyle(page);
   const t = page.customColors ? { ...baseT, bg: ts.bg, fg: ts.fg, accent: ts.accent } : baseT;
   const photos = picks(page);
-  const sel = selectionMeta(page, photos.length);
   /* Brooklyn has no serif — slot 1 maps to its display sans, slot 2 to its body sans. */
   const fDisplay = fontSlot(page, 1, BROOKLYN_FONTS.sans);
   const fBody    = fontSlot(page, 2, BROOKLYN_FONTS.sans);
   const fMono    = fontSlot(page, 3, BROOKLYN_FONTS.mono);
+  const wm = shouldWatermark(page);
+
+  if (view === "password") {
+    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={t} fDisplay={fDisplay} fBody={fBody} fMono={fMono} />;
+  }
 
   return (
     <div style={{ background: t.bg, color: t.fg, fontFamily: fBody, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
@@ -276,15 +352,6 @@ function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: Renderer
         </div>
       </EditableImage>
 
-      {sel && (
-        <div style={{ background: t.raised, borderBottom: `1px solid ${t.line}`, padding: isMobile ? "10px 16px" : "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <div style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: t.muted }}>
-            <span style={{ color: t.fg }}>{sel.picked}</span> / {sel.limit} selected
-          </div>
-          <button style={{ background: t.accent, color: t.bg, border: 0, fontFamily: fMono, fontWeight: 700, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", padding: "8px 14px", cursor: "pointer" }}>Submit selection</button>
-        </div>
-      )}
-
       <div style={{ padding: isMobile ? "18px" : "28px 32px" }}>
         {(page.welcomeMessage || set) && (
           <EditableText
@@ -299,8 +366,7 @@ function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: Renderer
             <div key={seed} style={{ position: "relative", aspectRatio: "1", overflow: "hidden", background: t.raised }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photoUrl(seed, 600, 600)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              {page.watermark && <Watermark text={page.logoText || "BROOKLYN"} fontFamily={fMono} />}
-              {page.mode === "selection" && <FavBadge accent={t.accent} square />}
+              {wm && <Watermark text={page.logoText || "BROOKLYN"} fontFamily={fMono} />}
               {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg={t.accent} fg={t.bg} fontFamily={fMono} />}
             </div>
           ))}
@@ -323,16 +389,20 @@ function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: Renderer
    MINIMAL — white paper, serif italic, strict grid
 ══════════════════════════════════════════════════════════════════════════ */
 
-function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererProps) {
+function MinimalPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange }: RendererProps) {
   const baseT = { bg: "#FAFAFA", fg: "#111111", muted: "#888888", line: "#E8E8E8", raised: "#FFFFFF", accent: "#111111" };
   const ts = effectiveStyle(page);
   const t = page.customColors ? { ...baseT, bg: ts.bg, fg: ts.fg, accent: ts.accent } : baseT;
   const photos = picks(page);
-  const sel = selectionMeta(page, photos.length);
   const [first, second] = page.client.split(/\s*&\s*|\s+y\s+|\s+and\s+/);
   const fDisplay = fontSlot(page, 1, MINIMAL_FONTS.serif);
   const fBody    = fontSlot(page, 2, MINIMAL_FONTS.sans);
   const fMono    = fontSlot(page, 3, MINIMAL_FONTS.mono);
+  const wm = shouldWatermark(page);
+
+  if (view === "password") {
+    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={t} fDisplay={fDisplay} fBody={fBody} fMono={fMono} />;
+  }
 
   return (
     <div style={{ background: t.bg, color: t.fg, fontFamily: fBody, minHeight: "100%", overflowY: "auto" }} className="w-full h-full">
@@ -381,15 +451,6 @@ function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
         </EditableImage>
       )}
 
-      {sel && (
-        <div style={{ background: t.bg, borderBottom: `1px solid ${t.line}`, padding: isMobile ? "12px 18px" : "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <div style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: t.muted }}>
-            <span style={{ color: t.fg }}>{sel.picked}</span> / {sel.limit} chosen
-          </div>
-          <button style={{ background: t.fg, color: t.bg, border: 0, fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", padding: "8px 18px", cursor: "pointer" }}>Submit</button>
-        </div>
-      )}
-
       <section style={{ padding: isMobile ? "32px 18px" : "48px 32px" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 24 }}>
           <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", color: t.muted, textTransform: "uppercase" }} data-font-slot={3}>01</span>
@@ -403,8 +464,7 @@ function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
             <div key={seed} style={{ position: "relative", aspectRatio: "4/5", overflow: "hidden", background: t.raised, border: `1px solid ${t.line}` }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photoUrl(seed, 600, 750)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              {page.watermark && <Watermark text={page.logoText || "STUDIO"} fontFamily={fMono} dark />}
-              {page.mode === "selection" && <FavBadge accent={t.fg} square />}
+              {wm && <Watermark text={page.logoText || "STUDIO"} fontFamily={fMono} dark />}
               {page.mode === "direct" && page.pricePerPhoto > 0 && <PriceTag price={page.pricePerPhoto} bg="rgba(255,255,255,0.92)" fg={t.fg} fontFamily={fMono} />}
             </div>
           ))}
@@ -430,12 +490,17 @@ function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
    GENERIC — fallback for vogue (and any future template without a renderer)
 ══════════════════════════════════════════════════════════════════════════ */
 
-function GenericPreview({ page, isMobile, set, onRequestCoverChange }: RendererProps) {
+function GenericPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange }: RendererProps) {
   const ts = effectiveStyle(page);
   const photos = picks(page);
   const fDisplay = fontSlot(page, 1, "Inter, sans-serif");
   const fBody    = fontSlot(page, 2, page.fontFamily || "Inter, sans-serif");
   const fMono    = fontSlot(page, 3, "monospace");
+
+  if (view === "password") {
+    const theme = { bg: ts.bg, fg: ts.fg, muted: ts.muted, accent: ts.accent, line: ts.muted + "33", raised: ts.accent };
+    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={theme} fDisplay={fDisplay} fBody={fBody} fMono={fMono} />;
+  }
 
   return (
     <div className="w-full h-full overflow-y-auto" style={{ background: ts.bg, color: ts.fg, fontFamily: fBody }}>
@@ -492,13 +557,6 @@ function Watermark({ text, fontFamily, dark }: { text: string; fontFamily: strin
     </div>
   );
 }
-function FavBadge({ accent, square }: { accent: string; square?: boolean }) {
-  return (
-    <button style={{ position: "absolute", top: 6, right: 6, width: 24, height: 24, background: "rgba(0,0,0,0.4)", border: 0, borderRadius: square ? 0 : "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2.4" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-    </button>
-  );
-}
 function PriceTag({ price, bg, fg, fontFamily }: { price: number; bg: string; fg: string; fontFamily: string }) {
   return (
     <div style={{ position: "absolute", bottom: 6, left: 6, background: bg, color: fg, fontFamily, fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", padding: "3px 8px" }}>
@@ -519,47 +577,74 @@ const RENDERERS: Record<TemplateName, (props: RendererProps) => React.JSX.Elemen
 };
 
 export function GalleryView({
-  page, viewport = "desktop", set, onRequestCoverChange,
+  page, viewport = "desktop", view = "gallery", set, onRequestCoverChange,
 }: {
   page: DeliveryPage;
   viewport?: "mobile" | "desktop";
+  view?: DeliveryView;
   set?: Setter;
   onRequestCoverChange?: () => void;
 }) {
   const isMobile = viewport === "mobile";
   const Renderer = RENDERERS[page.template] ?? GenericPreview;
-  return <Renderer page={page} isMobile={isMobile} set={set} onRequestCoverChange={onRequestCoverChange} />;
+  return <Renderer page={page} isMobile={isMobile} view={view} set={set} onRequestCoverChange={onRequestCoverChange} />;
 }
 
-/* Preview frame — browser/phone chrome around the live template */
+/* Preview frame — browser/phone chrome around the live template, with
+   viewport (desktop/mobile) and view (gallery/password) toggles. */
 export function PreviewFrame({
-  page, set, onRequestCoverChange,
+  page, view, onViewChange, set, onRequestCoverChange,
 }: {
   page: DeliveryPage;
+  view: DeliveryView;
+  onViewChange: (v: DeliveryView) => void;
   set?: Setter;
   onRequestCoverChange?: () => void;
 }) {
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
+  /* If the password gate isn't enabled the view toggle is hidden — there's
+   * no separate page to show. */
+  const showViewToggle = page.passwordEnabled;
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-center gap-1 py-3 border-b border-[var(--border)] shrink-0">
-        {(["desktop", "mobile"] as const).map((v) => (
-          <button
-            key={v}
-            onClick={() => setViewport(v)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-sans text-xs font-medium transition-colors ${
-              viewport === v ? "bg-[var(--bg-card)] text-[var(--fg)] border border-[var(--border)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"
-            }`}
-          >
-            {v === "desktop" ? (
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            ) : (
-              <svg width="11" height="13" viewBox="0 0 18 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="1" y="1" width="16" height="22" rx="3"/><line x1="7" y1="20" x2="11" y2="20"/></svg>
-            )}
-            {v.charAt(0).toUpperCase() + v.slice(1)}
-          </button>
-        ))}
+      <div className="flex items-center justify-center gap-3 py-3 border-b border-[var(--border)] shrink-0">
+        {showViewToggle && (
+          <div className="flex items-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg overflow-hidden">
+            {(["password", "gallery"] as const).map((v) => (
+              <button key={v} onClick={() => onViewChange(v)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 font-sans text-xs font-medium transition-colors ${
+                  view === v ? "bg-[var(--fg)] text-[var(--bg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"
+                }`}
+              >
+                {v === "password" ? (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                ) : (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                )}
+                {v === "password" ? "Password" : "Gallery"}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="flex items-center gap-1">
+          {(["desktop", "mobile"] as const).map((v) => (
+            <button
+              key={v}
+              onClick={() => setViewport(v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-sans text-xs font-medium transition-colors ${
+                viewport === v ? "bg-[var(--bg-card)] text-[var(--fg)] border border-[var(--border)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"
+              }`}
+            >
+              {v === "desktop" ? (
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              ) : (
+                <svg width="11" height="13" viewBox="0 0 18 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="1" y="1" width="16" height="22" rx="3"/><line x1="7" y1="20" x2="11" y2="20"/></svg>
+              )}
+              {v.charAt(0).toUpperCase() + v.slice(1)}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex-1 flex items-center justify-center overflow-auto bg-[var(--bg)] relative p-6">
@@ -580,7 +665,7 @@ export function PreviewFrame({
                 <span className="w-12" />
               </div>
               <div style={{ height: 640 }}>
-                <GalleryView page={page} viewport="desktop" set={set} onRequestCoverChange={onRequestCoverChange} />
+                <GalleryView page={page} viewport="desktop" view={view} set={set} onRequestCoverChange={onRequestCoverChange} />
               </div>
             </div>
           ) : (
@@ -596,7 +681,7 @@ export function PreviewFrame({
                   </div>
                 </div>
                 <div className="absolute inset-0 pt-9">
-                  <GalleryView page={page} viewport="mobile" set={set} onRequestCoverChange={onRequestCoverChange} />
+                  <GalleryView page={page} viewport="mobile" view={view} set={set} onRequestCoverChange={onRequestCoverChange} />
                 </div>
               </div>
               <div className="absolute rounded-l-sm" style={{ left: -3, top: 100, width: 3, height: 30, background: "#333" }} />

@@ -66,7 +66,7 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
 
         {/* Mode */}
         <div className="absolute top-2.5 right-2.5 px-2 py-1 rounded-md bg-black/40 backdrop-blur-sm text-[10px] font-mono text-white/70 capitalize">
-          {page.mode === "selection" ? `Pick ${page.selectionLimit}` : page.mode}
+          {page.mode}
         </div>
 
         {/* Hover hint */}
@@ -107,11 +107,8 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
             {page.passwordEnabled && (
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-label="Password"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
             )}
-            {page.watermark && (
+            {page.mode === "direct" && (
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-label="Watermark"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            )}
-            {page.proofingEnabled && (
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-label="Proofing"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
             )}
           </div>
         </div>

@@ -101,12 +101,16 @@ function Accordion({
 
 /* Map editable fields → which accordion section they live in */
 const FIELD_TO_SECTION: Record<string, string> = {
-  title:          "content",
-  client:         "content",
-  welcomeMessage: "content",
-  logoText:       "branding",
-  logoUrl:        "branding",
-  coverUrl:       "branding",
+  title:               "content",
+  client:              "content",
+  welcomeMessage:      "content",
+  logoText:            "branding",
+  logoUrl:             "branding",
+  coverUrl:            "branding",
+  passwordTitle:       "password",
+  passwordSubtitle:    "password",
+  passwordHint:        "password",
+  passwordButtonLabel: "password",
 };
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -759,6 +763,51 @@ function AccessPanel({ page, set }: { page: DeliveryPage; set: Setter }) {
   );
 }
 
+function PasswordCopyPanel({
+  page, set, focusedField, fieldRefs, onPreviewPasswordGate,
+}: {
+  page: DeliveryPage; set: Setter; focusedField: string | null;
+  fieldRefs: React.MutableRefObject<Record<string, HTMLElement | null>>;
+  onPreviewPasswordGate: () => void;
+}) {
+  if (!page.passwordEnabled) {
+    return (
+      <p className="font-sans text-[11px] text-[var(--fg-muted)] italic">
+        Password protection is off. Enable it in the Access section to edit the password page.
+      </p>
+    );
+  }
+  const inputCls = (field: string) =>
+    `w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border rounded-lg px-3 py-2 outline-none transition-colors ${focusedField === field ? "border-yellow" : "border-[var(--border)] focus:border-yellow"}`;
+  return (
+    <>
+      <button
+        onClick={onPreviewPasswordGate}
+        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors font-sans text-xs"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Show password page in preview
+      </button>
+      <div ref={(el) => { fieldRefs.current.passwordTitle = el; }}>
+        <FieldLabel>Title</FieldLabel>
+        <input value={page.passwordTitle} onChange={(e) => set("passwordTitle", e.target.value)} className={inputCls("passwordTitle")} />
+      </div>
+      <div ref={(el) => { fieldRefs.current.passwordSubtitle = el; }}>
+        <FieldLabel>Subtitle</FieldLabel>
+        <input value={page.passwordSubtitle} onChange={(e) => set("passwordSubtitle", e.target.value)} className={inputCls("passwordSubtitle")} />
+      </div>
+      <div ref={(el) => { fieldRefs.current.passwordButtonLabel = el; }}>
+        <FieldLabel>Unlock button</FieldLabel>
+        <input value={page.passwordButtonLabel} onChange={(e) => set("passwordButtonLabel", e.target.value)} className={inputCls("passwordButtonLabel")} />
+      </div>
+      <div ref={(el) => { fieldRefs.current.passwordHint = el; }}>
+        <FieldLabel>Hint line</FieldLabel>
+        <input value={page.passwordHint} onChange={(e) => set("passwordHint", e.target.value)} className={inputCls("passwordHint")} placeholder="Optional" />
+      </div>
+    </>
+  );
+}
+
 function MonetizePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
   const photoCount = page.photoSeeds.length || page.photoCount;
   const suggestedGalleryPrice = page.pricePerPhoto > 0 ? Math.round(page.pricePerPhoto * photoCount * 0.6) : 0;
@@ -771,9 +820,8 @@ function MonetizePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
         <FieldLabel>Mode</FieldLabel>
         <div className="flex flex-col gap-2">
           {([
-            { id: "gift",      label: "Gift / Free",    desc: "Client downloads at no cost" },
-            { id: "direct",    label: "Direct Sale",    desc: "Buy individually or as bundle" },
-            { id: "selection", label: "Selection Mode", desc: "Pick favorites from a paid contract" },
+            { id: "gift",   label: "Gift / Free",  desc: "Client downloads at no cost" },
+            { id: "direct", label: "Direct Sale",  desc: "Buy individually or as bundle. Watermark is added automatically." },
           ] as { id: DeliveryMode; label: string; desc: string }[]).map((opt) => (
             <button key={opt.id} onClick={() => set("mode", opt.id)}
               className={`flex items-start gap-3 px-3 py-3 rounded-xl border text-left transition-all ${
@@ -830,19 +878,6 @@ function MonetizePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
         </>
       )}
 
-      {page.mode === "selection" && (
-        <div>
-          <FieldLabel>Selection limit</FieldLabel>
-          <div className="flex items-center gap-3">
-            <input type="range" min={1} max={200} value={page.selectionLimit}
-              onChange={(e) => set("selectionLimit", Number(e.target.value))}
-              className="flex-1 accent-yellow" />
-            <span className="font-mono text-sm font-bold text-[var(--fg)] w-16 text-right">{page.selectionLimit}</span>
-          </div>
-          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1">Client can heart up to {page.selectionLimit} photos</p>
-        </div>
-      )}
-
       <div className="pt-3 border-t border-[var(--border)]">
         <FieldLabel>Download resolution</FieldLabel>
         <div className="flex gap-2">
@@ -863,20 +898,6 @@ function MonetizePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
           ))}
         </div>
       </div>
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="font-sans text-sm font-medium text-[var(--fg)]">Watermark previews</span>
-          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Add watermark to preview images</p>
-        </div>
-        <Toggle checked={page.watermark} onChange={() => set("watermark", !page.watermark)} />
-      </div>
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="font-sans text-sm font-medium text-[var(--fg)]">Proofing mode</span>
-          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Clients can leave comments per photo</p>
-        </div>
-        <Toggle checked={page.proofingEnabled} onChange={() => set("proofingEnabled", !page.proofingEnabled)} />
-      </div>
     </>
   );
 }
@@ -885,7 +906,8 @@ function MonetizePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
    BUILDER ROOT
 ══════════════════════════════════════════════════════════════════════════ */
 
-type SectionId = "template" | "content" | "branding" | "colors" | "typography" | "photos" | "access" | "monetize";
+type SectionId = "template" | "content" | "branding" | "colors" | "typography" | "photos" | "access" | "password" | "monetize";
+type DeliveryView = "gallery" | "password";
 
 export function DeliveryBuilder({ pageId }: { pageId: string }) {
   const router = useRouter();
@@ -897,6 +919,7 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
   const [openSections, setOpenSections] = useState<Set<SectionId>>(new Set(["content", "branding"]));
   const [activeField, setActiveField] = useState<string | null>(null);
   const [highlightFontSlot, setHighlightFontSlot] = useState<FontSlot | null>(null);
+  const [view, setView] = useState<DeliveryView>("gallery");
   const [showGallery, setShowGallery] = useState(false);
   const [showCoverPicker, setShowCoverPicker] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -911,10 +934,13 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
     setDirty(true);
   }, []);
 
-  /* When a field is focused in the canvas, open its section and scroll it into view */
+  /* When a field is focused (clicked in the canvas or via accordion section),
+     open the matching sidebar section, scroll the input into view, and switch
+     the preview view so the user sees the element they care about. */
   const focusField = useCallback((fieldPath: string) => {
     setActiveField(fieldPath);
     const sectionId = FIELD_TO_SECTION[fieldPath] as SectionId | undefined;
+    if (sectionId === "password") setView("password");
     if (sectionId) {
       setOpenSections((prev) => {
         if (prev.has(sectionId)) return prev;
@@ -1038,6 +1064,15 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
           >
             <AccessPanel page={page} set={set} />
           </Accordion>
+          {page.passwordEnabled && (
+            <Accordion id="password" title="Password page" count="copy"
+              isOpen={openSections.has("password")} onToggle={() => toggleSection("password")} isActive={activeSection === "password"}
+            >
+              <PasswordCopyPanel page={page} set={set} focusedField={activeField} fieldRefs={fieldRefs}
+                onPreviewPasswordGate={() => setView("password")}
+              />
+            </Accordion>
+          )}
           <Accordion id="monetize" title="Monetize" count={page.mode}
             isOpen={openSections.has("monetize")} onToggle={() => toggleSection("monetize")}
           >
@@ -1048,7 +1083,7 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
         {/* Live canvas */}
         <div className="flex-1 min-w-0 overflow-hidden">
           <EditModeProvider editMode activeField={activeField} focusField={focusField} highlightFontSlot={highlightFontSlot}>
-            <PreviewFrame page={page} set={set} onRequestCoverChange={() => setShowCoverPicker(true)} />
+            <PreviewFrame page={page} view={view} onViewChange={setView} set={set} onRequestCoverChange={() => setShowCoverPicker(true)} />
           </EditModeProvider>
         </div>
       </div>
