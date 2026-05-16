@@ -13,9 +13,19 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { DM_Serif_Display, Space_Grotesk, Space_Mono } from "next/font/google";
 import { effectiveStyle, INITIAL_PAGES, type DeliveryPage } from "~/lib/delivery/data";
 import { useDeliveryStore } from "~/lib/delivery/store";
 import { EditableText, EditableImage, EditableHoverStyles, type FontSlot } from "~/components/delivery/editable";
+
+/* Canonical Brooklyn typography. Loaded via next/font here so the component
+   carries its fonts everywhere it renders — editor preview, /d/[id],
+   /template/brooklyn/delivery. Without these, embedding outside the
+   /template/brooklyn layout would fall back to system fonts. */
+const bkSerif = DM_Serif_Display({ subsets: ["latin"], weight: ["400"], style: ["normal", "italic"], display: "swap", variable: "--bk-serif" });
+const bkSans  = Space_Grotesk({ subsets: ["latin"], weight: ["400", "500", "700"], display: "swap", variable: "--bk-sans" });
+const bkMono  = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], display: "swap", variable: "--bk-mono" });
+const BK_FONT_CLASSES = `${bkSerif.variable} ${bkSans.variable} ${bkMono.variable}`;
 
 const RED   = "#E8382C";
 const BLACK = "#0D0D0D";
@@ -53,6 +63,17 @@ interface BrooklynDeliveryProps {
 function slotFor(page: DeliveryPage, slot: FontSlot, fallback: string) {
   const v = slot === 1 ? page.fontFamily1 : slot === 2 ? page.fontFamily2 : page.fontFamily3;
   return v && v.trim() ? v : fallback;
+}
+
+/* Label helpers — every customisable label lives in page.labels with a
+   fallback default. An explicit empty string means the user deleted the
+   label and EditableText hides it in view mode. */
+function lbl(page: DeliveryPage, key: string, fallback: string): string {
+  return page.labels?.[key] ?? fallback;
+}
+function setLbl(set: Setter | undefined, page: DeliveryPage, key: string): ((v: string) => void) | undefined {
+  if (!set) return undefined;
+  return (v: string) => set("labels", { ...(page.labels ?? {}), [key]: v });
 }
 
 function themeFor(page: DeliveryPage) {
@@ -124,14 +145,29 @@ const SECTION_DEFAULTS = [
 function chaptersForPage(page: DeliveryPage) {
   const seeds = page.photoSeeds.length > 0 ? page.photoSeeds : [10, 71, 82, 93, 100, 111, 122, 133, 144, 155, 166, 177];
   if (seeds.length < 6) {
-    return [{ ...SECTION_DEFAULTS[0], label: "Gallery", note: "Your complete delivery.", photos: seeds }];
+    return [{
+      id: "gallery",
+      labelKey: "chapter1Label",
+      noteKey:  "chapter1Note",
+      label:    lbl(page, "chapter1Label", "Gallery"),
+      note:     lbl(page, "chapter1Note", "Your complete delivery."),
+      photos:   seeds,
+    }];
   }
   const third = Math.floor(seeds.length / 3);
-  return [
-    { ...SECTION_DEFAULTS[0], photos: seeds.slice(0, third) },
-    { ...SECTION_DEFAULTS[1], photos: seeds.slice(third, third * 2) },
-    { ...SECTION_DEFAULTS[2], photos: seeds.slice(third * 2) },
-  ];
+  return SECTION_DEFAULTS.map((def, i) => {
+    const photos = i === 0 ? seeds.slice(0, third)
+                  : i === 1 ? seeds.slice(third, third * 2)
+                  : seeds.slice(third * 2);
+    return {
+      id:       def.id,
+      labelKey: `chapter${i + 1}Label`,
+      noteKey:  `chapter${i + 1}Note`,
+      label:    lbl(page, `chapter${i + 1}Label`, def.label),
+      note:     lbl(page, `chapter${i + 1}Note`,  def.note),
+      photos,
+    };
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -162,7 +198,7 @@ export function BrooklynDelivery({ page, view, set, onRequestCoverChange, onUnlo
   }
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%", minHeight: isEditor ? undefined : "100dvh" }}>
+    <div className={BK_FONT_CLASSES} style={{ position: "relative", width: "100%", height: "100%", minHeight: isEditor ? undefined : "100dvh" }}>
       <EditableHoverStyles />
       {resolvedView === "password" ? (
         <PasswordGate page={page} set={set} onSubmit={handleUnlockAttempt} />
@@ -250,9 +286,11 @@ function PasswordGate({ page, set, onSubmit }: { page: DeliveryPage; set?: Sette
             textStyle={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }}
           />
           {page.logoMode !== "none" && (
-            <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
-              · Client Gallery
-            </span>
+            <EditableText
+              fieldPath="labels.gateSuffix" value={lbl(page, "gateSuffix", "· Client Gallery")}
+              onChange={setLbl(set, page, "gateSuffix")} as="span" fontSlot={3} hideIfEmpty
+              style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }}
+            />
           )}
         </div>
 
@@ -456,7 +494,13 @@ function Gallery({
               textTransform: "uppercase", color: t.accent, margin: "0 0 12px",
             }} data-font-slot={3}>
               <EditableText fieldPath="title" value={page.title} onChange={set ? (v) => set("title", v) : undefined} as="span" fontSlot={3} />
-              {" · "}{chapters.length} chapters
+              <EditableText
+                fieldPath="labels.heroChaptersSuffix"
+                value={lbl(page, "heroChaptersSuffix", ` · ${chapters.length} chapters`)}
+                onChange={setLbl(set, page, "heroChaptersSuffix")}
+                as="span" fontSlot={3} hideIfEmpty
+                style={{ color: "inherit" }}
+              />
             </p>
             <EditableText
               fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined}
@@ -512,7 +556,17 @@ function Gallery({
             }}
           >
             {downloading ? <Spinner /> : <DownloadIcon />}
-            {downloading ? "Preparing zip…" : "Download all"}
+            {downloading ? (
+              <EditableText fieldPath="labels.preparingZip" value={lbl(page, "preparingZip", "Preparing zip…")}
+                onChange={setLbl(set, page, "preparingZip")} as="span" fontSlot={3}
+                style={{ color: "inherit", fontFamily: fMono, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 700 }}
+              />
+            ) : (
+              <EditableText fieldPath="labels.downloadAll" value={lbl(page, "downloadAll", "Download all")}
+                onChange={setLbl(set, page, "downloadAll")} as="span" fontSlot={3}
+                style={{ color: "inherit", fontFamily: fMono, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 700 }}
+              />
+            )}
           </button>
         </div>
       </header>
@@ -527,11 +581,18 @@ function Gallery({
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px clamp(12px, 4vw, 48px)", flexWrap: "wrap" }}>
           <div style={{ display: "flex", border: `1px solid ${t.line}` }}>
             <FilterPill active={filter === "all"} onClick={() => setFilter("all")} accent={t.accent} muted={t.muted} fg={t.fg} mono={fMono}>
-              All <span style={{ opacity: 0.55, marginLeft: 4 }}>{allPhotos.length}</span>
+              <EditableText fieldPath="labels.filterAll" value={lbl(page, "filterAll", "All")}
+                onChange={setLbl(set, page, "filterAll")} as="span" fontSlot={3}
+                style={{ color: "inherit", fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}
+              />
+              <span style={{ opacity: 0.55, marginLeft: 4 }}>{allPhotos.length}</span>
             </FilterPill>
             <FilterPill active={filter === "favorites"} onClick={() => setFilter("favorites")} accent={t.accent} muted={t.muted} fg={t.fg} mono={fMono}>
               <Heart filled={filter === "favorites"} size={9} />
-              <span style={{ marginLeft: 5 }}>Favorites</span>
+              <EditableText fieldPath="labels.filterFavorites" value={lbl(page, "filterFavorites", "Favorites")}
+                onChange={setLbl(set, page, "filterFavorites")} as="span" fontSlot={3}
+                style={{ color: "inherit", marginLeft: 5, fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}
+              />
               <span style={{ opacity: 0.55, marginLeft: 4 }}>{favorites.size}</span>
             </FilterPill>
           </div>
@@ -602,23 +663,32 @@ function Gallery({
                 <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
                   Ch {String(si + 1).padStart(2, "0")}
                 </span>
-                <h2 style={{
-                  fontFamily: fSerif, fontStyle: "italic",
-                  fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 400,
-                  color: t.fg, letterSpacing: "-0.01em", lineHeight: 1,
-                  margin: 0,
-                }} data-font-slot={1}>
-                  {section.label}
-                </h2>
+                <EditableText
+                  fieldPath={`labels.${section.labelKey}`}
+                  value={section.label}
+                  onChange={setLbl(set, page, section.labelKey)}
+                  as="h2" fontSlot={1} hideIfEmpty
+                  style={{
+                    fontFamily: fSerif, fontStyle: "italic",
+                    fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 400,
+                    color: t.fg, letterSpacing: "-0.01em", lineHeight: 1,
+                    margin: 0,
+                  }}
+                />
                 <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", color: t.muted, textTransform: "uppercase" }} data-font-slot={3}>
                   {indices.length} photos
                 </span>
-                <p style={{
-                  flexBasis: "100%", fontFamily: fSans, fontSize: 12,
-                  fontWeight: 300, color: t.muted, margin: "4px 0 0", lineHeight: 1.6,
-                }}>
-                  {section.note}
-                </p>
+                <EditableText
+                  fieldPath={`labels.${section.noteKey}`}
+                  value={section.note}
+                  onChange={setLbl(set, page, section.noteKey)}
+                  as="p" multiline fontSlot={2} hideIfEmpty
+                  style={{
+                    flexBasis: "100%", fontFamily: fSans, fontSize: 12,
+                    fontWeight: 300, color: t.muted, margin: "4px 0 0", lineHeight: 1.6,
+                  }}
+                />
+
               </div>
 
               {page.layout === "masonry" ? (
@@ -708,11 +778,19 @@ function Gallery({
             </p>
           </div>
           <nav style={{ display: "flex", gap: 20, fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-            {["Print shop", "Contact", "Instagram"].map((item) => (
-              <a key={item} href="#" style={{ color: t.muted, textDecoration: "none" }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = t.fg; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = t.muted; }}
-              >{item}</a>
+            {[
+              { key: "footerLink1", fallback: "Print shop" },
+              { key: "footerLink2", fallback: "Contact" },
+              { key: "footerLink3", fallback: "Instagram" },
+            ].map(({ key, fallback }) => (
+              <EditableText
+                key={key}
+                fieldPath={`labels.${key}`}
+                value={lbl(page, key, fallback)}
+                onChange={setLbl(set, page, key)}
+                as="a" fontSlot={3} hideIfEmpty
+                style={{ color: t.muted, textDecoration: "none", fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase" }}
+              />
             ))}
           </nav>
         </div>

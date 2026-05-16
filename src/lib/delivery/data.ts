@@ -44,6 +44,10 @@ export interface DeliveryPage {
   passwordSubtitle: string;
   passwordHint:     string;
   passwordButtonLabel: string;
+  /** Free-form per-template label overrides. Keys vary per template;
+   *  templates read with a fallback so unset keys use the default copy
+   *  and explicitly-cleared keys (empty string) hide the element. */
+  labels:           Record<string, string>;
   // Branding
   logoMode:         LogoMode;
   logoText:         string;
@@ -93,6 +97,7 @@ export const DEFAULT_BRANDING = {
   coverPositionX: 50,
   coverPositionY: 50,
   logoWidth: 0,
+  labels: {} as Record<string, string>,
 };
 
 /* Cover URLs lifted from the actual template asset banks so each

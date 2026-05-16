@@ -82,11 +82,15 @@ interface EditableTextProps {
   /** Which template typography slot this element uses (1=display, 2=body, 3=mono).
    *  When the user opens the matching dropdown in the sidebar this element rings up. */
   fontSlot?:  FontSlot;
+  /** When true and value is empty, the element doesn't render at all in view
+   *  mode. In edit mode it still shows the placeholder so the editor can
+   *  click to bring the text back. Lets users delete optional labels. */
+  hideIfEmpty?: boolean;
 }
 
 export function EditableText({
   fieldPath, value, onChange, as = "span", style, className,
-  multiline = false, placeholder, fontSlot,
+  multiline = false, placeholder, fontSlot, hideIfEmpty = false,
 }: EditableTextProps) {
   const { editMode, activeField, focusField, highlightFontSlot } = useEditMode();
   const ref = useRef<HTMLElement | null>(null);
@@ -100,6 +104,7 @@ export function EditableText({
   }, [value, editing]);
 
   if (!editMode) {
+    if (hideIfEmpty && !value) return null;
     return (
       <Tag ref={ref} style={style} className={className}>
         {value || placeholder || ""}
