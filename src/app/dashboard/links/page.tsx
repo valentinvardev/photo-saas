@@ -1495,6 +1495,9 @@ export default function LinksPage() {
 
   const [activeTab, setActiveTab] = useState<"links" | "appearance">("links");
   const [copied,    setCopied]    = useState(false);
+  /* On phones the sidebar would cover the preview; on desktop both fit
+     side-by-side. The mobile tab decides which surface is visible. */
+  const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
   void hydrated; // store rehydrates synchronously on mount; nothing to gate
 
   const publicUrl = "frame.so/@sofia";
@@ -1512,32 +1515,48 @@ export default function LinksPage() {
 
       <div className="flex flex-col h-full">
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
-          <div>
-            <h1 className="font-sans font-bold text-lg text-[var(--fg)] leading-tight">Link Page</h1>
-            <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">{publicUrl}</p>
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[var(--border)] shrink-0 gap-3">
+          <div className="min-w-0 flex-1">
+            <h1 className="font-sans font-bold text-base sm:text-lg text-[var(--fg)] leading-tight">Link Page</h1>
+            <p className="font-mono text-[10px] sm:text-xs text-[var(--fg-muted)] mt-0.5 truncate">{publicUrl}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={copyUrl}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-xs font-sans text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+              aria-label="Copy link"
+              className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-lg border border-[var(--border)] text-xs font-sans text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
             >
               <CopyIcon />
-              {copied ? "Copied!" : "Copy link"}
+              <span className="hidden sm:inline">{copied ? "Copied!" : "Copy link"}</span>
             </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-xs font-sans text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
-              <ExternalIcon /> Open
+            <button aria-label="Open" className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-lg border border-[var(--border)] text-xs font-sans text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
+              <ExternalIcon /> <span className="hidden sm:inline">Open</span>
             </button>
-            <button className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-yellow text-[#111] text-xs font-sans font-semibold hover:opacity-90 transition-opacity">
-              Save changes
+            <button className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg bg-yellow text-[#111] text-xs font-sans font-semibold hover:opacity-90 transition-opacity whitespace-nowrap">
+              Save<span className="hidden sm:inline"> changes</span>
             </button>
           </div>
         </div>
 
-        {/* ── Body ── */}
+        {/* ── Mobile Edit / Preview switcher — only visible on phone ── */}
+        <div className="md:hidden flex items-center border-b border-[var(--border)] shrink-0 bg-[var(--bg-card)]">
+          {(["edit", "preview"] as const).map((v) => (
+            <button
+              key={v}
+              onClick={() => setMobileView(v)}
+              className={`flex-1 py-2.5 font-sans text-xs uppercase tracking-widest transition-colors border-b-2 ${
+                mobileView === v ? "border-yellow text-[var(--fg)] font-semibold" : "border-transparent text-[var(--fg-muted)]"
+              }`}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Body — side-by-side on md+, one surface at a time on mobile ── */}
         <div className="flex flex-1 min-h-0 overflow-hidden">
-          {/* Left panel */}
-          <div className="w-80 shrink-0 flex flex-col border-r border-[var(--border)] bg-[var(--bg-card)]">
+          {/* Left panel (edit) */}
+          <div className={`${mobileView === "edit" ? "flex" : "hidden md:flex"} w-full md:w-80 md:shrink-0 flex-col border-r border-[var(--border)] bg-[var(--bg-card)]`}>
             <div className="flex border-b border-[var(--border)] shrink-0">
               {(["links", "appearance"] as const).map((tab) => (
                 <button
@@ -1563,7 +1582,7 @@ export default function LinksPage() {
           </div>
 
           {/* Preview pane */}
-          <div className="flex-1 flex items-center justify-center overflow-auto bg-[var(--bg)] relative">
+          <div className={`${mobileView === "preview" ? "flex" : "hidden md:flex"} flex-1 items-center justify-center overflow-auto bg-[var(--bg)] relative`}>
             <div
               className="absolute inset-0 pointer-events-none opacity-60"
               style={{
@@ -1571,7 +1590,7 @@ export default function LinksPage() {
                 backgroundSize: "24px 24px",
               }}
             />
-            <div className="relative z-10 py-12">
+            <div className="relative z-10 py-8 sm:py-12">
               <PhoneShell page={page} />
               <p className="text-center font-mono text-[11px] text-[var(--fg-muted)] mt-5">{publicUrl}</p>
             </div>
