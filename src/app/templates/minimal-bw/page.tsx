@@ -277,8 +277,19 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
   const prev = () => { setIndex((i) => Math.max(i - 1, 0)); resetView(); };
   const next = () => { setIndex((i) => Math.min(i + 1, works.length - 1)); resetView(); };
 
+  // Touch swipe — only when not zoomed
+  const touchStartX = useRef(0);
+  const onTouchStart = (e: React.TouchEvent) => { if (zoom <= 1 && e.touches[0]) touchStartX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (zoom > 1) return;
+    const t = e.changedTouches[0]; if (!t) return;
+    const dx = touchStartX.current - t.clientX;
+    if (Math.abs(dx) > 40) { if (dx > 0) next(); else prev(); }
+  };
+
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 1100, background: "#000", display: "flex", flexDirection: "column", userSelect: "none" }}>
+    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+      style={{ position: "fixed", inset: 0, zIndex: 1100, background: "#000", display: "flex", flexDirection: "column", userSelect: "none" }}>
       {/* Top bar */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)", pointerEvents: "none" }}>
         <button style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.6)", padding: "4px 8px", fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", display: "flex", alignItems: "center", gap: "6px" }} onClick={onClose}>

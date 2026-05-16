@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /* ── Tokens ── */
 const T = {
@@ -46,6 +46,7 @@ export default function MinimalDeliveryPage() {
   const [favs,       setFavs]       = useState<Set<string>>(new Set());
   const [sel,        setSel]        = useState<Set<string>>(new Set());
   const [lightbox,   setLightbox]   = useState<{ photos: Photo[]; index: number } | null>(null);
+  const lbTouchX = useRef(0);
 
   const visible = useMemo(
     () => (filter === "fav" ? ALL_PHOTOS.filter((p) => favs.has(p.id)) : ALL_PHOTOS),
@@ -313,7 +314,18 @@ export default function MinimalDeliveryPage() {
 
       {/* ── Lightbox ─────────────────────────────────────── */}
       {lightbox && lightbox.photos[lightbox.index] && (
-        <div className="mn-lb" onClick={(e) => { if (e.target === e.currentTarget) setLightbox(null); }}>
+        <div className="mn-lb"
+          onClick={(e) => { if (e.target === e.currentTarget) setLightbox(null); }}
+          onTouchStart={(e) => { if (e.touches[0]) lbTouchX.current = e.touches[0].clientX; }}
+          onTouchEnd={(e) => {
+            const t = e.changedTouches[0]; if (!t) return;
+            const dx = lbTouchX.current - t.clientX;
+            if (Math.abs(dx) > 40) {
+              if (dx > 0) setLightbox((l) => l && ({ ...l, index: (l.index + 1) % l.photos.length }));
+              else        setLightbox((l) => l && ({ ...l, index: (l.index - 1 + l.photos.length) % l.photos.length }));
+            }
+          }}
+        >
           <button className="mn-lb-x" onClick={() => setLightbox(null)}>Close ✕</button>
           <button className="mn-lb-arrow l" onClick={() => setLightbox((l) => l && ({ ...l, index: (l.index - 1 + l.photos.length) % l.photos.length }))}>←</button>
           <button className="mn-lb-arrow r" onClick={() => setLightbox((l) => l && ({ ...l, index: (l.index + 1) % l.photos.length }))}>→</button>

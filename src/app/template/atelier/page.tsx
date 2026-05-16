@@ -609,8 +609,20 @@ function Lightbox({ photos, startIndex, onClose }: { photos: typeof PHOTOS; star
   const onMM = (e: React.MouseEvent) => { if (!dragging) return; setOffset({ x: dragRef.current.ox + e.clientX - dragRef.current.sx, y: dragRef.current.oy + e.clientY - dragRef.current.sy }); };
   const onMU = () => setDrag(false);
 
+  // Touch swipe — only when not zoomed
+  const touchStartX = useRef(0);
+  const onTouchStart = (e: React.TouchEvent) => { if (zoom <= 1 && e.touches[0]) touchStartX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (zoom > 1) return;
+    const t = e.changedTouches[0];
+    if (!t) return;
+    const dx = touchStartX.current - t.clientX;
+    if (Math.abs(dx) > 40) { if (dx > 0) next(); else prev(); }
+  };
+
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 1100, background: "#0a0a0a", display: "flex", flexDirection: "column", userSelect: "none" }}>
+    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+      style={{ position: "fixed", inset: 0, zIndex: 1100, background: "#0a0a0a", display: "flex", flexDirection: "column", userSelect: "none" }}>
       {/* Top bar */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", background: "linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)", pointerEvents: "none" }}>
         <button onClick={onClose} style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.7)", padding: "6px 10px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>

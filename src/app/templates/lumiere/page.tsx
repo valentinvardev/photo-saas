@@ -678,8 +678,19 @@ function PetalLightbox({
   const onMM = (e: React.MouseEvent) => { if (!dragging) return; setOffset({ x: dragRef.current.ox + e.clientX - dragRef.current.sx, y: dragRef.current.oy + e.clientY - dragRef.current.sy }); };
   const onMU = () => setDrag(false);
 
+  // Touch swipe — only when not zoomed
+  const touchStartX = useRef(0);
+  const onTouchStart = (e: React.TouchEvent) => { if (zoom <= 1 && e.touches[0]) touchStartX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (zoom > 1) return;
+    const t = e.changedTouches[0]; if (!t) return;
+    const dx = touchStartX.current - t.clientX;
+    if (Math.abs(dx) > 40) { if (dx > 0) next(); else prev(); }
+  };
+
   return (
-    <div onClick={(e) => e.stopPropagation()} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(18,18,20,0.97)", display: "flex", flexDirection: "column", userSelect: "none" }}>
+    <div onClick={(e) => e.stopPropagation()} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+      style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(18,18,20,0.97)", display: "flex", flexDirection: "column", userSelect: "none" }}>
 
       {/* Top bar */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 24px", flexShrink: 0 }}>
