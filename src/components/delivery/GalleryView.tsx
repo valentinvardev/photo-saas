@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import type { CSSProperties } from "react";
 import { ALL_GALLERY_SEEDS, effectiveStyle, type DeliveryPage, type TemplateName } from "~/lib/delivery/data";
-import { EditableText, EditableImage, EditableHoverStyles } from "./editable";
+import { EditableText, EditableImage, EditableHoverStyles, type FontSlot } from "./editable";
 
 /* ──────────────────────────────────────────────────────────────────────────
    GalleryView — live, per-template preview rendered from DeliveryPage state.
@@ -79,6 +80,42 @@ interface RendererProps {
   onRequestCoverChange?: () => void;
 }
 
+/* Renders the brand mark honouring page.logoMode (none / text / image /
+   image+text). When mode is "none" returns null so the entire logo slot is
+   removed from the template's layout. */
+function LogoBlock({
+  page, set, fallback, fontSlot: slot, textStyle, imageHeight,
+}: {
+  page: DeliveryPage;
+  set?: Setter;
+  fallback: string;
+  fontSlot: FontSlot;
+  textStyle: CSSProperties;
+  imageHeight: number;
+}) {
+  if (page.logoMode === "none") return null;
+  const showImage = page.logoMode === "image" || page.logoMode === "image+text";
+  const showText  = page.logoMode === "text"  || page.logoMode === "image+text";
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 8, lineHeight: 1 }}>
+      {showImage && page.logoUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={page.logoUrl} alt="" style={{ height: imageHeight, width: "auto", objectFit: "contain", display: "block" }} />
+      )}
+      {showText && (
+        <EditableText
+          fieldPath="logoText"
+          value={page.logoText || fallback}
+          onChange={set ? (v) => set("logoText", v) : undefined}
+          as="span"
+          fontSlot={slot}
+          style={textStyle}
+        />
+      )}
+    </span>
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    HALCYON — warm dark, serif italic, sectioned chapters
 ══════════════════════════════════════════════════════════════════════════ */
@@ -111,10 +148,10 @@ function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
         <div style={{ position: "absolute", inset: 0, background: t.accent, mixBlendMode: "multiply", opacity: 0.55 }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(14,13,11,0.35) 0%,rgba(14,13,11,0) 30%,rgba(14,13,11,0.7) 75%,rgba(14,13,11,0.96) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, padding: isMobile ? "16px 18px" : "24px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between", color: t.fg }}>
-          <EditableText
-            fieldPath="logoText" value={page.logoText || "HALCYON"} onChange={set ? (v) => set("logoText", v) : undefined}
-            fontSlot={3}
-            style={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.85 }}
+          <LogoBlock
+            page={page} set={set} fallback="HALCYON" fontSlot={3}
+            imageHeight={isMobile ? 18 : 22}
+            textStyle={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.85 }}
           />
           <div>
             <div style={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.8, marginBottom: 6 }} data-font-slot={3}>
@@ -173,8 +210,13 @@ function HalcyonPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
 
       {/* Footer */}
       <div style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-        <span style={{ fontFamily: fDisplay, fontSize: 16, color: t.fg, textTransform: "none", letterSpacing: 0 }}>
-          {page.logoText || "Halcyon"}<em style={{ color: t.accent, fontStyle: "italic" }}> Studio</em>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: fDisplay, fontSize: 16, color: t.fg, textTransform: "none", letterSpacing: 0 }}>
+          <LogoBlock
+            page={page} set={set} fallback="Halcyon" fontSlot={1}
+            imageHeight={18}
+            textStyle={{ fontFamily: fDisplay, fontSize: 16, color: t.fg }}
+          />
+          {page.logoMode !== "none" && <em style={{ color: t.accent, fontStyle: "italic" }}> Studio</em>}
         </span>
         <span>© {new Date().getFullYear()} · Delivered with Portapic</span>
       </div>
@@ -211,9 +253,14 @@ function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: Renderer
         <img src={coverFor(page)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", filter: "contrast(1.05)" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(13,13,13,0.25) 0%,rgba(13,13,13,0) 30%,rgba(13,13,13,0.85) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, padding: isMobile ? "16px 18px" : "24px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <div style={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
-            <EditableText fieldPath="logoText" value={page.logoText || "BROOKLYN"} onChange={set ? (v) => set("logoText", v) : undefined} as="span" fontSlot={3} />
-            {" / Client Gallery"}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
+            <LogoBlock
+              page={page} set={set} fallback="BROOKLYN" fontSlot={3}
+              imageHeight={isMobile ? 16 : 20}
+              textStyle={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }}
+            />
+            {page.logoMode !== "none" && <span>/ Client Gallery</span>}
+            {page.logoMode === "none" && <span>Client Gallery</span>}
           </div>
           <div>
             <div style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: t.muted, marginBottom: 8 }} data-font-slot={3}>
@@ -261,7 +308,11 @@ function BrooklynPreview({ page, isMobile, set, onRequestCoverChange }: Renderer
       </div>
 
       <div style={{ padding: isMobile ? "18px" : "24px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-        <span style={{ color: t.fg, fontWeight: 700 }}>{page.logoText || "BROOKLYN"}</span>
+        <LogoBlock
+          page={page} set={set} fallback="BROOKLYN" fontSlot={3}
+          imageHeight={18}
+          textStyle={{ color: t.fg, fontWeight: 700, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}
+        />
         <span>© {new Date().getFullYear()} · Portapic</span>
       </div>
     </div>
@@ -289,9 +340,13 @@ function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
       <EditableHoverStyles />
 
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "16px 18px" : "22px 32px", borderBottom: `1px solid ${t.line}`, background: t.raised }}>
-        <span style={{ fontFamily: fDisplay, fontSize: 20, letterSpacing: "-0.02em", fontWeight: 500 }} data-font-slot={1}>
-          <EditableText fieldPath="logoText" value={page.logoText || "Studio"} onChange={set ? (v) => set("logoText", v) : undefined} as="span" fontSlot={1} />
-          <em style={{ fontStyle: "italic", color: t.muted }}> Minimal</em>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: fDisplay, fontSize: 20, letterSpacing: "-0.02em", fontWeight: 500 }} data-font-slot={1}>
+          <LogoBlock
+            page={page} set={set} fallback="Studio" fontSlot={1}
+            imageHeight={24}
+            textStyle={{ fontFamily: fDisplay, fontSize: 20, letterSpacing: "-0.02em", fontWeight: 500 }}
+          />
+          {page.logoMode !== "none" && <em style={{ fontStyle: "italic", color: t.muted }}> Minimal</em>}
         </span>
         <span style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: t.muted }} data-font-slot={3}>
           <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" fontSlot={3} />
@@ -357,7 +412,14 @@ function MinimalPreview({ page, isMobile, set, onRequestCoverChange }: RendererP
       </section>
 
       <footer style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-        <span style={{ fontFamily: fDisplay, fontSize: 16, color: t.fg, textTransform: "none", letterSpacing: 0 }}>{page.logoText || "Studio"} <em style={{ fontStyle: "italic", color: t.muted }}>Minimal</em></span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: fDisplay, fontSize: 16, color: t.fg, textTransform: "none", letterSpacing: 0 }}>
+          <LogoBlock
+            page={page} set={set} fallback="Studio" fontSlot={1}
+            imageHeight={18}
+            textStyle={{ fontFamily: fDisplay, fontSize: 16, color: t.fg }}
+          />
+          {page.logoMode !== "none" && <em style={{ fontStyle: "italic", color: t.muted }}>Minimal</em>}
+        </span>
         <span>© {new Date().getFullYear()} · Portapic</span>
       </footer>
     </div>
