@@ -95,17 +95,35 @@ interface RendererProps {
   view?: DeliveryView;
   set?: Setter;
   onRequestCoverChange?: () => void;
+  /** Public route only — fired when the password gate submits a guess. */
+  onPasswordSubmit?: (pwd: string) => void;
 }
 
 /* Shared password gate — rendered when `view === "password"`. Each template
    passes its own theme tokens and fonts so the gate matches the gallery. */
 function PasswordGate({
-  page, set, isMobile, theme, fDisplay, fMono, fBody,
+  page, set, isMobile, theme, fDisplay, fMono, fBody, onSubmit,
 }: {
   page: DeliveryPage; set?: Setter; isMobile: boolean;
   theme: { bg: string; fg: string; muted: string; accent: string; line: string; raised: string };
   fDisplay: string; fMono: string; fBody: string;
+  onSubmit?: (pwd: string) => void;
 }) {
+  const [pwd, setPwd] = useState("");
+  const [error, setError] = useState(false);
+  /* Editor mode: input is read-only so it doesn't fight the user's editing.
+   * Public route: live input, submitting calls onSubmit. */
+  const isEditor = !!set;
+
+  const attempt = () => {
+    if (!onSubmit) return;
+    if (!pwd.trim()) { setError(true); setTimeout(() => setError(false), 1500); return; }
+    onSubmit(pwd);
+    /* If the parent didn't unlock we surface an error briefly. */
+    setTimeout(() => setError(true), 0);
+    setTimeout(() => setError(false), 2000);
+  };
+
   return (
     <div style={{ background: theme.bg, color: theme.fg, fontFamily: fBody, minHeight: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }} className="w-full h-full">
       <FontStylesheet />
@@ -139,23 +157,33 @@ function PasswordGate({
         <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 320, marginTop: 8 }}>
           <input
             type="password" placeholder="••••••••"
-            readOnly
+            value={isEditor ? "" : pwd}
+            readOnly={isEditor}
+            onChange={isEditor ? undefined : (e) => setPwd(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") attempt(); }}
             style={{
               fontFamily: fMono, fontSize: 14, padding: "12px 16px", textAlign: "center",
-              background: theme.raised, border: `1px solid ${theme.line}`, color: theme.fg,
-              letterSpacing: "0.32em", outline: "none",
+              background: theme.raised, border: `1px solid ${error ? theme.accent : theme.line}`,
+              color: theme.fg, letterSpacing: "0.32em", outline: "none",
+              transition: "border-color 0.2s",
             }}
           />
-          <EditableText
-            fieldPath="passwordButtonLabel" value={page.passwordButtonLabel} onChange={set ? (v) => set("passwordButtonLabel", v) : undefined}
-            as="button" fontSlot={3}
+          <button
+            onClick={attempt}
+            disabled={isEditor}
             style={{
               fontFamily: fMono, fontSize: 11, padding: "12px 18px",
               background: theme.accent, color: theme.bg, border: "none",
               letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700,
-              cursor: "pointer",
+              cursor: isEditor ? "default" : "pointer",
             }}
-          />
+          >
+            <EditableText
+              fieldPath="passwordButtonLabel" value={page.passwordButtonLabel} onChange={set ? (v) => set("passwordButtonLabel", v) : undefined}
+              as="span" fontSlot={3}
+              style={{ color: theme.bg, fontFamily: fMono, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700 }}
+            />
+          </button>
         </div>
 
         <EditableText
@@ -188,11 +216,14 @@ function LogoBlock({
   if (page.logoMode === "none") return null;
   const showImage = page.logoMode === "image" || page.logoMode === "image+text";
   const showText  = page.logoMode === "text"  || page.logoMode === "image+text";
+  const imgStyle: CSSProperties = page.logoWidth > 0
+    ? { width: page.logoWidth, height: "auto", objectFit: "contain", display: "block" }
+    : { height: imageHeight, width: "auto", objectFit: "contain", display: "block" };
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8, lineHeight: 1 }}>
       {showImage && page.logoUrl && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={page.logoUrl} alt="" style={{ height: imageHeight, width: "auto", objectFit: "contain", display: "block" }} />
+        <img src={page.logoUrl} alt="" style={imgStyle} />
       )}
       {showText && (
         <EditableText
@@ -212,7 +243,7 @@ function LogoBlock({
    HALCYON — warm dark, serif italic, sectioned chapters
 ══════════════════════════════════════════════════════════════════════════ */
 
-function HalcyonPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange }: RendererProps) {
+function HalcyonPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange, onPasswordSubmit }: RendererProps) {
   const baseT = { bg: "#0E0D0B", fg: "#EFEAE0", muted: "#8A8378", line: "#2C2925", raised: "#1A1815", accent: "#C2410C" };
   const ts = effectiveStyle(page);
   const t = page.customColors ? { ...baseT, bg: ts.bg, fg: ts.fg, accent: ts.accent } : baseT;
@@ -224,7 +255,7 @@ function HalcyonPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
   const wm = shouldWatermark(page);
 
   if (view === "password") {
-    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={t} fDisplay={fDisplay} fBody={fBody} fMono={fMono} />;
+    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={t} fDisplay={fDisplay} fBody={fBody} fMono={fMono} onSubmit={onPasswordSubmit} />;
   }
 
   return (
@@ -326,7 +357,7 @@ function HalcyonPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
    MINIMAL — white paper, serif italic, strict grid
 ══════════════════════════════════════════════════════════════════════════ */
 
-function MinimalPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange }: RendererProps) {
+function MinimalPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange, onPasswordSubmit }: RendererProps) {
   const baseT = { bg: "#FAFAFA", fg: "#111111", muted: "#888888", line: "#E8E8E8", raised: "#FFFFFF", accent: "#111111" };
   const ts = effectiveStyle(page);
   const t = page.customColors ? { ...baseT, bg: ts.bg, fg: ts.fg, accent: ts.accent } : baseT;
@@ -338,7 +369,7 @@ function MinimalPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
   const wm = shouldWatermark(page);
 
   if (view === "password") {
-    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={t} fDisplay={fDisplay} fBody={fBody} fMono={fMono} />;
+    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={t} fDisplay={fDisplay} fBody={fBody} fMono={fMono} onSubmit={onPasswordSubmit} />;
   }
 
   return (
@@ -440,7 +471,7 @@ function MinimalPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
    GENERIC — fallback for vogue (and any future template without a renderer)
 ══════════════════════════════════════════════════════════════════════════ */
 
-function GenericPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange }: RendererProps) {
+function GenericPreview({ page, isMobile, set, view = "gallery", onRequestCoverChange, onPasswordSubmit }: RendererProps) {
   const ts = effectiveStyle(page);
   const photos = picks(page);
   const fDisplay = fontSlot(page, 1, "Inter, sans-serif");
@@ -449,7 +480,7 @@ function GenericPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
 
   if (view === "password") {
     const theme = { bg: ts.bg, fg: ts.fg, muted: ts.muted, accent: ts.accent, line: ts.muted + "33", raised: ts.accent };
-    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={theme} fDisplay={fDisplay} fBody={fBody} fMono={fMono} />;
+    return <PasswordGate page={page} set={set} isMobile={isMobile} theme={theme} fDisplay={fDisplay} fBody={fBody} fMono={fMono} onSubmit={onPasswordSubmit} />;
   }
 
   return (
@@ -545,17 +576,40 @@ const RENDERERS: Record<TemplateName, (props: RendererProps) => React.JSX.Elemen
 };
 
 export function GalleryView({
-  page, viewport = "desktop", view = "gallery", set, onRequestCoverChange,
+  page, viewport = "desktop", view, set, onRequestCoverChange, enforceGate = false,
 }: {
   page: DeliveryPage;
   viewport?: "mobile" | "desktop";
   view?: DeliveryView;
   set?: Setter;
   onRequestCoverChange?: () => void;
+  /** When true and page.passwordEnabled, this component manages a local
+   *  unlock state and shows the canonical template gate until the correct
+   *  password is entered. The brooklyn template handles this internally,
+   *  so the flag is a no-op for it. */
+  enforceGate?: boolean;
 }) {
   const isMobile = viewport === "mobile";
   const Renderer = RENDERERS[page.template] ?? GenericPreview;
-  return <Renderer page={page} isMobile={isMobile} view={view} set={set} onRequestCoverChange={onRequestCoverChange} />;
+  const [unlocked, setUnlocked] = useState(!page.passwordEnabled);
+
+  /* Brooklyn: pass through — its canonical component owns the unlock state. */
+  if (page.template === "brooklyn") {
+    return <Renderer page={page} isMobile={isMobile} view={view} set={set} onRequestCoverChange={onRequestCoverChange} />;
+  }
+
+  /* Non-brooklyn: derive the effective view from local unlock state when
+     enforceGate is on. The editor passes `view` explicitly to bypass this. */
+  let effectiveView: DeliveryView = view ?? "gallery";
+  if (enforceGate && page.passwordEnabled && !unlocked && !view) effectiveView = "password";
+
+  return (
+    <Renderer
+      page={page} isMobile={isMobile} view={effectiveView}
+      set={set} onRequestCoverChange={onRequestCoverChange}
+      onPasswordSubmit={enforceGate ? (pwd: string) => { if (pwd === page.password) setUnlocked(true); } : undefined}
+    />
+  );
 }
 
 /* Preview frame — browser/phone chrome around the live template, with

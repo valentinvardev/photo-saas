@@ -556,7 +556,26 @@ function BrandingPanel({ page, set, focusedField, fieldRefs, onOpenCoverAdjust }
               className={`w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border rounded-lg px-3 py-2 outline-none transition-colors ${focusedField === "logoText" ? "border-yellow" : "border-[var(--border)] focus:border-yellow"}`} />
           )}
           {(page.logoMode === "image" || page.logoMode === "image+text") && (
-            <ImageButton value={page.logoUrl} onChange={(u) => set("logoUrl", u)} placeholder="Upload logo" />
+            <>
+              <ImageButton value={page.logoUrl} onChange={(u) => set("logoUrl", u)} placeholder="Upload logo" />
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <FieldLabel>Image width</FieldLabel>
+                  <span className="font-mono text-[10px] text-[var(--fg-muted)]">
+                    {page.logoWidth > 0 ? `${page.logoWidth}px` : "Auto"}
+                  </span>
+                </div>
+                <input
+                  type="range" min={0} max={240} step={4}
+                  value={page.logoWidth}
+                  onChange={(e) => set("logoWidth", Number(e.target.value))}
+                  className="w-full accent-yellow"
+                />
+                <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1">
+                  Slide to 0 to use the template&apos;s default sizing.
+                </p>
+              </div>
+            </>
           )}
         </div>
       </div>

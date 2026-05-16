@@ -48,6 +48,9 @@ export interface DeliveryPage {
   logoMode:         LogoMode;
   logoText:         string;
   logoUrl:          string;
+  /** Custom width override for the image logo in pixels. 0 = use the
+   *  template's per-surface default (height-driven). 60–240 typical. */
+  logoWidth:        number;
   customColors:     boolean;
   colorBg:          string;
   colorFg:          string;
@@ -89,6 +92,7 @@ export const DEFAULT_BRANDING = {
   coverFit: "cover" as const,
   coverPositionX: 50,
   coverPositionY: 50,
+  logoWidth: 0,
 };
 
 /* Cover URLs lifted from the actual template asset banks so each

@@ -73,6 +73,45 @@ function coverImgStyle(page: DeliveryPage, extra: React.CSSProperties = {}): Rea
   };
 }
 
+/* Renders the logo according to page.logoMode (none / text / image /
+   image+text). image width: page.logoWidth if set, else falls back to
+   the surface's preferred imageHeight (auto width). */
+function LogoMark({
+  page, set, fallback, fontSlot: slot, textStyle, imageHeight,
+}: {
+  page: DeliveryPage;
+  set?: Setter;
+  fallback: string;
+  fontSlot: FontSlot;
+  textStyle: React.CSSProperties;
+  imageHeight: number;
+}) {
+  if (page.logoMode === "none") return null;
+  const showImage = page.logoMode === "image" || page.logoMode === "image+text";
+  const showText  = page.logoMode === "text"  || page.logoMode === "image+text";
+  const imgStyle: React.CSSProperties = page.logoWidth > 0
+    ? { width: page.logoWidth, height: "auto", objectFit: "contain", display: "block" }
+    : { height: imageHeight, width: "auto", objectFit: "contain", display: "block" };
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 8, lineHeight: 1 }}>
+      {showImage && page.logoUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={page.logoUrl} alt="" style={imgStyle} />
+      )}
+      {showText && (
+        <EditableText
+          fieldPath="logoText"
+          value={page.logoText || fallback}
+          onChange={set ? (v) => set("logoText", v) : undefined}
+          as="span"
+          fontSlot={slot}
+          style={textStyle}
+        />
+      )}
+    </span>
+  );
+}
+
 /* Distribute page.photoSeeds into 3 chapters, preserving Brooklyn's
    editorial structure. If there are fewer than 6 photos we collapse to
    a single "Gallery" section so the layout doesn't look empty. */
@@ -205,14 +244,16 @@ function PasswordGate({ page, set, onSubmit }: { page: DeliveryPage; set?: Sette
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 32, justifyContent: "center" }}>
           <span style={{ width: 8, height: 8, background: t.accent, display: "inline-block" }} />
-          <EditableText
-            fieldPath="logoText" value={page.logoText || "STUDIO"} onChange={set ? (v) => set("logoText", v) : undefined}
-            as="span" fontSlot={3}
-            style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }}
+          <LogoMark
+            page={page} set={set} fallback="STUDIO" fontSlot={3}
+            imageHeight={20}
+            textStyle={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }}
           />
-          <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
-            · Client Gallery
-          </span>
+          {page.logoMode !== "none" && (
+            <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
+              · Client Gallery
+            </span>
+          )}
         </div>
 
         <EditableText
@@ -389,17 +430,19 @@ function Gallery({
           }} />
 
           {/* Photographer mark */}
-          <div style={{
-            position: "absolute", top: 16, left: 16,
-            display: "flex", alignItems: "center", gap: 8,
-          }}>
-            <span style={{ width: 8, height: 8, background: t.accent, display: "inline-block" }} />
-            <EditableText
-              fieldPath="logoText" value={page.logoText || "STUDIO"} onChange={set ? (v) => set("logoText", v) : undefined}
-              as="span" fontSlot={3}
-              style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: t.fg }}
-            />
-          </div>
+          {page.logoMode !== "none" && (
+            <div style={{
+              position: "absolute", top: 16, left: 16,
+              display: "flex", alignItems: "center", gap: 8,
+            }}>
+              <span style={{ width: 8, height: 8, background: t.accent, display: "inline-block" }} />
+              <LogoMark
+                page={page} set={set} fallback="STUDIO" fontSlot={3}
+                imageHeight={20}
+                textStyle={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: t.fg }}
+              />
+            </div>
+          )}
 
           {/* Title block */}
           <div style={{
@@ -647,14 +690,16 @@ function Gallery({
       }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 24, justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
-            <EditableText
-              fieldPath="logoText" value={page.logoText || "STUDIO"} onChange={set ? (v) => set("logoText", v) : undefined}
-              as="div" fontSlot={1}
-              style={{
-                fontFamily: fSerif, fontStyle: "italic", fontSize: 24, fontWeight: 400,
-                color: t.fg, letterSpacing: "-0.01em", lineHeight: 1, marginBottom: 6,
-              }}
-            />
+            <div style={{ marginBottom: 6 }}>
+              <LogoMark
+                page={page} set={set} fallback="STUDIO" fontSlot={1}
+                imageHeight={32}
+                textStyle={{
+                  fontFamily: fSerif, fontStyle: "italic", fontSize: 24, fontWeight: 400,
+                  color: t.fg, letterSpacing: "-0.01em", lineHeight: 1,
+                }}
+              />
+            </div>
             <p style={{
               fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em",
               textTransform: "uppercase", color: t.muted, margin: 0,

@@ -43,7 +43,7 @@ export const useDeliveryStore = create<DeliveryStore>()(
     }),
     {
       name: "frame-delivery-pages",
-      version: 8,
+      version: 9,
       /* Migration history
          v2: cinematic/editorial templates remapped to vogue/minimal.
          v5: example pages reseeded for the four real templates.
@@ -95,6 +95,12 @@ export const useDeliveryStore = create<DeliveryStore>()(
         if (version < 8) {
           state.pages = state.pages.map((p) => {
             const defaults: Partial<DeliveryPage> = { coverFit: "cover", coverPositionX: 50, coverPositionY: 50 };
+            return { ...defaults, ...p } as DeliveryPage;
+          });
+        }
+        if (version < 9) {
+          state.pages = state.pages.map((p) => {
+            const defaults: Partial<DeliveryPage> = { logoWidth: 0 };
             return { ...defaults, ...p } as DeliveryPage;
           });
         }
