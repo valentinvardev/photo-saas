@@ -370,6 +370,7 @@ function Gallery({
           onRequestChange={onRequestCoverChange}
           style={{
             position: "relative",
+            width: "100%",
             aspectRatio: "16 / 9",
             maxHeight: isEditor ? 360 : "70dvh",
             minHeight: 240,
