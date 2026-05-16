@@ -664,31 +664,29 @@ export function PreviewFrame({
   onRequestCoverChange?: () => void;
 }) {
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
-  /* If the password gate isn't enabled the view toggle is hidden — there's
-   * no separate page to show. */
-  const showViewToggle = page.passwordEnabled;
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-center gap-3 py-3 border-b border-[var(--border)] shrink-0">
-        {showViewToggle && (
-          <div className="flex items-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg overflow-hidden">
-            {(["password", "gallery"] as const).map((v) => (
-              <button key={v} onClick={() => onViewChange(v)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 font-sans text-xs font-medium transition-colors ${
-                  view === v ? "bg-[var(--fg)] text-[var(--bg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"
-                }`}
-              >
-                {v === "password" ? (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                ) : (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                )}
-                {v === "password" ? "Password" : "Gallery"}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="flex items-center bg-[var(--bg-card)] border border-[var(--border)] rounded-lg overflow-hidden" title={page.passwordEnabled ? undefined : "Password protection is off. You can still edit the gate."}>
+          {(["password", "gallery"] as const).map((v) => (
+            <button key={v} onClick={() => onViewChange(v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 font-sans text-xs font-medium transition-colors ${
+                view === v ? "bg-[var(--fg)] text-[var(--bg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"
+              }`}
+            >
+              {v === "password" ? (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              ) : (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              )}
+              {v === "password" ? "Password" : "Gallery"}
+              {v === "password" && !page.passwordEnabled && view !== "password" && (
+                <span className="ml-1 w-1.5 h-1.5 rounded-full bg-[var(--fg-muted)]" title="Protection is off" />
+              )}
+            </button>
+          ))}
+        </div>
         <div className="flex items-center gap-1">
           {(["desktop", "mobile"] as const).map((v) => (
             <button

@@ -917,17 +917,24 @@ function PasswordCopyPanel({
   fieldRefs: React.MutableRefObject<Record<string, HTMLElement | null>>;
   onPreviewPasswordGate: () => void;
 }) {
-  if (!page.passwordEnabled) {
-    return (
-      <p className="font-sans text-[11px] text-[var(--fg-muted)] italic">
-        Password protection is off. Enable it in the Access section to edit the password page.
-      </p>
-    );
-  }
   const inputCls = (field: string) =>
     `w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border rounded-lg px-3 py-2 outline-none transition-colors ${focusedField === field ? "border-yellow" : "border-[var(--border)] focus:border-yellow"}`;
   return (
     <>
+      {/* Protection status — inline toggle so the user never has to leave the panel */}
+      <div className={`flex items-center justify-between px-3 py-2.5 rounded-lg border ${page.passwordEnabled ? "border-yellow/40 bg-yellow/5" : "border-[var(--border)] bg-[var(--bg-subtle)]"}`}>
+        <div className="flex items-center gap-2 min-w-0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={page.passwordEnabled ? "text-yellow" : "text-[var(--fg-muted)]"}>
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+          <div className="min-w-0">
+            <div className="font-sans text-xs font-semibold text-[var(--fg)]">Protection {page.passwordEnabled ? "on" : "off"}</div>
+            <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{page.passwordEnabled ? "Clients see this page first" : "Anyone with the link gets straight in"}</div>
+          </div>
+        </div>
+        <Toggle checked={page.passwordEnabled} onChange={() => set("passwordEnabled", !page.passwordEnabled)} />
+      </div>
+
       <button
         onClick={onPreviewPasswordGate}
         className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors font-sans text-xs"
@@ -1212,15 +1219,13 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
           >
             <AccessPanel page={page} set={set} />
           </Accordion>
-          {page.passwordEnabled && (
-            <Accordion id="password" title="Password page" count="copy"
-              isOpen={openSections.has("password")} onToggle={() => toggleSection("password")} isActive={activeSection === "password"}
-            >
-              <PasswordCopyPanel page={page} set={set} focusedField={activeField} fieldRefs={fieldRefs}
-                onPreviewPasswordGate={() => setView("password")}
-              />
-            </Accordion>
-          )}
+          <Accordion id="password" title="Password page" count={page.passwordEnabled ? "on" : "off"}
+            isOpen={openSections.has("password")} onToggle={() => toggleSection("password")} isActive={activeSection === "password"}
+          >
+            <PasswordCopyPanel page={page} set={set} focusedField={activeField} fieldRefs={fieldRefs}
+              onPreviewPasswordGate={() => setView("password")}
+            />
+          </Accordion>
           <Accordion id="monetize" title="Monetize" count={page.mode}
             isOpen={openSections.has("monetize")} onToggle={() => toggleSection("monetize")}
           >
