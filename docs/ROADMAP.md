@@ -110,3 +110,4 @@ Replace the [https://picsum.photos](https://picsum.photos) placeholders with rea
 - `aefd110` — Links builder: restored base preview, added Template tab, replaced stacked mobile buttons with floating segmented control
 - `5910d9e` — Header: widened mobile search field so the placeholder fits
 - `65269c4` — Toggle: theme-aware colors and perfectly centered knob, extracted to [src/components/ui/Toggle.tsx](../src/components/ui/Toggle.tsx)
+- `7c83d77` — Rebrand FRAME → Portapic across platform surfaces (sidebar, landing nav/footer, login, register, metadata, prose). Logo via [src/components/ui/Logo.tsx](../src/components/ui/Logo.tsx) wrapping [public/portapiclogo.png](../public/portapiclogo.png). Known limitation: white "Porta" middle disappears on light backgrounds — to revisit if user wants theme parity
