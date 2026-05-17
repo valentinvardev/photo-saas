@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Toggle } from "~/components/ui/Toggle";
 
 /* ── Reusable primitives ── */
 function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
@@ -24,22 +25,6 @@ function Row({ label, hint, children }: { label: string; hint?: string; children
       </div>
       <div className="shrink-0">{children}</div>
     </div>
-  );
-}
-
-function Toggle({ defaultOn = false }: { defaultOn?: boolean }) {
-  const [on, setOn] = useState(defaultOn);
-  return (
-    <button
-      onClick={() => setOn((p) => !p)}
-      className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${on ? "bg-yellow" : "bg-[var(--border)]"}`}
-      role="switch"
-      aria-checked={on}
-    >
-      <span
-        className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${on ? "translate-x-4" : "translate-x-0"}`}
-      />
-    </button>
   );
 }
 

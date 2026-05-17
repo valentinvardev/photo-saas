@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCart } from "~/lib/cart";
 import { AnimatePresence } from "framer-motion";
 import { DevicePreviewModal, LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
+import { Toggle } from "~/components/ui/Toggle";
 
 /* Live URLs each page type points to — used to render real iframe
    previews in the page rows and the manage modal. */
@@ -182,13 +183,7 @@ function ManageModal({ pageId, url, onClose }: { pageId: PageId; url: string; on
                   {published ? "Publicly accessible at your domain." : "Hidden — only you can see it."}
                 </p>
               </div>
-              <button
-                onClick={() => setPublished(p => !p)}
-                className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${published ? "bg-yellow" : "bg-[var(--border)]"}`}
-                role="switch" aria-checked={published}
-              >
-                <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${published ? "translate-x-4" : ""}`} />
-              </button>
+              <Toggle checked={published} onChange={setPublished} ariaLabel="Published" />
             </div>
           </div>
 
@@ -278,13 +273,7 @@ function ManageModal({ pageId, url, onClose }: { pageId: PageId; url: string; on
                   <p className="font-sans text-sm font-medium text-[var(--fg)]">Search engine indexing</p>
                   <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">Allow Google and Bing to index this page.</p>
                 </div>
-                <button
-                  onClick={() => setSeoIndex(p => !p)}
-                  className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${seoIndex ? "bg-yellow" : "bg-[var(--border)]"}`}
-                  role="switch" aria-checked={seoIndex}
-                >
-                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${seoIndex ? "translate-x-4" : ""}`} />
-                </button>
+                <Toggle checked={seoIndex} onChange={setSeoIndex} ariaLabel="Search engine indexing" />
               </div>
             </div>
           )}
@@ -297,13 +286,7 @@ function ManageModal({ pageId, url, onClose }: { pageId: PageId; url: string; on
                 <p className="font-sans text-sm font-medium text-[var(--fg)]">Password protection</p>
                 <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">Require a password to view this page.</p>
               </div>
-              <button
-                onClick={() => setPwProtect(p => !p)}
-                className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${pwProtect ? "bg-yellow" : "bg-[var(--border)]"}`}
-                role="switch" aria-checked={pwProtect}
-              >
-                <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${pwProtect ? "translate-x-4" : ""}`} />
-              </button>
+              <Toggle checked={pwProtect} onChange={setPwProtect} ariaLabel="Password protection" />
             </div>
             {pwProtect && (
               <input className={`${inputCls} w-full mt-3`} type="password" placeholder="Set a password…" />
