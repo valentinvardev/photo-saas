@@ -1,10 +1,17 @@
 import Image from "next/image";
 
-/* The PNG ships at roughly 3.2:1 aspect. Size by height; width follows.
-   Note: the "Porta" middle text is rendered white in the asset, so on
-   white backgrounds it disappears — that's a known limitation of using
-   the PNG directly. */
-const LOGO_RATIO = 3.2;
+/* Two assets, picked by theme.
+   - portapiclogo.png is the yellow + white wordmark → looks right on
+     dark backgrounds.
+   - logoblack.png is the all-black wordmark → looks right on light
+     backgrounds.
+
+   Rather than reading the theme in JS (would FOUC on first paint), we
+   render both <Image>s and toggle their visibility with the `.dark`
+   class on <html>. SSR-safe, zero hydration mismatch. */
+
+const RATIO_DARK  = 3.2;   // portapiclogo.png  (≈1100×344)
+const RATIO_LIGHT = 3.66;  // logoblack.png     (≈1024×280)
 
 type LogoProps = {
   height?:   number;
@@ -13,16 +20,32 @@ type LogoProps = {
 };
 
 export function Logo({ height = 47, className, priority }: LogoProps) {
-  const width = Math.round(height * LOGO_RATIO);
+  const widthDark  = Math.round(height * RATIO_DARK);
+  const widthLight = Math.round(height * RATIO_LIGHT);
+
   return (
-    <Image
-      src="/portapiclogo.png"
-      alt="Portapic"
-      width={width}
-      height={height}
-      priority={priority}
-      className={className}
-      style={{ height, width: "auto" }}
-    />
+    <span className={`relative inline-flex items-center ${className ?? ""}`} style={{ height }}>
+      {/* Light theme — visible when html is NOT .dark */}
+      <Image
+        src="/logoblack.png"
+        alt="Portapic"
+        width={widthLight}
+        height={height}
+        priority={priority}
+        className="block dark:hidden"
+        style={{ height, width: "auto" }}
+      />
+      {/* Dark theme — visible when html IS .dark */}
+      <Image
+        src="/portapiclogo.png"
+        alt=""
+        aria-hidden
+        width={widthDark}
+        height={height}
+        priority={priority}
+        className="hidden dark:block"
+        style={{ height, width: "auto" }}
+      />
+    </span>
   );
 }
