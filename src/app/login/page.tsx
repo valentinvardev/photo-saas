@@ -26,7 +26,7 @@ const quote = quotes[0]!;
 function FrameLogo() {
   return (
     <Link href="/" className="inline-flex items-center group" aria-label="Portapic home">
-      <Logo height={28} priority />
+      <Logo priority />
     </Link>
   );
 }
@@ -61,7 +61,7 @@ function ImagePanel() {
       <div className="relative z-10 flex flex-col justify-between h-full p-10">
         {/* Logo */}
         <Link href="/" className="inline-flex items-center" aria-label="Portapic home">
-          <Logo height={28} priority />
+          <Logo priority />
         </Link>
 
         {/* Quote */}

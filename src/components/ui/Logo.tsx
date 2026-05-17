@@ -12,7 +12,7 @@ type LogoProps = {
   priority?: boolean;
 };
 
-export function Logo({ height = 28, className, priority }: LogoProps) {
+export function Logo({ height = 36, className, priority }: LogoProps) {
   const width = Math.round(height * LOGO_RATIO);
   return (
     <Image

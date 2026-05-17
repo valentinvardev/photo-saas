@@ -25,7 +25,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2">
             <div className="flex items-center mb-4">
-              <Logo height={28} />
+              <Logo />
             </div>
             <p className="font-serif text-sm text-[var(--fg-muted)] leading-relaxed mb-6 max-w-xs">
               The all-in-one platform built for professional photographers.
