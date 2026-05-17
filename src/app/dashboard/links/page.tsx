@@ -2,8 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useLinksStore } from "~/lib/links/store";
-import { BrooklynLinks } from "~/app/template/brooklyn/links/component";
-import type { LinksPage } from "~/lib/links/data";
+import { LINKS_TEMPLATES, type LinksTemplateName, type LinksPage } from "~/lib/links/data";
 
 /* ══════════════════════════════════════════════════════════════════════════
    TYPES
@@ -1427,10 +1426,155 @@ function LinkTreeView({ links, config }: { links: LinkItem[]; config: PageConfig
   );
 }
 
-function PhoneShell({ page }: { page: LinksPage }) {
-  /* The preview now renders the canonical BrooklynLinks template directly
-     — the same component the public /l/[id] route uses — so what the
-     photographer edits is exactly what their visitors will see. */
+/* ══════════════════════════════════════════════════════════════════════════
+   TEMPLATE TAB
+   Shows the currently selected canonical template as a hero card with a CTA
+   to open its dedicated editor (where only variables — fonts, colors — are
+   tweakable; the layout itself is locked by the template). Below it: a
+   compact list of alternative templates the photographer can switch to.
+══════════════════════════════════════════════════════════════════════════ */
+
+function TemplatePreviewTile({ id, accent }: { id: LinksTemplateName; accent: string }) {
+  if (id === "brooklyn") {
+    return (
+      <div className="absolute inset-0 flex flex-col" style={{ background: "#0D0D0D", color: "#F0EFE9" }}>
+        <div className="h-1/2 w-full" style={{ background: `linear-gradient(135deg, #1a1a1a, #0a0a0a)` }} />
+        <div className="px-2.5 py-2 flex flex-col gap-1">
+          <div className="font-mono text-[6px] uppercase tracking-[0.2em]" style={{ color: accent }}>Brooklyn</div>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontStyle: "italic", fontSize: 11, lineHeight: 1 }}>
+            Sofia
+          </div>
+          <div className="flex flex-col gap-1 mt-1">
+            <div className="h-2 rounded-sm" style={{ background: "#161616", border: "1px solid #1F1F1F" }} />
+            <div className="h-2 rounded-sm" style={{ background: "#161616", border: "1px solid #1F1F1F" }} />
+            <div className="h-2 rounded-sm" style={{ background: "#161616", border: "1px solid #1F1F1F" }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // halcyon (warm dark editorial)
+  return (
+    <div className="absolute inset-0 flex flex-col" style={{ background: "#1A0F08", color: "#F5E8D3" }}>
+      <div className="h-1/2 w-full" style={{ background: `linear-gradient(160deg, #3a1f0d, #1A0F08)` }} />
+      <div className="px-2.5 py-2 flex flex-col gap-1">
+        <div className="font-mono text-[6px] uppercase tracking-[0.2em]" style={{ color: accent }}>Halcyon</div>
+        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic", fontSize: 11, lineHeight: 1 }}>
+          Sofia
+        </div>
+        <div className="flex flex-col gap-1 mt-1">
+          <div className="h-2 rounded-full" style={{ background: "transparent", border: `1px solid ${accent}40` }} />
+          <div className="h-2 rounded-full" style={{ background: "transparent", border: `1px solid ${accent}40` }} />
+          <div className="h-2 rounded-full" style={{ background: "transparent", border: `1px solid ${accent}40` }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TemplateTab({
+  page,
+  update,
+}: {
+  page: LinksPage;
+  update: (patch: Partial<LinksPage>) => void;
+}) {
+  const active = LINKS_TEMPLATES.find((t) => t.id === page.template) ?? LINKS_TEMPLATES[0]!;
+  const alternates = LINKS_TEMPLATES.filter((t) => t.id !== active.id);
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Section label */}
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--fg-muted)]">Your template</span>
+        <span className="font-mono text-[10px] text-[var(--fg-muted)]">since {page.createdAt}</span>
+      </div>
+
+      {/* Active template hero card */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden">
+        {/* Top: thumbnail + meta */}
+        <div className="flex gap-4 p-4">
+          {/* Mini phone-shaped preview */}
+          <div className="relative shrink-0 rounded-lg overflow-hidden border border-[var(--border)]" style={{ width: 64, height: 96 }}>
+            <TemplatePreviewTile id={active.id} accent={active.accent} />
+          </div>
+          {/* Meta */}
+          <div className="flex flex-col justify-between min-w-0 flex-1">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-sans font-semibold text-[15px] text-[var(--fg)] leading-tight">{active.label}</h3>
+                <span
+                  className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded"
+                  style={{ background: `${active.accent}22`, color: active.accent }}
+                >
+                  Active
+                </span>
+              </div>
+              <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1 leading-snug line-clamp-3">
+                {active.desc}
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className="w-3 h-3 rounded-full border border-[var(--border)]" style={{ background: active.accent }} />
+              <span className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest">accent</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA strip */}
+        <a
+          href={`/template/${active.id}/links`}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center justify-between gap-2 px-4 py-3 border-t border-[var(--border)] bg-[var(--bg-subtle)] hover:bg-[var(--bg-card)] transition-colors group"
+        >
+          <span className="flex items-center gap-2">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] group-hover:text-yellow transition-colors">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.12 2.12 0 113 3L7 19l-4 1 1-4z" />
+            </svg>
+            <span className="font-sans text-[12px] font-medium text-[var(--fg)]">Edit template variables</span>
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </a>
+      </div>
+
+      {/* Helper note */}
+      <p className="font-sans text-[11px] text-[var(--fg-muted)] leading-relaxed -mt-1">
+        Your template controls the layout. Use the <span className="text-[var(--fg)] font-medium">Appearance</span> tab to fine-tune typography, colors and buttons — the structure stays locked so your page always looks intentional.
+      </p>
+
+      {/* Switch template */}
+      {alternates.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--fg-muted)]">Switch template</span>
+          <div className="flex flex-col gap-2">
+            {alternates.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => update({ template: t.id })}
+                className="flex items-center gap-3 p-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg)] hover:border-[var(--fg-muted)] transition-colors text-left"
+              >
+                <div className="relative shrink-0 rounded-md overflow-hidden border border-[var(--border)]" style={{ width: 40, height: 60 }}>
+                  <TemplatePreviewTile id={t.id} accent={t.accent} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-sans font-medium text-[12px] text-[var(--fg)]">{t.label}</div>
+                  <div className="font-sans text-[10px] text-[var(--fg-muted)] line-clamp-2 leading-snug mt-0.5">{t.desc}</div>
+                </div>
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: t.accent }} />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PhoneShell({ links, config }: { links: LinkItem[]; config: PageConfig }) {
   return (
     <div className="relative" style={{ width: 280, height: 568 }}>
       <div className="absolute inset-0 rounded-[40px] shadow-2xl" style={{ background: "linear-gradient(145deg,#2a2a2a,#1a1a1a)" }} />
@@ -1450,11 +1594,11 @@ function PhoneShell({ page }: { page: LinksPage }) {
             </svg>
           </div>
         </div>
-        <div className="absolute inset-0 pt-7">
-          <BrooklynLinks page={page} />
+        <div className="absolute inset-0">
+          <LinkTreeView links={links} config={config} />
         </div>
       </div>
-      {/* Side buttons */}
+      {/* Buttons */}
       <div className="absolute rounded-l-sm" style={{ left: -3.5, top: 100, width: 3.5, height: 32, background: "#333" }} />
       <div className="absolute rounded-l-sm" style={{ left: -3.5, top: 144, width: 3.5, height: 40, background: "#333" }} />
       <div className="absolute rounded-l-sm" style={{ left: -3.5, top: 196, width: 3.5, height: 40, background: "#333" }} />
@@ -1493,10 +1637,10 @@ export default function LinksPage() {
     update(next as Partial<LinksPage>);
   };
 
-  const [activeTab, setActiveTab] = useState<"links" | "appearance">("links");
+  const [activeTab, setActiveTab] = useState<"links" | "appearance" | "template">("links");
   const [copied,    setCopied]    = useState(false);
   /* On phones the sidebar would cover the preview; on desktop both fit
-     side-by-side. The mobile tab decides which surface is visible. */
+     side-by-side. The mobile segmented control decides which surface is visible. */
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
   void hydrated; // store rehydrates synchronously on mount; nothing to gate
 
@@ -1538,31 +1682,16 @@ export default function LinksPage() {
           </div>
         </div>
 
-        {/* ── Mobile Edit / Preview switcher — only visible on phone ── */}
-        <div className="md:hidden flex items-center border-b border-[var(--border)] shrink-0 bg-[var(--bg-card)]">
-          {(["edit", "preview"] as const).map((v) => (
-            <button
-              key={v}
-              onClick={() => setMobileView(v)}
-              className={`flex-1 py-2.5 font-sans text-xs uppercase tracking-widest transition-colors border-b-2 ${
-                mobileView === v ? "border-yellow text-[var(--fg)] font-semibold" : "border-transparent text-[var(--fg-muted)]"
-              }`}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
-
         {/* ── Body — side-by-side on md+, one surface at a time on mobile ── */}
-        <div className="flex flex-1 min-h-0 overflow-hidden">
+        <div className="flex flex-1 min-h-0 overflow-hidden relative">
           {/* Left panel (edit) */}
           <div className={`${mobileView === "edit" ? "flex" : "hidden md:flex"} w-full md:w-80 md:shrink-0 flex-col border-r border-[var(--border)] bg-[var(--bg-card)]`}>
             <div className="flex border-b border-[var(--border)] shrink-0">
-              {(["links", "appearance"] as const).map((tab) => (
+              {(["links", "appearance", "template"] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`flex-1 py-3 font-sans text-sm capitalize transition-all border-b-2 ${
+                  className={`flex-1 py-3 font-sans text-[13px] capitalize transition-all border-b-2 ${
                     activeTab === tab
                       ? "border-yellow text-[var(--fg)] font-semibold"
                       : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"
@@ -1572,11 +1701,13 @@ export default function LinksPage() {
                 </button>
               ))}
             </div>
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-4 pb-24 md:pb-4">
               {activeTab === "links" ? (
                 <LinksTab links={links} setLinks={setLinks} />
-              ) : (
+              ) : activeTab === "appearance" ? (
                 <AppearanceTab config={config} setConfig={setConfig} />
+              ) : (
+                <TemplateTab page={page} update={update} />
               )}
             </div>
           </div>
@@ -1591,8 +1722,42 @@ export default function LinksPage() {
               }}
             />
             <div className="relative z-10 py-8 sm:py-12">
-              <PhoneShell page={page} />
+              <PhoneShell links={links} config={config} />
               <p className="text-center font-mono text-[11px] text-[var(--fg-muted)] mt-5">{publicUrl}</p>
+            </div>
+          </div>
+
+          {/* ── Mobile floating segmented control (Edit ⇄ Preview) ── */}
+          <div className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
+            <div className="flex items-center gap-1 p-1 rounded-full bg-[var(--bg-card)]/95 backdrop-blur-md border border-[var(--border)] shadow-xl">
+              {(["edit", "preview"] as const).map((v) => {
+                const active = mobileView === v;
+                return (
+                  <button
+                    key={v}
+                    onClick={() => setMobileView(v)}
+                    className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full font-sans text-[12px] capitalize transition-all ${
+                      active
+                        ? "bg-yellow text-[#111] font-semibold shadow-sm"
+                        : "text-[var(--fg-muted)] hover:text-[var(--fg)]"
+                    }`}
+                    aria-pressed={active}
+                  >
+                    {v === "edit" ? (
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.12 2.12 0 113 3L7 19l-4 1 1-4z" />
+                      </svg>
+                    ) : (
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
+                    {v}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
