@@ -397,7 +397,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
   }, [searchOpen]);
 
   return (
-    <header className="h-14 shrink-0 flex items-center gap-1.5 sm:gap-3 px-3 sm:px-4 border-b border-[var(--border)] bg-[var(--bg-card)]">
+    <header className="h-14 shrink-0 flex items-center gap-1 sm:gap-3 px-2 sm:px-4 border-b border-[var(--border)] bg-[var(--bg-card)]">
 
       {/* Mobile hamburger */}
       {onMenuClick && (
@@ -417,7 +417,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
 
       {/* Universal search */}
       <div ref={searchRef} className={`relative flex-1 min-w-0 max-w-none sm:max-w-xs transition-all duration-200 ${searchFocused ? "sm:max-w-sm" : ""}`}>
-        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] pointer-events-none">
+        <span className="absolute left-2 sm:left-2.5 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] pointer-events-none">
           <SearchIcon />
         </span>
         <input
@@ -428,7 +428,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
           onFocus={() => { setSearchFocused(true); openSearch(); }}
           onBlur={() => setSearchFocused(false)}
           onChange={(e) => { setSearchQuery(e.target.value); if (!searchOpen) openSearch(); }}
-          className="w-full pl-8 pr-3 py-1.5 text-xs font-sans bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg text-[var(--fg)] placeholder:text-[var(--fg-muted)] outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition-all"
+          className="w-full pl-7 sm:pl-8 pr-2 sm:pr-3 py-1.5 text-xs font-sans bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg text-[var(--fg)] placeholder:text-[var(--fg-muted)] outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition-all"
         />
         <kbd className="hidden sm:block absolute right-2.5 top-1/2 -translate-y-1/2 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-card)] border border-[var(--border)] px-1 py-0.5 rounded pointer-events-none">
           ⌘K
