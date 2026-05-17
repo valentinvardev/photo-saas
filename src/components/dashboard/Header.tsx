@@ -397,7 +397,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
   }, [searchOpen]);
 
   return (
-    <header className="h-14 shrink-0 flex items-center gap-3 px-4 border-b border-[var(--border)] bg-[var(--bg-card)]">
+    <header className="h-14 shrink-0 flex items-center gap-1.5 sm:gap-3 px-3 sm:px-4 border-b border-[var(--border)] bg-[var(--bg-card)]">
 
       {/* Mobile hamburger */}
       {onMenuClick && (
@@ -416,7 +416,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
       <h1 className="hidden lg:block font-sans font-semibold text-[var(--fg)] text-sm shrink-0">{title}</h1>
 
       {/* Universal search */}
-      <div ref={searchRef} className={`relative flex-1 max-w-xs transition-all duration-200 ${searchFocused ? "max-w-sm" : ""}`}>
+      <div ref={searchRef} className={`relative flex-1 min-w-0 max-w-none sm:max-w-xs transition-all duration-200 ${searchFocused ? "sm:max-w-sm" : ""}`}>
         <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] pointer-events-none">
           <SearchIcon />
         </span>
@@ -839,7 +839,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
       {/* Chat */}
       <button
         onClick={onChatClick}
-        className={`relative p-2 rounded-lg transition-colors ${chatOpen ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
+        className={`relative p-1.5 sm:p-2 rounded-lg transition-colors shrink-0 ${chatOpen ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
         aria-label="Community chat"
       >
         <ChatIcon />
@@ -848,10 +848,10 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
       </button>
 
       {/* Notifications */}
-      <div ref={notifRef} className="relative">
+      <div ref={notifRef} className="relative shrink-0">
         <button
           onClick={() => { setNotifOpen((p) => !p); setProfileOpen(false); }}
-          className="relative p-2 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors"
+          className="relative p-1.5 sm:p-2 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors"
           aria-label="Notifications"
         >
           <BellIcon />
@@ -863,7 +863,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
       </div>
 
       {/* Profile avatar */}
-      <div ref={profileRef} className="relative">
+      <div ref={profileRef} className="relative shrink-0">
         <button
           onClick={() => { setProfileOpen((p) => !p); setNotifOpen(false); }}
           className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors"
