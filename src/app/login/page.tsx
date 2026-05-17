@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Logo } from "~/components/ui/Logo";
 
 const quotes = [
   {
@@ -24,15 +25,8 @@ const quote = quotes[0]!;
 /* ── Logo ── */
 function FrameLogo() {
   return (
-    <Link href="/" className="inline-flex items-center gap-2 group">
-      <div className="w-7 h-7 bg-yellow rounded-sm flex items-center justify-center">
-        <span className="font-sans font-black text-[#111] text-xs tracking-tighter leading-none">
-          F
-        </span>
-      </div>
-      <span className="font-sans font-black text-[var(--fg)] text-lg tracking-tight">
-        FRAME
-      </span>
+    <Link href="/" className="inline-flex items-center group" aria-label="Portapic home">
+      <Logo height={28} priority />
     </Link>
   );
 }
@@ -66,15 +60,8 @@ function ImagePanel() {
       {/* Content */}
       <div className="relative z-10 flex flex-col justify-between h-full p-10">
         {/* Logo */}
-        <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-7 h-7 bg-yellow rounded-sm flex items-center justify-center">
-            <span className="font-sans font-black text-[#111] text-xs tracking-tighter leading-none">
-              F
-            </span>
-          </div>
-          <span className="font-sans font-black text-white text-lg tracking-tight">
-            FRAME
-          </span>
+        <Link href="/" className="inline-flex items-center" aria-label="Portapic home">
+          <Logo height={28} priority />
         </Link>
 
         {/* Quote */}
@@ -127,7 +114,7 @@ export default function LoginPage() {
               Welcome back.
             </h1>
             <p className="font-serif text-[var(--fg-muted)] text-base mb-8">
-              Sign in to your FRAME account.
+              Sign in to your Portapic account.
             </p>
           </motion.div>
 

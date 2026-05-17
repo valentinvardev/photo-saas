@@ -279,7 +279,7 @@ function ExternalLinkModal({ url, onCancel, onContinue }: { url: string; onCance
           <div>
             <p className="font-sans text-sm font-semibold text-[var(--fg)]">Opening an external website</p>
             <p className="font-sans text-xs text-[var(--fg-muted)] mt-1 leading-relaxed">
-              You're about to leave FRAME and visit&nbsp;
+              You're about to leave Portapic and visit&nbsp;
               <span className="font-mono text-[var(--fg)]">{domain}</span>.
               Continue at your own discretion.
             </p>

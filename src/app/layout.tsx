@@ -7,7 +7,7 @@ import { ThemeProvider } from "~/components/providers/ThemeProvider";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
-  title: "FRAME — The platform built for photographers",
+  title: "Portapic — The platform built for photographers",
   description:
     "Build stunning portfolios, sell your work, manage cloud storage, and deliver galleries to clients — all in one place.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],

@@ -241,13 +241,13 @@ export default function SettingsPage() {
             <Row label="Portfolio analytics" hint="Track views, clicks, and engagement on your pages.">
               <Toggle defaultOn />
             </Row>
-            <Row label="Share anonymous usage data" hint="Help us improve FRAME with anonymised data.">
+            <Row label="Share anonymous usage data" hint="Help us improve Portapic with anonymised data.">
               <Toggle />
             </Row>
           </Section>
 
           <Section title="Download & watermark">
-            <Row label="Watermark preview images" hint="Add a subtle FRAME watermark to public previews.">
+            <Row label="Watermark preview images" hint="Add a subtle Portapic watermark to public previews.">
               <Toggle />
             </Row>
             <Row label="Disable right-click download" hint="Prevent right-click save on portfolio images.">
@@ -379,7 +379,7 @@ export default function SettingsPage() {
                 Connect MercadoPago
               </button>
               <p className="font-sans text-[11px] text-[var(--fg-muted)] text-center">
-                You'll be redirected to MercadoPago to authorize the connection. No card details are stored on FRAME.
+                You'll be redirected to MercadoPago to authorize the connection. No card details are stored on Portapic.
               </p>
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { useTheme } from "~/components/providers/ThemeProvider";
+import { Logo } from "~/components/ui/Logo";
 
 function MoonIcon() {
   return (
@@ -59,13 +60,8 @@ export function Navbar() {
 
       <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-7 h-7 bg-yellow rounded-sm flex items-center justify-center">
-            <span className="font-sans font-black text-[#111] text-xs tracking-tighter leading-none">F</span>
-          </div>
-          <span className="font-sans font-black text-[var(--fg)] text-lg tracking-tight">
-            FRAME
-          </span>
+        <Link href="/" className="flex items-center group" aria-label="Portapic home">
+          <Logo height={28} priority />
         </Link>
 
         {/* Center nav */}

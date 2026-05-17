@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { Logo } from "~/components/ui/Logo";
 
 /* ── Icons ── */
 function EyeIcon({ off = false }: { off?: boolean }) {
@@ -106,11 +107,8 @@ function ImagePanel() {
         }}
       />
       <div className="relative z-10 flex flex-col justify-between h-full p-10">
-        <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-7 h-7 bg-yellow rounded-sm flex items-center justify-center">
-            <span className="font-sans font-black text-[#111] text-xs tracking-tighter leading-none">F</span>
-          </div>
-          <span className="font-sans font-black text-white text-lg tracking-tight">FRAME</span>
+        <Link href="/" className="inline-flex items-center" aria-label="Portapic home">
+          <Logo height={28} priority />
         </Link>
         <div className="max-w-sm">
           <div className="text-yellow/50 mb-4">
@@ -121,7 +119,7 @@ function ImagePanel() {
           <p className="font-serif text-white/90 text-xl leading-relaxed mb-4">
             Your work deserves a home that grows with you.
           </p>
-          <p className="font-mono text-xs text-white/40 tracking-widest uppercase">— FRAME</p>
+          <p className="font-mono text-xs text-white/40 tracking-widest uppercase">— Portapic</p>
         </div>
       </div>
     </div>
@@ -177,11 +175,8 @@ export default function RegisterPage() {
 
           {/* Logo — mobile only */}
           <div className="lg:hidden mb-10">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-7 h-7 bg-yellow rounded-sm flex items-center justify-center">
-                <span className="font-sans font-black text-[#111] text-xs tracking-tighter leading-none">F</span>
-              </div>
-              <span className="font-sans font-black text-[var(--fg)] text-lg tracking-tight">FRAME</span>
+            <Link href="/" className="inline-flex items-center" aria-label="Portapic home">
+              <Logo height={28} priority />
             </Link>
           </div>
 
@@ -189,7 +184,7 @@ export default function RegisterPage() {
             Create your account.
           </h1>
           <p className="font-serif text-[var(--fg-muted)] text-base mb-8">
-            Join 12,000+ photographers on FRAME.
+            Join 12,000+ photographers on Portapic.
           </p>
 
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>

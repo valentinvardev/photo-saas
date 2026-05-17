@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Logo } from "~/components/ui/Logo";
 
 const links = {
   Product: ["Portfolio Builder", "Photo Sales", "Cloud Storage", "Client Delivery", "Analytics", "Custom Domains"],
@@ -23,13 +24,8 @@ export function Footer() {
         >
           {/* Brand */}
           <div className="col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 bg-yellow rounded-sm flex items-center justify-center">
-                <span className="font-sans font-black text-[#111] text-xs">F</span>
-              </div>
-              <span className="font-sans font-black text-[var(--fg)] text-lg tracking-tight">
-                FRAME
-              </span>
+            <div className="flex items-center mb-4">
+              <Logo height={28} />
             </div>
             <p className="font-serif text-sm text-[var(--fg-muted)] leading-relaxed mb-6 max-w-xs">
               The all-in-one platform built for professional photographers.

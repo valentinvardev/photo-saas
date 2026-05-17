@@ -1419,7 +1419,7 @@ function LinkTreeView({ links, config }: { links: LinkItem[]; config: PageConfig
         </div>
         {/* Watermark */}
         <div style={{ marginTop: "16px", fontFamily: "Inter, sans-serif", fontWeight: 900, fontSize: "9px", letterSpacing: "0.15em", color: `${config.subColor}60` }}>
-          FRAME
+          PORTAPIC
         </div>
       </div>
     </div>

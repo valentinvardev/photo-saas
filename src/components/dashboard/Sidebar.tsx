@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "~/components/providers/ThemeProvider";
+import { Logo } from "~/components/ui/Logo";
 
 /* ── Icons ── */
 function GalleryIcon() {
@@ -182,11 +183,8 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
     <div className="flex flex-col h-full bg-[var(--bg-card)] border-r border-[var(--border)]">
       {/* Logo */}
       <div className="flex items-center justify-between px-4 py-5 border-b border-[var(--border)]">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-yellow rounded-sm flex items-center justify-center shrink-0">
-            <span className="font-sans font-black text-[#111] text-xs tracking-tighter leading-none">F</span>
-          </div>
-          <span className="font-sans font-black text-[var(--fg)] text-lg tracking-tight">FRAME</span>
+        <Link href="/" className="flex items-center" aria-label="Portapic home">
+          <Logo height={28} priority />
         </Link>
         {onClose && (
           <button onClick={onClose} className="lg:hidden p-1 text-[var(--fg-muted)] hover:text-[var(--fg)]">
