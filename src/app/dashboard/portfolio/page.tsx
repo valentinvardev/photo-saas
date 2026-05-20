@@ -109,7 +109,6 @@ function PortfolioCard({ p }: { p: Portfolio }) {
               {p.customDomain ?? `${p.slug}.frame.co`}
             </span>
           </div>
-          <Sparkline data={p.weeklyViews} />
         </div>
 
         <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">

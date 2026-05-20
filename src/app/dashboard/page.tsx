@@ -117,11 +117,9 @@ export default function DashboardHomePage() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
 
-      {/* ── Greeting + next-best-action ───────────────────────────────── */}
+      {/* ── Greeting ──────────────────────────────────────────────────── */}
       <section>
         <div className="flex items-center gap-2 mb-2">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--fg-muted)]">Tuesday · April 8</span>
-          <span className="w-1 h-1 rounded-full bg-[var(--fg-muted)]" />
           <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-yellow">
             <span className="w-1.5 h-1.5 rounded-full bg-yellow" />Pro plan
           </span>
@@ -129,28 +127,6 @@ export default function DashboardHomePage() {
         <h1 className="font-sans text-2xl sm:text-3xl font-bold text-[var(--fg)] tracking-tight">
           Welcome back, <span className="text-[var(--fg)]">Sofia</span>.
         </h1>
-        <p className="font-sans text-sm text-[var(--fg-muted)] mt-1.5 max-w-xl">
-          Here's what's worth your attention today. Pick the next thing — or jump straight to a tool.
-        </p>
-
-        {/* Next action banner */}
-        <Link
-          href={next.href}
-          className="mt-6 group flex items-center gap-4 p-5 bg-yellow/8 border border-yellow/30 rounded-xl hover:bg-yellow/12 transition-colors"
-        >
-          <span className="w-11 h-11 rounded-lg bg-yellow text-[#111] flex items-center justify-center shrink-0">
-            {I.bolt}
-          </span>
-          <div className="flex-1 min-w-0">
-            <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-yellow font-semibold mb-1">Next best action</div>
-            <div className="font-sans text-base font-semibold text-[var(--fg)] truncate">{next.title}</div>
-            <div className="font-sans text-xs text-[var(--fg-muted)] truncate">{next.sub}</div>
-          </div>
-          <div className="hidden sm:inline-flex items-center gap-2 font-sans text-sm font-semibold text-[var(--fg)] group-hover:gap-3 transition-all">
-            {next.cta}
-            <span className="text-[var(--fg-muted)] group-hover:text-[var(--fg)]">{I.arrow}</span>
-          </div>
-        </Link>
       </section>
 
       {/* ── Web presence ──────────────────────────────────────────────── */}

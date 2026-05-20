@@ -505,10 +505,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                     className={`flex-1 flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${active ? "border-yellow text-[var(--fg)]" : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
                   >
                     <span className={active ? "text-yellow" : "text-[var(--fg-muted)]"}>{tab.icon}</span>
-                    <span className="flex-1 text-left">
-                      <span className="block font-sans text-xs font-semibold leading-none">{tab.label}</span>
-                      <span className="block font-mono text-[9px] uppercase tracking-widest mt-1 opacity-70">{tab.sub}</span>
-                    </span>
+                    <span className="font-sans text-xs font-semibold">{tab.label}</span>
                     <span className={`shrink-0 font-mono text-[9px] px-1.5 py-0.5 rounded ${active ? "bg-yellow/15 text-yellow" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)]"}`}>{count}</span>
                   </button>
                 );

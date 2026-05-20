@@ -993,16 +993,18 @@ function MonetizePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
         <FieldLabel>Mode</FieldLabel>
         <div className="flex flex-col gap-2">
           {([
-            { id: "gift",   label: "Gift / Free",  desc: "Client downloads at no cost" },
-            { id: "direct", label: "Direct Sale",  desc: "Buy individually or as bundle. Watermark is added automatically." },
-          ] as { id: DeliveryMode; label: string; desc: string }[]).map((opt) => (
+            { id: "gift",   label: "Gift / Free",  desc: "Client downloads at no cost",
+              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg> },
+            { id: "direct", label: "Direct Sale",  desc: "Buy individually or as bundle. Watermark is added automatically.",
+              icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
+          ] as { id: DeliveryMode; label: string; desc: string; icon: React.ReactNode }[]).map((opt) => (
             <button key={opt.id} onClick={() => set("mode", opt.id)}
               className={`flex items-start gap-3 px-3 py-3 rounded-xl border text-left transition-all ${
                 page.mode === opt.id ? "border-yellow bg-yellow/5" : "border-[var(--border)] hover:border-[var(--fg-muted)]"
               }`}
             >
-              <span className={`mt-0.5 w-3.5 h-3.5 rounded-full border-2 shrink-0 flex items-center justify-center ${page.mode === opt.id ? "border-yellow" : "border-[var(--fg-muted)]"}`}>
-                {page.mode === opt.id && <span className="w-1.5 h-1.5 rounded-full bg-yellow block" />}
+              <span className={`mt-0.5 shrink-0 ${page.mode === opt.id ? "text-yellow" : "text-[var(--fg-muted)]"}`}>
+                {opt.icon}
               </span>
               <div>
                 <div className="font-sans text-sm font-medium text-[var(--fg)]">{opt.label}</div>

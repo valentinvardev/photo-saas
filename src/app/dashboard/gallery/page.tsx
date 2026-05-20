@@ -219,7 +219,7 @@ function DragOverlay({
 }
 
 /* ── Full-screen lightbox ── */
-function ImageModal({ files, index, onIndex, onClose }: { files: GFile[]; index: number; onIndex: (i: number) => void; onClose: () => void }) {
+function ImageModal({ files, index, onIndex, onClose, onDelete }: { files: GFile[]; index: number; onIndex: (i: number) => void; onClose: () => void; onDelete: (f: GFile) => void }) {
   const file = files[index]!;
   const [zoom, setZoom]       = useState(1);
   const [offset, setOffset]   = useState({ x: 0, y: 0 });
@@ -275,6 +275,7 @@ function ImageModal({ files, index, onIndex, onClose }: { files: GFile[]; index:
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       className="fixed inset-0 z-50 flex flex-col bg-black select-none">
       {/* Top bar */}
       <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
@@ -282,7 +283,7 @@ function ImageModal({ files, index, onIndex, onClose }: { files: GFile[]; index:
         <span className="font-mono text-[11px] text-white/40 truncate max-w-xs">{file.name} · {index + 1} / {files.length}</span>
         <div className="flex items-center gap-1 pointer-events-auto">
           <button className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"><I.Share /></button>
-          <button className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-red-400 hover:bg-white/10 transition-colors"><I.Trash /></button>
+          <button onClick={() => onDelete(file)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-red-400 hover:bg-white/10 transition-colors"><I.Trash /></button>
           <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-sans font-medium transition-colors ml-1"><I.Download /> Download</button>
         </div>
       </div>
@@ -347,6 +348,7 @@ export default function GalleryPage() {
   const [search, setSearch]             = useState("");
   const [extDragCount, setExtDragCount] = useState(0);
   const [previewIdx, setPreviewIdx]     = useState<number | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<GFile | null>(null);
 
   /* Folder rename state */
   const [editFolderId, setEditFolderId]         = useState<string | null>(null);
@@ -825,7 +827,66 @@ export default function GalleryPage() {
       {/* Lightbox */}
       <AnimatePresence>
         {previewIdx !== null && previewIdx >= 0 && previewIdx < filtered.length && (
-          <ImageModal files={filtered} index={previewIdx} onIndex={setPreviewIdx} onClose={() => setPreviewIdx(null)} />
+          <ImageModal
+            files={filtered}
+            index={previewIdx}
+            onIndex={setPreviewIdx}
+            onClose={() => setPreviewIdx(null)}
+            onDelete={(f) => setDeleteTarget(f)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Delete confirmation modal */}
+      <AnimatePresence>
+        {deleteTarget && (
+          <motion.div
+            key="delete-confirm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center px-4"
+            style={{ backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", background: "rgba(0,0,0,0.55)" }}
+            onClick={(e) => { if (e.target === e.currentTarget) setDeleteTarget(null); }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full max-w-sm bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden"
+            >
+              <div className="px-6 pt-6 pb-4">
+                <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                  </svg>
+                </div>
+                <h2 className="font-sans font-bold text-[var(--fg)] text-base mb-1">Delete photo?</h2>
+                <p className="font-sans text-sm text-[var(--fg-muted)] leading-relaxed">
+                  <span className="font-medium text-[var(--fg)]">{deleteTarget.name}</span> will be permanently deleted. This can&apos;t be undone.
+                </p>
+              </div>
+              <div className="flex gap-2 px-6 pb-6">
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  className="flex-1 py-2 rounded-xl border border-[var(--border)] font-sans text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setDeleteTarget(null);
+                    setPreviewIdx(null);
+                  }}
+                  className="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 font-sans text-sm font-semibold text-white transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
