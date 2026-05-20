@@ -350,7 +350,10 @@ function ImageModal({ files, index, onIndex, onClose, onDelete, onShare }: { fil
 /* ── Share modal ── */
 function ShareModal({ files, onClose }: { files: GFile[]; onClose: () => void }) {
   const [copied, setCopied] = useState(false);
-  const shareUrl = `https://portapic.app/share/a7f3k9x`;
+  const shareId  = "a7f3k9x";
+  const shareUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/s/${shareId}`
+    : `https://portapic.app/s/${shareId}`;
 
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
