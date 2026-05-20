@@ -510,7 +510,7 @@ export default function GalleryPage() {
       <input ref={folderInputRef} type="file" className="hidden" {...({ webkitdirectory: "", directory: "" } as Record<string, string>)} />
 
       {/* ── Header ── */}
-      <div className="sticky top-14 z-10 bg-[var(--bg)] border-b border-[var(--border)] px-5 py-3">
+      <div className="bg-[var(--bg)] border-b border-[var(--border)] px-5 py-3">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             {activeFolder !== "All" && (
