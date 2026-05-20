@@ -219,7 +219,7 @@ function DragOverlay({
 }
 
 /* ── Full-screen lightbox ── */
-function ImageModal({ files, index, onIndex, onClose, onDelete }: { files: GFile[]; index: number; onIndex: (i: number) => void; onClose: () => void; onDelete: (f: GFile) => void }) {
+function ImageModal({ files, index, onIndex, onClose, onDelete, onShare }: { files: GFile[]; index: number; onIndex: (i: number) => void; onClose: () => void; onDelete: (f: GFile) => void; onShare: (f: GFile) => void }) {
   const file = files[index]!;
   const [zoom, setZoom]             = useState(1);
   const [offset, setOffset]         = useState({ x: 0, y: 0 });
@@ -288,7 +288,7 @@ function ImageModal({ files, index, onIndex, onClose, onDelete }: { files: GFile
         <button className="pointer-events-auto text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10" onClick={onClose}><I.Back /></button>
         <span className="font-mono text-[11px] text-white/40 truncate max-w-xs">{file.name} · {index + 1} / {files.length}</span>
         <div className="flex items-center gap-1 pointer-events-auto">
-          <button className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"><I.Share /></button>
+          <button onClick={() => onShare(file)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"><I.Share /></button>
           <button onClick={() => onDelete(file)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-red-400 hover:bg-white/10 transition-colors"><I.Trash /></button>
           <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-sans font-medium transition-colors ml-1"><I.Download /> Download</button>
         </div>
@@ -347,6 +347,139 @@ function ImageModal({ files, index, onIndex, onClose, onDelete }: { files: GFile
   );
 }
 
+/* ── Share modal ── */
+function ShareModal({ files, onClose }: { files: GFile[]; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const shareUrl = `https://portapic.app/share/a7f3k9x`;
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, [onClose]);
+
+  function copy() {
+    navigator.clipboard.writeText(shareUrl).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+
+  const thumb = files[0];
+  const count = files.length;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center sm:px-4"
+      style={{ backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", background: "rgba(0,0,0,0.5)" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 40 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full sm:max-w-sm bg-[var(--bg-card)] border border-[var(--border)] rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden"
+      >
+        {/* Handle (mobile only) */}
+        <div className="flex justify-center pt-3 sm:hidden">
+          <div className="w-10 h-1 rounded-full bg-[var(--border)]" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-4 pb-3">
+          <div>
+            <h2 className="font-sans font-bold text-[var(--fg)] text-base leading-tight">Share link</h2>
+            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
+              Expires in 7 days
+            </p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+            <I.Close />
+          </button>
+        </div>
+
+        {/* Photo strip */}
+        <div className="px-5 pb-4">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)]">
+            <div className="flex -space-x-2 shrink-0">
+              {files.slice(0, 4).map((f, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={f.id}
+                  src={`https://picsum.photos/seed/${f.seed}/48/48?grayscale`}
+                  alt=""
+                  className="w-8 h-8 rounded-md object-cover border-2 border-[var(--bg-card)]"
+                  style={{ zIndex: 4 - i }}
+                />
+              ))}
+              {count > 4 && (
+                <div className="w-8 h-8 rounded-md bg-[var(--border)] border-2 border-[var(--bg-card)] flex items-center justify-center font-mono text-[9px] text-[var(--fg-muted)] z-0">
+                  +{count - 4}
+                </div>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-sans text-xs font-semibold text-[var(--fg)] truncate">
+                {count === 1 ? thumb?.name : `${count} photos selected`}
+              </p>
+              <p className="font-mono text-[10px] text-[var(--fg-muted)]">
+                View-only · no download
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Link preview */}
+        <div className="px-5 pb-4">
+          <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[var(--bg)] border border-[var(--border)]">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0">
+              <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+            </svg>
+            <span className="font-mono text-[11px] text-[var(--fg-muted)] truncate flex-1">{shareUrl}</span>
+          </div>
+        </div>
+
+        {/* CTAs */}
+        <div className="flex flex-col gap-2 px-5 pb-6">
+          <button
+            onClick={copy}
+            className={`w-full py-3 rounded-xl font-sans text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
+              copied ? "bg-emerald-500 text-white" : "bg-yellow text-[#111] hover:bg-yellow/90"
+            }`}
+          >
+            {copied ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                Link copied!
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Copy link
+              </>
+            )}
+          </button>
+
+          {/* Email — paid feature */}
+          <button
+            className="w-full py-3 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg-muted)] flex items-center justify-center gap-2 relative overflow-hidden cursor-not-allowed opacity-70"
+            disabled
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/></svg>
+            Send by email
+            <span className="ml-1 font-mono text-[9px] uppercase tracking-widest bg-yellow/20 text-yellow border border-yellow/30 px-1.5 py-0.5 rounded">Pro</span>
+          </button>
+
+          <p className="text-center font-mono text-[9px] text-[var(--fg-muted)] mt-1 uppercase tracking-widest">
+            Link expires automatically · no account required to view
+          </p>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 /* ── Main page ── */
 export default function GalleryPage() {
   const [folders, setFolders]           = useState<Folder[]>(INITIAL_FOLDERS);
@@ -357,6 +490,7 @@ export default function GalleryPage() {
   const [extDragCount, setExtDragCount] = useState(0);
   const [previewIdx, setPreviewIdx]     = useState<number | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<GFile | null>(null);
+  const [shareFiles, setShareFiles]     = useState<GFile[] | null>(null);
 
   /* Folder rename state */
   const [editFolderId, setEditFolderId]         = useState<string | null>(null);
@@ -796,6 +930,10 @@ export default function GalleryPage() {
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 px-3 py-2 bg-[var(--bg-card)] border border-[var(--border)] shadow-xl rounded-xl">
             <span className="font-mono text-[10px] text-[var(--fg-muted)] px-2">{selected.size} selected</span>
             <div className="w-px h-4 bg-[var(--border)]" />
+            <button
+              onClick={() => setShareFiles(filtered.filter((f) => selected.has(f.id)))}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"
+            ><I.Share /> Share</button>
             <button className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"><I.Move /> Move</button>
             <button className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"><I.Download /> Download</button>
             <button className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><I.Trash /> Delete</button>
@@ -841,7 +979,15 @@ export default function GalleryPage() {
             onIndex={setPreviewIdx}
             onClose={() => setPreviewIdx(null)}
             onDelete={(f) => setDeleteTarget(f)}
+            onShare={(f) => setShareFiles([f])}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Share modal */}
+      <AnimatePresence>
+        {shareFiles && (
+          <ShareModal files={shareFiles} onClose={() => setShareFiles(null)} />
         )}
       </AnimatePresence>
 

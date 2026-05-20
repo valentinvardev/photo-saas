@@ -1973,32 +1973,31 @@ function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.05 }}
       className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden flex flex-col"
     >
-      {/* Phone preview */}
-      <div className="relative flex items-center justify-center py-8 overflow-hidden" style={{ background: t.bg, minHeight: 240 }}>
-        {/* Faint grain overlay */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
-        {/* Profile + links */}
-        <div className="relative flex flex-col items-center w-44 gap-3">
-          {/* Avatar */}
-          <div style={{ width: 52, height: 52, borderRadius: "50%", background: t.fg, opacity: 0.15 }} />
-          <div style={{ fontFamily: t.font, fontSize: 13, fontWeight: 700, color: t.fg, letterSpacing: "-0.01em" }}>Sofia Chen</div>
-          <div style={{ fontFamily: "monospace", fontSize: 9, color: t.sub, marginTop: -8, marginBottom: 4 }}>Photographer · NYC</div>
-          {/* Link buttons */}
-          {["Portfolio", "Book a session", "Instagram"].map((label) => (
-            <div key={label} style={{
-              width: "100%", padding: "9px 14px", borderRadius: r,
-              background: isOutline ? t.btnBg : t.btnBg,
-              border: isOutline ? `1px solid ${t.fg}40` : "none",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <span style={{ fontFamily: t.font, fontSize: 10, fontWeight: 600, color: t.btnFg }}>{label}</span>
+      {/* Cover — live iframe for templates with a canonical href, else
+          the branded phone-mockup wireframe for unavailable ones */}
+      <div className="relative overflow-hidden" style={{ minHeight: 240 }}>
+        {t.href ? (
+          <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
+            <LivePreviewThumbnail url={t.href} baseWidth={390} className="w-full h-full" />
+          </div>
+        ) : (
+          <div className="relative flex items-center justify-center py-8 overflow-hidden h-full" style={{ background: t.bg, minHeight: 240 }}>
+            <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
+            <div className="relative flex flex-col items-center w-44 gap-3">
+              <div style={{ width: 52, height: 52, borderRadius: "50%", background: t.fg, opacity: 0.15 }} />
+              <div style={{ fontFamily: t.font, fontSize: 13, fontWeight: 700, color: t.fg, letterSpacing: "-0.01em" }}>Sofia Chen</div>
+              <div style={{ fontFamily: "monospace", fontSize: 9, color: t.sub, marginTop: -8, marginBottom: 4 }}>Photographer · NYC</div>
+              {["Portfolio", "Book a session", "Instagram"].map((label) => (
+                <div key={label} style={{ width: "100%", padding: "9px 14px", borderRadius: r, background: t.btnBg, border: isOutline ? `1px solid ${t.fg}40` : "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontFamily: t.font, fontSize: 10, fontWeight: 600, color: t.btnFg }}>{label}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        {/* "New" badge */}
-        {t.new && <div className="absolute top-3 left-3 bg-yellow text-[#111] font-mono text-[8px] font-bold px-1.5 py-0.5 tracking-widest uppercase">New</div>}
+          </div>
+        )}
+        {t.new && <div className="absolute top-3 left-3 bg-yellow text-[#111] font-mono text-[8px] font-bold px-1.5 py-0.5 tracking-widest uppercase z-10">New</div>}
         {!t.available && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px] z-10">
             <span className="flex items-center gap-1.5 font-mono text-[10px] text-white/80 bg-black/50 px-3 py-1.5 rounded-full">
               <LockIcon /> Coming soon
             </span>
