@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Sidebar } from "./Sidebar";
 import { DashboardHeader } from "./Header";
 import { ChatPanel } from "./ChatPanel";
@@ -9,20 +9,43 @@ import { CartPanel } from "./CartPanel";
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [chatOpen, setChatOpen]       = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
+
+  const lastScrollY = useRef(0);
+  const ticking     = useRef(false);
+
+  const onScroll = useCallback((e: React.UIEvent<HTMLElement>) => {
+    const y = (e.currentTarget as HTMLElement).scrollTop;
+    if (!ticking.current) {
+      requestAnimationFrame(() => {
+        const delta = y - lastScrollY.current;
+        if (delta > 4)       setHeaderVisible(false); // scrolling down
+        else if (delta < -4) setHeaderVisible(true);  // scrolling up
+        lastScrollY.current = y;
+        ticking.current = false;
+      });
+      ticking.current = true;
+    }
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg)]">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <DashboardHeader
-          onMenuClick={() => setSidebarOpen(true)}
-          onChatClick={() => setChatOpen((p) => !p)}
-          chatOpen={chatOpen}
-        />
+        <div
+          className={`shrink-0 transition-transform duration-300 ease-in-out ${headerVisible ? "translate-y-0" : "-translate-y-full"}`}
+          style={{ position: "sticky", top: 0, zIndex: 30 }}
+        >
+          <DashboardHeader
+            onMenuClick={() => setSidebarOpen(true)}
+            onChatClick={() => setChatOpen((p) => !p)}
+            chatOpen={chatOpen}
+          />
+        </div>
 
         <div className="flex-1 flex min-h-0">
-          <main className="flex-1 overflow-y-auto">
+          <main className="flex-1 overflow-y-auto" onScroll={onScroll}>
             {children}
           </main>
 

@@ -24,10 +24,9 @@ export interface Portfolio {
 export const TEMPLATE_URL: Record<string, string> = {
   "Brooklyn":   "/template/brooklyn",
   "Minimal BW": "/templates/minimal-bw",
-  "Petal":      "/templates/lumiere",
 };
 
-export const TEMPLATES = ["Brooklyn", "Minimal BW", "Petal"];
+export const TEMPLATES = ["Brooklyn", "Minimal BW"];
 
 export const MOCK_PORTFOLIOS: Portfolio[] = [
   {

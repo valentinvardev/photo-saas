@@ -221,12 +221,14 @@ function DragOverlay({
 /* ── Full-screen lightbox ── */
 function ImageModal({ files, index, onIndex, onClose, onDelete }: { files: GFile[]; index: number; onIndex: (i: number) => void; onClose: () => void; onDelete: (f: GFile) => void }) {
   const file = files[index]!;
-  const [zoom, setZoom]       = useState(1);
-  const [offset, setOffset]   = useState({ x: 0, y: 0 });
-  const [isDragging, setDrag] = useState(false);
-  const dragRef               = useRef({ sx: 0, sy: 0, ox: 0, oy: 0 });
-  const containerRef          = useRef<HTMLDivElement>(null);
-  const touchStartX           = useRef(0);
+  const [zoom, setZoom]             = useState(1);
+  const [offset, setOffset]         = useState({ x: 0, y: 0 });
+  const [isDragging, setDrag]       = useState(false);
+  const [chevronVisible, setChevron] = useState(true);
+  const dragRef                     = useRef({ sx: 0, sy: 0, ox: 0, oy: 0 });
+  const containerRef                = useRef<HTMLDivElement>(null);
+  const touchStartX                 = useRef(0);
+  const chevronTimer                = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const resetView = useCallback(() => { setZoom(1); setOffset({ x: 0, y: 0 }); }, []);
   const prev = useCallback(() => { if (index > 0)              { onIndex(index - 1); resetView(); } }, [index, onIndex, resetView]);
@@ -257,6 +259,10 @@ function ImageModal({ files, index, onIndex, onClose, onDelete }: { files: GFile
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
+      // Hide chevrons when user scrolls — they know how to navigate
+      setChevron(false);
+      if (chevronTimer.current) clearTimeout(chevronTimer.current);
+      chevronTimer.current = setTimeout(() => setChevron(true), 2500);
       setZoom((prev) => {
         const next = Math.min(Math.max(prev * (e.deltaY < 0 ? 1.12 : 0.9), 1), 8);
         if (next === 1) setOffset({ x: 0, y: 0 });
@@ -307,10 +313,11 @@ function ImageModal({ files, index, onIndex, onClose, onDelete }: { files: GFile
         )}
       </div>
 
-      {/* Prev / Next arrows */}
+      {/* Prev / Next arrows — fade out when user uses scroll */}
       {index > 0 && (
         <button onClick={prev}
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 transition-colors"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 transition-all duration-500"
+          style={{ opacity: chevronVisible ? 1 : 0, pointerEvents: chevronVisible ? "auto" : "none" }}
           aria-label="Previous"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -318,7 +325,8 @@ function ImageModal({ files, index, onIndex, onClose, onDelete }: { files: GFile
       )}
       {index < files.length - 1 && (
         <button onClick={next}
-          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 transition-all duration-500"
+          style={{ opacity: chevronVisible ? 1 : 0, pointerEvents: chevronVisible ? "auto" : "none" }}
           aria-label="Next"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>

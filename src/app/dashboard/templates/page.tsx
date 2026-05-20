@@ -70,19 +70,6 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     collection: "brooklyn",
   },
   {
-    id: "petal",
-    name: "Petal",
-    description: "Playful pastel portfolio with bento works grid, VSCO masonry gallery, and warm sand background.",
-    category: "Minimal",
-    tags: ["Pastel", "Playful", "Modern"],
-    href: "/templates/lumiere",
-    seed: 452,
-    new: true,
-    fonts: { serif: "—", sans: "DM Sans", mono: "Space Mono" },
-    style: { bg: "#f0ebe3", fg: "#18181b", accent: "#d9544a", muted: "#9a9088" },
-    collection: "petal",
-  },
-  {
     id: "halcyon",
     name: "Halcyon",
     description: "Editorial warm-dark portfolio with burnt-sienna accent, Instrument Serif italics, and a typographic project index that reveals a hover thumbnail.",
@@ -262,18 +249,6 @@ const COLLECTIONS: TemplateCollection[] = [
       { type: "portfolio", href: "/template/halcyon",          seed: 600 },
       { type: "links",     href: "/template/halcyon/links",    seed: 601 },
       { type: "delivery",  href: "/template/halcyon/delivery", seed: 602 },
-    ],
-  },
-  {
-    id: "petal",
-    name: "Petal",
-    description: "Warm pastel palette with playful, modern layouts. Bento grid, masonry gallery, rounded cards — a cohesive identity that feels fresh and distinct.",
-    accentColor: "#d9544a",
-    accentText:  "#faf8f5",
-    pages: [
-      { type: "portfolio", href: "/templates/lumiere", seed: 452 },
-      { type: "links",     href: null,                  seed: 63  },
-      { type: "delivery",  href: null,                  seed: 71  },
     ],
   },
   {
@@ -1170,7 +1145,6 @@ const WIZARD_PALETTES = [
   { id: "bw",       label: "Black & White",  bg: "#fafafa", fg: "#0a0a0a", accent: "#facc15", muted: "#888888", btnBg: "#0a0a0a", btnFg: "#fafafa" },
   { id: "noir",     label: "Noir",           bg: "#0a0a0a", fg: "#f5f5f5", accent: "#e8382c", muted: "#666666", btnBg: "#e8382c", btnFg: "#0a0a0a" },
   { id: "warm",     label: "Warm Cream",     bg: "#faf8f5", fg: "#2a2520", accent: "#c9a89a", muted: "#9a9088", btnBg: "#2a2520", btnFg: "#faf8f5" },
-  { id: "petal",    label: "Petal Pastel",   bg: "#f0ebe3", fg: "#18181b", accent: "#d9544a", muted: "#71717a", btnBg: "#d9544a", btnFg: "#ffffff" },
   { id: "brooklyn", label: "Brooklyn Red",   bg: "#0d0d0d", fg: "#f0efe9", accent: "#e8382c", muted: "#7a7a7a", btnBg: "#e8382c", btnFg: "#0d0d0d" },
   { id: "slate",    label: "Cool Slate",     bg: "#f0f4f8", fg: "#1e293b", accent: "#334155", muted: "#64748b", btnBg: "#1e293b", btnFg: "#f0f4f8" },
 ];
