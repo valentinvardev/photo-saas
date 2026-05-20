@@ -512,13 +512,13 @@ function CollectionModal({ c, onClose, onPreview }: { c: TemplateCollection; onC
               <div key={page.type} className="flex items-center justify-between p-3 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]">
                 <div className="flex items-center gap-2">
                   {page.href
-                    ? <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: c.accentColor + "20" }}><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={c.accentColor} strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+                    ? <div className="w-5 h-5 rounded-md flex items-center justify-center bg-emerald-500/15"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg></div>
                     : <div className="w-5 h-5 rounded-md flex items-center justify-center bg-[var(--bg-card)]"><LockIcon /></div>
                   }
                   <span className="font-sans text-sm font-medium text-[var(--fg)]">{PAGE_LABELS[page.type]}</span>
                 </div>
                 {page.href
-                  ? <button onClick={() => onPreview(page.type as PageType)} className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors uppercase tracking-wide">Preview <ArrowIcon /></button>
+                  ? <button onClick={() => onPreview(page.type as PageType)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg)] border border-[var(--border)] font-sans text-[11px] font-semibold text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Preview</button>
                   : <span className="font-mono text-[9px] text-[var(--fg-muted)] opacity-40">Soon</span>
                 }
               </div>
@@ -1796,39 +1796,33 @@ function TemplatePreview({ kind, style, dense }: {
     );
   }
 
-  // delivery
-  const cols = dense ? 4 : 4;
+  // delivery — show a real-looking photo grid so users understand what
+  // the gallery surface looks like, not the password/cover page.
+  const SEEDS = [11, 22, 33, 44, 55, 66, 77, 88, 99, 111, 122, 133];
+  const cols = 4;
   const rows = dense ? 3 : 4;
   const total = cols * rows;
   return (
     <div className="relative w-full h-full overflow-hidden" style={{ background: bg, color: fg }}>
-      {/* Nav with title + count */}
+      {/* Thin nav bar */}
       <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor }}>
         <div className="flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
-          <div className="h-1.5 w-12 rounded-sm" style={{ background: fg, opacity: 0.85 }} />
-        </div>
-        <div className="h-1 w-7 rounded-full" style={{ background: muted }} />
-      </div>
-      {/* Action row */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b" style={{ borderColor }}>
-        <div className="flex gap-1">
-          <div className="h-1 w-5 rounded-full" style={{ background: muted }} />
-          <div className="h-1 w-5 rounded-full" style={{ background: muted }} />
+          <div className="h-1.5 w-12 rounded-sm" style={{ background: fg, opacity: 0.8 }} />
         </div>
         <div className="h-2 w-9 rounded-sm" style={{ background: accent }} />
       </div>
-      {/* Photo grid */}
-      <div className="grid p-1 gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+      {/* Photo grid with real images */}
+      <div className="grid gap-0.5 p-0.5" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
         {Array.from({ length: total }).map((_, i) => (
-          <div key={i} className="aspect-square relative" style={{ background: i % 3 === 1 ? placeholderAlt : placeholder }}>
-            {i === 2 && (
-              <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 rounded-sm" style={{ background: accent }} />
-            )}
-            {i === 5 && (
-              <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 rounded-sm" style={{ background: accent }} />
-            )}
-          </div>
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={i}
+            src={`https://picsum.photos/seed/${SEEDS[i] ?? i}/120/120?grayscale`}
+            alt=""
+            className="aspect-square w-full object-cover"
+            style={{ display: "block" }}
+          />
         ))}
       </div>
     </div>
@@ -2087,14 +2081,11 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.05 }}
       className="group border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden flex flex-col"
     >
-      {/* Live preview — iframe when available, else wireframe */}
+      {/* Gallery-grid preview — always shows the gallery surface, not the
+          password/cover page that the iframe would load first. */}
       <div className="relative overflow-hidden" style={{ aspectRatio: "16/10", minHeight: 180 }}>
         <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
-          {t.href ? (
-            <LivePreviewThumbnail url={t.href} baseWidth={1280} className="w-full h-full" />
-          ) : (
-            <TemplatePreview kind="delivery" style={previewStyle} dense />
-          )}
+          <TemplatePreview kind="delivery" style={previewStyle} dense />
         </div>
 
         {/* Hover CTAs */}
