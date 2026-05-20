@@ -33,13 +33,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header — slides up when scrolling down, reclaims space with
-            negative margin so no blank area is left behind. */}
+        {/* Header — collapses height to 0 when scrolling down so the
+            layout never shifts and the scroll container keeps its size. */}
         <div
-          className="shrink-0 transition-all duration-300 ease-in-out"
+          className="shrink-0 overflow-hidden"
           style={{
-            transform:    headerVisible ? "translateY(0)" : "translateY(-100%)",
-            marginBottom: headerVisible ? 0 : -56,
+            height: headerVisible ? 56 : 0,
+            transition: "height 250ms ease-in-out",
           }}
         >
           <DashboardHeader
