@@ -19,7 +19,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     if (ticking.current) return;
     ticking.current = true;
     requestAnimationFrame(() => {
-      // Always show when near the top
       if (y < 10) {
         setHeaderVisible(true);
       } else {
@@ -33,18 +32,21 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg)]">
+    /* h-dvh instead of h-screen — respects iOS Safari dynamic bottom bar */
+    <div className="flex overflow-hidden bg-[var(--bg)]" style={{ height: "100dvh" }}>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header stays in the normal flex flow — layout never changes.
-            Only opacity animates so nothing shifts or clips. */}
+      {/* relative: contains the absolute header. overflow-hidden: clips it
+          as it slides up. bg-[var(--bg-card)]: matches header bg so the
+          pt-14 slot is invisible when the header is hidden. */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-[var(--bg-card)]">
+
+        {/* Header: absolute within the right column. Slides up with
+            translateY(-100%) — the parent overflow-hidden clips it.
+            Layout is never affected; content always starts at pt-14. */}
         <div
-          className="shrink-0 transition-opacity duration-200"
-          style={{
-            opacity:       headerVisible ? 1 : 0,
-            pointerEvents: headerVisible ? "auto" : "none",
-          }}
+          className="absolute inset-x-0 top-0 z-30 transition-transform duration-300 ease-in-out"
+          style={{ transform: headerVisible ? "translateY(0)" : "translateY(-100%)" }}
         >
           <DashboardHeader
             onMenuClick={() => setSidebarOpen(true)}
@@ -54,7 +56,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="flex-1 flex min-h-0">
-          <main className="flex-1 overflow-y-auto" onScroll={onScroll}>
+          {/* pt-14 = 56px permanent slot for the header.
+              When visible: header overlays it.
+              When hidden:  slot shows page background (same color — invisible). */}
+          <main
+            className="flex-1 overflow-y-auto pt-14"
+            onScroll={onScroll}
+          >
             {children}
           </main>
 
