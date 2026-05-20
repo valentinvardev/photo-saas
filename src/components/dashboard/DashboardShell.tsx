@@ -52,7 +52,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="flex-1 flex min-h-0">
-          {/* pt-14 = 56px permanent spacer so content starts below the header */}
           <main className="flex-1 overflow-y-auto pt-14" onScroll={onScroll}>
             {children}
           </main>

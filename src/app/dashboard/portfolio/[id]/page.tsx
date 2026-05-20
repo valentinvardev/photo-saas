@@ -46,7 +46,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
     <div className="min-h-full">
 
       {/* ── Top bar with breadcrumb + actions ── */}
-      <header className="sticky top-0 z-10 bg-[var(--bg)] border-b border-[var(--border)]">
+      <header className="sticky top-14 z-10 bg-[var(--bg)] border-b border-[var(--border)]">
         <div className="px-5 py-3 flex items-center gap-3 flex-wrap">
           <Link
             href="/dashboard/portfolio"

@@ -2242,7 +2242,7 @@ export default function TemplatesPage() {
     <div className="min-h-full">
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[var(--bg)] border-b border-[var(--border)] px-5 pt-4 pb-0">
+      <div className="sticky top-14 z-10 bg-[var(--bg)] border-b border-[var(--border)] px-5 pt-4 pb-0">
         <div className="flex items-end justify-between gap-4 flex-wrap mb-4">
           <div>
             <h1 className="font-sans font-black text-[var(--fg)] text-lg leading-none">Templates</h1>
