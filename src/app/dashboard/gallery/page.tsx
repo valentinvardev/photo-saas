@@ -555,9 +555,11 @@ export default function GalleryPage() {
     return matchFolder && matchSearch;
   });
 
+  const [selectionMode, setSelectionMode] = useState(false);
+
   const toggleSel  = (id: string) => setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const selectAll  = () => setSelected(new Set(filtered.map((f) => f.id)));
-  const clearSel   = () => setSelected(new Set());
+  const clearSel   = () => { setSelected(new Set()); setSelectionMode(false); };
 
   const renameFolder = (id: string, newName: string) => {
     setFolders((fs) => fs.map((f) => f.id === id ? { ...f, name: newName } : f));
@@ -755,10 +757,12 @@ export default function GalleryPage() {
             <button onClick={() => setViewMode("grid")} className={`px-2.5 py-1.5 transition-colors ${viewMode === "grid" ? "bg-[var(--bg-subtle)] text-[var(--fg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}><I.Grid /></button>
             <button onClick={() => setViewMode("list")} className={`px-2.5 py-1.5 border-l border-[var(--border)] transition-colors ${viewMode === "list" ? "bg-[var(--bg-subtle)] text-[var(--fg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}><I.List /></button>
           </div>
-          {filtered.length > 0 && (
-            <button onClick={selected.size === filtered.length ? clearSel : selectAll}
-              className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors whitespace-nowrap rounded-lg px-2 py-1">
-              {selected.size === filtered.length ? "Deselect" : "Select all"}
+          {filtered.length > 0 && !selectionMode && (
+            <button
+              onClick={() => setSelectionMode(true)}
+              className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors whitespace-nowrap rounded-lg px-2 py-1"
+            >
+              Select
             </button>
           )}
         </div>
@@ -828,7 +832,7 @@ export default function GalleryPage() {
               onDragEnd={onFileDragEnd}
               className="relative aspect-square overflow-hidden cursor-pointer group bg-[var(--bg-subtle)]"
               style={{ boxShadow: selected.has(file.id) ? "inset 0 0 0 2px #fad502" : "none" }}
-              onClick={() => { if (selected.size > 0) toggleSel(file.id); else setPreviewIdx(filtered.indexOf(file)); }}
+              onClick={() => { if (selectionMode || selected.size > 0) { setSelectionMode(true); toggleSel(file.id); } else setPreviewIdx(filtered.indexOf(file)); }}
             >
               {file.type !== "raw" && file.type !== "tiff" ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -843,14 +847,12 @@ export default function GalleryPage() {
               <div className="absolute bottom-0 left-0 right-0 px-1.5 py-1 bg-gradient-to-t from-black/70 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-150">
                 <p className="font-mono text-[9px] text-white truncate">{file.name}</p>
               </div>
-              <div className="absolute top-1.5 left-1.5 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+              <div
+                className={`absolute top-1.5 left-1.5 transition-opacity ${selectionMode || selected.has(file.id) ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <Checkbox id={file.id} />
               </div>
-              {selected.has(file.id) && (
-                <div className="absolute top-1.5 left-1.5" onClick={(e) => e.stopPropagation()}>
-                  <Checkbox id={file.id} />
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -957,24 +959,44 @@ export default function GalleryPage() {
         </div>
       )}
 
-      {/* Bulk action bar */}
+      {/* Bulk action bar — visible in selection mode even with 0 selected */}
       <AnimatePresence>
-        {selected.size > 0 && (
+        {(selectionMode || selected.size > 0) && (
           <motion.div initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 px-3 py-2 bg-[var(--bg-card)] border border-[var(--border)] shadow-xl rounded-xl">
-            <span className="font-mono text-[10px] text-[var(--fg-muted)] px-2">{selected.size} selected</span>
+            {/* Count + select-all */}
+            <span className="font-mono text-[10px] text-[var(--fg-muted)] px-1">
+              {selected.size > 0 ? `${selected.size} selected` : "Tap to select"}
+            </span>
+            {selected.size < filtered.length ? (
+              <button onClick={selectAll} className="font-mono text-[10px] text-yellow hover:text-yellow/80 px-1.5 py-1 rounded transition-colors whitespace-nowrap">
+                All
+              </button>
+            ) : (
+              <button onClick={() => setSelected(new Set())} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-1.5 py-1 rounded transition-colors whitespace-nowrap">
+                None
+              </button>
+            )}
             <div className="w-px h-4 bg-[var(--border)]" />
             <button
+              disabled={selected.size === 0}
               onClick={() => setShareFiles(filtered.filter((f) => selected.has(f.id)))}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             ><I.Share /> Share</button>
-            <button className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"><I.Move /> Move</button>
             <button
+              disabled={selected.size === 0}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            ><I.Move /> Move</button>
+            <button
+              disabled={selected.size === 0}
               onClick={() => filtered.filter((f) => selected.has(f.id)).forEach((f) => smartDownload(`https://picsum.photos/seed/${f.seed}/2000/1500`, f.name))}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             ><I.Download /> Download</button>
-            <button className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><I.Trash /> Delete</button>
+            <button
+              disabled={selected.size === 0}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            ><I.Trash /> Delete</button>
             <div className="w-px h-4 bg-[var(--border)]" />
             <button onClick={clearSel} className="w-7 h-7 flex items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] rounded-lg transition-colors"><I.Close /></button>
           </motion.div>
