@@ -1,55 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { usePortfolioContentStore } from "~/lib/portfolio/store";
 import { contentSummary, type Visibility } from "~/lib/portfolio/data";
 import { PhotoPickerModal } from "./PhotoPickerModal";
+import { Toggle } from "~/components/ui/Toggle";
 
-/* ── Visibility ─────────────────────────────────────────────── */
-
-/* Binary on/off — "hidden" maps to off, anything else to on. Toggling
-   off always sets "hidden"; toggling on always sets "public". */
+/* ── Visibility toggle ────────────────────────────────────────── */
 const isVisible = (v: Visibility) => v !== "hidden";
 
 function VisibilityToggle({ v, onChange }: { v: Visibility; onChange: (next: Visibility) => void }) {
-  const on = isVisible(v);
   return (
-    <button
-      onClick={() => onChange(on ? "hidden" : "public")}
-      role="switch"
-      aria-checked={on}
-      title={on ? "Visible — click to hide" : "Hidden — click to show"}
-      className="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-md hover:bg-[var(--bg-subtle)] transition-colors"
-    >
-      {on ? (
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg)]">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-        </svg>
-      ) : (
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)]">
-          <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
-          <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
-          <line x1="1" y1="1" x2="23" y2="23"/>
-        </svg>
-      )}
-      {/* Switch */}
-      <span
-        className={`relative inline-block w-7 h-3.5 rounded-full transition-colors ${
-          on ? "bg-yellow" : "bg-[var(--bg-subtle)] border border-[var(--fg-muted)]"
-        }`}
-      >
-        <span
-          className="absolute top-0.5 w-2.5 h-2.5 rounded-full transition-all"
-          style={{ left: on ? 14 : 2, background: on ? "#111" : "var(--fg)" }}
-        />
-      </span>
-    </button>
+    <Toggle
+      checked={isVisible(v)}
+      onChange={(on) => onChange(on ? "public" : "hidden")}
+      ariaLabel="Toggle visibility"
+    />
   );
 }
 
-/* ── Inline rename ──────────────────────────────────────────── */
-
+/* ── Inline rename ──────────────────────────────────────────────*/
 function EditableLabel({ value, onSave, className }: {
   value: string; onSave: (next: string) => void; className?: string;
 }) {
@@ -64,11 +35,13 @@ function EditableLabel({ value, onSave, className }: {
 
   if (editing) return (
     <input
-      autoFocus
-      value={draft}
+      autoFocus value={draft}
       onChange={(e) => setDraft(e.target.value)}
       onBlur={commit}
-      onKeyDown={(e) => { if (e.key === "Enter") commit(); if (e.key === "Escape") { setDraft(value); setEditing(false); } }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") commit();
+        if (e.key === "Escape") { setDraft(value); setEditing(false); }
+      }}
       className={`bg-[var(--bg)] border border-yellow rounded px-1.5 py-0.5 outline-none ${className ?? ""}`}
     />
   );
@@ -83,280 +56,295 @@ function EditableLabel({ value, onSave, className }: {
   );
 }
 
-/* ── Reorderable photo grid (native HTML5 DnD + layout animations) ─
-   framer-motion's Reorder is a 1D widget; for a wrapping grid we use
-   native drag events. motion.div + layout prop animates items into
-   their new positions when the underlying array changes. */
+/* ── Photo grid with pointer-based drag-and-drop ─────────────────
+   Pointer events work on both mouse and touch without the ghost-image
+   issues of HTML5 DnD. The dragged tile follows the cursor as a
+   floating clone; all other tiles stay in place. An insertion gap
+   appears at the computed drop position — no layout animations. */
 
 function PhotoGrid({ photoIds, photos, onReorder, onRemove, onAddClick }: {
-  photoIds: string[];
-  photos:   Record<string, { id: string; src: string; visibility: Visibility }>;
-  onReorder: (newOrder: string[]) => void;
-  onRemove:  (id: string) => void;
+  photoIds:   string[];
+  photos:     Record<string, { id: string; src: string; visibility: Visibility }>;
+  onReorder:  (newOrder: string[]) => void;
+  onRemove:   (id: string) => void;
   onAddClick: () => void;
 }) {
-  const [draggingId, setDraggingId] = useState<string | null>(null);
-  const [overId,     setOverId]     = useState<string | null>(null);
+  const gridRef    = useRef<HTMLDivElement>(null);
+  const dragData   = useRef<{
+    id:       string;
+    fromIdx:  number;
+    startX:   number;
+    startY:   number;
+    cellW:    number;
+    cellH:    number;
+    cols:     number;
+  } | null>(null);
 
-  function handleDragStart(e: React.DragEvent<HTMLDivElement>, id: string) {
-    setDraggingId(id);
-    e.dataTransfer.effectAllowed = "move";
-    /* Firefox needs a non-empty payload to start a drag */
-    e.dataTransfer.setData("text/plain", id);
+  const [dragId,  setDragId]  = useState<string | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
+  const [ghostPos, setGhostPos] = useState({ x: 0, y: 0 });
+
+  /* Compute which grid index the pointer is hovering over */
+  function pointerToIndex(clientX: number, clientY: number): number | null {
+    const grid = gridRef.current;
+    if (!grid || !dragData.current) return null;
+    const rect = grid.getBoundingClientRect();
+    const { cellW, cellH, cols } = dragData.current;
+    const gx = clientX - rect.left;
+    const gy = clientY - rect.top;
+    const col = Math.max(0, Math.min(cols - 1, Math.floor(gx / cellW)));
+    const row = Math.max(0, Math.floor(gy / cellH));
+    const idx = row * cols + col;
+    return Math.min(idx, photoIds.length - 1);
   }
-  function handleDragOver(e: React.DragEvent<HTMLDivElement>, id: string) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    if (id !== overId) setOverId(id);
-  }
-  function handleDragLeave(id: string) {
-    if (id === overId) setOverId(null);
-  }
-  function handleDrop(e: React.DragEvent<HTMLDivElement>, targetId: string) {
-    e.preventDefault();
-    e.stopPropagation();
-    const from = draggingId;
-    cleanup();
-    if (!from || from === targetId) return;
-    const next     = [...photoIds];
-    const fromIdx  = next.indexOf(from);
-    const toIdx    = next.indexOf(targetId);
-    if (fromIdx < 0 || toIdx < 0) return;
-    next.splice(fromIdx, 1);
-    next.splice(toIdx, 0, from);
+
+  const onPointerDown = useCallback((e: React.PointerEvent, id: string, fromIdx: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const grid = gridRef.current;
+    if (!grid) return;
+    const firstCell = grid.children[0] as HTMLElement | undefined;
+    if (!firstCell) return;
+    const fr = firstCell.getBoundingClientRect();
+    const gap = 6; // gap-1.5 = 6px
+    const cellW = fr.width + gap;
+    const cellH = fr.height + gap;
+
+    /* Compute cols from grid container width */
+    const gridWidth = grid.getBoundingClientRect().width;
+    const cols = Math.round(gridWidth / cellW);
+
+    dragData.current = { id, fromIdx, startX: e.clientX, startY: e.clientY, cellW, cellH, cols };
+    setDragId(id);
+    setGhostPos({ x: e.clientX, y: e.clientY });
+    setOverIdx(fromIdx);
+  }, [photoIds]);
+
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!dragData.current) return;
+    setGhostPos({ x: e.clientX, y: e.clientY });
+    const idx = pointerToIndex(e.clientX, e.clientY);
+    if (idx !== null) setOverIdx(idx);
+  }, [photoIds]);
+
+  const onPointerUp = useCallback(() => {
+    const d = dragData.current;
+    if (!d) return;
+    const from = d.fromIdx;
+    const to   = overIdx ?? from;
+    dragData.current = null;
+    setDragId(null);
+    setOverIdx(null);
+
+    if (from === to) return;
+    const next = [...photoIds];
+    next.splice(from, 1);
+    next.splice(to, 0, d.id);
     onReorder(next);
-  }
-  function cleanup() {
-    setDraggingId(null);
-    setOverId(null);
-  }
+  }, [photoIds, overIdx, onReorder]);
+
+  /* Build rendered order with gap inserted at drop position */
+  const rendered = photoIds.map((pid, idx) => ({ pid, idx }));
 
   return (
-    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1.5">
-      {photoIds.map((pid) => {
-        const ph = photos[pid]; if (!ph) return null;
-        const isDragging = pid === draggingId;
-        const isOver     = pid === overId && overId !== draggingId;
+    <div className="relative">
+      {/* Ghost — follows pointer */}
+      {dragId && (() => {
+        const ph = photos[dragId];
+        if (!ph) return null;
+        const firstCell = gridRef.current?.children[0] as HTMLElement | undefined;
+        const size = firstCell ? firstCell.getBoundingClientRect().width : 60;
         return (
-          <motion.div
-            key={pid}
-            layout
-            transition={{ type: "spring", stiffness: 500, damping: 35 }}
-            draggable
-            onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, pid)}
-            onDragOver={(e) => handleDragOver(e as unknown as React.DragEvent<HTMLDivElement>, pid)}
-            onDragLeave={() => handleDragLeave(pid)}
-            onDrop={(e) => handleDrop(e as unknown as React.DragEvent<HTMLDivElement>, pid)}
-            onDragEnd={cleanup}
-            className={`relative aspect-square overflow-hidden rounded border cursor-grab active:cursor-grabbing transition-all ${
-              isOver ? "border-yellow ring-2 ring-yellow/30 scale-105" : "border-[var(--border)]"
-            }`}
+          <div
+            className="fixed pointer-events-none z-50 rounded overflow-hidden shadow-2xl ring-2 ring-yellow/60"
             style={{
-              opacity:   isDragging ? 0.3 : ph.visibility === "hidden" ? 0.35 : 1,
-              transform: isOver ? undefined : "scale(1)",
+              width: size, height: size,
+              left: ghostPos.x - size / 2,
+              top:  ghostPos.y - size / 2,
+              transform: "rotate(2deg) scale(1.05)",
+              transition: "none",
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={ph.src} alt="" className="w-full h-full object-cover pointer-events-none" draggable={false} />
-            <button
-              onClick={(e) => { e.stopPropagation(); if (confirm("Remove this photo?")) onRemove(pid); }}
-              onMouseDown={(e) => e.stopPropagation()}
-              className="absolute top-1 right-1 w-5 h-5 rounded bg-black/60 text-white opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-              title="Remove photo"
-              draggable={false}
-            >
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-            </button>
-          </motion.div>
+            <img src={ph.src} alt="" className="w-full h-full object-cover" draggable={false} />
+          </div>
         );
-      })}
+      })()}
 
-      {/* Add tile */}
-      <button
-        onClick={onAddClick}
-        className="aspect-square rounded border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:text-yellow hover:border-yellow hover:bg-yellow/5 transition-colors flex flex-col items-center justify-center gap-1"
-        title="Add photo from gallery"
+      <div
+        ref={gridRef}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerLeave={onPointerUp}
+        className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8"
+        style={{ gap: 6 }}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <span className="font-mono text-[8px] uppercase tracking-widest">Add</span>
-      </button>
+        {rendered.map(({ pid, idx }) => {
+          const ph = photos[pid]; if (!ph) return null;
+          const isDragging = pid === dragId;
+          const isGap      = overIdx !== null && idx === overIdx && !isDragging;
+
+          return (
+            <div key={pid} className="relative" style={{ display: "contents" }}>
+              {/* Insertion gap BEFORE */}
+              {isGap && overIdx !== null && overIdx < (dragData.current?.fromIdx ?? 0) && (
+                <div className="aspect-square rounded border-2 border-dashed border-yellow bg-yellow/5" />
+              )}
+
+              <div
+                className={`relative aspect-square overflow-hidden rounded border cursor-grab active:cursor-grabbing select-none ${
+                  isDragging ? "opacity-20 border-yellow/40" : "border-[var(--border)]"
+                } ${ph.visibility === "hidden" ? "opacity-40" : ""}`}
+                onPointerDown={(e) => onPointerDown(e, pid, idx)}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={ph.src} alt="" className="w-full h-full object-cover pointer-events-none" draggable={false} />
+                {/* Remove button */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); if (confirm("Remove this photo?")) onRemove(pid); }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className="absolute top-1 right-1 w-5 h-5 rounded bg-black/60 text-white opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center"
+                  title="Remove"
+                  draggable={false}
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
+
+              {/* Insertion gap AFTER */}
+              {isGap && overIdx !== null && overIdx >= (dragData.current?.fromIdx ?? 0) && (
+                <div className="aspect-square rounded border-2 border-dashed border-yellow bg-yellow/5" />
+              )}
+            </div>
+          );
+        })}
+
+        {/* Add tile */}
+        <button
+          onClick={onAddClick}
+          className="aspect-square rounded border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:text-yellow hover:border-yellow hover:bg-yellow/5 transition-colors flex flex-col items-center justify-center gap-1"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span className="font-mono text-[8px] uppercase tracking-widest">Add</span>
+        </button>
+      </div>
     </div>
   );
 }
 
-/* ── Main tree ──────────────────────────────────────────────── */
+/* ── Main content tree — folders only, no categories ─────────────
+   Categories still exist in the store (for backwards compatibility)
+   but the UI collapses them. All folders appear at the top level.
+   New folders go into the first existing category, or a "main"
+   category is auto-created if none exists. ────────────────────── */
 
 export function ContentTree({ portfolioId }: { portfolioId: string }) {
-  const store    = usePortfolioContentStore();
-  const content  = store.getContent(portfolioId);
-  const summary  = contentSummary(content);
+  const store   = usePortfolioContentStore();
+  const content = store.getContent(portfolioId);
+  const summary = contentSummary(content);
 
-  const [expanded, setExpanded] = useState<Set<string>>(new Set(content.categoryIds));
-  const toggleExp = (id: string) =>
-    setExpanded((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const [pickFor, setPickFor] = useState<{ folderId: string } | null>(null);
 
-  /* Photo picker target — when set, opens picker and the chosen photos are
-     added to this destination. Lives in tree state so a single picker
-     instance handles every "Add" tile. */
-  const [pickFor, setPickFor] = useState<{ categoryId?: string; folderId?: string } | null>(null);
+  /* Collect all folder IDs in display order (from all categories) */
+  const allFolderIds = content.categoryIds.flatMap(
+    (catId) => content.categories[catId]?.folderIds ?? [],
+  );
+
+  /* Ensure a default category exists before creating a folder */
+  function ensureDefaultCat(): string {
+    if (content.categoryIds.length > 0) return content.categoryIds[0]!;
+    return store.addCategory(portfolioId, "main");
+  }
+
+  function addFolder() {
+    const catId = ensureDefaultCat();
+    store.addFolder(portfolioId, catId, "New folder");
+  }
 
   function onPickPhotos(urls: string[]) {
     if (!pickFor) return;
     for (const url of urls) {
-      store.addPhoto(portfolioId, pickFor, url);
+      store.addPhoto(portfolioId, { folderId: pickFor.folderId }, url);
     }
   }
 
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div>
-        <h2 className="font-sans font-bold text-[var(--fg)] text-base">Content</h2>
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
-          {summary.categories} categories · {summary.folders} folders · {summary.photos} photos
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-sans font-bold text-[var(--fg)] text-base">Content</h2>
+          <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
+            {summary.folders} folder{summary.folders !== 1 ? "s" : ""} · {summary.photos} photo{summary.photos !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <button
+          onClick={addFolder}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-yellow hover:border-yellow transition-colors"
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New folder
+        </button>
       </div>
 
-      {/* Inline "Create category" line — replaces the old + Category button */}
-      <button
-        onClick={() => store.addCategory(portfolioId, "New category")}
-        className="group w-full flex items-center gap-3 py-3 px-4 rounded-xl border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:text-yellow hover:border-yellow hover:bg-yellow/5 transition-colors"
-      >
-        <span className="h-px flex-1 bg-[var(--border)] group-hover:bg-yellow/40 transition-colors" />
-        <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest font-semibold">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Create category
-        </span>
-        <span className="h-px flex-1 bg-[var(--border)] group-hover:bg-yellow/40 transition-colors" />
-      </button>
-
-      {/* Tree */}
-      {content.categoryIds.length === 0 ? (
+      {/* Folder list */}
+      {allFolderIds.length === 0 ? (
         <div className="rounded-xl border border-dashed border-[var(--border)] p-12 text-center text-[var(--fg-muted)]">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mx-auto mb-3 opacity-40"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-          <p className="font-sans text-sm font-semibold text-[var(--fg)] mb-1">No categories yet</p>
-          <p className="font-sans text-xs">Use the line above to create your first category.</p>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mx-auto mb-3 opacity-40" strokeLinecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+          <p className="font-sans text-sm font-semibold text-[var(--fg)] mb-1">No folders yet</p>
+          <p className="font-sans text-xs">Click "New folder" to create your first one.</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {content.categoryIds.map((catId) => {
-            const cat = content.categories[catId]!;
-            const isOpen = expanded.has(catId);
-            const photoCount = cat.directPhotoIds.length + cat.folderIds.reduce((sum, fid) => sum + (content.folders[fid]?.photoIds.length ?? 0), 0);
-
-            return (
-              <div key={catId} className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden">
-                {/* Category header — only visibility + delete; create child happens via inline tiles */}
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border)]">
-                  <button onClick={() => toggleExp(catId)} className="w-5 h-5 flex items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ transform: `rotate(${isOpen ? 90 : 0}deg)`, transition: "transform 0.15s" }}>
-                      <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                  </button>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-                  <EditableLabel
-                    value={cat.name}
-                    onSave={(n) => store.renameCategory(portfolioId, catId, n)}
-                    className="font-sans text-sm font-semibold text-[var(--fg)] flex-1 min-w-0"
-                  />
-                  <span className="font-mono text-[9px] text-[var(--fg-muted)] shrink-0">
-                    {cat.folderIds.length}f · {photoCount}p
-                  </span>
-                  <VisibilityToggle v={cat.visibility} onChange={(next) => store.setCategoryVis(portfolioId, catId, next)} />
-                  <button
-                    onClick={() => { if (confirm(`Delete category "${cat.name}" and all its content?`)) store.removeCategory(portfolioId, catId); }}
-                    className="text-[var(--fg-muted)] hover:text-red-400 transition-colors w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--bg-subtle)]"
-                    title="Delete category"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-                  </button>
-                </div>
-
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.18 }}
-                      className="overflow-hidden"
+          <AnimatePresence initial={false}>
+            {allFolderIds.map((folId) => {
+              const fol = content.folders[folId];
+              if (!fol) return null;
+              return (
+                <motion.div
+                  key={folId}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.18 }}
+                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden"
+                >
+                  {/* Folder header */}
+                  <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border)]">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                    <EditableLabel
+                      value={fol.title}
+                      onSave={(n) => store.renameFolder(portfolioId, folId, n)}
+                      className="font-sans text-sm font-semibold text-[var(--fg)] flex-1 min-w-0"
+                    />
+                    <span className="font-mono text-[9px] text-[var(--fg-muted)] shrink-0">{fol.photoIds.length} photo{fol.photoIds.length !== 1 ? "s" : ""}</span>
+                    <VisibilityToggle v={fol.visibility} onChange={(next) => store.setFolderVis(portfolioId, folId, next)} />
+                    <button
+                      onClick={() => { if (confirm(`Delete folder "${fol.title}"?`)) store.removeFolder(portfolioId, folId); }}
+                      className="text-[var(--fg-muted)] hover:text-red-400 transition-colors w-6 h-6 flex items-center justify-center rounded hover:bg-[var(--bg-subtle)]"
+                      title="Delete folder"
                     >
-                      <div className="p-4 space-y-3 bg-[var(--bg-subtle)]/40">
-                        {/* Folders */}
-                        {cat.folderIds.map((folId) => {
-                          const fol = content.folders[folId]; if (!fol) return null;
-                          return (
-                            <div key={folId} className="rounded-lg border border-[var(--border)] bg-[var(--bg-card)]">
-                              <div className="flex items-center gap-2 px-3 py-2.5">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-                                <EditableLabel
-                                  value={fol.title}
-                                  onSave={(n) => store.renameFolder(portfolioId, folId, n)}
-                                  className="font-sans text-xs font-medium text-[var(--fg)] flex-1 min-w-0"
-                                />
-                                <span className="font-mono text-[9px] text-[var(--fg-muted)] shrink-0">{fol.photoIds.length}p</span>
-                                <VisibilityToggle v={fol.visibility} onChange={(next) => store.setFolderVis(portfolioId, folId, next)} />
-                                <button
-                                  onClick={() => { if (confirm(`Delete folder "${fol.title}"?`)) store.removeFolder(portfolioId, folId); }}
-                                  className="text-[var(--fg-muted)] hover:text-red-400 transition-colors w-6 h-6 flex items-center justify-center rounded hover:bg-[var(--bg-subtle)]"
-                                  title="Delete folder"
-                                >
-                                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
-                                </button>
-                              </div>
-                              <div className="px-3 pb-3">
-                                <PhotoGrid
-                                  photoIds={fol.photoIds}
-                                  photos={content.photos}
-                                  onReorder={(ids) => store.reorderFolderPhotos(portfolioId, folId, ids)}
-                                  onRemove={(pid) => store.removePhoto(portfolioId, pid)}
-                                  onAddClick={() => setPickFor({ folderId: folId })}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                    </button>
+                  </div>
 
-                        {/* Inline "Create folder" tile — same dashed style as Add photo */}
-                        <button
-                          onClick={() => store.addFolder(portfolioId, catId, "New folder")}
-                          className="group w-full flex items-center gap-3 py-3 px-4 rounded-lg border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:text-yellow hover:border-yellow hover:bg-yellow/5 transition-colors bg-[var(--bg-card)]"
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-                          <span className="font-mono text-[10px] uppercase tracking-widest font-semibold">
-                            Create folder
-                          </span>
-                          <span className="h-px flex-1 bg-[var(--border)] group-hover:bg-yellow/40 transition-colors" />
-                        </button>
-
-                        {/* Direct photos in category (always show grid so users can add) */}
-                        <div className="rounded-lg border border-[var(--border)] p-3 bg-[var(--bg-card)]">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">
-                              Direct photos · {cat.directPhotoIds.length}
-                            </span>
-                            <span className="text-[var(--fg-muted)] text-[10px]">·</span>
-                            <span className="font-mono text-[9px] text-[var(--fg-muted)]">drag to reorder</span>
-                          </div>
-                          <PhotoGrid
-                            photoIds={cat.directPhotoIds}
-                            photos={content.photos}
-                            onReorder={(ids) => store.reorderCategoryPhotos(portfolioId, catId, ids)}
-                            onRemove={(pid) => store.removePhoto(portfolioId, pid)}
-                            onAddClick={() => setPickFor({ categoryId: catId })}
-                          />
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
+                  {/* Photo grid */}
+                  <div className="p-3">
+                    <PhotoGrid
+                      photoIds={fol.photoIds}
+                      photos={content.photos}
+                      onReorder={(ids) => store.reorderFolderPhotos(portfolioId, folId, ids)}
+                      onRemove={(pid) => store.removePhoto(portfolioId, pid)}
+                      onAddClick={() => setPickFor({ folderId: folId })}
+                    />
+                  </div>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
       )}
 
-      {/* Photo picker — shared instance for every Add tile */}
+      {/* Photo picker */}
       <AnimatePresence>
         {pickFor && (
           <PhotoPickerModal
