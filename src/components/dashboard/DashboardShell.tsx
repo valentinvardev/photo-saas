@@ -45,8 +45,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             translateY(-100%) — the parent overflow-hidden clips it.
             Layout is never affected; content always starts at pt-14. */}
         <div
-          className="absolute inset-x-0 top-0 z-30 transition-transform duration-300 ease-in-out"
-          style={{ transform: headerVisible ? "translateY(0)" : "translateY(-100%)" }}
+          className="absolute inset-x-0 z-30"
+          style={{
+            top: headerVisible ? 0 : -56,
+            transition: "top 300ms ease-in-out",
+          }}
         >
           <DashboardHeader
             onMenuClick={() => setSidebarOpen(true)}
