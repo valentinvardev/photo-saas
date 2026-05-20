@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePortfolioContentStore } from "~/lib/portfolio/store";
 import { contentSummary, type Visibility } from "~/lib/portfolio/data";
@@ -56,11 +56,12 @@ function EditableLabel({ value, onSave, className }: {
   );
 }
 
-/* ── Photo grid with pointer-based drag-and-drop ─────────────────
-   Pointer events work on both mouse and touch without the ghost-image
-   issues of HTML5 DnD. The dragged tile follows the cursor as a
-   floating clone; all other tiles stay in place. An insertion gap
-   appears at the computed drop position — no layout animations. */
+/* ── Photo grid — pointer-based drag-and-drop ────────────────────
+   Strategy: track dragId + dropIdx. liveOrder is derived inline —
+   photoIds with dragId removed, then reinserted at dropIdx.
+   Each tile fires onPointerEnter to update dropIdx. No geometry
+   math, no gap tiles. The dragged item stays visible at reduced
+   opacity to show where it will land. Works on mouse and touch. */
 
 function PhotoGrid({ photoIds, photos, onReorder, onRemove, onAddClick }: {
   photoIds:   string[];
@@ -69,158 +70,123 @@ function PhotoGrid({ photoIds, photos, onReorder, onRemove, onAddClick }: {
   onRemove:   (id: string) => void;
   onAddClick: () => void;
 }) {
-  const gridRef    = useRef<HTMLDivElement>(null);
-  const dragData   = useRef<{
-    id:       string;
-    fromIdx:  number;
-    startX:   number;
-    startY:   number;
-    cellW:    number;
-    cellH:    number;
-    cols:     number;
-  } | null>(null);
-
-  const [dragId,  setDragId]  = useState<string | null>(null);
-  const [overIdx, setOverIdx] = useState<number | null>(null);
+  const [dragId,   setDragId]   = useState<string | null>(null);
+  const [dropIdx,  setDropIdx]  = useState(0);
   const [ghostPos, setGhostPos] = useState({ x: 0, y: 0 });
+  const ghostSrc  = useRef("");
+  const ghostSize = useRef(60);
 
-  /* Compute which grid index the pointer is hovering over */
-  function pointerToIndex(clientX: number, clientY: number): number | null {
-    const grid = gridRef.current;
-    if (!grid || !dragData.current) return null;
-    const rect = grid.getBoundingClientRect();
-    const { cellW, cellH, cols } = dragData.current;
-    const gx = clientX - rect.left;
-    const gy = clientY - rect.top;
-    const col = Math.max(0, Math.min(cols - 1, Math.floor(gx / cellW)));
-    const row = Math.max(0, Math.floor(gy / cellH));
-    const idx = row * cols + col;
-    return Math.min(idx, photoIds.length - 1);
+  const isDragging = dragId !== null;
+
+  /* filtered = photoIds without the dragged item */
+  const filteredIds = isDragging ? photoIds.filter(id => id !== dragId) : photoIds;
+
+  /* liveOrder = filtered with dragged item reinserted at dropIdx */
+  const liveOrder: string[] = isDragging
+    ? [...filteredIds.slice(0, dropIdx), dragId, ...filteredIds.slice(dropIdx)]
+    : photoIds;
+
+  function handlePointerDown(e: React.PointerEvent, pid: string) {
+    if (isDragging) return;
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const ph = photos[pid];
+    if (ph) ghostSrc.current = ph.src;
+    ghostSize.current = (e.currentTarget as HTMLElement).getBoundingClientRect().width;
+    const origIdx = photoIds.indexOf(pid);
+    setDragId(pid);
+    setDropIdx(origIdx); // start at original position
+    setGhostPos({ x: e.clientX, y: e.clientY });
   }
 
-  const onPointerDown = useCallback((e: React.PointerEvent, id: string, fromIdx: number) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
-    const grid = gridRef.current;
-    if (!grid) return;
-    const firstCell = grid.children[0] as HTMLElement | undefined;
-    if (!firstCell) return;
-    const fr = firstCell.getBoundingClientRect();
-    const gap = 6; // gap-1.5 = 6px
-    const cellW = fr.width + gap;
-    const cellH = fr.height + gap;
-
-    /* Compute cols from grid container width */
-    const gridWidth = grid.getBoundingClientRect().width;
-    const cols = Math.round(gridWidth / cellW);
-
-    dragData.current = { id, fromIdx, startX: e.clientX, startY: e.clientY, cellW, cellH, cols };
-    setDragId(id);
+  function handlePointerMove(e: React.PointerEvent) {
+    if (!isDragging) return;
     setGhostPos({ x: e.clientX, y: e.clientY });
-    setOverIdx(fromIdx);
-  }, [photoIds]);
+  }
 
-  const onPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!dragData.current) return;
-    setGhostPos({ x: e.clientX, y: e.clientY });
-    const idx = pointerToIndex(e.clientX, e.clientY);
-    if (idx !== null) setOverIdx(idx);
-  }, [photoIds]);
-
-  const onPointerUp = useCallback(() => {
-    const d = dragData.current;
-    if (!d) return;
-    const from = d.fromIdx;
-    const to   = overIdx ?? from;
-    dragData.current = null;
+  function handlePointerUp() {
+    if (!dragId) return;
+    /* Compute final order from current state */
+    const fi = photoIds.filter(id => id !== dragId);
+    const finalOrder = [...fi.slice(0, dropIdx), dragId, ...fi.slice(dropIdx)];
+    if (finalOrder.join(",") !== photoIds.join(",")) {
+      onReorder(finalOrder);
+    }
     setDragId(null);
-    setOverIdx(null);
+  }
 
-    if (from === to) return;
-    const next = [...photoIds];
-    next.splice(from, 1);
-    next.splice(to, 0, d.id);
-    onReorder(next);
-  }, [photoIds, overIdx, onReorder]);
-
-  /* Build rendered order with gap inserted at drop position */
-  const rendered = photoIds.map((pid, idx) => ({ pid, idx }));
+  function handleTileEnter(pid: string) {
+    if (!isDragging || pid === dragId) return;
+    const fi = photoIds.filter(id => id !== dragId);
+    const idx = fi.indexOf(pid);
+    if (idx !== -1) setDropIdx(idx);
+  }
 
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+    >
       {/* Ghost — follows pointer */}
-      {dragId && (() => {
-        const ph = photos[dragId];
-        if (!ph) return null;
-        const firstCell = gridRef.current?.children[0] as HTMLElement | undefined;
-        const size = firstCell ? firstCell.getBoundingClientRect().width : 60;
-        return (
-          <div
-            className="fixed pointer-events-none z-50 rounded overflow-hidden shadow-2xl ring-2 ring-yellow/60"
-            style={{
-              width: size, height: size,
-              left: ghostPos.x - size / 2,
-              top:  ghostPos.y - size / 2,
-              transform: "rotate(2deg) scale(1.05)",
-              transition: "none",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={ph.src} alt="" className="w-full h-full object-cover" draggable={false} />
-          </div>
-        );
-      })()}
+      {isDragging && (
+        <div
+          className="fixed pointer-events-none z-50 rounded overflow-hidden shadow-2xl ring-2 ring-yellow/60"
+          style={{
+            width:  ghostSize.current,
+            height: ghostSize.current,
+            left:   ghostPos.x - ghostSize.current / 2,
+            top:    ghostPos.y - ghostSize.current / 2,
+            transform: "rotate(2deg) scale(1.05)",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ghostSrc.current} alt="" className="w-full h-full object-cover" draggable={false} />
+        </div>
+      )}
 
-      <div
-        ref={gridRef}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerLeave={onPointerUp}
-        className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8"
-        style={{ gap: 6 }}
-      >
-        {rendered.map(({ pid, idx }) => {
-          const ph = photos[pid]; if (!ph) return null;
-          const isDragging = pid === dragId;
-          const isGap      = overIdx !== null && idx === overIdx && !isDragging;
+      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1.5">
+        {liveOrder.map((pid) => {
+          const ph = photos[pid];
+          if (!ph) return null;
+          const isTheDragged = pid === dragId;
 
           return (
-            <div key={pid} className="relative" style={{ display: "contents" }}>
-              {/* Insertion gap BEFORE */}
-              {isGap && overIdx !== null && overIdx < (dragData.current?.fromIdx ?? 0) && (
-                <div className="aspect-square rounded border-2 border-dashed border-yellow bg-yellow/5" />
-              )}
-
-              <div
-                className={`relative aspect-square overflow-hidden rounded border cursor-grab active:cursor-grabbing select-none ${
-                  isDragging ? "opacity-20 border-yellow/40" : "border-[var(--border)]"
-                } ${ph.visibility === "hidden" ? "opacity-40" : ""}`}
-                onPointerDown={(e) => onPointerDown(e, pid, idx)}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={ph.src} alt="" className="w-full h-full object-cover pointer-events-none" draggable={false} />
-                {/* Remove button */}
+            <div
+              key={pid}
+              className={[
+                "relative aspect-square overflow-hidden rounded border select-none",
+                isDragging ? "cursor-grabbing" : "cursor-grab",
+                isTheDragged
+                  ? "opacity-20 border-yellow/40"
+                  : ph.visibility === "hidden"
+                    ? "opacity-40 border-[var(--border)]"
+                    : "border-[var(--border)]",
+              ].join(" ")}
+              onPointerDown={(e) => handlePointerDown(e, pid)}
+              onPointerEnter={() => handleTileEnter(pid)}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={ph.src} alt="" className="w-full h-full object-cover pointer-events-none" draggable={false} />
+              {!isTheDragged && (
                 <button
                   onClick={(e) => { e.stopPropagation(); if (confirm("Remove this photo?")) onRemove(pid); }}
                   onPointerDown={(e) => e.stopPropagation()}
                   className="absolute top-1 right-1 w-5 h-5 rounded bg-black/60 text-white opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center"
                   title="Remove"
-                  draggable={false}
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
-              </div>
-
-              {/* Insertion gap AFTER */}
-              {isGap && overIdx !== null && overIdx >= (dragData.current?.fromIdx ?? 0) && (
-                <div className="aspect-square rounded border-2 border-dashed border-yellow bg-yellow/5" />
               )}
             </div>
           );
         })}
 
-        {/* Add tile */}
+        {/* Add tile — hovering over it during drag moves item to end */}
         <button
           onClick={onAddClick}
+          onPointerEnter={() => { if (isDragging) setDropIdx(filteredIds.length); }}
           className="aspect-square rounded border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:text-yellow hover:border-yellow hover:bg-yellow/5 transition-colors flex flex-col items-center justify-center gap-1"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -232,8 +198,8 @@ function PhotoGrid({ photoIds, photos, onReorder, onRemove, onAddClick }: {
 }
 
 /* ── Main content tree — folders only, no categories ─────────────
-   Categories still exist in the store (for backwards compatibility)
-   but the UI collapses them. All folders appear at the top level.
+   Categories still exist in the store (backwards compat) but the
+   UI collapses them. All folders appear at the top level.
    New folders go into the first existing category, or a "main"
    category is auto-created if none exists. ────────────────────── */
 
@@ -244,12 +210,10 @@ export function ContentTree({ portfolioId }: { portfolioId: string }) {
 
   const [pickFor, setPickFor] = useState<{ folderId: string } | null>(null);
 
-  /* Collect all folder IDs in display order (from all categories) */
   const allFolderIds = content.categoryIds.flatMap(
     (catId) => content.categories[catId]?.folderIds ?? [],
   );
 
-  /* Ensure a default category exists before creating a folder */
   function ensureDefaultCat(): string {
     if (content.categoryIds.length > 0) return content.categoryIds[0]!;
     return store.addCategory(portfolioId, "main");
