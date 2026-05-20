@@ -369,110 +369,158 @@ function SeoTab({ portfolio }: { portfolio: Portfolio }) {
 }
 
 function AnalyticsTab({ portfolio }: { portfolio: Portfolio }) {
+  const week7 = portfolio.weeklyViews.reduce((a, b) => a + b, 0);
+
+  const STATS = [
+    { label: "Total views",      value: portfolio.visits.toLocaleString(), delta: "+12%", up: true  },
+    { label: "Unique visitors",  value: portfolio.uniqueVisitors.toLocaleString(), delta: "+8%", up: true },
+    { label: "Avg session",      value: "2:14",  delta: "+0:22", up: true  },
+    { label: "Inquiries",        value: "7",     delta: "+3",    up: true  },
+  ];
+
+  const INSIGHTS = [
+    {
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+      ),
+      color: "#e1306c",
+      title: "Instagram is your top referrer",
+      body:  "31% of traffic comes from Instagram. Pin your portfolio link in your bio.",
+    },
+    {
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      ),
+      color: "#fad502",
+      title: "Weddings page gets 4× more time",
+      body:  "Visitors spend 4:32 average on /weddings — your strongest content.",
+    },
+    {
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+          <polyline points="17 6 23 6 23 12"/>
+        </svg>
+      ),
+      color: "#34d399",
+      title: "Tuesday is your peak day",
+      body:  `${week7} views last 7 days. Tuesday drives 34% more traffic than average.`,
+    },
+  ];
+
+  const TOP_CONTENT = [
+    { slug: "weddings",  label: "Weddings 2024",  views: Math.round(portfolio.visits * 0.46), seed: "wed2024" },
+    { slug: "portraits", label: "Portraits",       views: Math.round(portfolio.visits * 0.29), seed: "port1"   },
+    { slug: "about",     label: "About",           views: Math.round(portfolio.visits * 0.14), seed: "about1"  },
+    { slug: "contact",   label: "Contact",         views: Math.round(portfolio.visits * 0.07), seed: "cont1"   },
+    { slug: "shop",      label: "Shop",            views: Math.round(portfolio.visits * 0.04), seed: "shop1"   },
+  ];
+  const topMax = TOP_CONTENT[0]!.views;
+
+  const SOURCES = [
+    { label: "Direct",      pct: 42, color: "var(--fg-muted)" },
+    { label: "Instagram",   pct: 31, color: "#e1306c"         },
+    { label: "Google",      pct: 18, color: "#4285f4"         },
+    { label: "Twitter / X", pct:  9, color: "var(--fg-muted)" },
+  ];
+
   return (
     <div className="space-y-5 max-w-4xl">
       <div>
         <h2 className="font-sans font-bold text-[var(--fg)] text-base">Analytics</h2>
         <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
-          Visits, sources, and what's resonating.
+          What's resonating and where visitors come from.
         </p>
       </div>
 
-      {/* Stats row */}
+      {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: "Total visits",     value: portfolio.visits.toLocaleString() },
-          { label: "Unique visitors",  value: portfolio.uniqueVisitors.toLocaleString() },
-          { label: "Pages",            value: String(portfolio.pages) },
-          { label: "Last 7d",          value: portfolio.weeklyViews.reduce((a, b) => a + b, 0).toString() },
-        ].map((stat) => (
-          <div key={stat.label} className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
-            <div className="font-mono text-[10px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{stat.label}</div>
-            <div className="font-sans font-black text-2xl text-[var(--fg)]">{stat.value}</div>
+        {STATS.map((s) => (
+          <div key={s.label} className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
+            <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{s.label}</div>
+            <div className="font-sans font-black text-2xl text-[var(--fg)] mb-1">{s.value}</div>
+            <span className={`inline-flex items-center gap-0.5 font-mono text-[9px] ${s.up ? "text-green-400" : "text-red-400"}`}>
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                {s.up ? <polyline points="18 15 12 9 6 15"/> : <polyline points="6 9 12 15 18 9"/>}
+              </svg>
+              {s.delta} vs last week
+            </span>
           </div>
         ))}
       </div>
 
-      {/* Weekly chart */}
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-        <div className="flex items-center justify-between mb-3">
-          <span className="font-sans font-semibold text-sm text-[var(--fg)]">Page views</span>
-          <span className="font-mono text-xs text-[var(--fg-muted)]">Last 7 days</span>
-        </div>
-        {(() => {
-          const data = portfolio.weeklyViews;
-          const max  = Math.max(...data, 1);
-          const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-          const w = 600; const h = 120;
-          const pts = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - (v / max) * h}`).join(" ");
-          const fillPts = `0,${h} ${pts} ${w},${h}`;
-          return (
-            <div>
-              <svg width="100%" viewBox={`0 0 ${w} ${h + 4}`} className="overflow-visible">
-                <defs>
-                  <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#fad502" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#fad502" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <polygon points={fillPts} fill="url(#chartGrad)" />
-                <polyline points={pts} fill="none" stroke="#fad502" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                {data.map((v, i) => (
-                  <circle key={i} cx={(i / (data.length - 1)) * w} cy={h - (v / max) * h} r="3" fill="#fad502" />
-                ))}
-              </svg>
-              <div className="flex justify-between mt-1">
-                {days.map((d) => <span key={d} className="font-mono text-[9px] text-[var(--fg-muted)]">{d}</span>)}
-              </div>
-            </div>
-          );
-        })()}
+      {/* Insights */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {INSIGHTS.map((ins) => (
+          <div key={ins.title} className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col gap-2">
+            <span style={{ color: ins.color }}>{ins.icon}</span>
+            <p className="font-sans text-sm font-semibold text-[var(--fg)] leading-tight">{ins.title}</p>
+            <p className="font-sans text-xs text-[var(--fg-muted)] leading-relaxed">{ins.body}</p>
+          </div>
+        ))}
       </div>
 
-      {/* Top pages + referrers */}
+      {/* Top content + Traffic sources */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+        {/* Top content with thumbnails */}
         <div className="rounded-xl border border-[var(--border)] overflow-hidden">
           <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--bg-subtle)]">
-            <span className="font-sans font-semibold text-sm text-[var(--fg)]">Top pages</span>
+            <span className="font-sans font-semibold text-sm text-[var(--fg)]">Top content</span>
           </div>
-          {[
-            { page: "Home",      pct: 0.45 },
-            { page: "Portfolio", pct: 0.28 },
-            { page: "About",     pct: 0.14 },
-            { page: "Contact",   pct: 0.08 },
-            { page: "Shop",      pct: 0.05 },
-          ].map((row) => {
-            const views = Math.round(portfolio.visits * row.pct);
-            return (
-              <div key={row.page} className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)] last:border-0">
-                <span className="font-sans text-sm text-[var(--fg)] flex-1">/{row.page.toLowerCase()}</span>
-                <div className="flex items-center gap-3">
-                  <div className="w-24 h-1.5 rounded-full bg-[var(--bg-subtle)] overflow-hidden">
-                    <div className="h-full rounded-full bg-yellow" style={{ width: `${row.pct * 100}%` }} />
-                  </div>
-                  <span className="font-mono text-xs text-[var(--fg-muted)] w-12 text-right">{views}</span>
+          {TOP_CONTENT.map((row) => (
+            <div key={row.slug} className="flex items-center gap-3 px-4 py-2.5 border-b border-[var(--border)] last:border-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://picsum.photos/seed/${row.seed}/60/60?grayscale`}
+                alt=""
+                className="w-8 h-8 rounded-md object-cover shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="font-sans text-xs font-medium text-[var(--fg)] truncate">{row.label}</div>
+                <div className="mt-1 h-1 rounded-full bg-[var(--bg-subtle)] overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-yellow"
+                    style={{ width: `${(row.views / topMax) * 100}%` }}
+                  />
                 </div>
               </div>
-            );
-          })}
-        </div>
-
-        <div className="rounded-xl border border-[var(--border)] overflow-hidden">
-          <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--bg-subtle)]">
-            <span className="font-sans font-semibold text-sm text-[var(--fg)]">Top referrers</span>
-          </div>
-          {[
-            { source: "Direct",      pct: 42 },
-            { source: "Instagram",   pct: 31 },
-            { source: "Google",      pct: 18 },
-            { source: "Twitter / X", pct: 9  },
-          ].map((row) => (
-            <div key={row.source} className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)] last:border-0">
-              <span className="font-sans text-sm text-[var(--fg)] flex-1">{row.source}</span>
-              <span className="font-mono text-xs text-[var(--fg-muted)]">{row.pct}%</span>
+              <span className="font-mono text-[10px] text-[var(--fg-muted)] shrink-0 tabular-nums">
+                {row.views.toLocaleString()}
+              </span>
             </div>
           ))}
         </div>
+
+        {/* Traffic sources */}
+        <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+          <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--bg-subtle)]">
+            <span className="font-sans font-semibold text-sm text-[var(--fg)]">Traffic sources</span>
+          </div>
+          <div className="px-4 py-3 space-y-3">
+            {SOURCES.map((s) => (
+              <div key={s.label}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-sans text-xs text-[var(--fg)]">{s.label}</span>
+                  <span className="font-mono text-[10px] text-[var(--fg-muted)]">{s.pct}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-[var(--bg-subtle)] overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${s.pct}%`, background: s.color }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );
