@@ -33,9 +33,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Header — slides up when scrolling down, reclaims space with
+            negative margin so no blank area is left behind. */}
         <div
-          className={`shrink-0 transition-transform duration-300 ease-in-out ${headerVisible ? "translate-y-0" : "-translate-y-full"}`}
-          style={{ position: "sticky", top: 0, zIndex: 30 }}
+          className="shrink-0 transition-all duration-300 ease-in-out"
+          style={{
+            transform:    headerVisible ? "translateY(0)" : "translateY(-100%)",
+            marginBottom: headerVisible ? 0 : -56,
+          }}
         >
           <DashboardHeader
             onMenuClick={() => setSidebarOpen(true)}
