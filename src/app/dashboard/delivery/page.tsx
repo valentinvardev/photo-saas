@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -243,187 +243,13 @@ function NewDeliveryTile({ onClick }: { onClick: () => void }) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   NEW PAGE MODAL
-══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Delivery onboarding wizard (3 steps) ────────────────────────────── */
-const DELIVERY_STEPS = ["Client", "Access", "Done"] as const;
-
-function StepDots({ current, total }: { current: number; total: number }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      {Array.from({ length: total }).map((_, i) => (
-        <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === current ? "w-5 bg-yellow" : i < current ? "w-2 bg-yellow/50" : "w-2 bg-[var(--border)]"}`} />
-      ))}
-    </div>
-  );
-}
-
-function NewPageModal({ onCreate, onClose }: { onCreate: (title: string, client: string) => void; onClose: () => void }) {
-  const [step, setStep]     = useState(0);
-  const [title, setTitle]   = useState("");
-  const [client, setClient] = useState("");
-  const [mode, setMode]     = useState<"gift" | "direct">("gift");
-  const [access, setAccess] = useState<"public" | "password">("public");
-
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", h);
-    return () => window.removeEventListener("keydown", h);
-  }, [onClose]);
-
-  const canNext = step === 0 ? !!(title.trim() && client.trim()) : true;
-
-  function finish() { onCreate(title.trim(), client.trim()); }
-
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.96, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.96, opacity: 0 }}
-        transition={{ type: "spring", stiffness: 300, damping: 28 }}
-        className="w-full max-w-sm rounded-2xl bg-[var(--bg)] border border-[var(--border)] shadow-2xl overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest">{DELIVERY_STEPS[step]}</span>
-            <StepDots current={step} total={DELIVERY_STEPS.length} />
-          </div>
-          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-          </button>
-        </div>
-
-        {/* Step content */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}
-            transition={{ duration: 0.18 }}
-            className="px-5 py-5 min-h-[220px]"
-          >
-            {step === 0 && (
-              <div className="space-y-4">
-                <div>
-                  <h2 className="font-sans font-black text-[var(--fg)] text-lg mb-0.5">New delivery</h2>
-                  <p className="font-sans text-xs text-[var(--fg-muted)]">Who are you delivering to?</p>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] block mb-1">Gallery title</label>
-                    <input autoFocus value={title} onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Wedding Gallery"
-                      className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-4 py-2.5 outline-none focus:border-yellow transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] block mb-1">Client name</label>
-                    <input value={client} onChange={(e) => setClient(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter" && canNext) setStep(1); }}
-                      placeholder="Sarah & James"
-                      className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-4 py-2.5 outline-none focus:border-yellow transition-colors"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {step === 1 && (
-              <div className="space-y-4">
-                <div>
-                  <h2 className="font-sans font-black text-[var(--fg)] text-lg mb-0.5">Access & pricing</h2>
-                  <p className="font-sans text-xs text-[var(--fg-muted)]">How should your client receive the photos?</p>
-                </div>
-                <div className="space-y-2">
-                  {([
-                    { id: "gift", label: "Gift / Free", desc: "Client downloads at no cost", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg> },
-                    { id: "direct", label: "Direct Sale", desc: "Buy individually or as a bundle", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
-                  ] as { id: "gift" | "direct"; label: string; desc: string; icon: React.ReactNode }[]).map((opt) => (
-                    <button key={opt.id} onClick={() => setMode(opt.id)}
-                      className={`w-full flex items-start gap-3 p-3 rounded-xl border text-left transition-all ${mode === opt.id ? "border-yellow bg-yellow/5" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}
-                    >
-                      <span className={mode === opt.id ? "text-yellow mt-0.5" : "text-[var(--fg-muted)] mt-0.5"}>{opt.icon}</span>
-                      <div>
-                        <div className="font-sans text-sm font-semibold text-[var(--fg)]">{opt.label}</div>
-                        <div className="font-sans text-[11px] text-[var(--fg-muted)]">{opt.desc}</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                <div className="flex gap-2 pt-1">
-                  {([
-                    { id: "public", label: "Public" },
-                    { id: "password", label: "Password protected" },
-                  ] as { id: "public" | "password"; label: string }[]).map((opt) => (
-                    <button key={opt.id} onClick={() => setAccess(opt.id)}
-                      className={`flex-1 py-2 rounded-xl border font-sans text-xs font-medium transition-all ${access === opt.id ? "border-yellow text-[var(--fg)] bg-yellow/5" : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)]"}`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="flex flex-col items-center text-center py-2 gap-4">
-                <div className="w-14 h-14 rounded-full bg-yellow/10 border border-yellow/30 flex items-center justify-center">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="2" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-                <div>
-                  <h2 className="font-sans font-black text-[var(--fg)] text-lg mb-1">Delivery ready!</h2>
-                  <p className="font-sans text-sm text-[var(--fg-muted)]">
-                    <span className="text-[var(--fg)] font-medium">{title}</span> for{" "}
-                    <span className="text-[var(--fg)] font-medium">{client}</span> is set up.<br/>
-                    Add your photos and send the link.
-                  </p>
-                </div>
-                <button onClick={finish} className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 transition-colors">
-                  Add photos & configure →
-                </button>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Footer nav */}
-        {step < 2 && (
-          <div className="px-5 py-4 border-t border-[var(--border)] flex items-center justify-between">
-            <button onClick={() => step > 0 ? setStep(step - 1) : onClose()}
-              className="px-4 py-2 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
-              {step === 0 ? "Cancel" : "← Back"}
-            </button>
-            <button disabled={!canNext} onClick={() => setStep(step + 1)}
-              className="px-5 py-2 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 disabled:opacity-40 transition-colors">
-              {step === 1 ? "Create delivery" : "Continue →"}
-            </button>
-          </div>
-        )}
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════════════════════════════ */
 
 export default function DeliveryPagesPage() {
-  const router = useRouter();
-  const pages = useDeliveryStore((s) => s.pages);
-  const add = useDeliveryStore((s) => s.add);
+  const router   = useRouter();
+  const pages    = useDeliveryStore((s) => s.pages);
   const hydrated = useDeliveryStore((s) => s.hydrated);
-  const [showNew, setShowNew] = useState(false);
-
-  const handleCreate = (title: string, client: string) => {
-    const newPage = add(title, client);
-    setShowNew(false);
-    router.push(`/delivery/edit/${newPage.id}`);
-  };
 
   const counts = {
     active:  pages.filter((p) => p.status === "active").length,
@@ -431,9 +257,10 @@ export default function DeliveryPagesPage() {
     expired: pages.filter((p) => p.status === "expired").length,
   };
 
+  function goNew() { router.push("/dashboard/delivery/new"); }
+
   return (
     <div className="p-6">
-      {/* Header — title + counts only; new-delivery action lives in the grid */}
       <div className="mb-6">
         <h1 className="font-sans font-black text-[var(--fg)] text-xl">Delivery</h1>
         <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">
@@ -443,7 +270,6 @@ export default function DeliveryPagesPage() {
         </p>
       </div>
 
-      {/* Grid */}
       {!hydrated ? (
         <div className="flex items-center justify-center py-32">
           <span className="font-mono text-xs text-[var(--fg-muted)]">Loading…</span>
@@ -455,22 +281,18 @@ export default function DeliveryPagesPage() {
           </div>
           <p className="font-sans font-semibold text-[var(--fg)] mb-1">No delivery pages yet</p>
           <p className="font-serif text-sm text-[var(--fg-muted)] mb-5">Create your first client gallery</p>
-          <button onClick={() => setShowNew(true)} className="btn-primary px-5 py-2.5 rounded-xl font-sans font-bold text-sm">
+          <button onClick={goNew} className="btn-primary px-5 py-2.5 rounded-xl font-sans font-bold text-sm">
             Create delivery
           </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          <NewDeliveryTile onClick={() => setShowNew(true)} />
+          <NewDeliveryTile onClick={goNew} />
           {pages.map((p) => (
             <DeliveryCard key={p.id} page={p} />
           ))}
         </div>
       )}
-
-      <AnimatePresence>
-        {showNew && <NewPageModal onCreate={handleCreate} onClose={() => setShowNew(false)} />}
-      </AnimatePresence>
     </div>
   );
 }
