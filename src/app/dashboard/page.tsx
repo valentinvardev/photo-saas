@@ -3,6 +3,31 @@
 import Link from "next/link";
 import { useState } from "react";
 
+/* ── Plan tier badge ── */
+const TIER_CONFIG = {
+  bronze: { label: "Bronze", color: "#cd7f32", glow: "#cd7f3240",
+    icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> },
+  silver: { label: "Silver", color: "#a8a8b3", glow: "#a8a8b340",
+    icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> },
+  gold:   { label: "Gold",   color: "#fad502", glow: "#fad50240",
+    icon: <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> },
+} as const;
+
+type PlanTier = keyof typeof TIER_CONFIG;
+
+function PlanBadge({ tier }: { tier: PlanTier }) {
+  const t = TIER_CONFIG[tier];
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border"
+      style={{ color: t.color, borderColor: `${t.color}40`, background: t.glow }}
+    >
+      {t.icon}
+      {t.label}
+    </span>
+  );
+}
+
 /* ── Icons ── */
 function Ico({ d, sw = 1.6 }: { d: React.ReactNode; sw?: number }) {
   return (
@@ -120,9 +145,7 @@ export default function DashboardHomePage() {
       {/* ── Greeting ──────────────────────────────────────────────────── */}
       <section>
         <div className="flex items-center gap-2 mb-2">
-          <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-yellow">
-            <span className="w-1.5 h-1.5 rounded-full bg-yellow" />Pro plan
-          </span>
+          <PlanBadge tier="gold" />
         </div>
         <h1 className="font-sans text-2xl sm:text-3xl font-bold text-[var(--fg)] tracking-tight">
           Welcome back, <span className="text-[var(--fg)]">Sofia</span>.

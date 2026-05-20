@@ -219,7 +219,7 @@ function DragOverlay({
 }
 
 /* ── Full-screen lightbox ── */
-function ImageModal({ files, index, onIndex, onClose, onDelete, onShare }: { files: GFile[]; index: number; onIndex: (i: number) => void; onClose: () => void; onDelete: (f: GFile) => void; onShare: (f: GFile) => void }) {
+function ImageModal({ files, index, onIndex, onClose, onDelete, onShare, onDownload }: { files: GFile[]; index: number; onIndex: (i: number) => void; onClose: () => void; onDelete: (f: GFile) => void; onShare: (f: GFile) => void; onDownload: (f: GFile) => void }) {
   const file = files[index]!;
   const [zoom, setZoom]             = useState(1);
   const [offset, setOffset]         = useState({ x: 0, y: 0 });
@@ -290,7 +290,7 @@ function ImageModal({ files, index, onIndex, onClose, onDelete, onShare }: { fil
         <div className="flex items-center gap-1 pointer-events-auto">
           <button onClick={() => onShare(file)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"><I.Share /></button>
           <button onClick={() => onDelete(file)} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-red-400 hover:bg-white/10 transition-colors"><I.Trash /></button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-sans font-medium transition-colors ml-1"><I.Download /> Download</button>
+          <button onClick={() => onDownload(file)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-sans font-medium transition-colors ml-1"><I.Download /> Download</button>
         </div>
       </div>
 
@@ -345,6 +345,38 @@ function ImageModal({ files, index, onIndex, onClose, onDelete, onShare }: { fil
       </div>
     </motion.div>
   );
+}
+
+/* ── Smart download ──────────────────────────────────────────────────────
+   On iOS Safari, the `download` attribute on <a> is ignored for cross-
+   origin URLs. The native "Save to Photos" flow is triggered by fetching
+   the image as a blob and opening it in a new tab — iOS shows its own
+   share/save sheet. On all other browsers we do a standard blob download.
+──────────────────────────────────────────────────────────────────────── */
+async function smartDownload(url: string, filename: string) {
+  const isIOS = /iphone|ipad|ipod/i.test(
+    typeof navigator !== "undefined" ? navigator.userAgent : ""
+  );
+
+  try {
+    const res  = await fetch(url);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+
+    if (isIOS) {
+      // Open blob URL in new tab — iOS Safari shows "Save to Photos" sheet
+      window.open(blobUrl, "_blank");
+    } else {
+      const a = document.createElement("a");
+      a.href     = blobUrl;
+      a.download = filename;
+      a.click();
+    }
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+  } catch {
+    // Fallback: open original URL in new tab
+    window.open(url, "_blank");
+  }
 }
 
 /* ── Share modal ── */
@@ -938,7 +970,10 @@ export default function GalleryPage() {
               className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"
             ><I.Share /> Share</button>
             <button className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"><I.Move /> Move</button>
-            <button className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"><I.Download /> Download</button>
+            <button
+              onClick={() => filtered.filter((f) => selected.has(f.id)).forEach((f) => smartDownload(`https://picsum.photos/seed/${f.seed}/2000/1500`, f.name))}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-[var(--fg)] hover:bg-[var(--bg-subtle)] rounded-lg transition-colors"
+            ><I.Download /> Download</button>
             <button className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-sans font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><I.Trash /> Delete</button>
             <div className="w-px h-4 bg-[var(--border)]" />
             <button onClick={clearSel} className="w-7 h-7 flex items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] rounded-lg transition-colors"><I.Close /></button>
@@ -983,6 +1018,7 @@ export default function GalleryPage() {
             onClose={() => setPreviewIdx(null)}
             onDelete={(f) => setDeleteTarget(f)}
             onShare={(f) => setShareFiles([f])}
+            onDownload={(f) => smartDownload(`https://picsum.photos/seed/${f.seed}/2000/1500`, f.name)}
           />
         )}
       </AnimatePresence>

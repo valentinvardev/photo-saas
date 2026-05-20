@@ -124,10 +124,26 @@ function PortfolioCard({ p }: { p: Portfolio }) {
 }
 
 /* ── New portfolio modal ── */
+/* ── Portfolio onboarding wizard (4 steps) ──────────────────────────── */
+const PORTFOLIO_STEPS = ["Name", "Template", "Domain", "Done"] as const;
+
+function StepDots({ current, total }: { current: number; total: number }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      {Array.from({ length: total }).map((_, i) => (
+        <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === current ? "w-5 bg-yellow" : i < current ? "w-2 bg-yellow/50" : "w-2 bg-[var(--border)]"}`} />
+      ))}
+    </div>
+  );
+}
+
 function NewPortfolioModal({ onClose }: { onClose: () => void }) {
   const router = useRouter();
+  const [step, setStep]         = useState(0);
   const [name, setName]         = useState("");
   const [template, setTemplate] = useState(TEMPLATES[0]!);
+  const [domain, setDomain]     = useState<"free" | "custom">("free");
+  const [customDomain, setCustomDomain] = useState("");
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -136,12 +152,12 @@ function NewPortfolioModal({ onClose }: { onClose: () => void }) {
     return () => { window.removeEventListener("keydown", handler); document.body.style.overflow = ""; };
   }, [onClose]);
 
-  function create() {
-    /* For the mock dashboard we just route to portfolio "1" — wire to a real
-       store later. */
+  function finish() {
     onClose();
     router.push("/dashboard/portfolio/1");
   }
+
+  const canNext = step === 0 ? !!name.trim() : true;
 
   return (
     <motion.div
@@ -155,51 +171,144 @@ function NewPortfolioModal({ onClose }: { onClose: () => void }) {
         className="w-full max-w-md rounded-2xl bg-[var(--bg)] border border-[var(--border)] shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-5 border-b border-[var(--border)] flex items-center justify-between">
-          <h3 className="font-sans font-black text-[var(--fg)] text-lg">New portfolio</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-[var(--border)] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest">{PORTFOLIO_STEPS[step]}</span>
+            <StepDots current={step} total={PORTFOLIO_STEPS.length} />
+          </div>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
         </div>
-        <div className="px-6 py-5 space-y-4">
-          <div>
-            <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">Name</label>
-            <input
-              autoFocus value={name} onChange={(e) => setName(e.target.value)}
-              placeholder="My new portfolio"
-              className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] rounded-lg px-4 py-3 outline-none focus:border-yellow transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">Starting template</label>
-            <div className="grid grid-cols-3 gap-2">
-              {TEMPLATES.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTemplate(t)}
-                  className={`p-2 rounded-lg border text-left transition-all ${template === t ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}
-                >
-                  <div className="aspect-[16/10] rounded-md overflow-hidden bg-[var(--bg-subtle)] mb-2">
-                    {TEMPLATE_URL[t] && <LivePreviewThumbnail url={TEMPLATE_URL[t]!} baseWidth={1280} className="w-full h-full" />}
-                  </div>
-                  <span className="font-sans text-[11px] font-semibold text-[var(--fg)]">{t}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="px-6 py-4 border-t border-[var(--border)] flex gap-2 justify-end">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
-            Cancel
-          </button>
-          <button
-            disabled={!name.trim()}
-            onClick={create}
-            className="px-5 py-2 rounded-lg bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 disabled:opacity-40 transition-colors"
+
+        {/* Step content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.18 }}
+            className="px-6 py-6 min-h-[240px]"
           >
-            Create &amp; configure
-          </button>
-        </div>
+            {step === 0 && (
+              <div className="space-y-3">
+                <h2 className="font-sans font-black text-[var(--fg)] text-xl">Name your portfolio</h2>
+                <p className="font-sans text-sm text-[var(--fg-muted)]">This is how it'll appear in your dashboard and in the browser tab.</p>
+                <input
+                  autoFocus value={name} onChange={(e) => setName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && name.trim()) setStep(1); }}
+                  placeholder="Sofia Chen Photography"
+                  className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-4 py-3 outline-none focus:border-yellow transition-colors mt-2"
+                />
+              </div>
+            )}
+
+            {step === 1 && (
+              <div className="space-y-3">
+                <h2 className="font-sans font-black text-[var(--fg)] text-xl">Pick a template</h2>
+                <p className="font-sans text-sm text-[var(--fg-muted)]">You can change this later. Choose what feels closest to your style.</p>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {TEMPLATES.map((t) => (
+                    <button key={t} onClick={() => setTemplate(t)}
+                      className={`p-2 rounded-xl border text-left transition-all ${template === t ? "border-yellow ring-2 ring-yellow/20 bg-yellow/5" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}
+                    >
+                      <div className="aspect-video rounded-lg overflow-hidden bg-[var(--bg-subtle)] mb-2">
+                        {TEMPLATE_URL[t] && <LivePreviewThumbnail url={TEMPLATE_URL[t]!} baseWidth={1280} className="w-full h-full" />}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-sans text-xs font-semibold text-[var(--fg)]">{t}</span>
+                        {template === t && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-3">
+                <h2 className="font-sans font-black text-[var(--fg)] text-xl">Choose your domain</h2>
+                <p className="font-sans text-sm text-[var(--fg-muted)]">Start free, upgrade to a custom domain any time.</p>
+                <div className="flex flex-col gap-2 mt-2">
+                  <button onClick={() => setDomain("free")}
+                    className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all ${domain === "free" ? "border-yellow bg-yellow/5" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}
+                  >
+                    <div className={`mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${domain === "free" ? "border-yellow" : "border-[var(--fg-muted)]"}`}>
+                      {domain === "free" && <div className="w-2 h-2 rounded-full bg-yellow" />}
+                    </div>
+                    <div>
+                      <div className="font-sans text-sm font-semibold text-[var(--fg)]">Free subdomain</div>
+                      <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">sofia.portapic.app</div>
+                    </div>
+                  </button>
+                  <button onClick={() => setDomain("custom")}
+                    className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all ${domain === "custom" ? "border-yellow bg-yellow/5" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}
+                  >
+                    <div className={`mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${domain === "custom" ? "border-yellow" : "border-[var(--fg-muted)]"}`}>
+                      {domain === "custom" && <div className="w-2 h-2 rounded-full bg-yellow" />}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-sans text-sm font-semibold text-[var(--fg)]">Custom domain</span>
+                        <span className="font-mono text-[9px] bg-yellow/10 text-yellow border border-yellow/20 px-1.5 py-0.5 rounded uppercase tracking-wider">Gold</span>
+                      </div>
+                      <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">yourdomain.com</div>
+                      {domain === "custom" && (
+                        <input value={customDomain} onChange={(e) => setCustomDomain(e.target.value)}
+                          placeholder="yourdomain.com"
+                          className="mt-2 w-full font-mono text-xs text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2 outline-none focus:border-yellow transition-colors"
+                        />
+                      )}
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="flex flex-col items-center text-center py-4 gap-4">
+                <div className="w-14 h-14 rounded-full bg-yellow/10 border border-yellow/30 flex items-center justify-center">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="2" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                </div>
+                <div>
+                  <h2 className="font-sans font-black text-[var(--fg)] text-xl mb-1">Ready to go!</h2>
+                  <p className="font-sans text-sm text-[var(--fg-muted)]">
+                    <span className="text-[var(--fg)] font-medium">{name}</span> is set up with the {template} template.
+                    Open the editor to add photos and go live.
+                  </p>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <button onClick={() => navigator.share?.({ url: window.location.href }).catch(() => {})} className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    Share
+                  </button>
+                  <button onClick={finish} className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 transition-colors">
+                    Open editor →
+                  </button>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Footer nav */}
+        {step < 3 && (
+          <div className="px-6 py-4 border-t border-[var(--border)] flex items-center justify-between">
+            <button
+              onClick={() => step > 0 ? setStep(step - 1) : onClose()}
+              className="px-4 py-2 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+            >
+              {step === 0 ? "Cancel" : "← Back"}
+            </button>
+            <button
+              disabled={!canNext}
+              onClick={() => setStep(step + 1)}
+              className="px-5 py-2 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 disabled:opacity-40 transition-colors"
+            >
+              {step === 2 ? "Create portfolio" : "Continue →"}
+            </button>
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );
