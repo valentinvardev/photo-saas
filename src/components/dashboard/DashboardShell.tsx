@@ -32,14 +32,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen overflow-hidden bg-[var(--bg)]">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header — collapses height to 0 when scrolling down so the
-            layout never shifts and the scroll container keeps its size. */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        {/* Header — absolutely positioned so it never affects layout.
+            Fades out on scroll-down, fades back in on scroll-up.
+            pointerEvents:none when invisible so clicks pass through. */}
         <div
-          className="shrink-0 overflow-hidden"
+          className="absolute top-0 left-0 right-0 z-30"
           style={{
-            height: headerVisible ? 56 : 0,
-            transition: "height 250ms ease-in-out",
+            opacity:       headerVisible ? 1 : 0,
+            pointerEvents: headerVisible ? "auto" : "none",
+            transition:    "opacity 200ms ease-in-out",
           }}
         >
           <DashboardHeader
@@ -50,7 +52,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="flex-1 flex min-h-0">
-          <main className="flex-1 overflow-y-auto" onScroll={onScroll}>
+          {/* pt-14 = 56px permanent spacer so content starts below the header */}
+          <main className="flex-1 overflow-y-auto pt-14" onScroll={onScroll}>
             {children}
           </main>
 
