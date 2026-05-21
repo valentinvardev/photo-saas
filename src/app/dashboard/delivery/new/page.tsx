@@ -312,7 +312,7 @@ export default function NewDeliveryPage() {
                 transition={{ duration: 0.2 }}
                 className="hidden lg:block"
               >
-                <RightPanel />
+                {RightPanel()}
               </motion.div>
             </AnimatePresence>
           </div>
