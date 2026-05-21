@@ -7,23 +7,27 @@ import { motion, AnimatePresence } from "framer-motion";
 /* ── Cover photo ── */
 function CoverUpload() {
   return (
-    <div className="relative group h-36 sm:h-44 overflow-hidden bg-[var(--bg-subtle)] rounded-xl border border-[var(--border)] cursor-pointer">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="https://picsum.photos/seed/sofiacover/1400/400?grayscale"
-        alt=""
-        className="w-full h-full object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
-        <span className="flex items-center gap-2 font-sans text-xs font-semibold text-white bg-black/50 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-lg">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          Change cover
-        </span>
+    /* Outer wrapper is NOT overflow-hidden so the avatar can spill below */
+    <div className="relative pb-8">
+      {/* Cover — has its own overflow-hidden for the image */}
+      <div className="relative group h-36 sm:h-44 overflow-hidden bg-[var(--bg-subtle)] rounded-xl border border-[var(--border)] cursor-pointer">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://picsum.photos/seed/sofiacover/1400/400?grayscale"
+          alt=""
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
+          <span className="flex items-center gap-2 font-sans text-xs font-semibold text-white bg-black/50 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-lg">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Change cover
+          </span>
+        </div>
       </div>
 
-      {/* Avatar — overlapping bottom */}
-      <div className="absolute bottom-0 left-6 translate-y-1/2">
+      {/* Avatar — positioned on outer wrapper so it overflows the cover boundary */}
+      <div className="absolute bottom-0 left-6">
         <div className="relative group/avatar w-16 h-16 rounded-full bg-yellow ring-4 ring-[var(--bg-card)] flex items-center justify-center shadow-lg cursor-pointer">
           <span className="font-sans font-black text-[#111] text-2xl">S</span>
           <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
@@ -96,11 +100,7 @@ export default function ProfilePage() {
       </div>
 
       {/* ── Cover + avatar ── */}
-      <div>
-        <CoverUpload />
-        {/* Spacer for avatar overlap */}
-        <div className="h-10" />
-      </div>
+      <CoverUpload />
 
       {/* ── Identity ── */}
       <Section title="Public profile">
