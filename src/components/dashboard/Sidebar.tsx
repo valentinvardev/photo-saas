@@ -184,7 +184,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       {/* Logo */}
       <div className="flex items-center justify-between px-4 py-5 border-b border-[var(--border)]">
         <Link href="/" className="flex items-center" aria-label="Portapic home">
-          <Logo priority />
+          <Logo height={34} priority />
         </Link>
         {onClose && (
           <button onClick={onClose} className="lg:hidden p-1 text-[var(--fg-muted)] hover:text-[var(--fg)]">
