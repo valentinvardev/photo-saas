@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "~/components/ui/Logo";
@@ -81,7 +81,8 @@ function fmt(n: number) {
 }
 
 /* ── Main page ───────────────────────────────────────────────── */
-export default function PublicProfilePage({ params }: { params: { username: string } }) {
+export default function PublicProfilePage({ params }: { params: Promise<{ username: string }> }) {
+  const { username: _username } = use(params);
   const [tab, setTab]     = useState<"works" | "about">("works");
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(247);
