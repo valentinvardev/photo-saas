@@ -160,8 +160,8 @@ export default function PortfolioPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          <NewPortfolioTile onClick={goNew} />
           {MOCK_PORTFOLIOS.map((p) => <PortfolioCard key={p.id} p={p} />)}
+          <NewPortfolioTile onClick={goNew} />
         </div>
       )}
     </div>
