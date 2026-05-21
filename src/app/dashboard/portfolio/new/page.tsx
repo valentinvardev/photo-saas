@@ -46,69 +46,62 @@ function PickerGrid({
 
   return (
     <div>
-      <div
-        className="grid gap-[3px]"
-        style={{ gridTemplateColumns: "repeat(4, 1fr)" }}
-      >
-        {/* Folder tiles — span 2 cols */}
+      {/* All tiles same size — no col-span mixing */}
+      <div className="grid grid-cols-4 gap-[3px]">
+
         {MOCK_FOLDERS.map((folder) => {
           const on = selectedFolders.has(folder.id);
-          const previewSeeds = folder.seeds.slice(0, 4);
           return (
             <button
               key={folder.id}
               onClick={() => onToggleFolder(folder.id)}
-              className={`relative overflow-hidden transition-all col-span-2 ${
+              className={`relative aspect-[4/3] overflow-hidden transition-all ${
                 on ? "ring-2 ring-yellow ring-inset" : "hover:opacity-90"
               }`}
-              style={{ aspectRatio: "8/3" }}
             >
               {/* 2×2 photo collage */}
-              <div className="absolute inset-0 grid grid-cols-2 gap-[2px]">
-                {previewSeeds.map((seed, i) => (
+              <div className="absolute inset-0 grid grid-cols-2 gap-[1px]">
+                {folder.seeds.slice(0, 4).map((seed, i) => (
                   /* eslint-disable-next-line @next/next/no-img-element */
-                  <img key={i} src={`https://picsum.photos/seed/${seed}/200/150?grayscale`} alt="" className="w-full h-full object-cover" draggable={false} />
+                  <img key={i} src={`https://picsum.photos/seed/${seed}/120/90?grayscale`} alt="" className="w-full h-full object-cover" draggable={false} />
                 ))}
               </div>
-              {/* Folder label overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-2 gap-1.5">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" className="shrink-0 mb-px"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-                <span className="font-sans text-[11px] font-semibold text-white truncate">{folder.name}</span>
-                <span className="font-mono text-[9px] text-white/60 ml-auto shrink-0">{folder.seeds.length}</span>
+              {/* Folder name overlay */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-1 flex items-center gap-1">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                <span className="font-sans text-[9px] font-semibold text-white truncate">{folder.name}</span>
+                <span className="font-mono text-[8px] text-white/50 ml-auto shrink-0">{folder.seeds.length}</span>
               </div>
               {on && (
-                <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-yellow flex items-center justify-center">
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="3.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-yellow flex items-center justify-center">
+                  <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="4" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
                 </div>
               )}
             </button>
           );
         })}
 
-        {/* Standalone photo tiles */}
         {STANDALONE.map((ph) => {
           const on = selectedPhotos.has(ph.id);
           return (
             <button
               key={ph.id}
               onClick={() => onTogglePhoto(ph.id)}
-              className={`relative overflow-hidden transition-all ${
+              className={`relative aspect-[4/3] overflow-hidden transition-all ${
                 on ? "ring-2 ring-yellow ring-inset" : "hover:opacity-90"
               }`}
-              style={{ aspectRatio: "4/3" }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={`https://picsum.photos/seed/${ph.seed}/300/225?grayscale`} alt="" className="w-full h-full object-cover" draggable={false} />
               {on && (
-                <div className="absolute inset-0 bg-yellow/15 flex items-start justify-end p-1">
-                  <div className="w-4 h-4 rounded-full bg-yellow flex items-center justify-center">
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="3.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-                  </div>
+                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-yellow flex items-center justify-center">
+                  <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="4" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
                 </div>
               )}
             </button>
           );
         })}
+
       </div>
 
       <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-2">
