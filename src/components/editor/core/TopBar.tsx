@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useStore } from "zustand";
 import { useEditorStore } from "~/lib/editor/store";
 import { saveState } from "~/lib/editor/localStorage";
@@ -86,13 +87,31 @@ export function TopBar() {
   const { nodes, palette, typography, logo, reset, viewport, setViewport } = useEditorStore();
   const { undo, redo, pastStates, futureStates } = useStore(useEditorStore.temporal);
   const { theme, toggle } = useEditorTheme();
+  const router = useRouter();
+  const [showExitModal, setShowExitModal] = useState(false);
 
   const canUndo = pastStates.length > 0;
   const canRedo = futureStates.length > 0;
+  const hasChanges = pastStates.length > 0;
+
+  function handleBack() {
+    if (hasChanges) setShowExitModal(true);
+    else router.push("/dashboard/templates");
+  }
+
+  function handleSaveAndExit() {
+    saveState({ nodes, palette, typography, logo });
+    router.push("/dashboard/templates");
+  }
+
+  function handleDiscard() {
+    router.push("/dashboard/templates");
+  }
 
   const divider = <div style={{ width: 1, height: 18, background: "var(--ec-border)", margin: "0 2px" }} />;
 
   return (
+    <>
     <header
       style={{
         height: "var(--ed-topbar-h)",
@@ -107,12 +126,13 @@ export function TopBar() {
       }}
     >
       {/* Back */}
-      <Link
-        href="/dashboard/templates"
-        style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 4, textDecoration: "none", color: "var(--ec-sub)" }}
+      <button
+        onClick={handleBack}
+        title="Back to dashboard"
+        style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 4, background: "none", border: "none", cursor: "pointer", color: "var(--ec-sub)", padding: "4px 5px", borderRadius: 3 }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </Link>
+      </button>
 
       {/* Logo */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 6 }}>
@@ -211,5 +231,80 @@ export function TopBar() {
         <SaveIcon /> Save
       </button>
     </header>
+
+      {/* Exit confirmation modal */}
+      {showExitModal && (
+        <div
+          style={{
+            position: "fixed", inset: 0, zIndex: 9999,
+            background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)",
+            display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
+          }}
+          onClick={() => setShowExitModal(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "var(--ec-bg)",
+              border: "1px solid var(--ec-border)",
+              borderRadius: 14,
+              width: "100%", maxWidth: 360,
+              boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
+              overflow: "hidden",
+            }}
+          >
+            {/* Header */}
+            <div style={{ padding: "20px 22px 16px", borderBottom: "1px solid var(--ec-line)" }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: "var(--ec-text)", margin: 0 }}>
+                Unsaved changes
+              </p>
+              <p style={{ fontSize: 12, color: "var(--ec-muted)", marginTop: 4, lineHeight: 1.5 }}>
+                You have unsaved changes. Do you want to save them before leaving?
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div style={{ padding: "14px 22px 18px", display: "flex", flexDirection: "column", gap: 8 }}>
+              {/* Save & exit — primary */}
+              <button
+                onClick={handleSaveAndExit}
+                style={{
+                  width: "100%", padding: "9px 16px", borderRadius: 8,
+                  background: "#facc15", border: "none", cursor: "pointer",
+                  fontSize: 13, fontWeight: 700, color: "#111",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                }}
+              >
+                <SaveIcon /> Save & exit
+              </button>
+
+              {/* Don't save */}
+              <button
+                onClick={handleDiscard}
+                style={{
+                  width: "100%", padding: "9px 16px", borderRadius: 8,
+                  background: "none", border: "1px solid var(--ec-border)", cursor: "pointer",
+                  fontSize: 13, fontWeight: 500, color: "var(--ec-label)",
+                }}
+              >
+                Don't save
+              </button>
+
+              {/* Cancel */}
+              <button
+                onClick={() => setShowExitModal(false)}
+                style={{
+                  width: "100%", padding: "7px 16px", borderRadius: 8,
+                  background: "none", border: "none", cursor: "pointer",
+                  fontSize: 12, color: "var(--ec-dim)",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
