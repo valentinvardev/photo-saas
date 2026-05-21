@@ -1,0 +1,410 @@
+{
+  "common": {
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "saved": "Guardado",
+    "cancel": "Cancelar",
+    "back": "Volver",
+    "continue": "Continuar →",
+    "delete": "Eliminar",
+    "remove": "Quitar",
+    "edit": "Editar",
+    "preview": "Vista previa",
+    "publish": "Publicar",
+    "unpublish": "Despublicar",
+    "loading": "Cargando…",
+    "search": "Buscar",
+    "close": "Cerrar",
+    "create": "Crear",
+    "skip": "Omitir por ahora",
+    "reset": "Restablecer",
+    "upload": "Subir",
+    "confirm": "Confirmar",
+    "discard": "Descartar",
+    "manage": "Gestionar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "openInNewTab": "Abrir en nueva pestaña",
+    "noResults": "Sin resultados",
+    "optional": "Opcional",
+    "required": "Obligatorio",
+    "or": "o",
+    "and": "y",
+    "free": "Gratis",
+    "pro": "Pro"
+  },
+
+  "time": {
+    "morning": "mañana",
+    "afternoon": "tarde",
+    "evening": "noche",
+    "justNow": "Justo ahora",
+    "daysAgo": "hace {n} días",
+    "hoursAgo": "hace {n} horas"
+  },
+
+  "nav": {
+    "dashboard": "Inicio",
+    "gallery": "Galería",
+    "portfolio": "Portafolio",
+    "delivery": "Entrega",
+    "links": "Enlaces",
+    "templates": "Plantillas",
+    "domain": "Dominio",
+    "profile": "Perfil",
+    "settings": "Ajustes",
+    "storage": "Almacenamiento"
+  },
+
+  "dashboard": {
+    "greeting": "Buenos {timeOfDay}, {name}",
+    "plan": {
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro",
+      "active": "Activo",
+      "renews": "Se renueva el {date} · {price} / mes",
+      "manage": "Gestionar plan"
+    },
+    "stats": {
+      "storageUsed": "Almacenamiento usado",
+      "portfolioViews": "Visitas al portafolio",
+      "thisMonth": "este mes",
+      "balance": "Saldo",
+      "available": "disponible"
+    }
+  },
+
+  "gallery": {
+    "title": "Galería",
+    "upload": "Subir",
+    "selectMode": "Seleccionar",
+    "selectAll": "Todos",
+    "selectNone": "Ninguno",
+    "selected": "{n} seleccionados",
+    "download": "Descargar",
+    "share": "Compartir",
+    "delete": "Eliminar",
+    "move": "Mover a carpeta",
+    "newFolder": "Nueva carpeta",
+    "folderName": "Nombre de carpeta",
+    "renameFolderPlaceholder": "Boda 2024",
+    "views": {
+      "grid": "Cuadrícula",
+      "list": "Lista"
+    },
+    "search": "Buscar archivos",
+    "storage": "Almacenamiento",
+    "deleteConfirmTitle": "¿Eliminar {count, plural, one {1 archivo} other {{count} archivos}}?",
+    "deleteConfirmBody": "Esta acción no se puede deshacer.",
+    "deletePhoto": "¿Eliminar esta foto?",
+    "lightbox": {
+      "download": "Descargar",
+      "share": "Compartir",
+      "delete": "Eliminar",
+      "zoom": "Zoom",
+      "prev": "Anterior",
+      "next": "Siguiente"
+    },
+    "share": {
+      "title": "Compartir fotos",
+      "linkExpiry": "El enlace expira en {n} días",
+      "copyLink": "Copiar enlace",
+      "sendEmail": "Enviar por correo",
+      "copied": "¡Copiado!"
+    },
+    "empty": {
+      "title": "Aún no hay archivos",
+      "body": "Sube tus primeras fotos para empezar."
+    }
+  },
+
+  "portfolio": {
+    "title": "Portafolio",
+    "new": "Nuevo portafolio",
+    "published": "Publicado",
+    "draft": "Borrador",
+    "visits": "{n} visitas",
+    "empty": {
+      "title": "Aún no hay portafolios",
+      "body": "Crea tu primer sitio web de portafolio."
+    },
+    "wizard": {
+      "steps": {
+        "nameAndPhotos": "Nombre y fotos",
+        "structure": "Estructura",
+        "template": "Plantilla",
+        "domain": "Dominio",
+        "done": "Listo"
+      },
+      "name": {
+        "title": "Nombre tu portafolio",
+        "body": "Así aparecerá en tu panel y en la pestaña del navegador.",
+        "placeholder": "Fotografía de Sofía Chen"
+      },
+      "photos": {
+        "title": "Agrega algunas fotos",
+        "body": "Elige de tu galería para poblar el portafolio de inmediato.",
+        "selected": "{folders, plural, =0 {} one {1 carpeta} other {{folders} carpetas}}{sep}{photos, plural, =0 {} one {1 foto} other {{photos} fotos}} seleccionadas",
+        "hint": "Selecciona carpetas o fotos individuales — puedes agregar más después"
+      },
+      "structure": {
+        "title": "Confirmar estructura",
+        "body": "Revisa cómo se organizará tu portafolio. Puedes reorganizarlo en cualquier momento en el editor.",
+        "skip": "Omitir por ahora",
+        "confirm": "Confirmar →",
+        "unsorted": "Fotos sin clasificar"
+      },
+      "template": {
+        "title": "Elige una plantilla",
+        "body": "Selecciona la que más se acerque a tu estilo.",
+        "browse": "Ver todas las plantillas",
+        "preview": "Vista previa en vivo",
+        "previewBody": "Mostrando {template} — se actualiza al elegir.",
+        "fullPreview": "Vista previa completa"
+      },
+      "domain": {
+        "title": "Elige tu dominio",
+        "body": "Comienza gratis, mejora cuando quieras.",
+        "free": "Subdominio gratuito",
+        "custom": "Dominio personalizado",
+        "yourAddress": "Tu dirección",
+        "ssl": "SSL seguro · Gratis para siempre"
+      },
+      "done": {
+        "title": "¡Listo para empezar!",
+        "body": "{name} está configurado con la plantilla {template}.",
+        "openEditor": "Abrir editor →",
+        "goToPortfolio": "Ir al portafolio"
+      },
+      "create": "Crear portafolio",
+      "cancel": "Cancelar"
+    },
+    "content": {
+      "title": "Contenido",
+      "folders": "{n, plural, one {1 carpeta} other {{n} carpetas}}",
+      "photos": "{n, plural, one {1 foto} other {{n} fotos}}",
+      "newFolder": "Nueva carpeta",
+      "noFolders": "Aún no hay carpetas",
+      "noFoldersBody": "Haz clic en "Nueva carpeta" para crear la primera.",
+      "addPhotos": "Agregar",
+      "deleteFolder": "¿Eliminar carpeta "{name}"?",
+      "visibility": "Cambiar visibilidad"
+    },
+    "analytics": {
+      "title": "Analíticas",
+      "subtitle": "Qué funciona y de dónde vienen tus visitantes.",
+      "totalViews": "Visitas totales",
+      "uniqueVisitors": "Visitantes únicos",
+      "avgSession": "Sesión promedio",
+      "inquiries": "Consultas",
+      "vsLastWeek": "vs. la semana pasada",
+      "topContent": "Contenido más visto",
+      "trafficSources": "Fuentes de tráfico"
+    },
+    "settings": {
+      "passwordProtection": "Protección con contraseña",
+      "passwordProtectionHint": "Los visitantes necesitan una contraseña para ver este portafolio.",
+      "dangerZone": "Zona de peligro",
+      "deletePortfolio": "Eliminar portafolio",
+      "deleteConfirm": "¿Eliminar "{name}"? Esta acción no se puede deshacer."
+    }
+  },
+
+  "delivery": {
+    "title": "Entrega",
+    "new": "Nueva entrega",
+    "active": "Activa",
+    "draft": "Borrador",
+    "expired": "Expirada",
+    "copyLink": "Copiar enlace",
+    "copied": "Copiado",
+    "edit": "Editar",
+    "empty": {
+      "title": "Aún no hay páginas de entrega",
+      "body": "Crea tu primera galería para clientes."
+    },
+    "wizard": {
+      "steps": {
+        "clientAndPhotos": "Cliente y fotos",
+        "access": "Acceso",
+        "done": "Listo"
+      },
+      "client": {
+        "title": "Nueva entrega",
+        "subtitle": "¿A quién le estás entregando?",
+        "galleryTitle": "Título de la galería",
+        "galleryTitlePlaceholder": "Galería de la boda",
+        "clientName": "Nombre del cliente",
+        "clientNamePlaceholder": "Sara y Javier"
+      },
+      "photos": {
+        "title": "Seleccionar fotos para entregar",
+        "body": "Elige de tu galería. Puedes agregar o quitar fotos después.",
+        "selected": "{folders, plural, =0 {} one {1 carpeta} other {{folders} carpetas}}{sep}{photos, plural, =0 {} one {1 foto} other {{photos} fotos}} seleccionadas",
+        "hint": "Selecciona carpetas o fotos individuales para esta entrega"
+      },
+      "access": {
+        "title": "Acceso y precios",
+        "subtitle": "¿Cómo recibirá las fotos tu cliente?",
+        "gift": "Regalo / Gratis",
+        "giftDesc": "El cliente descarga sin costo",
+        "direct": "Venta directa",
+        "directDesc": "Compra individual o en paquete",
+        "public": "Público",
+        "password": "Protegido con contraseña",
+        "preview": "Lo que ve tu cliente"
+      },
+      "done": {
+        "title": "¡Entrega lista!",
+        "body": "{title} para {client} está configurada.",
+        "configure": "Agregar fotos y configurar →"
+      },
+      "create": "Crear entrega",
+      "cancel": "Cancelar"
+    },
+    "editor": {
+      "back": "Volver",
+      "save": "Guardar",
+      "saved": "Guardado",
+      "exit": {
+        "title": "Cambios sin guardar",
+        "body": "Tienes cambios sin guardar. ¿Deseas guardarlos antes de salir?",
+        "saveAndExit": "Guardar y salir",
+        "dontSave": "No guardar",
+        "cancel": "Cancelar"
+      }
+    }
+  },
+
+  "domain": {
+    "title": "Dominio",
+    "subtitle": "Gestiona la dirección donde vive tu sitio.",
+    "yourDomains": "Tus dominios",
+    "addCustom": "+ Agregar dominio personalizado",
+    "free": "Gratis",
+    "custom": "Personalizado",
+    "active": "Activo",
+    "pendingDns": "DNS pendiente",
+    "fallback": "Respaldo — tu dominio personalizado está activo.",
+    "setupBanner": {
+      "title": "Esperando verificación de DNS",
+      "body": "Agrega este registro en tu registrador (GoDaddy, Namecheap, Cloudflare…). Los cambios de DNS pueden tardar hasta 48 horas.",
+      "pointingTo": "Apuntando a {domain}",
+      "checkNow": "Verificar ahora",
+      "checking": "Verificando…"
+    },
+    "addPanel": {
+      "title": "Agregar dominio personalizado",
+      "haveOne": "Ya tengo un dominio",
+      "haveOneDesc": "Conecta mediante registro CNAME en tu registrador.",
+      "buyNew": "Comprar un nuevo dominio",
+      "buyNewDesc": "Busca y compra — desde $12/año.",
+      "yourDomain": "Tu dominio",
+      "placeholder": "sofiachen.com",
+      "connect": "Conectar dominio →",
+      "search": "Buscar",
+      "afterPurchase": "Después de comprar, conéctalo mediante "Ya tengo un dominio"."
+    },
+    "yourPages": "Tus páginas",
+    "routes": "Rutas URL",
+    "routesSubtitle": "Personaliza la ruta de cada página bajo {domain}",
+    "liveUrls": "URLs activas",
+    "portfolio": "Portafolio",
+    "portfolioHint": "Servido en la raíz — no se puede cambiar.",
+    "links": "Página de enlaces",
+    "linksHint": "Tu página estilo Linktree.",
+    "clientDeliveries": "Entregas a clientes",
+    "clientDeliveriesHint": "Cada galería usa este prefijo + el slug del cliente.",
+    "save": "Guardar cambios",
+    "saved": "Guardado"
+  },
+
+  "profile": {
+    "title": "Perfil",
+    "subtitle": "Tu identidad pública en Portapic",
+    "viewPublic": "Ver perfil público",
+    "changeCover": "Cambiar portada",
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "displayName": "Nombre visible",
+      "displayNameHint": "Esto es lo que ven los clientes en tu perfil público.",
+      "username": "Usuario",
+      "bio": "Biografía",
+      "bioHint": "Máximo 200 caracteres.",
+      "location": "Ubicación",
+      "locationPlaceholder": "Ciudad, País",
+      "specialty": "Especialidad",
+      "specialtyPlaceholder": "ej. Bodas, Retrato…"
+    },
+    "sections": {
+      "public": "Perfil público",
+      "social": "Redes sociales",
+      "plan": "Plan y uso"
+    },
+    "save": "Guardar cambios",
+    "saved": "Guardado",
+    "discard": "Descartar"
+  },
+
+  "editor": {
+    "back": "Volver",
+    "save": "Guardar",
+    "preview": "Vista previa",
+    "reset": "Restablecer",
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "viewport": {
+      "desktop": "Escritorio",
+      "tablet": "Tableta",
+      "mobile": "Móvil"
+    },
+    "exit": {
+      "title": "Cambios sin guardar",
+      "body": "Tienes cambios sin guardar. ¿Deseas guardarlos antes de salir?",
+      "saveAndExit": "Guardar y salir",
+      "dontSave": "No guardar",
+      "cancel": "Cancelar"
+    }
+  },
+
+  "templates": {
+    "title": "Plantillas",
+    "tabs": {
+      "portfolio": "Portafolio",
+      "delivery": "Entrega",
+      "links": "Enlaces"
+    },
+    "use": "Usar",
+    "preview": "Vista previa de plantilla",
+    "active": "Activa",
+    "inUse": "En uso",
+    "browseAll": "Ver todas las plantillas"
+  },
+
+  "auth": {
+    "signOut": "Cerrar sesión",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "viewProfile": "Ver perfil",
+    "settings": "Ajustes",
+    "lightMode": "Modo claro",
+    "darkMode": "Modo oscuro"
+  },
+
+  "errors": {
+    "notFound": "No encontrado",
+    "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
+    "tryAgain": "Reintentar"
+  },
+
+  "storage": {
+    "title": "Almacenamiento",
+    "used": "{used} de {total} usado",
+    "raw": "RAW",
+    "tiff": "TIFF",
+    "jpeg": "JPEG",
+    "other": "Otro"
+  }
+}

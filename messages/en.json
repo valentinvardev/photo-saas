@@ -1,0 +1,410 @@
+{
+  "common": {
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "back": "Back",
+    "continue": "Continue →",
+    "delete": "Delete",
+    "remove": "Remove",
+    "edit": "Edit",
+    "preview": "Preview",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "loading": "Loading…",
+    "search": "Search",
+    "close": "Close",
+    "create": "Create",
+    "skip": "Skip for now",
+    "reset": "Reset",
+    "upload": "Upload",
+    "confirm": "Confirm",
+    "discard": "Discard",
+    "manage": "Manage",
+    "copy": "Copy",
+    "copied": "Copied",
+    "openInNewTab": "Open in new tab",
+    "noResults": "No results",
+    "optional": "Optional",
+    "required": "Required",
+    "or": "or",
+    "and": "and",
+    "free": "Free",
+    "pro": "Pro"
+  },
+
+  "time": {
+    "morning": "morning",
+    "afternoon": "afternoon",
+    "evening": "evening",
+    "justNow": "Just now",
+    "daysAgo": "{n} days ago",
+    "hoursAgo": "{n} hours ago"
+  },
+
+  "nav": {
+    "dashboard": "Dashboard",
+    "gallery": "Gallery",
+    "portfolio": "Portfolio",
+    "delivery": "Delivery",
+    "links": "Links",
+    "templates": "Templates",
+    "domain": "Domain",
+    "profile": "Profile",
+    "settings": "Settings",
+    "storage": "Storage"
+  },
+
+  "dashboard": {
+    "greeting": "Good {timeOfDay}, {name}",
+    "plan": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "active": "Active",
+      "renews": "Renews on {date} · {price} / month",
+      "manage": "Manage plan"
+    },
+    "stats": {
+      "storageUsed": "Storage used",
+      "portfolioViews": "Portfolio views",
+      "thisMonth": "this month",
+      "balance": "Balance",
+      "available": "available"
+    }
+  },
+
+  "gallery": {
+    "title": "Gallery",
+    "upload": "Upload",
+    "selectMode": "Select",
+    "selectAll": "All",
+    "selectNone": "None",
+    "selected": "{n} selected",
+    "download": "Download",
+    "share": "Share",
+    "delete": "Delete",
+    "move": "Move to folder",
+    "newFolder": "New folder",
+    "folderName": "Folder name",
+    "renameFolderPlaceholder": "Wedding 2024",
+    "views": {
+      "grid": "Grid",
+      "list": "List"
+    },
+    "search": "Search files",
+    "storage": "Storage",
+    "deleteConfirmTitle": "Delete {count, plural, one {1 file} other {{count} files}}?",
+    "deleteConfirmBody": "This action cannot be undone.",
+    "deletePhoto": "Remove this photo?",
+    "lightbox": {
+      "download": "Download",
+      "share": "Share",
+      "delete": "Delete",
+      "zoom": "Zoom",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "share": {
+      "title": "Share photos",
+      "linkExpiry": "Link expires in {n} days",
+      "copyLink": "Copy link",
+      "sendEmail": "Send by email",
+      "copied": "Copied!"
+    },
+    "empty": {
+      "title": "No files yet",
+      "body": "Upload your first photos to get started."
+    }
+  },
+
+  "portfolio": {
+    "title": "Portfolio",
+    "new": "New portfolio",
+    "published": "Published",
+    "draft": "Draft",
+    "visits": "{n} visits",
+    "empty": {
+      "title": "No portfolios yet",
+      "body": "Create your first portfolio website."
+    },
+    "wizard": {
+      "steps": {
+        "nameAndPhotos": "Name & Photos",
+        "structure": "Structure",
+        "template": "Template",
+        "domain": "Domain",
+        "done": "Done"
+      },
+      "name": {
+        "title": "Name your portfolio",
+        "body": "This is how it'll appear in your dashboard and browser tab.",
+        "placeholder": "Sofia Chen Photography"
+      },
+      "photos": {
+        "title": "Add some photos",
+        "body": "Pick from your gallery to populate the portfolio right away.",
+        "selected": "{folders, plural, =0 {} one {1 folder} other {{folders} folders}}{sep}{photos, plural, =0 {} one {1 photo} other {{photos} photos}} selected",
+        "hint": "Select folders or individual photos — you can add more later"
+      },
+      "structure": {
+        "title": "Confirm structure",
+        "body": "Review how your portfolio will be organized. You can reorganize anytime in the editor.",
+        "skip": "Skip for now",
+        "confirm": "Confirm →",
+        "unsorted": "Unsorted photos"
+      },
+      "template": {
+        "title": "Pick a template",
+        "body": "Choose what feels closest to your style.",
+        "browse": "Browse all templates",
+        "preview": "Live preview",
+        "previewBody": "Showing {template} — updates as you pick.",
+        "fullPreview": "Full preview"
+      },
+      "domain": {
+        "title": "Choose your domain",
+        "body": "Start free, upgrade any time.",
+        "free": "Free subdomain",
+        "custom": "Custom domain",
+        "yourAddress": "Your address",
+        "ssl": "SSL secured · Free forever"
+      },
+      "done": {
+        "title": "Ready to go!",
+        "body": "{name} is set up with the {template} template.",
+        "openEditor": "Open editor →",
+        "goToPortfolio": "Go to portfolio"
+      },
+      "create": "Create portfolio",
+      "cancel": "Cancel"
+    },
+    "content": {
+      "title": "Content",
+      "folders": "{n, plural, one {1 folder} other {{n} folders}}",
+      "photos": "{n, plural, one {1 photo} other {{n} photos}}",
+      "newFolder": "New folder",
+      "noFolders": "No folders yet",
+      "noFoldersBody": "Click "New folder" to create your first one.",
+      "addPhotos": "Add",
+      "deleteFolder": "Delete folder "{name}"?",
+      "visibility": "Toggle visibility"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "What's resonating and where visitors come from.",
+      "totalViews": "Total views",
+      "uniqueVisitors": "Unique visitors",
+      "avgSession": "Avg session",
+      "inquiries": "Inquiries",
+      "vsLastWeek": "vs last week",
+      "topContent": "Top content",
+      "trafficSources": "Traffic sources"
+    },
+    "settings": {
+      "passwordProtection": "Password protection",
+      "passwordProtectionHint": "Visitors need a password to view this portfolio.",
+      "dangerZone": "Danger zone",
+      "deletePortfolio": "Delete portfolio",
+      "deleteConfirm": "Delete "{name}"? This cannot be undone."
+    }
+  },
+
+  "delivery": {
+    "title": "Delivery",
+    "new": "New delivery",
+    "active": "Active",
+    "draft": "Draft",
+    "expired": "Expired",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "edit": "Edit",
+    "empty": {
+      "title": "No delivery pages yet",
+      "body": "Create your first client gallery."
+    },
+    "wizard": {
+      "steps": {
+        "clientAndPhotos": "Client & Photos",
+        "access": "Access",
+        "done": "Done"
+      },
+      "client": {
+        "title": "New delivery",
+        "subtitle": "Who are you delivering to?",
+        "galleryTitle": "Gallery title",
+        "galleryTitlePlaceholder": "Wedding Gallery",
+        "clientName": "Client name",
+        "clientNamePlaceholder": "Sarah & James"
+      },
+      "photos": {
+        "title": "Select photos to deliver",
+        "body": "Pick from your gallery. You can add or remove photos later.",
+        "selected": "{folders, plural, =0 {} one {1 folder} other {{folders} folders}}{sep}{photos, plural, =0 {} one {1 photo} other {{photos} photos}} selected",
+        "hint": "Select folders or individual photos for this delivery"
+      },
+      "access": {
+        "title": "Access & pricing",
+        "subtitle": "How should your client receive the photos?",
+        "gift": "Gift / Free",
+        "giftDesc": "Client downloads at no cost",
+        "direct": "Direct Sale",
+        "directDesc": "Buy individually or as a bundle",
+        "public": "Public",
+        "password": "Password protected",
+        "preview": "What your client sees"
+      },
+      "done": {
+        "title": "Delivery ready!",
+        "body": "{title} for {client} is set up.",
+        "configure": "Add photos & configure →"
+      },
+      "create": "Create delivery",
+      "cancel": "Cancel"
+    },
+    "editor": {
+      "back": "Back",
+      "save": "Save",
+      "saved": "Saved",
+      "exit": {
+        "title": "Unsaved changes",
+        "body": "You have unsaved changes. Do you want to save them before leaving?",
+        "saveAndExit": "Save & exit",
+        "dontSave": "Don't save",
+        "cancel": "Cancel"
+      }
+    }
+  },
+
+  "domain": {
+    "title": "Domain",
+    "subtitle": "Manage the address where your site lives.",
+    "yourDomains": "Your domains",
+    "addCustom": "+ Add custom domain",
+    "free": "Free",
+    "custom": "Custom",
+    "active": "Active",
+    "pendingDns": "Pending DNS",
+    "fallback": "Fallback — your custom domain is active.",
+    "setupBanner": {
+      "title": "Waiting for DNS verification",
+      "body": "Add this record at your registrar (GoDaddy, Namecheap, Cloudflare…). DNS changes can take up to 48 hours.",
+      "pointingTo": "Pointing to {domain}",
+      "checkNow": "Check now",
+      "checking": "Checking…"
+    },
+    "addPanel": {
+      "title": "Add a custom domain",
+      "haveOne": "I already have a domain",
+      "haveOneDesc": "Connect via CNAME record at your registrar.",
+      "buyNew": "Buy a new domain",
+      "buyNewDesc": "Search and purchase — from $12/yr.",
+      "yourDomain": "Your domain",
+      "placeholder": "sofiachen.com",
+      "connect": "Connect domain →",
+      "search": "Search",
+      "afterPurchase": "After purchasing, connect it via "I already have a domain"."
+    },
+    "yourPages": "Your pages",
+    "routes": "URL routes",
+    "routesSubtitle": "Customize the path for each page under {domain}",
+    "liveUrls": "Live URLs",
+    "portfolio": "Portfolio",
+    "portfolioHint": "Served at the root — cannot be changed.",
+    "links": "Links page",
+    "linksHint": "Your Linktree-style page.",
+    "clientDeliveries": "Client deliveries",
+    "clientDeliveriesHint": "Each gallery uses this prefix + the client slug.",
+    "save": "Save changes",
+    "saved": "Saved"
+  },
+
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Your public identity on Portapic",
+    "viewPublic": "View public profile",
+    "changeCover": "Change cover",
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "displayName": "Display name",
+      "displayNameHint": "This is what clients see on your public profile.",
+      "username": "Username",
+      "bio": "Bio",
+      "bioHint": "Max 200 characters.",
+      "location": "Location",
+      "locationPlaceholder": "City, Country",
+      "specialty": "Specialty",
+      "specialtyPlaceholder": "e.g. Wedding, Portrait…"
+    },
+    "sections": {
+      "public": "Public profile",
+      "social": "Social links",
+      "plan": "Plan & usage"
+    },
+    "save": "Save changes",
+    "saved": "Saved",
+    "discard": "Discard"
+  },
+
+  "editor": {
+    "back": "Back",
+    "save": "Save",
+    "preview": "Preview",
+    "reset": "Reset",
+    "undo": "Undo",
+    "redo": "Redo",
+    "viewport": {
+      "desktop": "Desktop",
+      "tablet": "Tablet",
+      "mobile": "Mobile"
+    },
+    "exit": {
+      "title": "Unsaved changes",
+      "body": "You have unsaved changes. Do you want to save them before leaving?",
+      "saveAndExit": "Save & exit",
+      "dontSave": "Don't save",
+      "cancel": "Cancel"
+    }
+  },
+
+  "templates": {
+    "title": "Templates",
+    "tabs": {
+      "portfolio": "Portfolio",
+      "delivery": "Delivery",
+      "links": "Links"
+    },
+    "use": "Use",
+    "preview": "Preview template",
+    "active": "Active",
+    "inUse": "In use",
+    "browseAll": "Browse all templates"
+  },
+
+  "auth": {
+    "signOut": "Sign out",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "viewProfile": "View profile",
+    "settings": "Settings",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode"
+  },
+
+  "errors": {
+    "notFound": "Not found",
+    "generic": "Something went wrong. Please try again.",
+    "tryAgain": "Try again"
+  },
+
+  "storage": {
+    "title": "Storage",
+    "used": "{used} of {total} used",
+    "raw": "RAW",
+    "tiff": "TIFF",
+    "jpeg": "JPEG",
+    "other": "Other"
+  }
+}
