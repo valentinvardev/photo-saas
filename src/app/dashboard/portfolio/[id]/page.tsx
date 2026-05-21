@@ -242,6 +242,26 @@ function TemplateTab({ portfolio }: { portfolio: Portfolio }) {
             </button>
           );
         })}
+
+        {/* Browse all */}
+        <Link
+          href="/dashboard/templates"
+          target="_blank"
+          className="group text-left rounded-xl overflow-hidden border border-dashed border-[var(--border)] hover:border-yellow transition-all flex flex-col"
+        >
+          <div className="aspect-[16/10] bg-[var(--bg-subtle)] group-hover:bg-yellow/5 transition-colors flex items-center justify-center text-[var(--fg-muted)] group-hover:text-yellow">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+          </div>
+          <div className="p-3 flex items-center justify-between">
+            <span className="font-sans font-bold text-[var(--fg-muted)] group-hover:text-[var(--fg)] text-sm transition-colors">Browse all templates</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] group-hover:text-yellow transition-colors">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </div>
+        </Link>
       </div>
 
       <div className="flex items-center gap-2">

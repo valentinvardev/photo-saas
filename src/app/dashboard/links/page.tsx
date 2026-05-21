@@ -1503,10 +1503,7 @@ function TemplateTab({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-sans font-semibold text-[15px] text-[var(--fg)] leading-tight">{active.label}</h3>
-                <span
-                  className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded"
-                  style={{ background: `${active.accent}22`, color: active.accent }}
-                >
+                <span className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-green-500/10 text-green-500 border border-green-500/20">
                   Active
                 </span>
               </div>

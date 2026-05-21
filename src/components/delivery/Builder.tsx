@@ -379,14 +379,25 @@ function GalleryModal({ page, onSave, onClose }: { page: DeliveryPage; onSave: (
   );
 }
 
+const TEMPLATE_PREVIEW_URLS: Partial<Record<TemplateName, string>> = {
+  halcyon:  "/template/halcyon/delivery",
+  brooklyn: "/template/brooklyn/delivery",
+  minimal:  "/template/minimal/delivery",
+};
+
 function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; onSelect: (t: TemplateName) => void; onClose: () => void }) {
   const [preview, setPreview] = useState<TemplateName>(current);
+  const [frame, setFrame] = useState<"desktop" | "mobile">("desktop");
+
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, [onClose]);
+
   const chosen = TEMPLATES.find((t) => t.id === preview)!;
+  const previewUrl = TEMPLATE_PREVIEW_URLS[preview];
+
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -396,58 +407,101 @@ function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; 
       <motion.div
         initial={{ scale: 0.97, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 28 }}
-        className="w-full max-w-3xl flex flex-col rounded-2xl bg-[var(--bg)] border border-[var(--border)] shadow-2xl overflow-hidden"
-        style={{ maxHeight: "85vh" }}
+        className="w-full max-w-5xl flex flex-col rounded-2xl bg-[var(--bg)] border border-[var(--border)] shadow-2xl overflow-hidden"
+        style={{ maxHeight: "88vh" }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
           <div>
             <h3 className="font-sans font-black text-[var(--fg)] text-sm">Choose template</h3>
             <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">Visual style for your delivery page</p>
           </div>
-          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Frame toggle */}
+            <div className="flex items-center gap-0.5 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg p-1">
+              {(["desktop", "mobile"] as const).map((f) => (
+                <button key={f} onClick={() => setFrame(f)}
+                  className={`px-2.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5 ${frame === f ? "bg-[var(--bg-card)] text-[var(--fg)] shadow-sm" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}
+                >
+                  {f === "desktop"
+                    ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                    : <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="18" r="1" fill="currentColor" stroke="none"/></svg>}
+                </button>
+              ))}
+            </div>
+            <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
         </div>
+
         <div className="flex flex-1 min-h-0 overflow-hidden">
-          <div className="w-56 shrink-0 border-r border-[var(--border)] overflow-y-auto p-3 space-y-1">
+          {/* Template list */}
+          <div className="w-52 shrink-0 border-r border-[var(--border)] overflow-y-auto p-3 space-y-1">
             {TEMPLATES.map((t) => (
               <button key={t.id} onClick={() => setPreview(t.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
-                  preview === t.id ? "bg-yellow/10 text-[var(--fg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"
+                  preview === t.id ? "bg-yellow/10" : "hover:bg-[var(--bg-subtle)]"
                 }`}
               >
                 <div className="w-8 h-8 rounded-lg shrink-0 border border-[var(--border)]" style={{ background: t.accent }} />
                 <div className="min-w-0">
-                  <div className={`font-sans text-xs font-semibold truncate ${preview === t.id ? "text-[var(--fg)]" : ""}`}>{t.label}</div>
-                  {preview === t.id && <div className="font-mono text-[9px] text-yellow mt-0.5">Selected</div>}
+                  <div className={`font-sans text-xs font-semibold truncate ${preview === t.id ? "text-[var(--fg)]" : "text-[var(--fg-muted)]"}`}>{t.label}</div>
+                  {preview === t.id && <div className="font-mono text-[9px] text-yellow mt-0.5">Previewing</div>}
                 </div>
               </button>
             ))}
           </div>
-          <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <div className="flex-1 overflow-hidden" style={{ background: chosen.accent }}>
-              <div className="flex items-center justify-between px-8 py-4" style={{ borderBottom: `1px solid ${chosen.fg}18` }}>
-                <span style={{ fontFamily: "serif", fontSize: 14, fontWeight: 900, color: chosen.fg, letterSpacing: "0.12em", textTransform: "uppercase" }}>STUDIO</span>
-                <div className="flex items-center gap-4">
-                  <span style={{ fontFamily: "monospace", fontSize: 10, color: chosen.sub }}>Gallery</span>
-                  <span style={{ fontFamily: "monospace", fontSize: 10, color: chosen.sub }}>Info</span>
-                </div>
-              </div>
-              <div className="px-8 py-6">
-                <div style={{ fontFamily: "serif", fontSize: 28, fontWeight: 900, color: chosen.fg, lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: 8 }}>Sarah &amp; James</div>
-                <div style={{ fontFamily: "monospace", fontSize: 10, color: chosen.sub, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 24 }}>Wedding · April 2026 · 247 photos</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
-                  {[401,402,403,404,405,406,407,408].map((seed) => (
-                    <div key={seed} style={{ aspectRatio: "1", overflow: "hidden", borderRadius: chosen.id === "minimal" ? 4 : 0 }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={`https://picsum.photos/seed/${seed}/200/200?grayscale`} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+
+          {/* Preview panel */}
+          <div className="flex-1 flex flex-col min-w-0 bg-[var(--bg-subtle)]">
+            <div className="flex-1 flex items-center justify-center p-6 overflow-hidden">
+              {frame === "desktop" ? (
+                /* Desktop browser frame */
+                <div className="w-full max-w-2xl flex flex-col rounded-xl overflow-hidden border border-[var(--border)] shadow-2xl" style={{ height: "clamp(340px, 55vh, 480px)" }}>
+                  <div className="flex items-center gap-1.5 px-3 py-2 bg-[#1e1e1e] border-b border-white/10 shrink-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/80"/>
+                    <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80"/>
+                    <span className="w-2.5 h-2.5 rounded-full bg-green-500/80"/>
+                    <div className="flex-1 mx-3 bg-white/10 rounded px-3 py-0.5">
+                      <span className="font-mono text-[10px] text-white/40">portapic.app/d/preview</span>
                     </div>
-                  ))}
+                  </div>
+                  <iframe
+                    key={preview}
+                    src={previewUrl}
+                    className="w-full flex-1 border-none"
+                    title={`${chosen.label} preview`}
+                  />
                 </div>
-              </div>
+              ) : (
+                /* Phone frame */
+                <div className="relative flex-shrink-0" style={{ width: 260, height: 520 }}>
+                  {/* Outer shell */}
+                  <div className="absolute inset-0 rounded-[44px] shadow-2xl" style={{ background: "linear-gradient(145deg,#2a2a2a,#111)" }} />
+                  {/* Screen */}
+                  <div className="absolute inset-[4px] rounded-[40px] overflow-hidden bg-black">
+                    {/* Notch */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-black z-10 rounded-b-2xl" />
+                    <iframe
+                      key={preview + "-mobile"}
+                      src={previewUrl}
+                      className="absolute inset-0 w-full h-full border-none"
+                      style={{ width: "200%", height: "200%", transform: "scale(0.5)", transformOrigin: "0 0" }}
+                      title={`${chosen.label} mobile preview`}
+                    />
+                  </div>
+                  {/* Side buttons */}
+                  <div className="absolute left-[-3px] top-20 w-1 h-8 rounded-l bg-[#333]" />
+                  <div className="absolute left-[-3px] top-32 w-1 h-6 rounded-l bg-[#333]" />
+                  <div className="absolute right-[-3px] top-24 w-1 h-10 rounded-r bg-[#333]" />
+                </div>
+              )}
             </div>
-            <div className="px-6 py-4 border-t border-[var(--border)] flex items-center justify-between shrink-0">
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-[var(--border)] bg-[var(--bg)] flex items-center justify-between shrink-0">
               <div>
                 <div className="font-sans font-bold text-[var(--fg)] text-sm">{chosen.label}</div>
                 <div className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">{chosen.desc}</div>
