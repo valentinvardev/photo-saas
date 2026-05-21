@@ -5,9 +5,98 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "~/components/providers/ThemeProvider";
+import { useT } from "~/components/providers/LangProvider";
+import { LOCALES, type Locale } from "~/lib/i18n";
 import { useCart } from "~/lib/cart";
 import { CartPanel } from "~/components/dashboard/CartPanel";
 import { DevicePreviewModal } from "~/components/dashboard/DevicePreviewModal";
+
+/* ── Language tester ────────────────────────────────────── */
+function LangTester() {
+  const { locale, setLocale, t } = useT();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const PREVIEW_KEYS = [
+    { key: "nav.gallery",   section: "Nav" },
+    { key: "nav.portfolio", section: "Nav" },
+    { key: "nav.delivery",  section: "Nav" },
+    { key: "common.save",   section: "Common" },
+    { key: "common.cancel", section: "Common" },
+    { key: "gallery.title", section: "Gallery" },
+  ];
+
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        title="Language"
+        className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors font-mono text-[10px] font-bold uppercase tracking-widest ${open ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+        </svg>
+        {locale.toUpperCase()}
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 top-full mt-2 w-64 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-lg overflow-hidden z-50"
+          >
+            {/* Locale switcher */}
+            <div className="px-3 py-2.5 border-b border-[var(--border)]">
+              <p className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-2">Language</p>
+              <div className="flex gap-1.5">
+                {LOCALES.map((l) => (
+                  <button
+                    key={l.id}
+                    onClick={() => { setLocale(l.id as Locale); }}
+                    className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-lg border transition-all ${
+                      locale === l.id
+                        ? "border-yellow bg-yellow/10 text-yellow"
+                        : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
+                    }`}
+                  >
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest">{l.id}</span>
+                    <span className="font-sans text-[9px] leading-none">{l.native}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Live string preview */}
+            <div className="px-3 py-2.5">
+              <p className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-2">Preview</p>
+              <div className="space-y-1.5">
+                {PREVIEW_KEYS.map(({ key, section }) => (
+                  <div key={key} className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-[9px] text-[var(--fg-muted)] shrink-0">{section}.{key.split(".")[1]}</span>
+                    <span className="font-sans text-xs text-[var(--fg)] font-medium truncate text-right">{t(key)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 /* ── Theme tester ───────────────────────────────────────── */
 const CSS_VARS = [
@@ -953,7 +1042,8 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
         </button>
       </div>
 
-      {/* Theme tester */}
+      {/* Dev testers */}
+      <LangTester />
       <ThemeTester />
 
       {/* Cart — only visible when there's something in it */}

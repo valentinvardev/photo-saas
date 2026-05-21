@@ -186,9 +186,9 @@
       "photos": "{n, plural, one {1 photo} other {{n} photos}}",
       "newFolder": "New folder",
       "noFolders": "No folders yet",
-      "noFoldersBody": "Click "New folder" to create your first one.",
+      "noFoldersBody": "Click 'New folder' to create your first one.",
       "addPhotos": "Add",
-      "deleteFolder": "Delete folder "{name}"?",
+      "deleteFolder": "Delete folder '{name}'?",
       "visibility": "Toggle visibility"
     },
     "analytics": {
@@ -207,7 +207,7 @@
       "passwordProtectionHint": "Visitors need a password to view this portfolio.",
       "dangerZone": "Danger zone",
       "deletePortfolio": "Delete portfolio",
-      "deleteConfirm": "Delete "{name}"? This cannot be undone."
+      "deleteConfirm": "Delete '{name}'? This cannot be undone."
     }
   },
 
@@ -304,7 +304,7 @@
       "placeholder": "sofiachen.com",
       "connect": "Connect domain →",
       "search": "Search",
-      "afterPurchase": "After purchasing, connect it via "I already have a domain"."
+      "afterPurchase": "After purchasing, connect it via 'I already have a domain'."
     },
     "yourPages": "Your pages",
     "routes": "URL routes",

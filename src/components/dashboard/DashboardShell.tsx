@@ -5,6 +5,7 @@ import { Sidebar } from "./Sidebar";
 import { DashboardHeader } from "./Header";
 import { ChatPanel } from "./ChatPanel";
 import { CartPanel } from "./CartPanel";
+import { LangProvider } from "~/components/providers/LangProvider";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,7 +33,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    /* h-dvh instead of h-screen — respects iOS Safari dynamic bottom bar */
+    <LangProvider>
+    {/* h-dvh instead of h-screen — respects iOS Safari dynamic bottom bar */}
     <div className="flex overflow-hidden bg-[var(--bg)]" style={{ height: "100dvh" }}>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -85,5 +87,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
       <CartPanel />
     </div>
+    </LangProvider>
   );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "~/components/providers/ThemeProvider";
+import { useT } from "~/components/providers/LangProvider";
 import { Logo } from "~/components/ui/Logo";
 
 /* ── Icons ── */
@@ -125,15 +126,15 @@ function HomeIcon() {
 }
 
 const navMain = [
-  { label: "Home",      href: "/dashboard",            icon: HomeIcon, exact: true },
-  { label: "Gallery",   href: "/dashboard/gallery",   icon: GalleryIcon },
-  { label: "Portfolio",  href: "/dashboard/portfolio",  icon: PortfolioIcon },
-  { label: "Templates", href: "/dashboard/templates",  icon: TemplatesIcon },
-  { label: "Links",     href: "/dashboard/links",      icon: LinksIcon },
-  { label: "Delivery",  href: "/dashboard/delivery",   icon: DeliveryIcon },
-  { label: "Domain",    href: "/dashboard/domain",     icon: DomainIcon },
-  { label: "Sales",     href: "/dashboard/sales",      icon: SalesIcon,    soon: true },
-  { label: "Clients",   href: "/dashboard/clients",    icon: ClientsIcon,  soon: true },
+  { labelKey: "nav.dashboard", label: "Home",      href: "/dashboard",           icon: HomeIcon, exact: true },
+  { labelKey: "nav.gallery",   label: "Gallery",   href: "/dashboard/gallery",   icon: GalleryIcon },
+  { labelKey: "nav.portfolio", label: "Portfolio", href: "/dashboard/portfolio", icon: PortfolioIcon },
+  { labelKey: "nav.templates", label: "Templates", href: "/dashboard/templates", icon: TemplatesIcon },
+  { labelKey: "nav.links",     label: "Links",     href: "/dashboard/links",     icon: LinksIcon },
+  { labelKey: "nav.delivery",  label: "Delivery",  href: "/dashboard/delivery",  icon: DeliveryIcon },
+  { labelKey: "nav.domain",    label: "Domain",    href: "/dashboard/domain",    icon: DomainIcon },
+  { label: "Sales",     href: "/dashboard/sales",      icon: SalesIcon,     soon: true },
+  { label: "Clients",   href: "/dashboard/clients",    icon: ClientsIcon,   soon: true },
   { label: "Analytics", href: "/dashboard/analytics",  icon: AnalyticsIcon, soon: true },
 ];
 
@@ -145,15 +146,17 @@ function ProfileIcon() {
   );
 }
 
-function NavItem({ label, href, icon: Icon, soon, exact }: { label: string; href: string; icon: () => React.ReactNode; soon?: boolean; exact?: boolean }) {
+function NavItem({ labelKey, label, href, icon: Icon, soon, exact }: { labelKey?: string; label: string; href: string; icon: () => React.ReactNode; soon?: boolean; exact?: boolean }) {
   const pathname = usePathname();
+  const { t } = useT();
   const active = exact ? pathname === href : pathname.startsWith(href);
+  const displayLabel = labelKey ? t(labelKey) : label;
 
   if (soon) {
     return (
       <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-35 cursor-not-allowed select-none">
         <span className="text-[var(--fg-muted)]"><Icon /></span>
-        <span className="font-sans text-sm text-[var(--fg-muted)] flex-1">{label}</span>
+        <span className="font-sans text-sm text-[var(--fg-muted)] flex-1">{displayLabel}</span>
         <span className="font-mono text-[9px] bg-[var(--bg-subtle)] text-[var(--fg-muted)] px-1.5 py-0.5 rounded tracking-wider uppercase">Soon</span>
       </div>
     );
@@ -171,7 +174,7 @@ function NavItem({ label, href, icon: Icon, soon, exact }: { label: string; href
       <span className={active ? "text-yellow" : "text-[var(--fg-muted)] group-hover:text-[var(--fg)]"}>
         <Icon />
       </span>
-      <span className="font-sans text-sm font-medium">{label}</span>
+      <span className="font-sans text-sm font-medium">{displayLabel}</span>
     </Link>
   );
 }
@@ -204,8 +207,8 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
       {/* Bottom */}
       <div className="px-2 py-3 border-t border-[var(--border)] space-y-0.5">
-        <NavItem label="Profile"  href="/dashboard/profile"  icon={ProfileIcon} />
-        <NavItem label="Settings" href="/dashboard/settings" icon={SettingsIcon} />
+        <NavItem labelKey="nav.profile"  label="Profile"  href="/dashboard/profile"  icon={ProfileIcon} />
+        <NavItem labelKey="nav.settings" label="Settings" href="/dashboard/settings" icon={SettingsIcon} />
 
         {/* Theme toggle */}
         <div className="flex items-center gap-1 px-3 py-2">

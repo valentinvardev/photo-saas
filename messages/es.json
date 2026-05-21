@@ -186,9 +186,9 @@
       "photos": "{n, plural, one {1 foto} other {{n} fotos}}",
       "newFolder": "Nueva carpeta",
       "noFolders": "Aún no hay carpetas",
-      "noFoldersBody": "Haz clic en "Nueva carpeta" para crear la primera.",
+      "noFoldersBody": "Haz clic en 'Nueva carpeta' para crear la primera.",
       "addPhotos": "Agregar",
-      "deleteFolder": "¿Eliminar carpeta "{name}"?",
+      "deleteFolder": "¿Eliminar carpeta '{name}'?",
       "visibility": "Cambiar visibilidad"
     },
     "analytics": {
@@ -207,7 +207,7 @@
       "passwordProtectionHint": "Los visitantes necesitan una contraseña para ver este portafolio.",
       "dangerZone": "Zona de peligro",
       "deletePortfolio": "Eliminar portafolio",
-      "deleteConfirm": "¿Eliminar "{name}"? Esta acción no se puede deshacer."
+      "deleteConfirm": "¿Eliminar '{name}'? Esta acción no se puede deshacer."
     }
   },
 
@@ -304,7 +304,7 @@
       "placeholder": "sofiachen.com",
       "connect": "Conectar dominio →",
       "search": "Buscar",
-      "afterPurchase": "Después de comprar, conéctalo mediante "Ya tengo un dominio"."
+      "afterPurchase": "Después de comprar, conéctalo mediante 'Ya tengo un dominio'."
     },
     "yourPages": "Tus páginas",
     "routes": "Rutas URL",
