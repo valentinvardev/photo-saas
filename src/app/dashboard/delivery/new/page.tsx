@@ -246,10 +246,38 @@ export default function NewDeliveryPage() {
       <div className="max-w-6xl mx-auto w-full flex-1">
         {isDone ? (
           <div className="flex flex-col items-center justify-center text-center gap-6 py-16">
-            <div className="w-20 h-20 rounded-full bg-yellow/10 border border-yellow/30 flex items-center justify-center">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="2" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-            </div>
-            <div>
+            {/* Circle + checkmark */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.05 }}
+              className="relative w-20 h-20"
+            >
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: [1, 1.18, 1], opacity: [0.5, 0, 0] }}
+                transition={{ delay: 0.35, duration: 0.9, ease: "easeOut" }}
+                className="absolute inset-0 rounded-full bg-yellow/30"
+              />
+              <div className="absolute inset-0 rounded-full bg-yellow/10 border border-yellow/30 flex items-center justify-center">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" strokeLinecap="round">
+                  <motion.path
+                    d="M20 6L9 17l-5-5"
+                    stroke="#fad502"
+                    strokeWidth="2"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.45, ease: "easeOut" }}
+                  />
+                </svg>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.35 }}
+            >
               <h1 className="font-sans font-black text-[var(--fg)] text-3xl mb-2">Delivery ready!</h1>
               <p className="font-sans text-sm text-[var(--fg-muted)] leading-relaxed max-w-sm mx-auto">
                 <span className="text-[var(--fg)] font-medium">{title}</span> for{" "}
@@ -257,10 +285,17 @@ export default function NewDeliveryPage() {
                 {selectedPhotos.size > 0 && ` with ${selectedPhotos.size} photo${selectedPhotos.size !== 1 ? "s" : ""}`}.
                 Add your photos and send the link.
               </p>
-            </div>
-            <button onClick={finish} className="flex items-center gap-1.5 px-7 py-3 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 transition-colors">
+            </motion.div>
+
+            <motion.button
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.65, duration: 0.3 }}
+              onClick={finish}
+              className="flex items-center gap-1.5 px-7 py-3 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 transition-colors"
+            >
               Add photos & configure →
-            </button>
+            </motion.button>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 items-start">
