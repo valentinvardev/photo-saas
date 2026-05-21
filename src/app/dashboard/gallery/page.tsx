@@ -297,6 +297,7 @@ function ImageModal({ files, index, onIndex, onClose, onDelete, onShare, onDownl
       {/* Image — padded so it doesn't fill edge to edge */}
       <div ref={containerRef} className="flex-1 flex items-center justify-center overflow-hidden px-16 py-20"
         style={{ cursor: zoom > 1 ? (isDragging ? "grabbing" : "grab") : "default" }}
+        onClick={(e) => { if (zoom <= 1 && e.target === e.currentTarget) onClose(); }}
         onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU}>
         {isRaw ? (
           <div className="flex flex-col items-center gap-3 text-white/30">
