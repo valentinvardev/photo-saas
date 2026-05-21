@@ -25,7 +25,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem("theme") as Theme | null;
-    const initial = stored ?? "dark";
+    let initial: Theme;
+    if (stored) {
+      initial = stored;
+    } else {
+      // No manual preference — auto-detect by time: 7:00–19:00 = light, else dark
+      const hour = new Date().getHours();
+      initial = hour >= 7 && hour < 19 ? "light" : "dark";
+    }
     setTheme(initial);
     document.documentElement.classList.toggle("dark", initial === "dark");
   }, []);

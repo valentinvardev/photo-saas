@@ -113,7 +113,7 @@ export function ShareView({ shareId }: { shareId: string }) {
     <div className="min-h-dvh bg-[#0a0a0a] text-white flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-5 py-4 border-b border-white/8">
-        <Logo height={28} />
+        <Logo height={40} />
         <div className="flex items-center gap-3">
           <span className="font-mono text-[10px] text-white/40 uppercase tracking-widest hidden sm:block">
             View only · expires in {MOCK_EXPIRES}

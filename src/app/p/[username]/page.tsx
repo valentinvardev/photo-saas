@@ -98,7 +98,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
       {/* ── Top bar ── */}
       <div className="fixed inset-x-0 top-0 z-20 flex items-center justify-between px-4 py-3 bg-[var(--bg)]/80 backdrop-blur-md border-b border-[var(--border)]">
         <Link href="/dashboard">
-          <Logo height={28} />
+          <Logo height={40} />
         </Link>
         <Link
           href="/dashboard"
