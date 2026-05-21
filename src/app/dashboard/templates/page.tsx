@@ -940,7 +940,6 @@ function TemplateBanner({ onDismiss, onBrowse }: { onDismiss: () => void; onBrow
         {/* Text */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <span className="font-mono text-[9px] font-bold uppercase tracking-widest bg-yellow text-[#111] px-2 py-0.5 rounded-sm">New</span>
             <span className="font-mono text-[9px] text-white/30 uppercase tracking-wider">Collections</span>
           </div>
           <h2 className="font-sans font-black text-white text-base leading-tight mb-1">
@@ -1885,7 +1884,6 @@ function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: nu
         <div className="absolute top-0 left-0 right-0 h-5 bg-black/40 backdrop-blur-sm flex items-center px-2 gap-1">
           <div className="w-1.5 h-1.5 rounded-full bg-white/30" /><div className="w-1.5 h-1.5 rounded-full bg-white/30" /><div className="w-1.5 h-1.5 rounded-full bg-white/30" />
         </div>
-        {t.new && <div className="absolute top-5 left-2 bg-yellow text-[#111] font-mono text-[8px] font-bold px-1.5 py-0.5 tracking-widest uppercase rounded-sm">New</div>}
       </div>
 
       {/* Card body */}
@@ -1995,7 +1993,6 @@ function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
             </div>
           </div>
         )}
-        {t.new && <div className="absolute top-3 left-3 bg-yellow text-[#111] font-mono text-[8px] font-bold px-1.5 py-0.5 tracking-widest uppercase z-10">New</div>}
         {!t.available && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px] z-10">
             <span className="flex items-center gap-1.5 font-mono text-[10px] text-white/80 bg-black/50 px-3 py-1.5 rounded-full">
@@ -2109,7 +2106,6 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
           )}
         </div>
 
-        {t.new && <div className="absolute top-3 left-3 bg-yellow text-[#111] font-mono text-[8px] font-bold px-1.5 py-0.5 tracking-widest uppercase rounded-sm">New</div>}
         {!t.available && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
             <span className="flex items-center gap-1.5 font-mono text-[10px] text-white/80 bg-black/50 px-3 py-1.5 rounded-full">
