@@ -1143,8 +1143,15 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
     setDirty(false);
   };
 
+  const [showExitModal, setShowExitModal] = useState(false);
+
   const handleBack = () => {
-    if (dirty && !confirm("Discard unsaved changes?")) return;
+    if (dirty) setShowExitModal(true);
+    else router.push("/dashboard/delivery");
+  };
+
+  const handleSaveAndExit = () => {
+    handleSave();
     router.push("/dashboard/delivery");
   };
 
@@ -1271,6 +1278,51 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
         )}
         {showCoverAdjust && (
           <CoverAdjustModal page={page} set={set} onClose={() => setShowCoverAdjust(false)} />
+        )}
+
+        {/* Exit confirmation modal */}
+        {showExitModal && (
+          <motion.div
+            key="exit-modal"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm"
+            onClick={() => setShowExitModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 28 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-[340px] bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-2xl"
+            >
+              <div className="px-5 pt-5 pb-4 border-b border-[var(--border)]">
+                <p className="font-sans font-bold text-sm text-[var(--fg)]">Unsaved changes</p>
+                <p className="font-sans text-xs text-[var(--fg-muted)] mt-1.5 leading-relaxed">
+                  You have unsaved changes. Do you want to save them before leaving?
+                </p>
+              </div>
+              <div className="px-5 py-4 flex flex-col gap-2">
+                <button
+                  onClick={handleSaveAndExit}
+                  className="w-full py-2.5 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm flex items-center justify-center gap-2 hover:bg-yellow/90 transition-colors"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  Save & exit
+                </button>
+                <button
+                  onClick={() => router.push("/dashboard/delivery")}
+                  className="w-full py-2.5 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+                >
+                  Don't save
+                </button>
+                <button
+                  onClick={() => setShowExitModal(false)}
+                  className="w-full py-2 font-sans text-xs text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
