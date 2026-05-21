@@ -10,41 +10,39 @@ import { CartPanel } from "~/components/dashboard/CartPanel";
 import { DevicePreviewModal } from "~/components/dashboard/DevicePreviewModal";
 
 /* ── Theme tester ───────────────────────────────────────── */
-const PRESETS = [
-  { name: "Portapic",  accent: "#fad502", bg: "#111111", card: "#1c1c1c", subtle: "#181818", fg: "#ffffff", fgMuted: "#808080", border: "#282828", dark: true  },
-  { name: "Light",     accent: "#fad502", bg: "#ffffff", card: "#fafafa", subtle: "#f5f5f5", fg: "#111111", fgMuted: "#808080", border: "#e5e5e5", dark: false },
-  { name: "Ocean",     accent: "#38bdf8", bg: "#0c1422", card: "#111e33", subtle: "#0f1929", fg: "#e0f4ff", fgMuted: "#6b9ab8", border: "#1a2f4a", dark: true  },
-  { name: "Forest",    accent: "#4ade80", bg: "#0a1a0f", card: "#0f1f14", subtle: "#0d1a12", fg: "#e8fdf0", fgMuted: "#6aaa7f", border: "#1a3322", dark: true  },
-  { name: "Sunset",    accent: "#fb923c", bg: "#1a0d08", card: "#221207", subtle: "#1c0f09", fg: "#fff4ed", fgMuted: "#b8735a", border: "#3d1c0a", dark: true  },
-  { name: "Lavender",  accent: "#c084fc", bg: "#0f0b1c", card: "#150f24", subtle: "#120d1f", fg: "#f5f0ff", fgMuted: "#9070bb", border: "#251840", dark: true  },
-  { name: "Rose",      accent: "#fb7185", bg: "#1a0a10", card: "#210f15", subtle: "#1c0c12", fg: "#fff1f3", fgMuted: "#b8617a", border: "#3d1020", dark: true  },
-  { name: "Slate",     accent: "#6366f1", bg: "#f8fafc", card: "#f1f5f9", subtle: "#e2e8f0", fg: "#0f172a", fgMuted: "#64748b", border: "#cbd5e1", dark: false },
+const CSS_VARS = [
+  { key: "--color-yellow", label: "Accent"      },
+  { key: "--bg",           label: "Background"  },
+  { key: "--bg-card",      label: "Card"        },
+  { key: "--bg-subtle",    label: "Subtle bg"   },
+  { key: "--fg",           label: "Text"        },
+  { key: "--fg-muted",     label: "Muted text"  },
+  { key: "--border",       label: "Border"      },
 ] as const;
 
-function applyPreset(p: typeof PRESETS[number]) {
-  const r = document.documentElement;
-  r.style.setProperty("--color-yellow", p.accent);
-  r.style.setProperty("--bg",           p.bg);
-  r.style.setProperty("--bg-card",      p.card);
-  r.style.setProperty("--bg-subtle",    p.subtle);
-  r.style.setProperty("--fg",           p.fg);
-  r.style.setProperty("--fg-muted",     p.fgMuted);
-  r.style.setProperty("--border",       p.border);
-  if (p.dark) r.classList.add("dark"); else r.classList.remove("dark");
-}
+type VarKey = typeof CSS_VARS[number]["key"];
 
-function resetTheme(storedTheme: "dark" | "light") {
-  const r = document.documentElement;
-  ["--color-yellow","--bg","--bg-card","--bg-subtle","--fg","--fg-muted","--border"].forEach((v) => r.style.removeProperty(v));
-  if (storedTheme === "dark") r.classList.add("dark"); else r.classList.remove("dark");
+function readVars(): Record<VarKey, string> {
+  const style = getComputedStyle(document.documentElement);
+  const result = {} as Record<VarKey, string>;
+  for (const { key } of CSS_VARS) {
+    result[key] = style.getPropertyValue(key).trim() || "#000000";
+  }
+  return result;
 }
 
 function ThemeTester() {
   const { theme } = useTheme();
-  const [open, setOpen] = useState(false);
-  const [accent, setAccent] = useState("#fad502");
+  const [open, setOpen]     = useState(false);
+  const [colors, setColors] = useState<Record<VarKey, string>>({} as Record<VarKey, string>);
   const ref = useRef<HTMLDivElement>(null);
 
+  /* Read current values when panel opens */
+  useEffect(() => {
+    if (open) setColors(readVars());
+  }, [open]);
+
+  /* Close on outside click */
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -53,23 +51,30 @@ function ThemeTester() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  function handleAccentChange(color: string) {
-    setAccent(color);
-    document.documentElement.style.setProperty("--color-yellow", color);
+  function handleChange(key: VarKey, value: string) {
+    document.documentElement.style.setProperty(key, value);
+    setColors((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function reset() {
+    CSS_VARS.forEach(({ key }) => document.documentElement.style.removeProperty(key));
+    if (theme === "dark") document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+    setColors(readVars());
   }
 
   return (
     <div ref={ref} className="relative shrink-0">
       <button
         onClick={() => setOpen((o) => !o)}
-        title="Theme tester"
+        title="Theme variables"
         className={`p-2 rounded-lg transition-colors ${open ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor"/>
           <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor"/>
-          <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor"/>
-          <circle cx="6.5" cy="12.5" r="0.5" fill="currentColor"/>
+          <circle cx="8.5"  cy="7.5"  r="0.5" fill="currentColor"/>
+          <circle cx="6.5"  cy="12.5" r="0.5" fill="currentColor"/>
           <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
         </svg>
       </button>
@@ -81,69 +86,58 @@ function ThemeTester() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-64 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-lg overflow-hidden z-50"
+            className="absolute right-0 top-full mt-2 w-72 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-lg overflow-hidden z-50"
           >
-            {/* Header */}
             <div className="px-4 py-3 border-b border-[var(--border)] flex items-center justify-between">
-              <p className="font-sans text-xs font-semibold text-[var(--fg)]">Theme tester</p>
+              <p className="font-sans text-xs font-semibold text-[var(--fg)]">CSS variables</p>
               <button
-                onClick={() => { resetTheme(theme); setAccent("#fad502"); }}
+                onClick={reset}
                 className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
               >
                 Reset
               </button>
             </div>
 
-            {/* Presets grid */}
-            <div className="p-3 grid grid-cols-4 gap-1.5">
-              {PRESETS.map((p) => (
-                <button
-                  key={p.name}
-                  onClick={() => { applyPreset(p); setAccent(p.accent); }}
-                  title={p.name}
-                  className="group flex flex-col items-center gap-1.5"
-                >
-                  {/* Color chip */}
-                  <div
-                    className="w-full aspect-square rounded-lg border border-black/10 relative overflow-hidden"
-                    style={{ background: p.bg }}
-                  >
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-3 h-3 rounded-full" style={{ background: p.accent }} />
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ background: p.card }} />
-                  </div>
-                  <span className="font-mono text-[8px] text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors truncate w-full text-center">
-                    {p.name}
-                  </span>
-                </button>
-              ))}
-            </div>
+            <div className="px-4 py-3 flex flex-col gap-3">
+              {CSS_VARS.map(({ key, label }) => {
+                const val = colors[key] ?? "#000000";
+                /* Ensure it's a valid 6-digit hex for input[type=color] */
+                const hex = /^#[0-9a-fA-F]{6}$/.test(val) ? val : "#000000";
+                return (
+                  <div key={key} className="flex items-center gap-3">
+                    {/* Swatch — clicking opens native color picker */}
+                    <label className="relative w-7 h-7 rounded-md border border-[var(--border)] cursor-pointer shrink-0 overflow-hidden" style={{ background: val }}>
+                      <input
+                        type="color"
+                        value={hex}
+                        onChange={(e) => handleChange(key, e.target.value)}
+                        className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                      />
+                    </label>
 
-            {/* Accent color picker */}
-            <div className="px-3 pb-3 border-t border-[var(--border)] pt-3">
-              <p className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-2">Accent color</p>
-              <div className="flex items-center gap-2">
-                <div className="relative w-8 h-8 rounded-lg border border-[var(--border)] overflow-hidden cursor-pointer shrink-0" style={{ background: accent }}>
-                  <input
-                    type="color"
-                    value={accent}
-                    onChange={(e) => handleAccentChange(e.target.value)}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                  />
-                </div>
-                <span className="font-mono text-xs text-[var(--fg)]">{accent}</span>
-                <div className="flex gap-1 ml-auto">
-                  {["#fad502","#38bdf8","#4ade80","#fb923c","#c084fc","#fb7185"].map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => handleAccentChange(c)}
-                      className="w-4 h-4 rounded-full border border-black/10 hover:scale-110 transition-transform"
-                      style={{ background: c }}
+                    {/* Label + var name */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-sans text-xs font-medium text-[var(--fg)] leading-none">{label}</p>
+                      <p className="font-mono text-[9px] text-[var(--fg-muted)] mt-0.5">{key}</p>
+                    </div>
+
+                    {/* Hex input */}
+                    <input
+                      type="text"
+                      value={val}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setColors((prev) => ({ ...prev, [key]: v }));
+                        if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+                          document.documentElement.style.setProperty(key, v);
+                        }
+                      }}
+                      maxLength={7}
+                      className="font-mono text-[11px] text-[var(--fg)] bg-[var(--bg-subtle)] border border-[var(--border)] rounded-md px-2 py-1 w-20 outline-none focus:border-yellow/60 transition-colors"
                     />
-                  ))}
-                </div>
-              </div>
+                  </div>
+                );
+              })}
             </div>
           </motion.div>
         )}
