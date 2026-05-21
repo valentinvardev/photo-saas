@@ -7,10 +7,16 @@ import { useDeliveryStore } from "~/lib/delivery/store";
 
 const STEPS = ["Client & Photos", "Access", "Done"] as const;
 
-const GALLERY_PHOTOS = Array.from({ length: 20 }, (_, i) => ({
-  id: String(i + 1),
-  seed: `dlv${i + 10}`,
-}));
+const MOCK_FOLDERS = [
+  { id: "f1", name: "Ceremony",  seeds: ["cr1","cr2","cr3","cr4","cr5","cr6"] },
+  { id: "f2", name: "Reception", seeds: ["rc1","rc2","rc3","rc4"] },
+  { id: "f3", name: "Portraits", seeds: ["pt1","pt2","pt3","pt4","pt5"] },
+];
+const STANDALONE = [
+  { id: "s1", seed: "dl1" },{ id: "s2", seed: "dl2" },
+  { id: "s3", seed: "dl3" },{ id: "s4", seed: "dl4" },
+  { id: "s5", seed: "dl5" },{ id: "s6", seed: "dl6" },
+];
 
 function StepDots({ current, total }: { current: number; total: number }) {
   return (
@@ -24,27 +30,53 @@ function StepDots({ current, total }: { current: number; total: number }) {
   );
 }
 
-function PhotoPickerGrid({ selected, onToggle }: {
-  selected: Set<string>;
-  onToggle: (id: string) => void;
+function PickerGrid({
+  selectedFolders, selectedPhotos,
+  onToggleFolder, onTogglePhoto,
+}: {
+  selectedFolders: Set<string>; selectedPhotos: Set<string>;
+  onToggleFolder: (id: string) => void; onTogglePhoto: (id: string) => void;
 }) {
   return (
     <div>
-      <div className="grid grid-cols-5 gap-1.5">
-        {GALLERY_PHOTOS.map((ph) => {
-          const on = selected.has(ph.id);
+      <div className="grid gap-[3px]" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+        {MOCK_FOLDERS.map((folder) => {
+          const on = selectedFolders.has(folder.id);
           return (
-            <button
-              key={ph.id}
-              onClick={() => onToggle(ph.id)}
-              className={`relative aspect-square rounded-lg overflow-hidden transition-all select-none ${
-                on ? "ring-2 ring-yellow ring-offset-1 ring-offset-[var(--bg-card)]" : "hover:opacity-80"
-              }`}
+            <button key={folder.id} onClick={() => onToggleFolder(folder.id)}
+              className={`relative overflow-hidden transition-all col-span-2 ${on ? "ring-2 ring-yellow ring-inset" : "hover:opacity-90"}`}
+              style={{ aspectRatio: "8/3" }}
+            >
+              <div className="absolute inset-0 grid grid-cols-2 gap-[2px]">
+                {folder.seeds.slice(0, 4).map((seed, i) => (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img key={i} src={`https://picsum.photos/seed/${seed}/200/150?grayscale`} alt="" className="w-full h-full object-cover" draggable={false} />
+                ))}
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-2 gap-1.5">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                <span className="font-sans text-[11px] font-semibold text-white truncate">{folder.name}</span>
+                <span className="font-mono text-[9px] text-white/60 ml-auto shrink-0">{folder.seeds.length}</span>
+              </div>
+              {on && (
+                <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-yellow flex items-center justify-center">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="3.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                </div>
+              )}
+            </button>
+          );
+        })}
+        {STANDALONE.map((ph) => {
+          const on = selectedPhotos.has(ph.id);
+          return (
+            <button key={ph.id} onClick={() => onTogglePhoto(ph.id)}
+              className={`relative overflow-hidden transition-all ${on ? "ring-2 ring-yellow ring-inset" : "hover:opacity-90"}`}
+              style={{ aspectRatio: "4/3" }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`https://picsum.photos/seed/${ph.seed}/200/200?grayscale`} alt="" className="w-full h-full object-cover" draggable={false} />
+              <img src={`https://picsum.photos/seed/${ph.seed}/300/225?grayscale`} alt="" className="w-full h-full object-cover" draggable={false} />
               {on && (
-                <div className="absolute inset-0 bg-yellow/20 flex items-start justify-end p-1">
+                <div className="absolute inset-0 bg-yellow/15 flex items-start justify-end p-1">
                   <div className="w-4 h-4 rounded-full bg-yellow flex items-center justify-center">
                     <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="3.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
                   </div>
@@ -54,10 +86,10 @@ function PhotoPickerGrid({ selected, onToggle }: {
           );
         })}
       </div>
-      <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-3">
-        {selected.size > 0
-          ? `${selected.size} photo${selected.size !== 1 ? "s" : ""} selected for this delivery`
-          : "Select photos to include — you can add more later"}
+      <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-2">
+        {(selectedFolders.size + selectedPhotos.size) > 0
+          ? `${selectedFolders.size > 0 ? `${selectedFolders.size} folder${selectedFolders.size !== 1 ? "s" : ""}` : ""}${selectedFolders.size > 0 && selectedPhotos.size > 0 ? " + " : ""}${selectedPhotos.size > 0 ? `${selectedPhotos.size} photo${selectedPhotos.size !== 1 ? "s" : ""}` : ""} selected`
+          : "Select folders or individual photos for this delivery"}
       </p>
     </div>
   );
@@ -67,22 +99,23 @@ export default function NewDeliveryPage() {
   const router = useRouter();
   const add    = useDeliveryStore((s) => s.add);
 
-  const [step,           setStep]           = useState(0);
-  const [title,          setTitle]          = useState("");
-  const [client,         setClient]         = useState("");
-  const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
-  const [mode,           setMode]           = useState<"gift" | "direct">("gift");
-  const [access,         setAccess]         = useState<"public" | "password">("public");
+  const [step,            setStep]            = useState(0);
+  const [title,           setTitle]           = useState("");
+  const [client,          setClient]          = useState("");
+  const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set());
+  const [selectedPhotos,  setSelectedPhotos]  = useState<Set<string>>(new Set());
+  const [mode,            setMode]            = useState<"gift" | "direct">("gift");
+  const [access,          setAccess]          = useState<"public" | "password">("public");
 
-  const canNext = step === 0 ? !!(title.trim() && client.trim()) : true;
-  const isDone  = step === 2;
+  const canNext  = step === 0 ? !!(title.trim() && client.trim()) : true;
+  const isDone   = step === 2;
+  const totalSel = selectedFolders.size + selectedPhotos.size;
 
+  function toggleFolder(id: string) {
+    setSelectedFolders((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  }
   function togglePhoto(id: string) {
-    setSelectedPhotos((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+    setSelectedPhotos((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
   }
 
   function back() {
@@ -96,14 +129,17 @@ export default function NewDeliveryPage() {
   }
 
   /* ── Right panel ── */
-  function RightPanel() {
+  function rightPanel() {
     if (step === 0) return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         <div>
           <h2 className="font-sans font-bold text-[var(--fg)] text-lg">Select photos to deliver</h2>
-          <p className="font-sans text-sm text-[var(--fg-muted)] mt-1">Pick from your gallery. You can add or remove photos later.</p>
+          <p className="font-sans text-sm text-[var(--fg-muted)] mt-0.5">Pick from your gallery. You can add or remove photos later.</p>
         </div>
-        <PhotoPickerGrid selected={selectedPhotos} onToggle={togglePhoto} />
+        <PickerGrid
+          selectedFolders={selectedFolders} selectedPhotos={selectedPhotos}
+          onToggleFolder={toggleFolder} onTogglePhoto={togglePhoto}
+        />
       </div>
     );
 
@@ -114,57 +150,78 @@ export default function NewDeliveryPage() {
         <div className="flex flex-col gap-4">
           <div>
             <h2 className="font-sans font-bold text-[var(--fg)] text-lg">What your client sees</h2>
-            <p className="font-sans text-sm text-[var(--fg-muted)] mt-1">A preview of how you're delivering these photos.</p>
+            <p className="font-sans text-sm text-[var(--fg-muted)] mt-0.5">A preview of how {client || "your client"} will receive the gallery.</p>
           </div>
 
-          {/* Mock delivery preview card */}
           <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden">
-            {/* Top */}
-            <div className="relative h-36 overflow-hidden bg-[var(--bg-subtle)]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://picsum.photos/seed/dlvpreview/600/300?grayscale" alt="" className="w-full h-full object-cover opacity-60" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)] to-transparent" />
-              <div className="absolute bottom-3 left-4">
-                <p className="font-sans font-bold text-[var(--fg)] text-base">{title || "Gallery title"}</p>
-                <p className="font-sans text-xs text-[var(--fg-muted)]">From {client || "Your name"}</p>
+            {/* Header bar */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-yellow flex items-center justify-center shrink-0">
+                  <span className="font-sans font-black text-[#111] text-[10px]">S</span>
+                </div>
+                <div>
+                  <p className="font-sans text-xs font-semibold text-[var(--fg)] leading-none">{title || "Gallery title"}</p>
+                  <p className="font-sans text-[10px] text-[var(--fg-muted)] mt-0.5">from Sofia Chen</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className={`inline-flex items-center gap-1 font-mono text-[8px] uppercase tracking-widest px-1.5 py-0.5 rounded border ${
+                  isPublic ? "border-green-400/30 bg-green-400/10 text-green-400" : "border-yellow/30 bg-yellow/10 text-yellow"
+                }`}>
+                  {isPublic ? "Public" : "Protected"}
+                </span>
+                <span className={`inline-flex font-mono text-[8px] uppercase tracking-widest px-1.5 py-0.5 rounded border ${
+                  isGift ? "border-[var(--border)] text-[var(--fg-muted)]" : "border-yellow/30 bg-yellow/10 text-yellow"
+                }`}>
+                  {isGift ? "Free" : "For sale"}
+                </span>
               </div>
             </div>
 
-            {/* Body */}
-            <div className="p-4 flex flex-col gap-3">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className={`inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2 py-1 rounded-full border ${
-                  isPublic ? "border-green-400/30 bg-green-400/10 text-green-400" : "border-yellow/30 bg-yellow/10 text-yellow"
-                }`}>
-                  {isPublic ? (
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                  ) : (
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                  )}
-                  {isPublic ? "Public" : "Password protected"}
-                </span>
-                <span className={`inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2 py-1 rounded-full border ${
-                  isGift ? "border-[var(--border)] text-[var(--fg-muted)]" : "border-yellow/30 bg-yellow/10 text-yellow"
-                }`}>
-                  {isGift ? "Free download" : "For purchase"}
-                </span>
+            {/* Photo grid — varied sizes, no radius */}
+            <div className="flex flex-col gap-[3px] bg-[var(--bg-subtle)] p-[3px]">
+              {/* Row 1: single wide landscape */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="https://picsum.photos/seed/dlv_h1/800/350?grayscale" alt="" className="w-full object-cover" style={{ height: 140 }} draggable={false} />
+
+              {/* Row 2: two side-by-side */}
+              <div className="grid grid-cols-2 gap-[3px]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="https://picsum.photos/seed/dlv_h2/400/300?grayscale" alt="" className="w-full object-cover" style={{ height: 100 }} draggable={false} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="https://picsum.photos/seed/dlv_h3/400/300?grayscale" alt="" className="w-full object-cover" style={{ height: 100 }} draggable={false} />
               </div>
 
-              <div className="grid grid-cols-4 gap-1">
-                {[...Array(8)].map((_, i) => (
+              {/* Row 3: three equal */}
+              <div className="grid grid-cols-3 gap-[3px]">
+                {["dlv_h4","dlv_h5","dlv_h6"].map((seed) => (
                   /* eslint-disable-next-line @next/next/no-img-element */
-                  <img key={i} src={`https://picsum.photos/seed/prev${i}/100/100?grayscale`} alt="" className="aspect-square object-cover rounded" />
+                  <img key={seed} src={`https://picsum.photos/seed/${seed}/280/210?grayscale`} alt="" className="w-full object-cover" style={{ height: 72 }} draggable={false} />
                 ))}
               </div>
 
-              <div className="flex gap-2">
-                <button className="flex-1 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold">
-                  {isGift ? "Download all" : "View & purchase"}
-                </button>
-                <button className="px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--fg-muted)]">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                </button>
+              {/* Row 4: 1 portrait + 2 stacked */}
+              <div className="grid gap-[3px]" style={{ gridTemplateColumns: "1.4fr 1fr" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="https://picsum.photos/seed/dlv_p1/300/400?grayscale" alt="" className="w-full object-cover" style={{ height: 130 }} draggable={false} />
+                <div className="flex flex-col gap-[3px]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="https://picsum.photos/seed/dlv_h7/300/200?grayscale" alt="" className="w-full object-cover flex-1" style={{ height: 63 }} draggable={false} />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="https://picsum.photos/seed/dlv_h8/300/200?grayscale" alt="" className="w-full object-cover flex-1" style={{ height: 63 }} draggable={false} />
+                </div>
               </div>
+            </div>
+
+            {/* Footer CTA */}
+            <div className="px-4 py-3 flex items-center justify-between gap-2">
+              <span className="font-mono text-[10px] text-[var(--fg-muted)]">
+                {totalSel > 0 ? `${totalSel} item${totalSel !== 1 ? "s" : ""} · ` : ""}Expires in 30 days
+              </span>
+              <button className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 transition-colors">
+                {isGift ? "Download all" : "View & purchase"}
+              </button>
             </div>
           </div>
         </div>
@@ -247,8 +304,12 @@ export default function NewDeliveryPage() {
                           />
                         </div>
                       </div>
-                      {selectedPhotos.size > 0 && (
-                        <p className="font-mono text-[10px] text-yellow">{selectedPhotos.size} photo{selectedPhotos.size !== 1 ? "s" : ""} selected</p>
+                      {totalSel > 0 && (
+                        <p className="font-mono text-[10px] text-yellow">
+                          {selectedFolders.size > 0 && `${selectedFolders.size} folder${selectedFolders.size !== 1 ? "s" : ""}`}
+                          {selectedFolders.size > 0 && selectedPhotos.size > 0 && " + "}
+                          {selectedPhotos.size > 0 && `${selectedPhotos.size} photo${selectedPhotos.size !== 1 ? "s" : ""}`} selected →
+                        </p>
                       )}
                     </div>
                   )}
@@ -312,7 +373,7 @@ export default function NewDeliveryPage() {
                 transition={{ duration: 0.2 }}
                 className="hidden lg:block"
               >
-                {RightPanel()}
+                {rightPanel()}
               </motion.div>
             </AnimatePresence>
           </div>
