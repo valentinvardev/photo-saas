@@ -227,12 +227,14 @@ function ImageModal({ files, index, onIndex, onClose, onDelete, onShare, onDownl
   const [chevronVisible, setChevron] = useState(true);
   const dragRef                     = useRef({ sx: 0, sy: 0, ox: 0, oy: 0 });
   const containerRef                = useRef<HTMLDivElement>(null);
-  const touchStartX                 = useRef(0);
   const chevronTimer                = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const resetView = useCallback(() => { setZoom(1); setOffset({ x: 0, y: 0 }); }, []);
   const prev = useCallback(() => { if (index > 0)              { onIndex(index - 1); resetView(); } }, [index, onIndex, resetView]);
   const next = useCallback(() => { if (index < files.length-1) { onIndex(index + 1); resetView(); } }, [index, files.length, onIndex, resetView]);
+
+  // Touch state — swipe (single finger) + pinch (two fingers)
+  const touchRef = useRef({ x: 0, y: 0, ox: 0, oy: 0, dist: 0, startZoom: 1 });
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -245,12 +247,42 @@ function ImageModal({ files, index, onIndex, onClose, onDelete, onShare, onDownl
     return () => { window.removeEventListener("keydown", handler); document.body.style.overflow = ""; };
   }, [onClose, prev, next]);
 
-  // Touch swipe — only when not zoomed
-  const onTouchStart = (e: React.TouchEvent) => { if (zoom <= 1 && e.touches[0]) touchStartX.current = e.touches[0].clientX; };
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const t1 = e.touches[0]!, t2 = e.touches[1]!;
+      touchRef.current.dist      = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+      touchRef.current.startZoom = zoom;
+    } else if (e.touches[0]) {
+      touchRef.current.x  = e.touches[0].clientX;
+      touchRef.current.y  = e.touches[0].clientY;
+      touchRef.current.ox = offset.x;
+      touchRef.current.oy = offset.y;
+    }
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const t1 = e.touches[0]!, t2 = e.touches[1]!;
+      const dist  = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+      const scale = dist / (touchRef.current.dist || 1);
+      const newZoom = Math.min(Math.max(touchRef.current.startZoom * scale, 1), 8);
+      if (newZoom === 1) setOffset({ x: 0, y: 0 });
+      setZoom(newZoom);
+    } else if (zoom > 1 && e.touches[0]) {
+      e.preventDefault();
+      setOffset({
+        x: touchRef.current.ox + (e.touches[0].clientX - touchRef.current.x),
+        y: touchRef.current.oy + (e.touches[0].clientY - touchRef.current.y),
+      });
+    }
+  };
+
   const onTouchEnd = (e: React.TouchEvent) => {
     if (zoom > 1) return;
+    if (e.touches.length > 0) return; // still pinching
     const t = e.changedTouches[0]; if (!t) return;
-    const dx = touchStartX.current - t.clientX;
+    const dx = touchRef.current.x - t.clientX;
     if (Math.abs(dx) > 40) { if (dx > 0) next(); else prev(); }
   };
 
@@ -259,7 +291,6 @@ function ImageModal({ files, index, onIndex, onClose, onDelete, onShare, onDownl
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      // Hide chevrons when user scrolls — they know how to navigate
       setChevron(false);
       if (chevronTimer.current) clearTimeout(chevronTimer.current);
       chevronTimer.current = setTimeout(() => setChevron(true), 2500);
@@ -280,9 +311,10 @@ function ImageModal({ files, index, onIndex, onClose, onDelete, onShare, onDownl
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+      onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-      className="fixed inset-0 z-50 flex flex-col bg-black select-none">
+      className="fixed inset-0 z-50 flex flex-col bg-black select-none"
+      style={{ touchAction: zoom > 1 ? "none" : "pan-y" }}>
       {/* Top bar */}
       <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
         <button className="pointer-events-auto text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10" onClick={onClose}><I.Back /></button>
