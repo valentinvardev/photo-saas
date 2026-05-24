@@ -6,18 +6,6 @@ import { motion } from "framer-motion";
 import { LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
 import { MOCK_PORTFOLIOS, TEMPLATE_URL, type Portfolio } from "~/lib/portfolio/mock";
 
-/* ── Mini sparkline ── */
-function Sparkline({ data, color = "#fad502" }: { data: number[]; color?: string }) {
-  const max = Math.max(...data, 1);
-  const w = 80; const h = 28;
-  const pts = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - (v / max) * h}`).join(" ");
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 /* ── New-portfolio tile — sits in the grid as the last "card" ── */
 function NewPortfolioTile({ onClick }: { onClick: () => void }) {
   return (
@@ -59,6 +47,17 @@ function NewPortfolioTile({ onClick }: { onClick: () => void }) {
       </div>
     </button>
   );
+}
+
+/* ── Compute week trend from weeklyViews ── */
+function weekTrend(views: number[]): "up" | "down" | "flat" | "none" {
+  const total = views.reduce((a, b) => a + b, 0);
+  if (total === 0) return "none";
+  const first = views.slice(0, 3).reduce((a, b) => a + b, 0);
+  const last  = views.slice(4).reduce((a, b) => a + b, 0);
+  if (last > first * 1.1) return "up";
+  if (last < first * 0.9) return "down";
+  return "flat";
 }
 
 /* ── Portfolio card — clicking it navigates to the manage page ── */
@@ -110,13 +109,31 @@ function PortfolioCard({ p }: { p: Portfolio }) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-[9px] text-[var(--fg-muted)]">{p.visits.toLocaleString()} visits</span>
-            <span className="font-mono text-[9px] text-[var(--fg-muted)]">{p.pages}p</span>
-          </div>
-          <div className="font-mono text-[9px] text-[var(--fg-muted)]">{p.updatedAt}</div>
-        </div>
+        {/* Metrics row */}
+        {(() => {
+          const weekTotal = p.weeklyViews.reduce((a, b) => a + b, 0);
+          const trend = weekTrend(p.weeklyViews);
+          return (
+            <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
+              {p.status === "published" ? (
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)]">
+                    {trend === "up"   && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>}
+                    {trend === "down" && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>}
+                    {trend === "flat" && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14"/></svg>}
+                    {weekTotal > 0 ? `${weekTotal} this wk` : `${p.visits.toLocaleString()} views`}
+                  </span>
+                  {p.uniqueVisitors > 0 && (
+                    <span className="font-mono text-[9px] text-[var(--fg-muted)]">{p.uniqueVisitors} unique</span>
+                  )}
+                </div>
+              ) : (
+                <span className="font-mono text-[9px] text-yellow/70">Unpublished</span>
+              )}
+              <span className="font-mono text-[9px] text-[var(--fg-muted)]">{p.updatedAt}</span>
+            </div>
+          );
+        })()}
       </div>
     </Link>
   );

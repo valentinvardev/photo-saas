@@ -208,12 +208,17 @@ function AddDomainPanel({ onConnect, onClose }: {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -6 }}
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.18 }}
-      className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden"
+      exit={{ opacity: 0, y: 24 }}
+      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed bottom-0 inset-x-0 z-50 rounded-t-2xl sm:relative sm:inset-auto sm:z-auto sm:rounded-xl border-t sm:border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden"
+      style={{ maxHeight: "85dvh" }}
     >
+      {/* Drag handle — mobile only */}
+      <div className="flex justify-center pt-3 pb-1 sm:hidden">
+        <div className="w-10 h-1 rounded-full bg-[var(--border)]" />
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
         <p className="font-sans text-sm font-semibold text-[var(--fg)]">Add a custom domain</p>
@@ -323,43 +328,11 @@ function AddDomainPanel({ onConnect, onClose }: {
 
 /* ── Edit page button ─────────────────────────────────────────── */
 function EditPageButton({ href }: { href: string }) {
-  const [showModal, setShowModal] = useState(false);
   return (
-    <>
-      <a href={href} className="hidden sm:flex font-sans text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors items-center gap-1.5">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        Edit
-      </a>
-      <button onClick={() => setShowModal(true)} className="sm:hidden font-sans text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        Edit
-      </button>
-      <AnimatePresence>
-        {showModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-6"
-            style={{ backdropFilter: "blur(8px)", background: "rgba(0,0,0,0.45)" }}
-            onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
-          >
-            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 24 }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full max-w-sm bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden"
-            >
-              <div className="px-6 pt-6 pb-4">
-                <div className="w-10 h-10 rounded-full bg-[var(--bg-subtle)] flex items-center justify-center mb-4">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" className="text-[var(--fg-muted)]"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-                </div>
-                <h2 className="font-sans font-bold text-[var(--fg)] text-base mb-1">Desktop feature</h2>
-                <p className="font-sans text-sm text-[var(--fg-muted)] leading-relaxed">The page editor is designed for larger screens. Open Portapic on your computer to edit this page.</p>
-              </div>
-              <div className="px-6 pb-6">
-                <button onClick={() => setShowModal(false)} className="w-full py-2.5 rounded-xl bg-[var(--fg)] text-[var(--bg)] font-sans text-sm font-semibold hover:opacity-90 transition-opacity">Got it</button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+    <a href={href} className="font-sans text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit
+    </a>
   );
 }
 
@@ -377,8 +350,8 @@ function RouteRow({ icon, label, hint, prefix, slug, onSlug, locked }: {
           <p className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">{hint}</p>
         </div>
       </div>
-      <div className="md:shrink-0 flex items-center bg-[var(--bg)] border border-[var(--border)] rounded-lg overflow-hidden min-w-0 ml-11 md:ml-0">
-        <span className="font-mono text-xs text-[var(--fg-muted)] pl-3 pr-0.5 select-none truncate min-w-0">{prefix}</span>
+      <div className="md:shrink-0 flex items-center bg-[var(--bg)] border border-[var(--border)] rounded-lg overflow-x-auto ml-11 md:ml-0">
+        <span className="font-mono text-xs text-[var(--fg-muted)] pl-3 pr-0.5 select-none whitespace-nowrap shrink-0">{prefix}</span>
         {locked ? (
           <span className="font-mono text-xs text-[var(--fg-muted)] italic px-2 py-2 select-none shrink-0">root</span>
         ) : (
@@ -624,10 +597,19 @@ export default function DomainPage() {
           )}
         </AnimatePresence>
 
-        {/* Add domain panel */}
+        {/* Add domain panel (bottom sheet on mobile, inline on desktop) */}
         <AnimatePresence>
           {showAddPanel && !customDomain && (
-            <AddDomainPanel onConnect={handleConnect} onClose={() => setShowAddPanel(false)} />
+            <>
+              <motion.div
+                key="add-backdrop"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="fixed inset-0 z-40 sm:hidden"
+                style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
+                onClick={() => setShowAddPanel(false)}
+              />
+              <AddDomainPanel onConnect={handleConnect} onClose={() => setShowAddPanel(false)} />
+            </>
           )}
         </AnimatePresence>
       </section>
