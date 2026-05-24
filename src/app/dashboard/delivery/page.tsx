@@ -51,7 +51,7 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
       {/* Cover — clicking it opens the device-framed preview modal */}
       <button
         onClick={() => setPreviewOpen(true)}
-        className="relative h-36 overflow-hidden bg-[var(--bg-subtle)] block w-full text-left"
+        className="relative h-40 sm:h-36 overflow-hidden bg-[var(--bg-subtle)] block w-full text-left"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={cover} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -117,7 +117,7 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
           <button
             onClick={handleCopyLink}
             aria-live="polite"
-            className="flex-1 relative h-7 rounded-md overflow-hidden"
+            className="flex-1 relative h-9 sm:h-7 rounded-md overflow-hidden"
           >
             <AnimatePresence mode="wait" initial={false}>
               {copied ? (
@@ -153,7 +153,7 @@ function DeliveryCard({ page }: { page: DeliveryPage }) {
           </button>
           <Link
             href={`/delivery/edit/${page.id}`}
-            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md font-sans text-[10px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 sm:py-1.5 px-2 rounded-md font-sans text-[10px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Edit
@@ -260,7 +260,7 @@ export default function DeliveryPagesPage() {
   function goNew() { router.push("/dashboard/delivery/new"); }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <div className="mb-6">
         <h1 className="font-sans font-black text-[var(--fg)] text-xl">Delivery</h1>
         <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">

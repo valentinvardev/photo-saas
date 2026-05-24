@@ -548,6 +548,234 @@ function ShareModal({ files, onClose }: { files: GFile[]; onClose: () => void })
   );
 }
 
+/* ── Mobile share sheet — folder navigation ── */
+function MobileShareSheet({
+  folders,
+  allFiles,
+  initialFolder,
+  onClose,
+}: {
+  folders: Folder[];
+  allFiles: GFile[];
+  initialFolder: Folder | null;
+  onClose: () => void;
+}) {
+  const [step, setStep]           = useState<"folders" | "photos" | "share">(initialFolder ? "photos" : "folders");
+  const [currentFolder, setFolder] = useState<Folder | null>(initialFolder);
+  const [pickedIds, setPickedIds] = useState<Set<string>>(new Set());
+  const [copied, setCopied]       = useState(false);
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, [onClose]);
+
+  const photos     = allFiles.filter((f) => currentFolder ? f.folder === currentFolder.name : true);
+  const pickedFiles = allFiles.filter((f) => pickedIds.has(f.id));
+  const shareUrl   = typeof window !== "undefined" ? `${window.location.origin}/s/a7f3k9x` : "https://portapic.app/s/a7f3k9x";
+
+  const toggle = (id: string) => setPickedIds((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+  function goBack() {
+    if (step === "share")  { setStep("photos"); return; }
+    if (step === "photos") { setStep("folders"); setFolder(null); setPickedIds(new Set()); }
+  }
+
+  function copy() {
+    navigator.clipboard.writeText(shareUrl).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      className="fixed inset-0 z-[60] flex items-end justify-center"
+      style={{ backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", background: "rgba(0,0,0,0.5)" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <motion.div
+        initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+        transition={{ type: "spring", stiffness: 280, damping: 30 }}
+        className="w-full max-w-lg bg-[var(--bg-card)] border-t border-[var(--border)] rounded-t-2xl shadow-2xl flex flex-col overflow-hidden"
+        style={{ maxHeight: "85dvh" }}
+      >
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-1 shrink-0">
+          <div className="w-10 h-1 rounded-full bg-[var(--border)]" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)] shrink-0">
+          {step !== "folders" && (
+            <button onClick={goBack}
+              className="w-8 h-8 flex items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] rounded-lg hover:bg-[var(--bg-subtle)] transition-colors shrink-0">
+              <I.Back />
+            </button>
+          )}
+          <div className="flex-1 min-w-0">
+            <h2 className="font-sans font-bold text-[var(--fg)] text-sm">
+              {step === "folders" && "Share photos"}
+              {step === "photos"  && (currentFolder?.name ?? "All photos")}
+              {step === "share"   && "Share link"}
+            </h2>
+            {step === "photos" && (
+              <p className="font-mono text-[10px] text-[var(--fg-muted)]">
+                {pickedIds.size > 0 ? `${pickedIds.size} selected` : "Tap to select"}
+              </p>
+            )}
+            {step === "share" && (
+              <p className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest">Expires in 7 days</p>
+            )}
+          </div>
+          <button onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] rounded-lg hover:bg-[var(--bg-subtle)] transition-colors shrink-0">
+            <I.Close />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="overflow-y-auto flex-1">
+          <AnimatePresence mode="wait">
+            {step === "folders" && (
+              <motion.div key="folders"
+                initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="p-4 flex flex-col gap-2"
+              >
+                {/* All photos row */}
+                <button onClick={() => { setFolder(null); setStep("photos"); }}
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] hover:bg-[var(--bg-card)] transition-colors">
+                  <div className="w-10 h-10 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)] shrink-0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <p className="font-sans font-bold text-[var(--fg)] text-sm">All photos</p>
+                    <p className="font-mono text-[10px] text-[var(--fg-muted)]">{allFiles.length} photos</p>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+
+                {/* Folder grid */}
+                <div className="grid grid-cols-2 gap-2">
+                  {folders.map((folder) => (
+                    <button key={folder.id} onClick={() => { setFolder(folder); setStep("photos"); }}
+                      className="relative aspect-[4/3] overflow-hidden rounded-xl border border-[var(--border)]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`https://picsum.photos/seed/${folder.seed}/200/150?grayscale`} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/55" />
+                      <div className="absolute inset-x-0 bottom-0 p-2.5 text-left">
+                        <p className="font-sans font-bold text-white text-xs">{folder.name}</p>
+                        <p className="font-mono text-[9px] text-white/60">{folder.count} photos</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {step === "photos" && (
+              <motion.div key="photos"
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="grid grid-cols-3" style={{ gap: "1px", backgroundColor: "var(--border)" }}>
+                  {photos.map((file) => (
+                    <button key={file.id} className="relative aspect-square overflow-hidden" onClick={() => toggle(file.id)}>
+                      {file.type !== "raw" && file.type !== "tiff" ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={`https://picsum.photos/seed/${file.seed}/200/200?grayscale`} alt={file.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: typeColor(file.type).bg }}>
+                          <span className="font-mono font-black text-xs" style={{ color: typeColor(file.type).text }}>.{file.type.toUpperCase()}</span>
+                        </div>
+                      )}
+                      {pickedIds.has(file.id) && <div className="absolute inset-0 bg-yellow/25 border-2 border-yellow" />}
+                      <div className={`absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center transition-colors ${pickedIds.has(file.id) ? "bg-yellow" : "bg-black/40 border border-white/30"}`}>
+                        {pickedIds.has(file.id) && <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#111" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {step === "share" && (
+              <motion.div key="share"
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                className="p-4 flex flex-col gap-3"
+              >
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)]">
+                  <div className="flex -space-x-2 shrink-0">
+                    {pickedFiles.slice(0, 4).map((f, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={f.id} src={`https://picsum.photos/seed/${f.seed}/48/48?grayscale`} alt=""
+                        className="w-9 h-9 rounded-lg object-cover border-2 border-[var(--bg-card)]" style={{ zIndex: 4 - i }} />
+                    ))}
+                    {pickedFiles.length > 4 && (
+                      <div className="w-9 h-9 rounded-lg bg-[var(--border)] border-2 border-[var(--bg-card)] flex items-center justify-center font-mono text-[9px] text-[var(--fg-muted)] z-0">
+                        +{pickedFiles.length - 4}
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-sans text-xs font-semibold text-[var(--fg)] truncate">
+                      {pickedFiles.length === 1 ? pickedFiles[0]?.name : `${pickedFiles.length} photos`}
+                    </p>
+                    <p className="font-mono text-[10px] text-[var(--fg-muted)]">View-only · no download</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[var(--bg)] border border-[var(--border)]">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0">
+                    <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+                  </svg>
+                  <span className="font-mono text-[11px] text-[var(--fg-muted)] truncate flex-1">{shareUrl}</span>
+                </div>
+
+                <button onClick={copy}
+                  className={`w-full py-4 rounded-xl font-sans text-sm font-semibold flex items-center justify-center gap-2 transition-all ${copied ? "bg-emerald-500 text-white" : "bg-yellow text-[#111]"}`}>
+                  {copied ? (
+                    <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>Link copied!</>
+                  ) : (
+                    <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy link</>
+                  )}
+                </button>
+
+                <button disabled
+                  className="w-full py-4 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg-muted)] flex items-center justify-center gap-2 cursor-not-allowed opacity-70">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/></svg>
+                  Send by email
+                  <span className="font-mono text-[9px] uppercase tracking-widest bg-yellow/20 text-yellow border border-yellow/30 px-1.5 py-0.5 rounded">Pro</span>
+                </button>
+
+                <p className="text-center font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest">
+                  Link expires automatically · no account required to view
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Footer CTA for photos step */}
+        {step === "photos" && (
+          <div className="px-4 pb-8 pt-3 border-t border-[var(--border)] shrink-0">
+            <button onClick={() => setStep("share")} disabled={pickedIds.size === 0}
+              className="w-full py-4 rounded-xl font-sans font-semibold text-sm bg-yellow text-[#111] disabled:opacity-40 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-2">
+              <I.Share />
+              {pickedIds.size === 0 ? "Select photos to share" : `Share ${pickedIds.size} photo${pickedIds.size > 1 ? "s" : ""}`}
+            </button>
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+}
+
 /* ── Main page ── */
 export default function GalleryPage() {
   const [folders, setFolders]           = useState<Folder[]>(INITIAL_FOLDERS);
@@ -559,6 +787,8 @@ export default function GalleryPage() {
   const [previewIdx, setPreviewIdx]     = useState<number | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<GFile | null>(null);
   const [shareFiles, setShareFiles]     = useState<GFile[] | null>(null);
+  const [mobileShareOpen, setMobileShareOpen]       = useState(false);
+  const [mobileShareFolder, setMobileShareFolder]   = useState<Folder | null>(null);
 
   /* Folder rename state */
   const [editFolderId, setEditFolderId]         = useState<string | null>(null);
@@ -854,6 +1084,14 @@ export default function GalleryPage() {
                 )}
                 <span className="font-mono text-[9px] text-white/50">{folder.count} photos</span>
               </div>
+              {/* Share button — mobile only */}
+              <button
+                className="absolute bottom-2 right-2 sm:hidden w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white/80 active:bg-black/70 transition-colors"
+                onClick={(e) => { e.stopPropagation(); setMobileShareFolder(folder); setMobileShareOpen(true); }}
+                aria-label={`Share ${folder.name}`}
+              >
+                <I.Share />
+              </button>
             </div>
           ))}
 
@@ -1078,10 +1316,22 @@ export default function GalleryPage() {
         )}
       </AnimatePresence>
 
-      {/* Share modal */}
+      {/* Share modal (desktop / bulk selection) */}
       <AnimatePresence>
         {shareFiles && (
           <ShareModal files={shareFiles} onClose={() => setShareFiles(null)} />
+        )}
+      </AnimatePresence>
+
+      {/* Mobile share sheet (folder navigation) */}
+      <AnimatePresence>
+        {mobileShareOpen && (
+          <MobileShareSheet
+            folders={folders}
+            allFiles={MOCK_FILES}
+            initialFolder={mobileShareFolder}
+            onClose={() => { setMobileShareOpen(false); setMobileShareFolder(null); }}
+          />
         )}
       </AnimatePresence>
 
