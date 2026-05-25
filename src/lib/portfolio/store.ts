@@ -38,6 +38,9 @@ interface PortfolioContentStore {
   reorderCategories:        (portfolioId: string, ids: string[]) => void;
   reorderFolderPhotos:      (portfolioId: string, folderId: string, ids: string[]) => void;
   reorderCategoryPhotos:    (portfolioId: string, categoryId: string, ids: string[]) => void;
+
+  /* Move photo between folders */
+  movePhoto: (portfolioId: string, photoId: string, fromFolderId: string, toFolderId: string, atIndex: number) => void;
 }
 
 /* Helper — produce a fresh content object for portfolios with no entry yet */
@@ -268,6 +271,29 @@ export const usePortfolioContentStore = create<PortfolioContentStore>()(
           byPortfolio: {
             ...s.byPortfolio,
             [portfolioId]: { ...c, categories: { ...c.categories, [categoryId]: { ...cat, directPhotoIds: ids } } },
+          },
+        };
+      }),
+
+      movePhoto: (portfolioId, photoId, fromFolderId, toFolderId, atIndex) => set((s) => {
+        const c = ensureContent(s.byPortfolio, portfolioId);
+        const src = c.folders[fromFolderId];
+        const tgt = c.folders[toFolderId];
+        if (!src || !tgt) return s;
+        const srcIds = src.photoIds.filter((id) => id !== photoId);
+        const tgtIds = tgt.photoIds.filter((id) => id !== photoId);
+        tgtIds.splice(Math.max(0, Math.min(atIndex, tgtIds.length)), 0, photoId);
+        return {
+          byPortfolio: {
+            ...s.byPortfolio,
+            [portfolioId]: {
+              ...c,
+              folders: {
+                ...c.folders,
+                [fromFolderId]: { ...src, photoIds: srcIds },
+                [toFolderId]:   { ...tgt, photoIds: tgtIds },
+              },
+            },
           },
         };
       }),
