@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { DevicePreviewModal, LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
 import { ContentTree } from "~/components/portfolio/ContentTree";
-import { getPortfolioById, TEMPLATE_URL, TEMPLATES, type Portfolio } from "~/lib/portfolio/mock";
+import { TEMPLATE_URL, TEMPLATES, type Portfolio } from "~/lib/portfolio/mock";
+import { dbToView } from "~/lib/portfolio/adapt";
+import { api } from "~/trpc/react";
 
 type Tab = "content" | "template" | "domain" | "seo" | "analytics" | "settings";
 
@@ -22,11 +24,29 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 export default function PortfolioManagePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const portfolio = getPortfolioById(id);
+
+  const { data: dbP, isLoading } = api.portfolio.get.useQuery({ id });
+  const portfolio = dbP ? dbToView(dbP) : undefined;
 
   const [tab, setTab]                 = useState<Tab>("content");
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [published, setPublished]     = useState(portfolio?.status === "published");
+  const [published, setPublished]     = useState(false);
+
+  const utils      = api.useUtils();
+  const publishMut = api.portfolio.update.useMutation({
+    onSuccess: () => { void utils.portfolio.get.invalidate({ id }); void utils.portfolio.list.invalidate(); },
+  });
+  const deleteMut  = api.portfolio.delete.useMutation();
+
+  useEffect(() => { if (dbP) setPublished(dbP.status === "published"); }, [dbP]);
+
+  if (isLoading) {
+    return (
+      <div className="p-12 flex items-center justify-center">
+        <div className="w-6 h-6 rounded-full border-2 border-[var(--border)] border-t-yellow animate-spin" />
+      </div>
+    );
+  }
 
   if (!portfolio) {
     return (
@@ -84,8 +104,13 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
             Edit website
           </Link>
           <button
-            onClick={() => setPublished((v) => !v)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-sans text-xs font-bold transition-colors ${
+            onClick={() => {
+              const nextStatus = published ? "draft" : "published";
+              setPublished(!published);
+              publishMut.mutate({ id, status: nextStatus });
+            }}
+            disabled={publishMut.isPending}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-sans text-xs font-bold transition-colors disabled:opacity-50 ${
               published
                 ? "border border-red-500/30 text-red-400 hover:bg-red-500/10"
                 : "bg-yellow text-[#111] hover:bg-yellow/90"
@@ -181,7 +206,11 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
 
           {tab === "settings" && (
             <motion.div key="settings" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <SettingsTab portfolio={portfolio} onDelete={() => router.push("/dashboard/portfolio")} />
+              <SettingsTab portfolio={portfolio} onDelete={async () => {
+                await deleteMut.mutateAsync({ id });
+                void utils.portfolio.list.invalidate();
+                router.push("/dashboard/portfolio");
+              }} />
             </motion.div>
           )}
         </AnimatePresence>

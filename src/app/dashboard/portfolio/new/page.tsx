@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { LivePreviewThumbnail, DevicePreviewModal } from "~/components/dashboard/DevicePreviewModal";
 import { TEMPLATE_URL, TEMPLATES } from "~/lib/portfolio/mock";
+import { api } from "~/trpc/react";
 
 const STEPS = ["Name & Photos", "Structure", "Template", "Domain", "Done"] as const;
 
@@ -176,6 +177,41 @@ export default function NewPortfolioPage() {
   const [domain,          setDomain]          = useState<"free" | "custom">("free");
   const [customDomain,    setCustomDomain]    = useState("");
   const [previewOpen,     setPreviewOpen]     = useState(false);
+  const [newId,           setNewId]           = useState<string | null>(null);
+  const [creating,        setCreating]        = useState(false);
+  const [createError,     setCreateError]     = useState<string | null>(null);
+
+  const utils = api.useUtils();
+  const createMut = api.portfolio.create.useMutation();
+
+  /** Persist the portfolio, then advance to the success step. Retries once
+   *  with a suffixed slug if the chosen slug is already taken. */
+  async function createPortfolio() {
+    if (creating) return;
+    setCreating(true);
+    setCreateError(null);
+    const payload = { title: name.trim(), template };
+    try {
+      let made;
+      try {
+        made = await createMut.mutateAsync({ ...payload, slug });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.toLowerCase().includes("slug")) {
+          made = await createMut.mutateAsync({ ...payload, slug: `${slug}-${Math.random().toString(36).slice(2, 6)}` });
+        } else {
+          throw err;
+        }
+      }
+      setNewId(made.id);
+      void utils.portfolio.list.invalidate();
+      setStep(4);
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : "Could not create portfolio.");
+    } finally {
+      setCreating(false);
+    }
+  }
 
   const canNext   = step === 0 ? !!name.trim() : true;
   const isDone    = step === 4;
@@ -360,7 +396,7 @@ export default function NewPortfolioPage() {
               <button onClick={() => router.push("/dashboard/portfolio")} className="px-5 py-2.5 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
                 Go to portfolio
               </button>
-              <button onClick={() => router.push("/dashboard/portfolio/1")} className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 transition-colors">
+              <button onClick={() => router.push(newId ? `/dashboard/portfolio/${newId}` : "/dashboard/portfolio")} className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 transition-colors">
                 Open editor →
               </button>
             </motion.div>
@@ -514,10 +550,15 @@ export default function NewPortfolioPage() {
                       Skip for now
                     </button>
                   )}
-                  <button disabled={!canNext} onClick={() => setStep(step + 1)}
+                  {createError && (
+                    <span className="font-mono text-[10px] text-red-400 max-w-[180px] truncate" title={createError}>{createError}</span>
+                  )}
+                  <button
+                    disabled={!canNext || creating}
+                    onClick={() => { if (step === 3) void createPortfolio(); else setStep(step + 1); }}
                     className="px-5 py-2 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 disabled:opacity-40 transition-colors"
                   >
-                    {step === 3 ? "Create portfolio" : step === 1 ? "Confirm →" : "Continue →"}
+                    {creating ? "Creating…" : step === 3 ? "Create portfolio" : step === 1 ? "Confirm →" : "Continue →"}
                   </button>
                 </div>
               </div>

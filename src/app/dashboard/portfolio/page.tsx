@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
-import { MOCK_PORTFOLIOS, TEMPLATE_URL, type Portfolio } from "~/lib/portfolio/mock";
+import { TEMPLATE_URL, type Portfolio } from "~/lib/portfolio/mock";
+import { dbToView } from "~/lib/portfolio/adapt";
+import { api } from "~/trpc/react";
 
 /* ── New-portfolio tile — sits in the grid as the last "card" ── */
 function NewPortfolioTile({ onClick }: { onClick: () => void }) {
@@ -143,9 +145,11 @@ function PortfolioCard({ p }: { p: Portfolio }) {
 
 export default function PortfolioPage() {
   const router = useRouter();
+  const { data, isLoading } = api.portfolio.list.useQuery();
 
-  const published = MOCK_PORTFOLIOS.filter((p) => p.status === "published").length;
-  const drafts    = MOCK_PORTFOLIOS.filter((p) => p.status === "draft").length;
+  const portfolios = (data ?? []).map(dbToView);
+  const published = portfolios.filter((p) => p.status === "published").length;
+  const drafts    = portfolios.filter((p) => p.status === "draft").length;
 
   function goNew() { router.push("/dashboard/portfolio/new"); }
 
@@ -156,15 +160,27 @@ export default function PortfolioPage() {
         <div>
           <h1 className="font-sans font-black text-[var(--fg)] text-xl">Portfolio</h1>
           <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">
-            <span className="text-green-400">{published} published</span>
-            {drafts > 0 && <> · <span>{drafts} draft{drafts > 1 ? "s" : ""}</span></>}
-            <> · <span>{MOCK_PORTFOLIOS.length} total</span></>
+            {isLoading ? (
+              <span>Loading…</span>
+            ) : (
+              <>
+                <span className="text-green-400">{published} published</span>
+                {drafts > 0 && <> · <span>{drafts} draft{drafts > 1 ? "s" : ""}</span></>}
+                <> · <span>{portfolios.length} total</span></>
+              </>
+            )}
           </p>
         </div>
       </div>
 
       {/* ── Grid ── */}
-      {MOCK_PORTFOLIOS.length === 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-52 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] animate-pulse" />
+          ))}
+        </div>
+      ) : portfolios.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 text-center">
           <div className="w-16 h-16 rounded-2xl bg-[var(--bg-subtle)] flex items-center justify-center mb-4 text-[var(--fg-muted)]">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
@@ -178,7 +194,7 @@ export default function PortfolioPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           <NewPortfolioTile onClick={goNew} />
-          {MOCK_PORTFOLIOS.map((p) => <PortfolioCard key={p.id} p={p} />)}
+          {portfolios.map((p) => <PortfolioCard key={p.id} p={p} />)}
         </div>
       )}
     </div>
