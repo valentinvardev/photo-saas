@@ -125,17 +125,13 @@ function HomeIcon() {
   );
 }
 
+// MVP scope: portfolio + gallery only. Templates, Links, Delivery, Domain and
+// the "soon" items are built but hidden — see next.config.js redirects. To
+// restore a feature, add its entry back here and remove its redirect.
 const navMain = [
   { labelKey: "nav.dashboard", label: "Home",      href: "/dashboard",           icon: HomeIcon, exact: true },
   { labelKey: "nav.gallery",   label: "Gallery",   href: "/dashboard/gallery",   icon: GalleryIcon },
   { labelKey: "nav.portfolio", label: "Portfolio", href: "/dashboard/portfolio", icon: PortfolioIcon },
-  { labelKey: "nav.templates", label: "Templates", href: "/dashboard/templates", icon: TemplatesIcon },
-  { labelKey: "nav.links",     label: "Links",     href: "/dashboard/links",     icon: LinksIcon },
-  { labelKey: "nav.delivery",  label: "Delivery",  href: "/dashboard/delivery",  icon: DeliveryIcon },
-  { labelKey: "nav.domain",    label: "Domain",    href: "/dashboard/domain",    icon: DomainIcon },
-  { label: "Sales",     href: "/dashboard/sales",      icon: SalesIcon,     soon: true },
-  { label: "Clients",   href: "/dashboard/clients",    icon: ClientsIcon,   soon: true },
-  { label: "Analytics", href: "/dashboard/analytics",  icon: AnalyticsIcon, soon: true },
 ];
 
 function ProfileIcon() {

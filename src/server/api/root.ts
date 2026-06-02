@@ -1,14 +1,13 @@
 import { postRouter }      from "~/server/api/routers/post";
-import { linksRouter }     from "~/server/api/routers/links";
-import { deliveryRouter }  from "~/server/api/routers/delivery";
 import { portfolioRouter } from "~/server/api/routers/portfolio";
 import { photoRouter }     from "~/server/api/routers/photo";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
+// MVP scope: portfolio + gallery (photo) only. The links & delivery routers
+// are built and kept in src/server/api/routers/ but unregistered here. To
+// re-enable, re-import and add them back to the router map below.
 export const appRouter = createTRPCRouter({
   post:      postRouter,
-  links:     linksRouter,
-  delivery:  deliveryRouter,
   portfolio: portfolioRouter,
   photo:     photoRouter,
 });

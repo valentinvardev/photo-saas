@@ -303,23 +303,14 @@ function LogoutIcon() {
 
 type Tpl = { id: string; name: string; type: "Portfolio" | "Links" | "Delivery"; subtitle: string; tags: string[]; href: string; accent: string; bg: string; fg: string; mono: string; display: string; displayItalic?: boolean; displayWeight?: number };
 
+// MVP scope: only portfolio templates surface in the command palette. The
+// links & delivery template demos still exist under /template/* but are hidden.
 const TEMPLATES_INDEX: Tpl[] = [
   { id: "halcyon-portfolio",  name: "Halcyon",  type: "Portfolio", subtitle: "Editorial warm dark",     tags: ["editorial","warm","italic"],   href: "/template/halcyon",          accent: "#C2410C", bg: "#0E0D0B", fg: "#EFEAE0", mono: "'Geist Mono'",      display: "'Instrument Serif'",    displayItalic: true,  displayWeight: 400 },
   { id: "brooklyn-portfolio", name: "Brooklyn", type: "Portfolio", subtitle: "Urban dark + red",        tags: ["dark","urban","bold"],         href: "/template/brooklyn",         accent: "#E8382C", bg: "#0D0D0D", fg: "#F0EFE9", mono: "'Space Mono'",      display: "'DM Serif Display'",    displayItalic: true,  displayWeight: 400 },
   { id: "monolith-portfolio", name: "Monolith", type: "Portfolio", subtitle: "Sans-first brutal modern", tags: ["grid","bold","sans"],         href: "/template/monolith",         accent: "#FF4015", bg: "#F5F4F1", fg: "#0A0A0A", mono: "'Geist Mono'",      display: "'Bricolage Grotesque'", displayWeight: 800 },
   { id: "atlas-portfolio",    name: "Atlas",    type: "Portfolio", subtitle: "Cobalt cream cursor index", tags: ["editorial","cobalt"],        href: "/template/atlas",            accent: "#2235FF", bg: "#EFEAE0", fg: "#0E0E0E", mono: "'Geist Mono'",      display: "'Bricolage Grotesque'", displayItalic: true,  displayWeight: 500 },
   { id: "vault-portfolio",    name: "Vault",    type: "Portfolio", subtitle: "Paper archive book",      tags: ["magazine","archive","paper"],  href: "/template/vault",            accent: "#A8462E", bg: "#F4F0E6", fg: "#1A1714", mono: "'JetBrains Mono'",  display: "'Anton'",               displayWeight: 400 },
-  { id: "halcyon-links",      name: "Halcyon",  type: "Links",     subtitle: "Marquee + italic name",   tags: ["editorial","warm"],            href: "/template/halcyon/links",    accent: "#C2410C", bg: "#0E0D0B", fg: "#EFEAE0", mono: "'Geist Mono'",      display: "'Instrument Serif'",    displayItalic: true },
-  { id: "brooklyn-links",     name: "Brooklyn", type: "Links",     subtitle: "Urban marquee + red CTA", tags: ["dark","urban"],                href: "/template/brooklyn/links",   accent: "#E8382C", bg: "#0D0D0D", fg: "#F0EFE9", mono: "'Space Mono'",      display: "'DM Serif Display'",    displayItalic: true },
-  { id: "monolith-links",     name: "Monolith", type: "Links",     subtitle: "Numbered cards + lava",   tags: ["grid","sans"],                 href: "/template/monolith/links",   accent: "#FF4015", bg: "#F5F4F1", fg: "#0A0A0A", mono: "'Geist Mono'",      display: "'Bricolage Grotesque'", displayWeight: 800 },
-  { id: "atlas-links",        name: "Atlas",    type: "Links",     subtitle: "Italic marquee cobalt",   tags: ["editorial","cobalt"],          href: "/template/atlas/links",      accent: "#2235FF", bg: "#EFEAE0", fg: "#0E0E0E", mono: "'Geist Mono'",      display: "'Bricolage Grotesque'", displayItalic: true },
-  { id: "vault-links",        name: "Vault",    type: "Links",     subtitle: "Paper hub + terracotta",  tags: ["magazine","archive"],          href: "/template/vault/links",      accent: "#A8462E", bg: "#F4F0E6", fg: "#1A1714", mono: "'JetBrains Mono'",  display: "'Anton'" },
-  { id: "halcyon-delivery",   name: "Halcyon",  type: "Delivery",  subtitle: "Curtain reveal chapters", tags: ["editorial","warm"],            href: "/template/halcyon/delivery", accent: "#C2410C", bg: "#0E0D0B", fg: "#EFEAE0", mono: "'Geist Mono'",      display: "'Instrument Serif'",    displayItalic: true },
-  { id: "brooklyn-delivery",  name: "Brooklyn", type: "Delivery",  subtitle: "Dark gallery + downloads",tags: ["dark","urban"],                href: "/template/brooklyn/delivery",accent: "#E8382C", bg: "#0D0D0D", fg: "#F0EFE9", mono: "'Space Mono'",      display: "'DM Serif Display'" },
-  { id: "minimal-delivery",   name: "Minimal",  type: "Delivery",  subtitle: "White paper strict grid", tags: ["minimal","fine art"],          href: "/template/minimal/delivery", accent: "#111111", bg: "#FAFAFA", fg: "#111111", mono: "'Space Mono'",      display: "'Cormorant Garamond'",  displayItalic: true },
-  { id: "monolith-delivery",  name: "Monolith", type: "Delivery",  subtitle: "Two-pane numbered gate",  tags: ["grid","sans"],                 href: "/template/monolith/delivery",accent: "#FF4015", bg: "#F5F4F1", fg: "#0A0A0A", mono: "'Geist Mono'",      display: "'Bricolage Grotesque'", displayWeight: 800 },
-  { id: "atlas-delivery",     name: "Atlas",    type: "Delivery",  subtitle: "Cobalt curtain masonry",  tags: ["editorial","cobalt"],          href: "/template/atlas/delivery",   accent: "#2235FF", bg: "#EFEAE0", fg: "#0E0E0E", mono: "'Geist Mono'",      display: "'Bricolage Grotesque'", displayItalic: true },
-  { id: "vault-delivery",     name: "Vault",    type: "Delivery",  subtitle: "Paper archive sectioned", tags: ["magazine","archive"],          href: "/template/vault/delivery",   accent: "#A8462E", bg: "#F4F0E6", fg: "#1A1714", mono: "'JetBrains Mono'",  display: "'Anton'" },
 ];
 
 type Person = { id: string; name: string; role: string; location: string; mutual?: number; href: string; tone: string };
@@ -351,22 +342,19 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
 };
 
 type QuickAction = { id: string; label: string; sub: string; href: string; kbd?: string; group: "Workspace" | "Create" };
+// MVP scope: portfolio + gallery only. Templates/Delivery/Links/Domain actions
+// are hidden (their routes redirect — see next.config.js).
 const QUICK_ACTIONS: QuickAction[] = [
   { id: "qa-home",       label: "Home",          sub: "Dashboard overview",      href: "/dashboard",           kbd: "G H", group: "Workspace" },
   { id: "qa-gallery",    label: "Gallery",       sub: "All photos & folders",    href: "/dashboard/gallery",   kbd: "G G", group: "Workspace" },
   { id: "qa-portfolio",  label: "Portfolio",     sub: "Manage your sites",       href: "/dashboard/portfolio", kbd: "G P", group: "Workspace" },
-  { id: "qa-templates",  label: "Templates",     sub: "Browse all collections",  href: "/dashboard/templates", kbd: "G T", group: "Workspace" },
-  { id: "qa-delivery",   label: "Delivery",      sub: "Client galleries",        href: "/dashboard/delivery",  kbd: "G D", group: "Workspace" },
-  { id: "qa-links",      label: "Links",         sub: "Your links page",         href: "/dashboard/links",     kbd: "G L", group: "Workspace" },
-  { id: "qa-domain",     label: "Domain",        sub: "Custom domain & DNS",     href: "/dashboard/domain",    kbd: "G O", group: "Workspace" },
   { id: "qa-settings",   label: "Settings",      sub: "Account & preferences",   href: "/dashboard/settings",          group: "Workspace" },
   { id: "qa-profile",    label: "Profile",       sub: "Your public profile",     href: "/dashboard/profile",           group: "Workspace" },
-  { id: "qa-new-del",    label: "New delivery",  sub: "Start a client gallery",  href: "/dashboard/delivery",  kbd: "N D", group: "Create"    },
   { id: "qa-upload",     label: "Upload photos", sub: "Add to your gallery",     href: "/dashboard/gallery",   kbd: "U",   group: "Create"    },
   { id: "qa-new-port",   label: "New portfolio", sub: "Start a fresh site",      href: "/dashboard/portfolio", kbd: "N P", group: "Create"    },
 ];
 
-const TEMPLATE_TYPES = ["All", "Portfolio", "Links", "Delivery"] as const;
+const TEMPLATE_TYPES = ["All", "Portfolio"] as const;
 type TplFilter = (typeof TEMPLATE_TYPES)[number];
 type SearchTab = "templates" | "social" | "navigate";
 

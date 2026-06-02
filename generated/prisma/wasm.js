@@ -93,53 +93,26 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.AccountScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  type: 'type',
-  provider: 'provider',
-  providerAccountId: 'providerAccountId',
-  refresh_token: 'refresh_token',
-  access_token: 'access_token',
-  expires_at: 'expires_at',
-  token_type: 'token_type',
-  scope: 'scope',
-  id_token: 'id_token',
-  session_state: 'session_state',
-  refresh_token_expires_in: 'refresh_token_expires_in'
-};
-
-exports.Prisma.SessionScalarFieldEnum = {
-  id: 'id',
-  sessionToken: 'sessionToken',
-  userId: 'userId',
-  expires: 'expires'
-};
-
-exports.Prisma.VerificationTokenScalarFieldEnum = {
-  identifier: 'identifier',
-  token: 'token',
-  expires: 'expires'
-};
-
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
-  name: 'name',
   email: 'email',
-  emailVerified: 'emailVerified',
-  image: 'image'
+  name: 'name',
+  avatarUrl: 'avatarUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.PhotoScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   url: 'url',
+  storagePath: 'storagePath',
   filename: 'filename',
   size: 'size',
   width: 'width',
   height: 'height',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  mimeType: 'mimeType',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.PortfolioScalarFieldEnum = {
@@ -150,7 +123,7 @@ exports.Prisma.PortfolioScalarFieldEnum = {
   status: 'status',
   template: 'template',
   customDomain: 'customDomain',
-  coverUrl: 'coverUrl',
+  content: 'content',
   views: 'views',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -159,16 +132,31 @@ exports.Prisma.PortfolioScalarFieldEnum = {
 exports.Prisma.LinksPageScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  title: 'title',
-  slug: 'slug',
+  template: 'template',
+  displayName: 'displayName',
   bio: 'bio',
   avatarUrl: 'avatarUrl',
+  avatarBg: 'avatarBg',
+  avatarInitial: 'avatarInitial',
   bgType: 'bgType',
   bgColor: 'bgColor',
-  btnStyle: 'btnStyle',
+  bgGradFrom: 'bgGradFrom',
+  bgGradTo: 'bgGradTo',
+  bgGradAngle: 'bgGradAngle',
+  bgImageUrl: 'bgImageUrl',
+  bgOverlayColor: 'bgOverlayColor',
+  bgOverlayOpacity: 'bgOverlayOpacity',
+  btnShape: 'btnShape',
+  btnVariant: 'btnVariant',
   btnBg: 'btnBg',
-  btnFg: 'btnFg',
-  font: 'font',
+  btnText: 'btnText',
+  btnBorder: 'btnBorder',
+  fontFamily: 'fontFamily',
+  fontWeight: 'fontWeight',
+  textColor: 'textColor',
+  subColor: 'subColor',
+  labels: 'labels',
+  slug: 'slug',
   published: 'published',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -177,33 +165,65 @@ exports.Prisma.LinksPageScalarFieldEnum = {
 exports.Prisma.LinkItemScalarFieldEnum = {
   id: 'id',
   linksPageId: 'linksPageId',
-  label: 'label',
+  type: 'type',
+  title: 'title',
   url: 'url',
+  enabled: 'enabled',
   order: 'order',
-  visible: 'visible',
+  icon: 'icon',
+  waCountry: 'waCountry',
+  waPhone: 'waPhone',
+  waMessage: 'waMessage',
+  igUsername: 'igUsername',
+  emailAddress: 'emailAddress',
+  emailSubject: 'emailSubject',
   createdAt: 'createdAt'
 };
 
 exports.Prisma.DeliveryScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  clientName: 'clientName',
-  clientEmail: 'clientEmail',
   title: 'title',
+  client: 'client',
   status: 'status',
   template: 'template',
+  layout: 'layout',
+  coverUrl: 'coverUrl',
+  coverFit: 'coverFit',
+  coverPositionX: 'coverPositionX',
+  coverPositionY: 'coverPositionY',
+  passwordEnabled: 'passwordEnabled',
   password: 'password',
-  expiresAt: 'expiresAt',
+  whitelistEnabled: 'whitelistEnabled',
+  whitelist: 'whitelist',
+  passwordTitle: 'passwordTitle',
+  passwordSubtitle: 'passwordSubtitle',
+  passwordHint: 'passwordHint',
+  passwordButtonLabel: 'passwordButtonLabel',
   mode: 'mode',
   pricePerPhoto: 'pricePerPhoto',
-  priceBundle: 'priceBundle',
-  selectionCount: 'selectionCount',
-  watermark: 'watermark',
+  priceFullGallery: 'priceFullGallery',
   downloadRes: 'downloadRes',
-  proofingMode: 'proofingMode',
-  layout: 'layout',
-  welcomeMsg: 'welcomeMsg',
+  logoMode: 'logoMode',
+  logoText: 'logoText',
+  logoUrl: 'logoUrl',
+  logoWidth: 'logoWidth',
+  customColors: 'customColors',
+  colorBg: 'colorBg',
+  colorFg: 'colorFg',
+  colorAccent: 'colorAccent',
+  colorBtnBg: 'colorBtnBg',
+  colorBtnFg: 'colorBtnFg',
+  fontFamily: 'fontFamily',
+  fontFamily1: 'fontFamily1',
+  fontFamily2: 'fontFamily2',
+  fontFamily3: 'fontFamily3',
+  welcomeMessage: 'welcomeMessage',
+  showUpsellBanner: 'showUpsellBanner',
+  labels: 'labels',
+  slug: 'slug',
   views: 'views',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -220,6 +240,10 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -230,11 +254,14 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
 
 exports.Prisma.ModelName = {
-  Account: 'Account',
-  Session: 'Session',
-  VerificationToken: 'VerificationToken',
   User: 'User',
   Photo: 'Photo',
   Portfolio: 'Portfolio',
@@ -282,6 +309,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -290,13 +318,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  // DATABASE_URL: transaction pooler (port 6543) — runtime queries\n  // DIRECT_URL:  direct connection  (port 5432) — migrations\n  url       = env(\"DATABASE_URL\")\n  directUrl = env(\"DIRECT_URL\")\n}\n\n// ── NextAuth ──────────────────────────────────────────────────────────────────\n\nmodel Account {\n  id                       String  @id @default(cuid())\n  userId                   String\n  type                     String\n  provider                 String\n  providerAccountId        String\n  refresh_token            String? @db.Text\n  access_token             String? @db.Text\n  expires_at               Int?\n  token_type               String?\n  scope                    String?\n  id_token                 String? @db.Text\n  session_state            String?\n  refresh_token_expires_in Int?\n  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@unique([provider, providerAccountId])\n}\n\nmodel Session {\n  id           String   @id @default(cuid())\n  sessionToken String   @unique\n  userId       String\n  expires      DateTime\n  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n\nmodel VerificationToken {\n  identifier String\n  token      String   @unique\n  expires    DateTime\n\n  @@unique([identifier, token])\n}\n\n// ── FRAME ─────────────────────────────────────────────────────────────────────\n\nmodel User {\n  id            String    @id @default(cuid())\n  name          String?\n  email         String?   @unique\n  emailVerified DateTime?\n  image         String?\n  accounts      Account[]\n  sessions      Session[]\n\n  photos     Photo[]\n  portfolios Portfolio[]\n  linksPages LinksPage[]\n  deliveries Delivery[]\n}\n\n// Master photo library\nmodel Photo {\n  id        String   @id @default(cuid())\n  userId    String\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  url       String\n  filename  String\n  size      Int // bytes\n  width     Int?\n  height    Int?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  deliveryPhotos DeliveryPhoto[]\n\n  @@index([userId])\n}\n\n// Portfolio sites\nmodel Portfolio {\n  id           String   @id @default(cuid())\n  userId       String\n  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  title        String\n  slug         String   @unique\n  status       String   @default(\"draft\") // draft | published\n  template     String   @default(\"minimal\")\n  customDomain String?  @unique\n  coverUrl     String?\n  views        Int      @default(0)\n  createdAt    DateTime @default(now())\n  updatedAt    DateTime @updatedAt\n\n  @@index([userId])\n}\n\n// Link pages (linktree-style)\nmodel LinksPage {\n  id        String  @id @default(cuid())\n  userId    String\n  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  title     String\n  slug      String  @unique\n  bio       String?\n  avatarUrl String?\n\n  // Appearance\n  bgType   String @default(\"solid\") // solid | gradient | image\n  bgColor  String @default(\"#111111\")\n  btnStyle String @default(\"pill\") // pill | rounded | square | outline\n  btnBg    String @default(\"#fad502\")\n  btnFg    String @default(\"#111111\")\n  font     String @default(\"Inter\")\n\n  published Boolean  @default(false)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  links LinkItem[]\n\n  @@index([userId])\n}\n\nmodel LinkItem {\n  id          String    @id @default(cuid())\n  linksPageId String\n  linksPage   LinksPage @relation(fields: [linksPageId], references: [id], onDelete: Cascade)\n  label       String\n  url         String\n  order       Int\n  visible     Boolean   @default(true)\n  createdAt   DateTime  @default(now())\n\n  @@index([linksPageId])\n}\n\n// Client delivery galleries\nmodel Delivery {\n  id          String  @id @default(cuid())\n  userId      String\n  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  clientName  String\n  clientEmail String?\n  title       String?\n  status      String  @default(\"draft\") // draft | active | expired\n  template    String  @default(\"minimal\") // minimal | vogue | cinematic | editorial\n\n  // Access control\n  password  String?\n  expiresAt DateTime?\n\n  // Monetization\n  mode           String  @default(\"gift\") // gift | direct | selection\n  pricePerPhoto  Float?\n  priceBundle    Float?\n  selectionCount Int?\n  watermark      Boolean @default(false)\n  downloadRes    String  @default(\"original\") // original | web | mobile\n  proofingMode   Boolean @default(false)\n\n  // Look & Feel\n  layout     String  @default(\"grid\") // grid | masonry\n  welcomeMsg String?\n\n  views     Int      @default(0)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  photos DeliveryPhoto[]\n\n  @@index([userId])\n}\n\n// Junction: which photos belong to a delivery, in what order\nmodel DeliveryPhoto {\n  id         String   @id @default(cuid())\n  deliveryId String\n  delivery   Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)\n  photoId    String\n  photo      Photo    @relation(fields: [photoId], references: [id], onDelete: Cascade)\n  order      Int      @default(0)\n\n  @@unique([deliveryId, photoId])\n  @@index([deliveryId])\n}\n",
-  "inlineSchemaHash": "cd19e194096f9e6077c2c61a25647e10832728562040d793475480ec54bbe312",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL\")\n  directUrl = env(\"DIRECT_URL\")\n}\n\n// ── Users ────────────────────────────────────────────────────────────────────\n// Mirrors auth.users from Supabase. Created automatically by a DB trigger\n// (see supabase/migrations/001_handle_new_user.sql) — do not insert manually.\n\nmodel User {\n  id        String   @id // UUID from auth.users.id\n  email     String   @unique\n  name      String?\n  avatarUrl String?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  photos     Photo[]\n  portfolios Portfolio[]\n  linksPages LinksPage[]\n  deliveries Delivery[]\n}\n\n// ── Photo library ─────────────────────────────────────────────────────────────\n// Master library for all uploaded photos (used by both delivery and portfolio).\n// Files live in Supabase Storage bucket \"photos\" at storagePath.\n\nmodel Photo {\n  id          String   @id @default(cuid())\n  userId      String\n  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  url         String // public URL (Supabase Storage)\n  storagePath String // path within the bucket e.g. \"userId/timestamp-filename.jpg\"\n  filename    String\n  size        Int // bytes\n  width       Int?\n  height      Int?\n  mimeType    String   @default(\"image/jpeg\")\n  createdAt   DateTime @default(now())\n\n  deliveryPhotos DeliveryPhoto[]\n\n  @@index([userId])\n}\n\n// ── Portfolio sites ───────────────────────────────────────────────────────────\n// Each user can have multiple portfolio sites. The full content tree\n// (categories → folders → photos) is stored as JSON to avoid complex\n// normalisation in v1 — matches the PortfolioContent type in lib/portfolio/data.ts.\n\nmodel Portfolio {\n  id           String  @id @default(cuid())\n  userId       String\n  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  title        String\n  slug         String  @unique\n  status       String  @default(\"draft\") // draft | published\n  template     String  @default(\"minimal\")\n  customDomain String? @unique\n\n  // Shape: { categoryIds, categories, folders, photos } — see lib/portfolio/data.ts\n  content Json @default(\"{}\")\n\n  views     Int      @default(0)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@index([userId])\n}\n\n// ── Links pages ───────────────────────────────────────────────────────────────\n// Linktree-style pages. Fields mirror the LinksPage type in lib/links/data.ts.\n// One per user for v1 (getMine returns the first match).\n\nmodel LinksPage {\n  id     String @id @default(cuid())\n  userId String\n  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  template String @default(\"brooklyn\")\n\n  // Profile\n  displayName   String @default(\"\")\n  bio           String @default(\"\")\n  avatarUrl     String @default(\"\")\n  avatarBg      String @default(\"\")\n  avatarInitial String @default(\"\")\n\n  // Background\n  bgType           String @default(\"solid\")\n  bgColor          String @default(\"#111111\")\n  bgGradFrom       String @default(\"#111111\")\n  bgGradTo         String @default(\"#333333\")\n  bgGradAngle      Int    @default(135)\n  bgImageUrl       String @default(\"\")\n  bgOverlayColor   String @default(\"#000000\")\n  bgOverlayOpacity Float  @default(0.4)\n\n  // Buttons\n  btnShape   String @default(\"square\")\n  btnVariant String @default(\"filled\")\n  btnBg      String @default(\"#fad502\")\n  btnText    String @default(\"#111111\")\n  btnBorder  String @default(\"#fad502\")\n\n  // Typography\n  fontFamily String @default(\"\")\n  fontWeight String @default(\"400\")\n  textColor  String @default(\"#F0EFE9\")\n  subColor   String @default(\"#7A7A7A\")\n\n  // Per-template label overrides (marquee text, stats, eyebrow, etc.)\n  labels Json @default(\"{}\")\n\n  // Publishing\n  slug      String? @unique\n  published Boolean @default(false)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  links LinkItem[]\n\n  @@index([userId])\n}\n\n// ── Link items ────────────────────────────────────────────────────────────────\n// Individual rows in a links page. Fields mirror the LinkItem type.\n\nmodel LinkItem {\n  id          String    @id @default(cuid())\n  linksPageId String\n  linksPage   LinksPage @relation(fields: [linksPageId], references: [id], onDelete: Cascade)\n\n  type    String  @default(\"link\") // link | divider | whatsapp | instagram | email | delivery\n  title   String  @default(\"\")\n  url     String  @default(\"\")\n  enabled Boolean @default(true)\n  order   Int     @default(0)\n  icon    String  @default(\"\")\n\n  // WhatsApp\n  waCountry String?\n  waPhone   String?\n  waMessage String?\n\n  // Instagram\n  igUsername String?\n\n  // Email\n  emailAddress String?\n  emailSubject String?\n\n  createdAt DateTime @default(now())\n\n  @@index([linksPageId])\n}\n\n// ── Client delivery galleries ─────────────────────────────────────────────────\n// Fields mirror the DeliveryPage type in lib/delivery/data.ts.\n// Photos are linked via the DeliveryPhoto join table.\n\nmodel Delivery {\n  id     String @id @default(cuid())\n  userId String\n  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  // Core\n  title    String @default(\"\")\n  client   String @default(\"\")\n  status   String @default(\"draft\") // draft | active | expired\n  template String @default(\"halcyon\") // halcyon | brooklyn | minimal | vogue\n  layout   String @default(\"masonry\") // grid | masonry\n\n  // Cover\n  coverUrl       String @default(\"\")\n  coverFit       String @default(\"cover\")\n  coverPositionX Float  @default(50)\n  coverPositionY Float  @default(50)\n\n  // Security\n  passwordEnabled  Boolean  @default(false)\n  password         String   @default(\"\")\n  whitelistEnabled Boolean  @default(false)\n  whitelist        String[] @default([])\n\n  // Password page copy\n  passwordTitle       String @default(\"Private gallery\")\n  passwordSubtitle    String @default(\"Enter the access code to view.\")\n  passwordHint        String @default(\"\")\n  passwordButtonLabel String @default(\"Unlock gallery\")\n\n  // Monetization\n  mode             String @default(\"gift\") // gift | direct\n  pricePerPhoto    Float  @default(0)\n  priceFullGallery Float  @default(0)\n  downloadRes      String @default(\"choice\") // full | web | choice\n\n  // Branding\n  logoMode  String @default(\"text\") // none | text | image | image+text\n  logoText  String @default(\"STUDIO\")\n  logoUrl   String @default(\"\")\n  logoWidth Int    @default(0)\n\n  // Custom colors\n  customColors Boolean @default(false)\n  colorBg      String  @default(\"#ffffff\")\n  colorFg      String  @default(\"#111111\")\n  colorAccent  String  @default(\"#f5f5f5\")\n  colorBtnBg   String  @default(\"#111111\")\n  colorBtnFg   String  @default(\"#ffffff\")\n\n  // Typography slots\n  fontFamily  String @default(\"\")\n  fontFamily1 String @default(\"\")\n  fontFamily2 String @default(\"\")\n  fontFamily3 String @default(\"\")\n\n  // Misc\n  welcomeMessage   String  @default(\"\")\n  showUpsellBanner Boolean @default(false)\n\n  // Per-template label overrides\n  labels Json @default(\"{}\")\n\n  // Publishing\n  slug      String?   @unique\n  views     Int       @default(0)\n  expiresAt DateTime?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  photos DeliveryPhoto[]\n\n  @@index([userId])\n}\n\n// ── Delivery ↔ Photo join ─────────────────────────────────────────────────────\n\nmodel DeliveryPhoto {\n  id         String   @id @default(cuid())\n  deliveryId String\n  delivery   Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)\n  photoId    String\n  photo      Photo    @relation(fields: [photoId], references: [id], onDelete: Cascade)\n  order      Int      @default(0)\n\n  @@unique([deliveryId, photoId])\n  @@index([deliveryId])\n}\n",
+  "inlineSchemaHash": "65ff8ee793f5e38ee6c3aa579778de0ab52912051ff9926af2f0812604a93559",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Account\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"provider\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"providerAccountId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"refresh_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"access_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires_at\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"token_type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"scope\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"session_state\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"refresh_token_expires_in\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"AccountToUser\"}],\"dbName\":null},\"Session\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sessionToken\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"SessionToUser\"}],\"dbName\":null},\"VerificationToken\":{\"fields\":[{\"name\":\"identifier\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"emailVerified\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"image\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"accounts\",\"kind\":\"object\",\"type\":\"Account\",\"relationName\":\"AccountToUser\"},{\"name\":\"sessions\",\"kind\":\"object\",\"type\":\"Session\",\"relationName\":\"SessionToUser\"},{\"name\":\"photos\",\"kind\":\"object\",\"type\":\"Photo\",\"relationName\":\"PhotoToUser\"},{\"name\":\"portfolios\",\"kind\":\"object\",\"type\":\"Portfolio\",\"relationName\":\"PortfolioToUser\"},{\"name\":\"linksPages\",\"kind\":\"object\",\"type\":\"LinksPage\",\"relationName\":\"LinksPageToUser\"},{\"name\":\"deliveries\",\"kind\":\"object\",\"type\":\"Delivery\",\"relationName\":\"DeliveryToUser\"}],\"dbName\":null},\"Photo\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PhotoToUser\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"filename\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"size\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"width\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"height\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"deliveryPhotos\",\"kind\":\"object\",\"type\":\"DeliveryPhoto\",\"relationName\":\"DeliveryPhotoToPhoto\"}],\"dbName\":null},\"Portfolio\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PortfolioToUser\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"slug\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"template\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"customDomain\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"coverUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"views\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"LinksPage\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"LinksPageToUser\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"slug\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bio\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatarUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgColor\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"btnStyle\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"btnBg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"btnFg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"font\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"published\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"links\",\"kind\":\"object\",\"type\":\"LinkItem\",\"relationName\":\"LinkItemToLinksPage\"}],\"dbName\":null},\"LinkItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"linksPageId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"linksPage\",\"kind\":\"object\",\"type\":\"LinksPage\",\"relationName\":\"LinkItemToLinksPage\"},{\"name\":\"label\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"order\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"visible\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Delivery\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"DeliveryToUser\"},{\"name\":\"clientName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"clientEmail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"template\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expiresAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"mode\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pricePerPhoto\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"priceBundle\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"selectionCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"watermark\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"downloadRes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"proofingMode\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"layout\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"welcomeMsg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"views\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"photos\",\"kind\":\"object\",\"type\":\"DeliveryPhoto\",\"relationName\":\"DeliveryToDeliveryPhoto\"}],\"dbName\":null},\"DeliveryPhoto\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"deliveryId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"delivery\",\"kind\":\"object\",\"type\":\"Delivery\",\"relationName\":\"DeliveryToDeliveryPhoto\"},{\"name\":\"photoId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"photo\",\"kind\":\"object\",\"type\":\"Photo\",\"relationName\":\"DeliveryPhotoToPhoto\"},{\"name\":\"order\",\"kind\":\"scalar\",\"type\":\"Int\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatarUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"photos\",\"kind\":\"object\",\"type\":\"Photo\",\"relationName\":\"PhotoToUser\"},{\"name\":\"portfolios\",\"kind\":\"object\",\"type\":\"Portfolio\",\"relationName\":\"PortfolioToUser\"},{\"name\":\"linksPages\",\"kind\":\"object\",\"type\":\"LinksPage\",\"relationName\":\"LinksPageToUser\"},{\"name\":\"deliveries\",\"kind\":\"object\",\"type\":\"Delivery\",\"relationName\":\"DeliveryToUser\"}],\"dbName\":null},\"Photo\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PhotoToUser\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"storagePath\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"filename\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"size\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"width\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"height\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"mimeType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"deliveryPhotos\",\"kind\":\"object\",\"type\":\"DeliveryPhoto\",\"relationName\":\"DeliveryPhotoToPhoto\"}],\"dbName\":null},\"Portfolio\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PortfolioToUser\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"slug\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"template\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"customDomain\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"views\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"LinksPage\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"LinksPageToUser\"},{\"name\":\"template\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"displayName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bio\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatarUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatarBg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatarInitial\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgColor\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgGradFrom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgGradTo\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgGradAngle\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"bgImageUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgOverlayColor\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bgOverlayOpacity\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"btnShape\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"btnVariant\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"btnBg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"btnText\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"btnBorder\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fontFamily\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fontWeight\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"textColor\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"subColor\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"labels\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"slug\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"published\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"links\",\"kind\":\"object\",\"type\":\"LinkItem\",\"relationName\":\"LinkItemToLinksPage\"}],\"dbName\":null},\"LinkItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"linksPageId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"linksPage\",\"kind\":\"object\",\"type\":\"LinksPage\",\"relationName\":\"LinkItemToLinksPage\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"enabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"order\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"icon\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"waCountry\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"waPhone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"waMessage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"igUsername\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"emailAddress\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"emailSubject\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Delivery\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"DeliveryToUser\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"client\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"template\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"layout\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"coverUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"coverFit\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"coverPositionX\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"coverPositionY\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"passwordEnabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"whitelistEnabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"whitelist\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordTitle\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordSubtitle\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHint\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordButtonLabel\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"mode\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pricePerPhoto\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"priceFullGallery\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"downloadRes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"logoMode\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"logoText\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"logoUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"logoWidth\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"customColors\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"colorBg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"colorFg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"colorAccent\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"colorBtnBg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"colorBtnFg\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fontFamily\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fontFamily1\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fontFamily2\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fontFamily3\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"welcomeMessage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"showUpsellBanner\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"labels\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"slug\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"views\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"expiresAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"photos\",\"kind\":\"object\",\"type\":\"DeliveryPhoto\",\"relationName\":\"DeliveryToDeliveryPhoto\"}],\"dbName\":null},\"DeliveryPhoto\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"deliveryId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"delivery\",\"kind\":\"object\",\"type\":\"Delivery\",\"relationName\":\"DeliveryToDeliveryPhoto\"},{\"name\":\"photoId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"photo\",\"kind\":\"object\",\"type\":\"Photo\",\"relationName\":\"DeliveryPhotoToPhoto\"},{\"name\":\"order\",\"kind\":\"scalar\",\"type\":\"Int\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

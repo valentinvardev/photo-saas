@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 
 /* ── Plan tier badge ── */
 const TIER_CONFIG = {
@@ -123,21 +122,7 @@ function MiniAction({ href, icon, label, sub }: { href: string; icon: React.Reac
 
 export default function DashboardHomePage() {
   /* Mock state — wire to real data later. */
-  const [hasDomain] = useState(false);
-  const fullName = "Sofia Chen";
-  const domainPreview = fullName.toLowerCase().replace(/\s+/g, "") + ".com";
-
-  const pendingDeliveries = 2;
   const portfolioProjects = 5;
-  const linksPageLive     = false;
-  const photosPending     = 47;
-
-  const next = {
-    title: `${photosPending} photos waiting to be delivered`,
-    sub: "Margot & Auden — wedding gallery, draft from Tuesday",
-    href: "/dashboard/delivery",
-    cta: "Open delivery",
-  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
@@ -158,7 +143,7 @@ export default function DashboardHomePage() {
           title="Your web presence"
           hint="Everything clients see — keep it current."
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <ActionCard
             href="/dashboard/portfolio"
             icon={I.portfolio}
@@ -168,59 +153,7 @@ export default function DashboardHomePage() {
             cta="Manage portfolio"
             status={{ dot: "green", label: "Live" }}
           />
-          <ActionCard
-            href="/dashboard/links"
-            icon={I.links}
-            eyebrow="Links page"
-            title={linksPageLive ? "Update your links page" : "Create a links page"}
-            body="One short URL with everything — Instagram, bookings, latest gallery."
-            cta={linksPageLive ? "Open editor" : "Create page"}
-            status={linksPageLive ? { dot: "green", label: "Live" } : { dot: "muted", label: "Not set up" }}
-          />
-          <ActionCard
-            href="/dashboard/delivery"
-            icon={I.delivery}
-            eyebrow="Delivery"
-            title="Deliver photos to clients"
-            body={`${pendingDeliveries} galleries pending · branded, password-protected.`}
-            cta="Open delivery"
-            status={{ dot: "yellow", label: `${pendingDeliveries} pending` }}
-          />
         </div>
-      </section>
-
-      {/* ── Domain ────────────────────────────────────────────────────── */}
-      <section>
-        <SectionLabel
-          title="Your domain"
-          hint={hasDomain ? "Manage DNS, redirects, and certificates." : "Claim a custom address — looks more professional."}
-        />
-        <Link
-          href="/dashboard/domain"
-          className="group block p-6 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl hover:border-[var(--fg-muted)] transition-all"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-            <div className="flex-1 min-w-0">
-              <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--fg-muted)] mb-1.5">
-                {hasDomain ? "Connected" : "Suggested address"}
-              </div>
-              <div className="font-mono text-2xl text-[var(--fg)] tracking-tight">
-                {domainPreview}
-              </div>
-              <div className="font-sans text-xs text-[var(--fg-muted)] mt-2 max-w-md">
-                {hasDomain
-                  ? "Domain is connected. SSL auto-renews. Manage records, redirects and email forwarding."
-                  : "Available · $12/year · auto-SSL, custom email forwarding, full DNS control."}
-              </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--fg)] text-[var(--bg)] rounded-lg font-sans text-sm font-semibold group-hover:opacity-90 transition-opacity">
-                {hasDomain ? "Manage domain" : "Get this domain"}
-                <span>{I.arrow}</span>
-              </span>
-            </div>
-          </div>
-        </Link>
       </section>
 
       {/* ── Gallery quick actions ─────────────────────────────────────── */}
@@ -241,37 +174,6 @@ export default function DashboardHomePage() {
         </div>
       </section>
 
-      {/* ── Visual identity ───────────────────────────────────────────── */}
-      <section>
-        <SectionLabel
-          title="Define your visual identity"
-          hint="Templates wire your photos into a website in minutes."
-          action={
-            <Link href="/dashboard/templates" className="font-sans text-xs font-semibold text-[var(--fg-muted)] hover:text-[var(--fg)] inline-flex items-center gap-1.5 transition-colors">
-              All templates <span>{I.arrow}</span>
-            </Link>
-          }
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ActionCard
-            href="/dashboard/templates"
-            icon={I.templates}
-            eyebrow="Templates"
-            title="Browse templates"
-            body="Editorial, minimal, bold. Filter by mood, swap with one click."
-            cta="Open library"
-          />
-          <ActionCard
-            href="/dashboard/templates?quickstart=1"
-            icon={I.sparkle}
-            eyebrow="Quick start"
-            title="Find my style in 2 minutes"
-            body="Answer a few questions and we'll suggest three templates that fit."
-            cta="Start quiz"
-          />
-        </div>
-      </section>
-
       {/* ── Recent activity / quick chips ─────────────────────────────── */}
       <section>
         <SectionLabel
@@ -280,13 +182,12 @@ export default function DashboardHomePage() {
         />
         <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl divide-y divide-[var(--border-subtle)]">
           {[
-            { icon: I.delivery,  title: "Margot & Auden — gallery viewed",  time: "12m ago",   tone: "muted" as const },
-            { icon: I.upload,    title: "47 photos uploaded to 'Coastal'",  time: "2h ago",    tone: "muted" as const },
-            { icon: I.bell,      title: "New sale — Portrait license $120", time: "Yesterday", tone: "yellow" as const },
-            { icon: I.portfolio, title: "Portfolio viewed from Berlin",     time: "Yesterday", tone: "muted" as const },
+            { icon: I.upload,    title: "47 photos uploaded to 'Coastal'",  time: "2h ago"    },
+            { icon: I.portfolio, title: "Portfolio viewed from Berlin",     time: "Yesterday" },
+            { icon: I.portfolio, title: "Portfolio cover updated",          time: "2d ago"    },
           ].map((row, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-3.5">
-              <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${row.tone === "yellow" ? "bg-yellow/10 text-yellow" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)]"}`}>
+              <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[var(--bg-subtle)] text-[var(--fg-muted)]">
                 {row.icon}
               </span>
               <div className="flex-1 min-w-0 font-sans text-sm text-[var(--fg)] truncate">{row.title}</div>

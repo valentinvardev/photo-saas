@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -8,59 +5,21 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  // DATABASE_URL: transaction pooler (port 6543) — runtime queries
-  // DIRECT_URL:  direct connection  (port 5432) — migrations
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-// ── NextAuth ──────────────────────────────────────────────────────────────────
-
-model Account {
-  id                       String  @id @default(cuid())
-  userId                   String
-  type                     String
-  provider                 String
-  providerAccountId        String
-  refresh_token            String? @db.Text
-  access_token             String? @db.Text
-  expires_at               Int?
-  token_type               String?
-  scope                    String?
-  id_token                 String? @db.Text
-  session_state            String?
-  refresh_token_expires_in Int?
-  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-// ── FRAME ─────────────────────────────────────────────────────────────────────
+// ── Users ────────────────────────────────────────────────────────────────────
+// Mirrors auth.users from Supabase. Created automatically by a DB trigger
+// (see supabase/migrations/001_handle_new_user.sql) — do not insert manually.
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
+  id        String   @id // UUID from auth.users.id
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   photos     Photo[]
   portfolios Portfolio[]
@@ -68,61 +27,101 @@ model User {
   deliveries Delivery[]
 }
 
-// Master photo library
+// ── Photo library ─────────────────────────────────────────────────────────────
+// Master library for all uploaded photos (used by both delivery and portfolio).
+// Files live in Supabase Storage bucket "photos" at storagePath.
+
 model Photo {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  url       String
-  filename  String
-  size      Int // bytes
-  width     Int?
-  height    Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  url         String // public URL (Supabase Storage)
+  storagePath String // path within the bucket e.g. "userId/timestamp-filename.jpg"
+  filename    String
+  size        Int // bytes
+  width       Int?
+  height      Int?
+  mimeType    String   @default("image/jpeg")
+  createdAt   DateTime @default(now())
 
   deliveryPhotos DeliveryPhoto[]
 
   @@index([userId])
 }
 
-// Portfolio sites
+// ── Portfolio sites ───────────────────────────────────────────────────────────
+// Each user can have multiple portfolio sites. The full content tree
+// (categories → folders → photos) is stored as JSON to avoid complex
+// normalisation in v1 — matches the PortfolioContent type in lib/portfolio/data.ts.
+
 model Portfolio {
-  id           String   @id @default(cuid())
+  id           String  @id @default(cuid())
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   title        String
-  slug         String   @unique
-  status       String   @default("draft") // draft | published
-  template     String   @default("minimal")
-  customDomain String?  @unique
-  coverUrl     String?
-  views        Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  slug         String  @unique
+  status       String  @default("draft") // draft | published
+  template     String  @default("minimal")
+  customDomain String? @unique
+
+  // Shape: { categoryIds, categories, folders, photos } — see lib/portfolio/data.ts
+  content Json @default("{}")
+
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }
 
-// Link pages (linktree-style)
+// ── Links pages ───────────────────────────────────────────────────────────────
+// Linktree-style pages. Fields mirror the LinksPage type in lib/links/data.ts.
+// One per user for v1 (getMine returns the first match).
+
 model LinksPage {
-  id        String  @id @default(cuid())
-  userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  slug      String  @unique
-  bio       String?
-  avatarUrl String?
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Appearance
-  bgType   String @default("solid") // solid | gradient | image
-  bgColor  String @default("#111111")
-  btnStyle String @default("pill") // pill | rounded | square | outline
-  btnBg    String @default("#fad502")
-  btnFg    String @default("#111111")
-  font     String @default("Inter")
+  template String @default("brooklyn")
 
-  published Boolean  @default(false)
+  // Profile
+  displayName   String @default("")
+  bio           String @default("")
+  avatarUrl     String @default("")
+  avatarBg      String @default("")
+  avatarInitial String @default("")
+
+  // Background
+  bgType           String @default("solid")
+  bgColor          String @default("#111111")
+  bgGradFrom       String @default("#111111")
+  bgGradTo         String @default("#333333")
+  bgGradAngle      Int    @default(135)
+  bgImageUrl       String @default("")
+  bgOverlayColor   String @default("#000000")
+  bgOverlayOpacity Float  @default(0.4)
+
+  // Buttons
+  btnShape   String @default("square")
+  btnVariant String @default("filled")
+  btnBg      String @default("#fad502")
+  btnText    String @default("#111111")
+  btnBorder  String @default("#fad502")
+
+  // Typography
+  fontFamily String @default("")
+  fontWeight String @default("400")
+  textColor  String @default("#F0EFE9")
+  subColor   String @default("#7A7A7A")
+
+  // Per-template label overrides (marquee text, stats, eyebrow, etc.)
+  labels Json @default("{}")
+
+  // Publishing
+  slug      String? @unique
+  published Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -131,48 +130,110 @@ model LinksPage {
   @@index([userId])
 }
 
+// ── Link items ────────────────────────────────────────────────────────────────
+// Individual rows in a links page. Fields mirror the LinkItem type.
+
 model LinkItem {
   id          String    @id @default(cuid())
   linksPageId String
   linksPage   LinksPage @relation(fields: [linksPageId], references: [id], onDelete: Cascade)
-  label       String
-  url         String
-  order       Int
-  visible     Boolean   @default(true)
-  createdAt   DateTime  @default(now())
+
+  type    String  @default("link") // link | divider | whatsapp | instagram | email | delivery
+  title   String  @default("")
+  url     String  @default("")
+  enabled Boolean @default(true)
+  order   Int     @default(0)
+  icon    String  @default("")
+
+  // WhatsApp
+  waCountry String?
+  waPhone   String?
+  waMessage String?
+
+  // Instagram
+  igUsername String?
+
+  // Email
+  emailAddress String?
+  emailSubject String?
+
+  createdAt DateTime @default(now())
 
   @@index([linksPageId])
 }
 
-// Client delivery galleries
-model Delivery {
-  id          String  @id @default(cuid())
-  userId      String
-  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  clientName  String
-  clientEmail String?
-  title       String?
-  status      String  @default("draft") // draft | active | expired
-  template    String  @default("minimal") // minimal | vogue | cinematic | editorial
+// ── Client delivery galleries ─────────────────────────────────────────────────
+// Fields mirror the DeliveryPage type in lib/delivery/data.ts.
+// Photos are linked via the DeliveryPhoto join table.
 
-  // Access control
-  password  String?
-  expiresAt DateTime?
+model Delivery {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Core
+  title    String @default("")
+  client   String @default("")
+  status   String @default("draft") // draft | active | expired
+  template String @default("halcyon") // halcyon | brooklyn | minimal | vogue
+  layout   String @default("masonry") // grid | masonry
+
+  // Cover
+  coverUrl       String @default("")
+  coverFit       String @default("cover")
+  coverPositionX Float  @default(50)
+  coverPositionY Float  @default(50)
+
+  // Security
+  passwordEnabled  Boolean  @default(false)
+  password         String   @default("")
+  whitelistEnabled Boolean  @default(false)
+  whitelist        String[] @default([])
+
+  // Password page copy
+  passwordTitle       String @default("Private gallery")
+  passwordSubtitle    String @default("Enter the access code to view.")
+  passwordHint        String @default("")
+  passwordButtonLabel String @default("Unlock gallery")
 
   // Monetization
-  mode           String  @default("gift") // gift | direct | selection
-  pricePerPhoto  Float?
-  priceBundle    Float?
-  selectionCount Int?
-  watermark      Boolean @default(false)
-  downloadRes    String  @default("original") // original | web | mobile
-  proofingMode   Boolean @default(false)
+  mode             String @default("gift") // gift | direct
+  pricePerPhoto    Float  @default(0)
+  priceFullGallery Float  @default(0)
+  downloadRes      String @default("choice") // full | web | choice
 
-  // Look & Feel
-  layout     String  @default("grid") // grid | masonry
-  welcomeMsg String?
+  // Branding
+  logoMode  String @default("text") // none | text | image | image+text
+  logoText  String @default("STUDIO")
+  logoUrl   String @default("")
+  logoWidth Int    @default(0)
 
-  views     Int      @default(0)
+  // Custom colors
+  customColors Boolean @default(false)
+  colorBg      String  @default("#ffffff")
+  colorFg      String  @default("#111111")
+  colorAccent  String  @default("#f5f5f5")
+  colorBtnBg   String  @default("#111111")
+  colorBtnFg   String  @default("#ffffff")
+
+  // Typography slots
+  fontFamily  String @default("")
+  fontFamily1 String @default("")
+  fontFamily2 String @default("")
+  fontFamily3 String @default("")
+
+  // Misc
+  welcomeMessage   String  @default("")
+  showUpsellBanner Boolean @default(false)
+
+  // Per-template label overrides
+  labels Json @default("{}")
+
+  // Publishing
+  slug      String?   @unique
+  views     Int       @default(0)
+  expiresAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -181,7 +242,8 @@ model Delivery {
   @@index([userId])
 }
 
-// Junction: which photos belong to a delivery, in what order
+// ── Delivery ↔ Photo join ─────────────────────────────────────────────────────
+
 model DeliveryPhoto {
   id         String   @id @default(cuid())
   deliveryId String
