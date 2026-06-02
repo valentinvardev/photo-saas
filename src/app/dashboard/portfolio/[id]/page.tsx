@@ -8,6 +8,7 @@ import { DevicePreviewModal, LivePreviewThumbnail } from "~/components/dashboard
 import { ContentTree } from "~/components/portfolio/ContentTree";
 import { TEMPLATE_URL, TEMPLATES, type Portfolio } from "~/lib/portfolio/mock";
 import { dbToView } from "~/lib/portfolio/adapt";
+import { usePortfolioContentSync } from "~/lib/portfolio/useContentSync";
 import { api } from "~/trpc/react";
 
 type Tab = "content" | "template" | "domain" | "seo" | "analytics" | "settings";
@@ -37,6 +38,8 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
     onSuccess: () => { void utils.portfolio.get.invalidate({ id }); void utils.portfolio.list.invalidate(); },
   });
   const deleteMut  = api.portfolio.delete.useMutation();
+
+  const { saving } = usePortfolioContentSync(id);
 
   useEffect(() => { if (dbP) setPublished(dbP.status === "published"); }, [dbP]);
 
@@ -83,6 +86,20 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
           }`}>
             <span className={`w-1.5 h-1.5 rounded-full ${published ? "bg-green-400" : "bg-[var(--fg-muted)]"}`} />
             {published ? "Published" : "Draft"}
+          </span>
+
+          <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">
+            {saving ? (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-yellow animate-pulse" />
+                Saving…
+              </>
+            ) : (
+              <>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                Saved
+              </>
+            )}
           </span>
 
           <div className="flex-1" />

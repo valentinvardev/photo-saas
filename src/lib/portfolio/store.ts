@@ -14,6 +14,9 @@ interface PortfolioContentStore {
 
   setHydrated: () => void;
 
+  /* Hydrate a portfolio's whole content tree from the server (canonical on load) */
+  setContent: (portfolioId: string, content: PortfolioContent) => void;
+
   /* Read */
   getContent: (portfolioId: string) => PortfolioContent;
 
@@ -57,6 +60,10 @@ export const usePortfolioContentStore = create<PortfolioContentStore>()(
       hydrated:    false,
 
       setHydrated: () => set({ hydrated: true }),
+
+      setContent: (portfolioId, content) => set((s) => ({
+        byPortfolio: { ...s.byPortfolio, [portfolioId]: content },
+      })),
 
       getContent: (portfolioId) => ensureContent(get().byPortfolio, portfolioId),
 
