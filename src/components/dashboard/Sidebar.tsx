@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "~/components/providers/ThemeProvider";
 import { useT } from "~/components/providers/LangProvider";
 import { Logo } from "~/components/ui/Logo";
+import { createClient } from "~/lib/supabase/client";
 
 /* ── Icons ── */
 function GalleryIcon() {
@@ -177,6 +179,27 @@ function NavItem({ labelKey, label, href, icon: Icon, soon, exact }: { labelKey?
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { theme, toggle } = useTheme();
+  const router = useRouter();
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    void supabase.auth.getUser().then(({ data }) => {
+      const u = data.user;
+      if (!u) return;
+      const meta = (u.user_metadata ?? {}) as { full_name?: string; name?: string };
+      setUser({ name: meta.full_name ?? meta.name ?? (u.email?.split("@")[0] ?? "Account"), email: u.email ?? "" });
+    });
+  }, []);
+
+  async function signOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
+  const initial = (user?.name ?? "?").charAt(0).toUpperCase();
 
   return (
     <div className="flex flex-col h-full bg-[var(--bg-card)] border-r border-[var(--border)]">
@@ -218,15 +241,29 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         </div>
 
         {/* User row */}
-        <Link href="/dashboard/profile" className="flex items-center gap-2 px-3 py-2.5 mt-1 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors group">
-          <div className="w-7 h-7 rounded-full bg-yellow flex items-center justify-center shrink-0">
-            <span className="font-sans font-black text-[#111] text-[10px]">S</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">Sofia Chen</div>
-            <div className="font-mono text-[10px] text-[var(--fg-muted)] truncate">sofia@example.com</div>
-          </div>
-        </Link>
+        <div className="flex items-center gap-2 px-3 py-2.5 mt-1 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors group">
+          <Link href="/dashboard/profile" className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="w-7 h-7 rounded-full bg-yellow flex items-center justify-center shrink-0">
+              <span className="font-sans font-black text-[#111] text-[10px]">{initial}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{user?.name ?? "—"}</div>
+              <div className="font-mono text-[10px] text-[var(--fg-muted)] truncate">{user?.email ?? ""}</div>
+            </div>
+          </Link>
+          <button
+            onClick={signOut}
+            title="Sign out"
+            aria-label="Sign out"
+            className="p-1.5 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-card)] transition-colors shrink-0"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );

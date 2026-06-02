@@ -2,8 +2,10 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "~/components/ui/Logo";
+import { createClient } from "~/lib/supabase/client";
 
 /* ── Icons ── */
 function EyeIcon({ off = false }: { off?: boolean }) {
@@ -146,6 +148,50 @@ export default function RegisterPage() {
     setTouched((t) => ({ ...t, [field]: true }));
   }, []);
 
+  const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [checkEmail, setCheckEmail] = useState(false);
+
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+    if (submitting || !formValid) return;
+    setSubmitError(null);
+    setSubmitting(true);
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: `${firstName} ${lastName}`.trim(), username },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      setSubmitError(error.message);
+      setSubmitting(false);
+      return;
+    }
+    // If email confirmation is on, there's no active session yet.
+    if (data.session) {
+      router.push("/dashboard");
+      router.refresh();
+    } else {
+      setCheckEmail(true);
+      setSubmitting(false);
+    }
+  }
+
+  async function handleGoogle() {
+    setSubmitError(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (error) setSubmitError(error.message);
+  }
+
   /* derived validation */
   const firstValid   = firstName.trim().length >= 2;
   const lastValid    = lastName.trim().length >= 2;
@@ -187,7 +233,17 @@ export default function RegisterPage() {
             Join 12,000+ photographers on Portapic.
           </p>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          {checkEmail && (
+            <div className="mb-6 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3">
+              <p className="font-sans text-sm font-semibold text-[var(--fg)]">Check your inbox</p>
+              <p className="font-sans text-xs text-[var(--fg-muted)] mt-1">
+                We sent a confirmation link to <span className="font-mono">{email}</span>. Click it to
+                activate your account, then sign in.
+              </p>
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleRegister}>
 
             {/* First + Last name */}
             <div className="grid grid-cols-2 gap-3">
@@ -356,14 +412,20 @@ export default function RegisterPage() {
               )}
             </AnimatePresence>
 
+            {submitError && (
+              <p className="font-mono text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                {submitError}
+              </p>
+            )}
+
             {/* Submit */}
             <motion.button
               type="submit"
-              disabled={!formValid}
-              whileTap={formValid ? { scale: 0.98 } : {}}
+              disabled={!formValid || submitting}
+              whileTap={formValid && !submitting ? { scale: 0.98 } : {}}
               className="btn-primary w-full rounded-xl py-3.5 font-sans font-bold text-sm mt-2 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-200"
             >
-              Create account
+              {submitting ? "Creating account…" : "Create account"}
             </motion.button>
           </form>
 
@@ -377,6 +439,7 @@ export default function RegisterPage() {
           {/* Google */}
           <button
             type="button"
+            onClick={handleGoogle}
             className="w-full rounded-xl py-3 px-4 font-sans font-medium text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors duration-200 flex items-center justify-center gap-3"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>

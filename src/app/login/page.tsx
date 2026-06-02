@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Logo } from "~/components/ui/Logo";
+import { createClient } from "~/lib/supabase/client";
 
 const quotes = [
   {
@@ -88,8 +90,46 @@ function ImagePanel() {
 
 /* ── Auth form ── */
 export default function LoginPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  /** Where to land after sign-in — honours ?next= from the dashboard guard. */
+  function getNext() {
+    if (typeof window === "undefined") return "/dashboard";
+    return new URLSearchParams(window.location.search).get("next") ?? "/dashboard";
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (loading) return;
+    setError(null);
+    setLoading(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+    router.push(getNext());
+    router.refresh();
+  }
+
+  async function handleGoogle() {
+    setError(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(getNext())}`,
+      },
+    });
+    if (error) setError(error.message);
+  }
 
   return (
     <div className="min-h-screen flex bg-[var(--bg)]">
@@ -119,7 +159,7 @@ export default function LoginPage() {
           </motion.div>
 
           {/* Form */}
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="block font-mono text-[11px] text-[var(--fg-muted)] tracking-widest uppercase mb-1.5">
                 Email
@@ -154,11 +194,18 @@ export default function LoginPage() {
               />
             </div>
 
+            {error && (
+              <p className="font-mono text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                {error}
+              </p>
+            )}
+
             <button
               type="submit"
-              className="btn-primary w-full rounded-xl py-3.5 font-sans font-bold text-sm mt-2"
+              disabled={loading}
+              className="btn-primary w-full rounded-xl py-3.5 font-sans font-bold text-sm mt-2 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Sign in
+              {loading ? "Signing in…" : "Sign in"}
             </button>
           </form>
 
@@ -171,9 +218,10 @@ export default function LoginPage() {
             <div className="flex-1 h-px bg-[var(--border)]" />
           </div>
 
-          {/* Google OAuth placeholder */}
+          {/* Google OAuth */}
           <button
             type="button"
+            onClick={handleGoogle}
             className="w-full rounded-xl py-3 px-4 font-sans font-medium text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors duration-200 flex items-center justify-center gap-3"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
