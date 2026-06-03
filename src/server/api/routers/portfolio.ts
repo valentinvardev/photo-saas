@@ -1,9 +1,29 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 export const portfolioRouter = createTRPCRouter({
+  /** Public — fetch a published portfolio by slug for the /p/[slug] site. */
+  getPublicBySlug: publicProcedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const portfolio = await ctx.db.portfolio.findFirst({
+        where: { slug: input.slug, status: "published" },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          template: true,
+          content: true,
+          updatedAt: true,
+          user: { select: { name: true, avatarUrl: true } },
+        },
+      });
+      if (!portfolio) throw new TRPCError({ code: "NOT_FOUND" });
+      return portfolio;
+    }),
+
   /** List all portfolios for the current user. */
   list: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.portfolio.findMany({

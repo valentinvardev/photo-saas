@@ -105,6 +105,17 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
           <div className="flex-1" />
 
           {/* Actions */}
+          {published && (
+            <a
+              href={`/p/${portfolio.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors font-sans text-xs font-medium"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              View live
+            </a>
+          )}
           <button
             onClick={() => setPreviewOpen(true)}
             disabled={!previewUrl}
