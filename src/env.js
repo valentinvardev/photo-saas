@@ -18,6 +18,17 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+
+    // ── AWS S3 (photo storage) ──
+    AWS_ACCESS_KEY_ID:     z.string().optional(),
+    AWS_SECRET_ACCESS_KEY: z.string().optional(),
+    AWS_REGION:            z.string().default("us-east-1"),
+    AWS_S3_BUCKET:         z.string().optional(),
+    AWS_S3_PREFIX:         z.string().default("fotografo"),
+    AWS_S3_ACCELERATE:     z.coerce.boolean().default(false),
+    // CloudFront CDN domain (e.g. d111111abcdef8.cloudfront.net) — when set,
+    // photos are served from the CDN instead of presigned S3 URLs.
+    CLOUDFRONT_DOMAIN:     z.string().optional(),
   },
 
   /**
@@ -41,6 +52,13 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     DIRECT_URL: process.env.DIRECT_URL,
     NODE_ENV: process.env.NODE_ENV,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    AWS_REGION: process.env.AWS_REGION,
+    AWS_S3_BUCKET: process.env.AWS_S3_BUCKET,
+    AWS_S3_PREFIX: process.env.AWS_S3_PREFIX,
+    AWS_S3_ACCELERATE: process.env.AWS_S3_ACCELERATE,
+    CLOUDFRONT_DOMAIN: process.env.CLOUDFRONT_DOMAIN,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   },

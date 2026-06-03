@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { api } from "~/trpc/react";
-import { createClient } from "~/lib/supabase/client";
 
 /** Read an image file's natural pixel dimensions (best-effort). */
 function readImageSize(file: File): Promise<{ w: number; h: number }> {
@@ -47,7 +46,6 @@ export function useUploadPhotos() {
     const images = files.filter((f) => f.type.startsWith("image/"));
     if (images.length === 0) return [];
 
-    const supabase = createClient();
     const created: UploadedPhoto[] = [];
     setError(null);
     setUploading(true);
@@ -55,20 +53,24 @@ export function useUploadPhotos() {
 
     try {
       for (const file of images) {
-        const { token, path } = await createUpload.mutateAsync({
+        const { uploadUrl, key, photoId } = await createUpload.mutateAsync({
           filename: file.name,
           mimeType: file.type,
           size:     file.size,
         });
 
-        const { error: upErr } = await supabase.storage
-          .from("photos")
-          .uploadToSignedUrl(path, token, file, { contentType: file.type });
-        if (upErr) throw new Error(upErr.message);
+        // Direct browser → S3 PUT. Content-Type must match what was signed.
+        const put = await fetch(uploadUrl, {
+          method:  "PUT",
+          headers: { "Content-Type": file.type },
+          body:    file,
+        });
+        if (!put.ok) throw new Error(`Upload failed (HTTP ${put.status})`);
 
         const dims = await readImageSize(file).catch(() => undefined);
         const photo = await confirm.mutateAsync({
-          path,
+          photoId,
+          key,
           filename: file.name,
           mimeType: file.type,
           size:     file.size,
