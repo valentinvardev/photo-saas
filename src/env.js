@@ -24,7 +24,7 @@ export const env = createEnv({
     AWS_SECRET_ACCESS_KEY: z.string().optional(),
     AWS_REGION:            z.string().default("us-east-1"),
     AWS_S3_BUCKET:         z.string().optional(),
-    AWS_S3_PREFIX:         z.string().default("fotografo"),
+    AWS_S3_PREFIX:         z.string().default("portapic"),
     AWS_S3_ACCELERATE:     z.coerce.boolean().default(false),
     // CloudFront CDN domain (e.g. d111111abcdef8.cloudfront.net) — when set,
     // photos are served from the CDN instead of presigned S3 URLs.
