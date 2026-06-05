@@ -1051,16 +1051,13 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
         </button>
       )}
 
-      {/* Chat */}
-      <button
-        onClick={onChatClick}
-        className={`relative p-1.5 sm:p-2 rounded-lg transition-colors shrink-0 ${chatOpen ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
-        aria-label="Community chat"
-      >
-        <ChatIcon />
-        {/* online dot */}
-        <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full ring-2 ring-[var(--bg-card)]" />
-      </button>
+      {/* Community chat — hidden for MVP (not production-ready). Re-enable by
+          restoring this button + the ChatPanel mount in DashboardShell. */}
+      {false && (
+        <button onClick={onChatClick} aria-label="Community chat" className="relative p-2">
+          <ChatIcon />
+        </button>
+      )}
 
       {/* Notifications */}
       <div ref={notifRef} className="relative shrink-0">
