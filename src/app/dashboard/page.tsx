@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { api } from "~/trpc/react";
+import { createClient } from "~/lib/supabase/client";
 
 /* ── Plan tier badge ── */
 const TIER_CONFIG = {
@@ -121,19 +124,26 @@ function MiniAction({ href, icon, label, sub }: { href: string; icon: React.Reac
 }
 
 export default function DashboardHomePage() {
-  /* Mock state — wire to real data later. */
-  const portfolioProjects = 5;
+  const [firstName, setFirstName] = useState<string>("");
+  const { data: portfolios } = api.portfolio.list.useQuery();
+  const portfolioProjects = portfolios?.length ?? 0;
+
+  useEffect(() => {
+    const supabase = createClient();
+    void supabase.auth.getUser().then(({ data }) => {
+      const meta = (data.user?.user_metadata ?? {}) as { full_name?: string; name?: string };
+      const name = meta.full_name ?? meta.name ?? data.user?.email?.split("@")[0] ?? "";
+      setFirstName(name.split(" ")[0] ?? "");
+    });
+  }, []);
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
 
       {/* ── Greeting ──────────────────────────────────────────────────── */}
       <section>
-        <div className="flex items-center gap-2 mb-2">
-          <PlanBadge tier="gold" />
-        </div>
         <h1 className="font-sans text-2xl sm:text-3xl font-bold text-[var(--fg)] tracking-tight">
-          Welcome back, <span className="text-[var(--fg)]">Sofia</span>.
+          Welcome back{firstName ? <>, <span className="text-[var(--fg)]">{firstName}</span></> : ""}.
         </h1>
       </section>
 
