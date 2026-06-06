@@ -45,14 +45,22 @@ export const photoRouter = createTRPCRouter({
       return { items, nextCursor };
     }),
 
-  /** Folders in the user's library, with photo counts. */
+  /** Folders in the user's library, with photo counts + a cover (latest photo). */
   listFolders: protectedProcedure.query(async ({ ctx }) => {
     const folders = await ctx.db.photoFolder.findMany({
       where:   { userId: ctx.userId },
       orderBy: { createdAt: "asc" },
-      include: { _count: { select: { photos: true } } },
+      include: {
+        _count: { select: { photos: true } },
+        photos: { orderBy: { createdAt: "desc" }, take: 1, select: { storagePath: true } },
+      },
     });
-    return folders.map((f) => ({ id: f.id, name: f.name, count: f._count.photos }));
+    return Promise.all(folders.map(async (f) => ({
+      id: f.id,
+      name: f.name,
+      count: f._count.photos,
+      coverUrl: f.photos[0] ? await resolveMediaUrl(f.photos[0].storagePath) : null,
+    })));
   }),
 
   createFolder: protectedProcedure
