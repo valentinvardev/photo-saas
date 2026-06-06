@@ -75,8 +75,11 @@ function FolderModal({ mode, initial, busy, onSubmit, onClose }: {
 /* ── Lightbox ── */
 function Lightbox({ photos, index, onIndex, onClose }: { photos: GPhoto[]; index: number; onIndex: (i: number) => void; onClose: () => void }) {
   const photo = photos[index]!;
+  const [loaded, setLoaded] = useState(false);
   const prev = useCallback(() => onIndex(Math.max(0, index - 1)), [index, onIndex]);
   const next = useCallback(() => onIndex(Math.min(photos.length - 1, index + 1)), [index, photos.length, onIndex]);
+  /* Reset the loaded state whenever the shown photo changes (open / navigate). */
+  useEffect(() => { setLoaded(false); }, [photo.originalUrl]);
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); if (e.key === "ArrowLeft") prev(); if (e.key === "ArrowRight") next(); };
     window.addEventListener("keydown", fn); document.body.style.overflow = "hidden";
@@ -84,13 +87,26 @@ function Lightbox({ photos, index, onIndex, onClose }: { photos: GPhoto[]; index
   }, [onClose, prev, next]);
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6 sm:p-10"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors"><CloseIcon /></button>
-      {index > 0 && <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>}
-      {index < photos.length - 1 && <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={photo.originalUrl} alt={photo.filename} className="max-w-full max-h-full object-contain rounded" />
+      <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors z-10"><CloseIcon /></button>
+      {index > 0 && <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center z-10"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>}
+      {index < photos.length - 1 && <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center z-10"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>}
+
+      {/* Framed, smaller image area with a skeleton until the image loads */}
+      <div className="relative flex items-center justify-center w-[min(88vw,760px)] h-[min(78vh,620px)]">
+        {!loaded && <div className="absolute inset-0 rounded-lg bg-white/10 animate-pulse" />}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          key={photo.originalUrl}
+          src={photo.originalUrl}
+          alt={photo.filename}
+          onLoad={() => setLoaded(true)}
+          onError={() => setLoaded(true)}
+          className={`max-w-full max-h-full object-contain rounded-lg transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        />
+      </div>
+
       <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[11px] text-white/50">
         {photo.filename} · {fmtSize(photo.size)}{photo.width ? ` · ${photo.width}×${photo.height}px` : ""} · {index + 1}/{photos.length}
       </div>
