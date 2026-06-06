@@ -18,6 +18,15 @@ model User {
     email     String   @unique
     name      String?
     avatarUrl String?
+    coverUrl  String?
+    bio       String?
+    location  String?
+    specialty String?
+    // Social links
+    instagram String?
+    twitter   String?
+    website   String?
+    behance   String?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 

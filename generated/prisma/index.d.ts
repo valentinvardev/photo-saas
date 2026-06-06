@@ -1803,6 +1803,14 @@ export namespace Prisma {
     email: string | null
     name: string | null
     avatarUrl: string | null
+    coverUrl: string | null
+    bio: string | null
+    location: string | null
+    specialty: string | null
+    instagram: string | null
+    twitter: string | null
+    website: string | null
+    behance: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1812,6 +1820,14 @@ export namespace Prisma {
     email: string | null
     name: string | null
     avatarUrl: string | null
+    coverUrl: string | null
+    bio: string | null
+    location: string | null
+    specialty: string | null
+    instagram: string | null
+    twitter: string | null
+    website: string | null
+    behance: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1821,6 +1837,14 @@ export namespace Prisma {
     email: number
     name: number
     avatarUrl: number
+    coverUrl: number
+    bio: number
+    location: number
+    specialty: number
+    instagram: number
+    twitter: number
+    website: number
+    behance: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1832,6 +1856,14 @@ export namespace Prisma {
     email?: true
     name?: true
     avatarUrl?: true
+    coverUrl?: true
+    bio?: true
+    location?: true
+    specialty?: true
+    instagram?: true
+    twitter?: true
+    website?: true
+    behance?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1841,6 +1873,14 @@ export namespace Prisma {
     email?: true
     name?: true
     avatarUrl?: true
+    coverUrl?: true
+    bio?: true
+    location?: true
+    specialty?: true
+    instagram?: true
+    twitter?: true
+    website?: true
+    behance?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1850,6 +1890,14 @@ export namespace Prisma {
     email?: true
     name?: true
     avatarUrl?: true
+    coverUrl?: true
+    bio?: true
+    location?: true
+    specialty?: true
+    instagram?: true
+    twitter?: true
+    website?: true
+    behance?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1932,6 +1980,14 @@ export namespace Prisma {
     email: string
     name: string | null
     avatarUrl: string | null
+    coverUrl: string | null
+    bio: string | null
+    location: string | null
+    specialty: string | null
+    instagram: string | null
+    twitter: string | null
+    website: string | null
+    behance: string | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -1958,6 +2014,14 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     avatarUrl?: boolean
+    coverUrl?: boolean
+    bio?: boolean
+    location?: boolean
+    specialty?: boolean
+    instagram?: boolean
+    twitter?: boolean
+    website?: boolean
+    behance?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     photos?: boolean | User$photosArgs<ExtArgs>
@@ -1974,6 +2038,14 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     avatarUrl?: boolean
+    coverUrl?: boolean
+    bio?: boolean
+    location?: boolean
+    specialty?: boolean
+    instagram?: boolean
+    twitter?: boolean
+    website?: boolean
+    behance?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -1983,6 +2055,14 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     avatarUrl?: boolean
+    coverUrl?: boolean
+    bio?: boolean
+    location?: boolean
+    specialty?: boolean
+    instagram?: boolean
+    twitter?: boolean
+    website?: boolean
+    behance?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -1992,11 +2072,19 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     avatarUrl?: boolean
+    coverUrl?: boolean
+    bio?: boolean
+    location?: boolean
+    specialty?: boolean
+    instagram?: boolean
+    twitter?: boolean
+    website?: boolean
+    behance?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "avatarUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "avatarUrl" | "coverUrl" | "bio" | "location" | "specialty" | "instagram" | "twitter" | "website" | "behance" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     photos?: boolean | User$photosArgs<ExtArgs>
     photoFolders?: boolean | User$photoFoldersArgs<ExtArgs>
@@ -2024,6 +2112,14 @@ export namespace Prisma {
       email: string
       name: string | null
       avatarUrl: string | null
+      coverUrl: string | null
+      bio: string | null
+      location: string | null
+      specialty: string | null
+      instagram: string | null
+      twitter: string | null
+      website: string | null
+      behance: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -2459,6 +2555,14 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly avatarUrl: FieldRef<"User", 'String'>
+    readonly coverUrl: FieldRef<"User", 'String'>
+    readonly bio: FieldRef<"User", 'String'>
+    readonly location: FieldRef<"User", 'String'>
+    readonly specialty: FieldRef<"User", 'String'>
+    readonly instagram: FieldRef<"User", 'String'>
+    readonly twitter: FieldRef<"User", 'String'>
+    readonly website: FieldRef<"User", 'String'>
+    readonly behance: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -13061,6 +13165,14 @@ export namespace Prisma {
     email: 'email',
     name: 'name',
     avatarUrl: 'avatarUrl',
+    coverUrl: 'coverUrl',
+    bio: 'bio',
+    location: 'location',
+    specialty: 'specialty',
+    instagram: 'instagram',
+    twitter: 'twitter',
+    website: 'website',
+    behance: 'behance',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -13389,6 +13501,14 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     name?: StringNullableFilter<"User"> | string | null
     avatarUrl?: StringNullableFilter<"User"> | string | null
+    coverUrl?: StringNullableFilter<"User"> | string | null
+    bio?: StringNullableFilter<"User"> | string | null
+    location?: StringNullableFilter<"User"> | string | null
+    specialty?: StringNullableFilter<"User"> | string | null
+    instagram?: StringNullableFilter<"User"> | string | null
+    twitter?: StringNullableFilter<"User"> | string | null
+    website?: StringNullableFilter<"User"> | string | null
+    behance?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     photos?: PhotoListRelationFilter
@@ -13404,6 +13524,14 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrderInput | SortOrder
     avatarUrl?: SortOrderInput | SortOrder
+    coverUrl?: SortOrderInput | SortOrder
+    bio?: SortOrderInput | SortOrder
+    location?: SortOrderInput | SortOrder
+    specialty?: SortOrderInput | SortOrder
+    instagram?: SortOrderInput | SortOrder
+    twitter?: SortOrderInput | SortOrder
+    website?: SortOrderInput | SortOrder
+    behance?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     photos?: PhotoOrderByRelationAggregateInput
@@ -13422,6 +13550,14 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringNullableFilter<"User"> | string | null
     avatarUrl?: StringNullableFilter<"User"> | string | null
+    coverUrl?: StringNullableFilter<"User"> | string | null
+    bio?: StringNullableFilter<"User"> | string | null
+    location?: StringNullableFilter<"User"> | string | null
+    specialty?: StringNullableFilter<"User"> | string | null
+    instagram?: StringNullableFilter<"User"> | string | null
+    twitter?: StringNullableFilter<"User"> | string | null
+    website?: StringNullableFilter<"User"> | string | null
+    behance?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     photos?: PhotoListRelationFilter
@@ -13437,6 +13573,14 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrderInput | SortOrder
     avatarUrl?: SortOrderInput | SortOrder
+    coverUrl?: SortOrderInput | SortOrder
+    bio?: SortOrderInput | SortOrder
+    location?: SortOrderInput | SortOrder
+    specialty?: SortOrderInput | SortOrder
+    instagram?: SortOrderInput | SortOrder
+    twitter?: SortOrderInput | SortOrder
+    website?: SortOrderInput | SortOrder
+    behance?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -13452,6 +13596,14 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"User"> | string
     name?: StringNullableWithAggregatesFilter<"User"> | string | null
     avatarUrl?: StringNullableWithAggregatesFilter<"User"> | string | null
+    coverUrl?: StringNullableWithAggregatesFilter<"User"> | string | null
+    bio?: StringNullableWithAggregatesFilter<"User"> | string | null
+    location?: StringNullableWithAggregatesFilter<"User"> | string | null
+    specialty?: StringNullableWithAggregatesFilter<"User"> | string | null
+    instagram?: StringNullableWithAggregatesFilter<"User"> | string | null
+    twitter?: StringNullableWithAggregatesFilter<"User"> | string | null
+    website?: StringNullableWithAggregatesFilter<"User"> | string | null
+    behance?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -14392,6 +14544,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
@@ -14407,6 +14567,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
@@ -14422,6 +14590,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
@@ -14437,6 +14613,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
@@ -14452,6 +14636,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -14461,6 +14653,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14470,6 +14670,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15683,6 +15891,14 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     avatarUrl?: SortOrder
+    coverUrl?: SortOrder
+    bio?: SortOrder
+    location?: SortOrder
+    specialty?: SortOrder
+    instagram?: SortOrder
+    twitter?: SortOrder
+    website?: SortOrder
+    behance?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15692,6 +15908,14 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     avatarUrl?: SortOrder
+    coverUrl?: SortOrder
+    bio?: SortOrder
+    location?: SortOrder
+    specialty?: SortOrder
+    instagram?: SortOrder
+    twitter?: SortOrder
+    website?: SortOrder
+    behance?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15701,6 +15925,14 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrder
     avatarUrl?: SortOrder
+    coverUrl?: SortOrder
+    bio?: SortOrder
+    location?: SortOrder
+    specialty?: SortOrder
+    instagram?: SortOrder
+    twitter?: SortOrder
+    website?: SortOrder
+    behance?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -17998,6 +18230,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
@@ -18012,6 +18252,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
@@ -18042,6 +18290,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
@@ -18056,6 +18312,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
@@ -18070,6 +18334,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photoFolders?: PhotoFolderCreateNestedManyWithoutUserInput
@@ -18084,6 +18356,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photoFolders?: PhotoFolderUncheckedCreateNestedManyWithoutUserInput
@@ -18155,6 +18435,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photoFolders?: PhotoFolderUpdateManyWithoutUserNestedInput
@@ -18169,6 +18457,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photoFolders?: PhotoFolderUncheckedUpdateManyWithoutUserNestedInput
@@ -18234,6 +18530,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
@@ -18248,6 +18552,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
@@ -18318,6 +18630,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
@@ -18332,6 +18652,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
@@ -18362,6 +18690,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
@@ -18376,6 +18712,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
@@ -18406,6 +18750,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
@@ -18420,6 +18772,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
@@ -18434,6 +18794,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
@@ -18448,6 +18816,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
@@ -18522,6 +18898,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
@@ -18536,6 +18920,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
@@ -18735,6 +19127,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
@@ -18749,6 +19149,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     avatarUrl?: string | null
+    coverUrl?: string | null
+    bio?: string | null
+    location?: string | null
+    specialty?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    website?: string | null
+    behance?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
@@ -18801,6 +19209,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
@@ -18815,6 +19231,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    specialty?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    behance?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput

@@ -1,42 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { api, type RouterOutputs } from "~/trpc/react";
+import { PhotoPickerModal } from "~/components/portfolio/PhotoPickerModal";
 
-/* ── Cover photo ── */
-function CoverUpload() {
-  return (
-    /* Outer wrapper is NOT overflow-hidden so the avatar can spill below */
-    <div className="relative pb-8">
-      {/* Cover — has its own overflow-hidden for the image */}
-      <div className="relative group h-36 sm:h-44 overflow-hidden bg-[var(--bg-subtle)] rounded-xl border border-[var(--border)] cursor-pointer">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="https://picsum.photos/seed/sofiacover/1400/400?grayscale"
-          alt=""
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
-          <span className="flex items-center gap-2 font-sans text-xs font-semibold text-white bg-black/50 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-lg">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            Change cover
-          </span>
-        </div>
-      </div>
+type Me = RouterOutputs["user"]["me"];
 
-      {/* Avatar — positioned on outer wrapper so it overflows the cover boundary */}
-      <div className="absolute bottom-0 left-6">
-        <div className="relative group/avatar w-16 h-16 rounded-full bg-yellow ring-4 ring-[var(--bg-card)] flex items-center justify-center shadow-lg cursor-pointer">
-          <span className="font-sans font-black text-[#111] text-2xl">S</span>
-          <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+/* The editable subset of the profile, as controlled form state. */
+type Form = {
+  name: string; bio: string; location: string; specialty: string;
+  avatarUrl: string; coverUrl: string;
+  instagram: string; twitter: string; website: string; behance: string;
+};
+
+function toForm(me: Me): Form {
+  return {
+    name:      me.name      ?? "",
+    bio:       me.bio       ?? "",
+    location:  me.location  ?? "",
+    specialty: me.specialty ?? "",
+    avatarUrl: me.avatarUrl ?? "",
+    coverUrl:  me.coverUrl  ?? "",
+    instagram: me.instagram ?? "",
+    twitter:   me.twitter   ?? "",
+    website:   me.website   ?? "",
+    behance:   me.behance   ?? "",
+  };
+}
+
+/* Send empty strings as null so cleared fields are actually cleared in the DB. */
+function toPatch(f: Form) {
+  const n = (v: string) => (v.trim() === "" ? null : v.trim());
+  return {
+    name: n(f.name), bio: n(f.bio), location: n(f.location), specialty: n(f.specialty),
+    avatarUrl: n(f.avatarUrl), coverUrl: n(f.coverUrl),
+    instagram: n(f.instagram), twitter: n(f.twitter), website: n(f.website), behance: n(f.behance),
+  };
 }
 
 /* ── Section wrapper ── */
@@ -70,80 +71,134 @@ const SOCIALS = [
   { key: "twitter",   label: "X / Twitter", placeholder: "@username" },
   { key: "website",   label: "Website", placeholder: "https://yoursite.com" },
   { key: "behance",   label: "Behance", placeholder: "behance.net/username" },
-];
+] as const;
 
 export default function ProfilePage() {
-  const [saved, setSaved] = useState(false);
+  const utils = api.useUtils();
+  const { data: me, isLoading } = api.user.me.useQuery();
+  const { data: portfolios }    = api.portfolio.list.useQuery();
+  const updateMut = api.user.updateProfile.useMutation({
+    onSuccess: () => { void utils.user.me.invalidate(); },
+  });
 
-  function handleSave() {
+  const [form, setForm]   = useState<Form | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [picking, setPicking] = useState<"avatar" | "cover" | null>(null);
+
+  /* Seed the form once the user loads (and after a successful save refetch). */
+  useEffect(() => { if (me) setForm(toForm(me)); }, [me]);
+
+  const published = portfolios?.find((p) => p.status === "published");
+  const dirty = !!me && !!form && JSON.stringify(toForm(me)) !== JSON.stringify(form);
+
+  function set<K extends keyof Form>(key: K, value: Form[K]) {
+    setForm((f) => (f ? { ...f, [key]: value } : f));
+  }
+
+  async function handleSave() {
+    if (!form || !dirty) return;
+    await updateMut.mutateAsync(toPatch(form));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
+
+  if (isLoading || !form || !me) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-6">
+        <div className="h-8 w-40 rounded bg-[var(--bg-subtle)] animate-pulse" />
+        <div className="h-44 rounded-xl bg-[var(--bg-subtle)] animate-pulse" />
+        <div className="h-64 rounded-xl bg-[var(--bg-subtle)] animate-pulse" />
+        <div className="h-40 rounded-xl bg-[var(--bg-subtle)] animate-pulse" />
+      </div>
+    );
+  }
+
+  const initial = (form.name.trim()[0] ?? me.email[0] ?? "?").toUpperCase();
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-6">
 
       {/* ── Page header ── */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="font-sans font-black text-[var(--fg)] text-xl">Profile</h1>
           <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">Your public identity on Portapic</p>
         </div>
-        <Link
-          href="/p/sofia-chen"
-          target="_blank"
-          className="flex items-center gap-1.5 font-sans text-xs font-medium text-[var(--fg-muted)] border border-[var(--border)] px-3 py-2 rounded-lg hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
-        >
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          View public profile
-        </Link>
+        {published && (
+          <Link
+            href={`/p/${published.slug}`}
+            target="_blank"
+            className="flex items-center gap-1.5 font-sans text-xs font-medium text-[var(--fg-muted)] border border-[var(--border)] px-3 py-2 rounded-lg hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors shrink-0"
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View live portfolio
+          </Link>
+        )}
       </div>
 
       {/* ── Cover + avatar ── */}
-      <CoverUpload />
+      <div className="relative pb-8">
+        <button
+          onClick={() => setPicking("cover")}
+          className="relative group block w-full h-36 sm:h-44 overflow-hidden bg-[var(--bg-subtle)] rounded-xl border border-[var(--border)] cursor-pointer"
+        >
+          {form.coverUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={form.coverUrl} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <span className="absolute inset-0 flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)]">No cover photo</span>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="flex items-center gap-2 font-sans text-xs font-semibold text-white bg-black/50 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-lg">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              {form.coverUrl ? "Change cover" : "Add cover"}
+            </span>
+          </span>
+        </button>
+
+        {/* Avatar */}
+        <div className="absolute bottom-0 left-6">
+          <button
+            onClick={() => setPicking("avatar")}
+            className="relative group/avatar w-16 h-16 rounded-full bg-yellow ring-4 ring-[var(--bg-card)] flex items-center justify-center shadow-lg cursor-pointer overflow-hidden"
+          >
+            {form.avatarUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={form.avatarUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <span className="font-sans font-black text-[#111] text-2xl">{initial}</span>
+            )}
+            <span className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </span>
+          </button>
+        </div>
+      </div>
 
       {/* ── Identity ── */}
       <Section title="Public profile">
-        {/* Name row */}
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="First name">
-            <input className={inputCls} defaultValue="Sofia" />
-          </Field>
-          <Field label="Last name">
-            <input className={inputCls} defaultValue="Chen" />
-          </Field>
-        </div>
-
-        <Field label="Display name" hint="This is what clients see on your public profile.">
-          <input className={inputCls} defaultValue="Sofia Chen" />
+        <Field label="Display name" hint="This is what clients see on your public portfolio.">
+          <input className={inputCls} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Your name" />
         </Field>
 
-        <Field label="Username" hint="portapic.app/p/sofia-chen">
-          <div className="flex items-center">
-            <span className="font-mono text-sm text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] border-r-0 px-3 py-2 rounded-l-lg select-none">
-              portapic.app/p/
-            </span>
-            <input
-              className="flex-1 font-mono text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-r-lg px-3 py-2 outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition"
-              defaultValue="sofia-chen"
-            />
-          </div>
-        </Field>
-
-        <Field label="Bio" hint="Max 200 characters.">
+        <Field label="Bio" hint="Max 300 characters.">
           <textarea
             className={`${inputCls} resize-none`}
             rows={3}
-            defaultValue="Documentary and portrait photographer based in New York. Available for editorial and commercial work."
+            maxLength={300}
+            value={form.bio}
+            onChange={(e) => set("bio", e.target.value)}
+            placeholder="A short line about you and your work."
           />
         </Field>
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="Location">
-            <input className={inputCls} defaultValue="New York, NY" placeholder="City, Country" />
+            <input className={inputCls} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="City, Country" />
           </Field>
           <Field label="Specialty">
-            <input className={inputCls} defaultValue="Portrait · Documentary" placeholder="e.g. Wedding, Portrait…" />
+            <input className={inputCls} value={form.specialty} onChange={(e) => set("specialty", e.target.value)} placeholder="e.g. Wedding, Portrait…" />
           </Field>
         </div>
       </Section>
@@ -152,47 +207,33 @@ export default function ProfilePage() {
       <Section title="Social links">
         {SOCIALS.map((s) => (
           <Field key={s.key} label={s.label}>
-            <input className={inputCls} placeholder={s.placeholder} />
+            <input
+              className={inputCls}
+              value={form[s.key]}
+              onChange={(e) => set(s.key, e.target.value)}
+              placeholder={s.placeholder}
+            />
           </Field>
         ))}
       </Section>
 
-      {/* ── Plan & stats ── */}
-      <Section title="Plan & usage">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-sans text-sm font-semibold text-[var(--fg)]">Pro plan</span>
-              <span className="inline-flex items-center gap-1 bg-yellow/10 border border-yellow/30 rounded-full px-2 py-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-yellow" />
-                <span className="font-mono text-[9px] text-yellow font-bold uppercase tracking-wider">Active</span>
-              </span>
-            </div>
-            <p className="font-sans text-xs text-[var(--fg-muted)] mt-1">Renews on June 1, 2026 · $12 / month</p>
-          </div>
-          <button className="font-sans text-xs font-semibold text-[var(--fg-muted)] border border-[var(--border)] px-3 py-1.5 rounded-lg hover:text-[var(--fg)] transition-colors">
-            Manage plan
-          </button>
-        </div>
-
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "Storage used",    value: "2.4 TB",  sub: "of 5 TB" },
-            { label: "Portfolio views", value: "1,284",   sub: "this month" },
-            { label: "Balance",         value: "$124.50", sub: "available" },
-          ].map((s) => (
-            <div key={s.label} className="bg-[var(--bg-subtle)] rounded-lg px-4 py-3">
-              <div className="font-mono text-lg font-semibold text-[var(--fg)]">{s.value}</div>
-              <div className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">{s.label}</div>
-              <div className="font-mono text-[10px] text-[var(--fg-muted)]">{s.sub}</div>
-            </div>
-          ))}
+      {/* ── Account ── */}
+      <Section title="Account">
+        <Field label="Email" hint="Used to sign in. Contact support to change it.">
+          <input className={`${inputCls} opacity-60 cursor-not-allowed`} value={me.email} disabled />
+        </Field>
+        <div className="font-sans text-xs text-[var(--fg-muted)]">
+          Member since {new Date(me.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long" })}
         </div>
       </Section>
 
       {/* ── Save ── */}
       <div className="flex justify-end gap-3">
-        <button className="font-sans text-sm text-[var(--fg-muted)] border border-[var(--border)] px-4 py-2 rounded-lg hover:text-[var(--fg)] transition-colors">
+        <button
+          onClick={() => me && setForm(toForm(me))}
+          disabled={!dirty || updateMut.isPending}
+          className="font-sans text-sm text-[var(--fg-muted)] border border-[var(--border)] px-4 py-2 rounded-lg hover:text-[var(--fg)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
           Discard
         </button>
         <AnimatePresence mode="wait">
@@ -203,14 +244,26 @@ export default function ProfilePage() {
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.15 }}
             onClick={handleSave}
-            className={`font-sans text-sm font-semibold px-5 py-2 rounded-lg transition-colors ${
+            disabled={(!dirty && !saved) || updateMut.isPending}
+            className={`font-sans text-sm font-semibold px-5 py-2 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
               saved ? "bg-green-500 text-white" : "bg-yellow text-[#111] hover:bg-yellow/90"
             }`}
           >
-            {saved ? "Saved" : "Save changes"}
+            {saved ? "Saved" : updateMut.isPending ? "Saving…" : "Save changes"}
           </motion.button>
         </AnimatePresence>
       </div>
+
+      {/* ── Avatar / cover picker ── */}
+      <AnimatePresence>
+        {picking && (
+          <PhotoPickerModal
+            multi={false}
+            onPick={(urls) => { if (urls[0]) set(picking === "avatar" ? "avatarUrl" : "coverUrl", urls[0]); }}
+            onClose={() => setPicking(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
