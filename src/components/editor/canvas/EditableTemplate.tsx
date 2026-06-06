@@ -57,9 +57,13 @@ function EditableNode({
 
   const El = Tag as "div";
 
+  // minWidth:0 lets the node shrink inside flex/grid rows so text wraps to the
+  // container instead of overflowing (and pushing siblings, e.g. images, out).
+  const base: React.CSSProperties = { position: "relative", minWidth: 0, overflowWrap: "break-word", wordBreak: "break-word" };
+
   // Read-only (public site): no selection/editing affordances.
   if (readOnly) {
-    return <El style={{ position: "relative", ...style, ...overrides }}>{children}</El>;
+    return <El style={{ ...base, ...style, ...overrides }}>{children}</El>;
   }
 
   return (
@@ -70,7 +74,7 @@ function EditableNode({
       data-editing={editing ? "true" : undefined}
       onClick={(e) => { e.stopPropagation(); selectNode(id); }}
       onDoubleClick={(e) => { e.stopPropagation(); selectNode(id); setEditing(id); }}
-      style={{ position: "relative", ...style, ...overrides }}
+      style={{ ...base, ...style, ...overrides }}
     >
       {children}
     </El>
@@ -96,7 +100,7 @@ function EditableText({ id, style }: { id: string; style?: React.CSSProperties }
     );
   }
   return (
-    <span style={{ display: "block", ...style }} dangerouslySetInnerHTML={{ __html: content }} />
+    <span style={{ display: "block", overflowWrap: "break-word", wordBreak: "break-word", ...style }} dangerouslySetInnerHTML={{ __html: content }} />
   );
 }
 
