@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +7,7 @@ import { useTheme } from "~/components/providers/ThemeProvider";
 import { useT } from "~/components/providers/LangProvider";
 import { Logo } from "~/components/ui/Logo";
 import { createClient } from "~/lib/supabase/client";
+import { api } from "~/trpc/react";
 
 /* ── Icons ── */
 function GalleryIcon() {
@@ -190,17 +190,11 @@ function NavItem({ labelKey, label, href, icon: Icon, soon, exact }: { labelKey?
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { theme, toggle } = useTheme();
   const router = useRouter();
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-
-  useEffect(() => {
-    const supabase = createClient();
-    void supabase.auth.getUser().then(({ data }) => {
-      const u = data.user;
-      if (!u) return;
-      const meta = (u.user_metadata ?? {}) as { full_name?: string; name?: string };
-      setUser({ name: meta.full_name ?? meta.name ?? (u.email?.split("@")[0] ?? "Account"), email: u.email ?? "" });
-    });
-  }, []);
+  /* DB profile — keeps name/avatar in sync with the /profile page. */
+  const { data: me } = api.user.me.useQuery(undefined, { staleTime: 60_000 });
+  const user = me
+    ? { name: me.name?.trim() || me.email.split("@")[0] || "Account", email: me.email, avatarUrl: me.avatarUrl ?? null }
+    : null;
 
   async function signOut() {
     const supabase = createClient();
@@ -253,8 +247,13 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         {/* User row */}
         <div className="flex items-center gap-2 px-3 py-2.5 mt-1 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors group">
           <Link href="/dashboard/profile" className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="w-7 h-7 rounded-full bg-yellow flex items-center justify-center shrink-0">
-              <span className="font-sans font-black text-[#111] text-[10px]">{initial}</span>
+            <div className="w-7 h-7 rounded-full bg-yellow flex items-center justify-center shrink-0 overflow-hidden">
+              {user?.avatarUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="font-sans font-black text-[#111] text-[10px]">{initial}</span>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{user?.name ?? "—"}</div>

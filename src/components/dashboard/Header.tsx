@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "~/lib/supabase/client";
+import { api } from "~/trpc/react";
 import { useTheme } from "~/components/providers/ThemeProvider";
 import { useT } from "~/components/providers/LangProvider";
 import { LOCALES, type Locale } from "~/lib/i18n";
@@ -471,20 +472,19 @@ function NotificationPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
-/* ── Current signed-in user ─────────────────────────────── */
+/* ── Current signed-in user ───────────────────────────────
+   Reads the DB profile (api.user.me) so the header reflects edits made on
+   the /profile page (name + avatar), not the stale Supabase auth metadata. */
 function useCurrentUser() {
-  const [user, setUser] = useState<{ name: string; email: string; initial: string } | null>(null);
-  useEffect(() => {
-    const supabase = createClient();
-    void supabase.auth.getUser().then(({ data }) => {
-      const u = data.user;
-      if (!u) return;
-      const meta = (u.user_metadata ?? {}) as { full_name?: string; name?: string };
-      const name = meta.full_name ?? meta.name ?? (u.email?.split("@")[0] ?? "Account");
-      setUser({ name, email: u.email ?? "", initial: (name.trim()[0] ?? "?").toUpperCase() });
-    });
-  }, []);
-  return user;
+  const { data } = api.user.me.useQuery(undefined, { staleTime: 60_000 });
+  if (!data) return null;
+  const name = data.name?.trim() || data.email.split("@")[0] || "Account";
+  return {
+    name,
+    email:     data.email,
+    initial:   (name.trim()[0] ?? "?").toUpperCase(),
+    avatarUrl: data.avatarUrl ?? null,
+  };
 }
 
 /* ── Profile dropdown ───────────────────────────────────── */
@@ -1102,8 +1102,13 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
           className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors"
           aria-label="Profile menu"
         >
-          <div className="w-7 h-7 rounded-full bg-yellow flex items-center justify-center shrink-0">
-            <span className="font-sans font-black text-[#111] text-[10px]">{user?.initial ?? "?"}</span>
+          <div className="w-7 h-7 rounded-full bg-yellow flex items-center justify-center shrink-0 overflow-hidden">
+            {user?.avatarUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <span className="font-sans font-black text-[#111] text-[10px]">{user?.initial ?? "?"}</span>
+            )}
           </div>
           <span className="hidden md:block font-sans text-xs font-semibold text-[var(--fg)]">{user?.name?.split(" ")[0] ?? ""}</span>
           <span className="hidden md:block text-[var(--fg-muted)]"><ChevronDown /></span>
