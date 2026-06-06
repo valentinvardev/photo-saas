@@ -14,6 +14,7 @@ import { api, type RouterOutputs } from "~/trpc/react";
 
 type DbPortfolio = NonNullable<RouterOutputs["portfolio"]["get"]>;
 type SaveFn = (patch: Partial<{
+  template: string;
   customDomain: string | null; seoTitle: string | null; seoDescription: string | null;
   ogImageUrl: string | null; passwordEnabled: boolean; password: string;
 }>) => void;
@@ -218,7 +219,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
 
           {tab === "template" && (
             <motion.div key="template" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <TemplateTab portfolio={portfolio} />
+              <TemplateTab portfolio={portfolio} save={save} saving={publishMut.isPending} />
             </motion.div>
           )}
 
@@ -269,8 +270,12 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
 
 /* ─── Tabs ─────────────────────────────────────────────────── */
 
-function TemplateTab({ portfolio }: { portfolio: Portfolio }) {
+function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: SaveFn; saving: boolean }) {
   const [selected, setSelected] = useState(portfolio.template);
+  /* Keep the local pick in sync if the applied template changes elsewhere. */
+  useEffect(() => { setSelected(portfolio.template); }, [portfolio.template]);
+
+  const dirty = selected !== portfolio.template;
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -283,8 +288,9 @@ function TemplateTab({ portfolio }: { portfolio: Portfolio }) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {TEMPLATES.map((t) => {
-          const url    = TEMPLATE_URL[t];
-          const active = selected === t;
+          const url     = TEMPLATE_URL[t];
+          const active  = selected === t;            // the user's current pick (highlight)
+          const inUse   = portfolio.template === t;  // what's actually applied
           return (
             <button
               key={t}
@@ -296,13 +302,17 @@ function TemplateTab({ portfolio }: { portfolio: Portfolio }) {
               <div className="aspect-[16/10] bg-[var(--bg-subtle)] overflow-hidden">
                 {url && <LivePreviewThumbnail url={url} baseWidth={1280} className="w-full h-full" />}
               </div>
-              <div className="p-3 flex items-center justify-between">
-                <span className="font-sans font-bold text-[var(--fg)] text-sm">{t}</span>
-                {active && (
-                  <span className="font-mono text-[9px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 rounded">
+              <div className="p-3 flex items-center justify-between gap-2">
+                <span className="font-sans font-bold text-[var(--fg)] text-sm capitalize">{t}</span>
+                {inUse ? (
+                  <span className="font-mono text-[9px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 rounded shrink-0">
                     In use
                   </span>
-                )}
+                ) : active ? (
+                  <span className="font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded shrink-0">
+                    Selected
+                  </span>
+                ) : null}
               </div>
             </button>
           );
@@ -331,10 +341,11 @@ function TemplateTab({ portfolio }: { portfolio: Portfolio }) {
 
       <div className="flex items-center gap-2">
         <button
-          disabled={selected === portfolio.template}
+          onClick={() => { if (dirty) save({ template: selected }); }}
+          disabled={!dirty || saving}
           className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          Apply template
+          {saving ? "Applying…" : dirty ? "Apply template" : "Applied"}
         </button>
         <Link
           href="/dashboard/templates"
