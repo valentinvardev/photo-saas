@@ -148,6 +148,14 @@ exports.Prisma.PhotoScalarFieldEnum = {
   width: 'width',
   height: 'height',
   mimeType: 'mimeType',
+  createdAt: 'createdAt',
+  folderId: 'folderId'
+};
+
+exports.Prisma.PhotoFolderScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
   createdAt: 'createdAt'
 };
 
@@ -301,6 +309,7 @@ exports.Prisma.ModelName = {
   User: 'User',
   Message: 'Message',
   Photo: 'Photo',
+  PhotoFolder: 'PhotoFolder',
   Portfolio: 'Portfolio',
   LinksPage: 'LinksPage',
   LinkItem: 'LinkItem',

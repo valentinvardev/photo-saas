@@ -9,6 +9,10 @@ import { useUploadPhotos } from "~/lib/photo/upload";
 const UploadIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;
 const TrashIcon  = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>;
 const CloseIcon  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>;
+const FolderIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>;
+const BackIcon   = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>;
+const MoveIcon   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="9" y1="13" x2="15" y2="13"/></svg>;
+const PencilIcon = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;
 
 function fmtSize(bytes: number) {
   if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
@@ -17,6 +21,7 @@ function fmtSize(bytes: number) {
 }
 
 type GPhoto = { id: string; url: string; filename: string; size: number; width: number | null; height: number | null };
+type GFolder = { id: string; name: string; count: number };
 
 /* ── Lightbox ── */
 function Lightbox({ photos, index, onIndex, onClose }: { photos: GPhoto[]; index: number; onIndex: (i: number) => void; onClose: () => void }) {
@@ -47,11 +52,19 @@ function Lightbox({ photos, index, onIndex, onClose }: { photos: GPhoto[]; index
 /* ── Page ── */
 export default function GalleryPage() {
   const utils = api.useUtils();
-  const { data, isLoading } = api.photo.list.useQuery({ limit: 200 });
+  const [activeFolder, setActiveFolder] = useState<string | null>(null);
+
+  const { data: foldersData } = api.photo.listFolders.useQuery();
+  const folders: GFolder[] = foldersData ?? [];
+  const { data, isLoading } = api.photo.list.useQuery({ limit: 200, folderId: activeFolder ?? undefined });
   const photos: GPhoto[] = data?.items ?? [];
 
   const { upload, uploading, progress, error } = useUploadPhotos();
-  const deleteMut = api.photo.delete.useMutation();
+  const deleteMut       = api.photo.delete.useMutation();
+  const createFolderMut = api.photo.createFolder.useMutation();
+  const renameFolderMut = api.photo.renameFolder.useMutation();
+  const deleteFolderMut = api.photo.deleteFolder.useMutation();
+  const moveMut         = api.photo.moveToFolder.useMutation();
 
   const fileRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -59,15 +72,18 @@ export default function GalleryPage() {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [moveMenu, setMoveMenu] = useState(false);
+
+  const activeFolderObj = folders.find((f) => f.id === activeFolder) ?? null;
 
   const toggle = (id: string) => setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  const clearSel = () => { setSelected(new Set()); setSelectMode(false); };
+  const clearSel = () => { setSelected(new Set()); setSelectMode(false); setMoveMenu(false); };
+  const refresh = async () => { await Promise.all([utils.photo.list.invalidate(), utils.photo.listFolders.invalidate()]); };
 
   async function doUpload(files: File[]) {
     if (files.length === 0) return;
-    try { await upload(files); await utils.photo.list.invalidate(); } catch { /* hook surfaces error */ }
+    try { await upload(files, { folderId: activeFolder }); await refresh(); } catch { /* hook surfaces error */ }
   }
-
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     e.target.value = "";
@@ -78,46 +94,86 @@ export default function GalleryPage() {
     if (selected.size === 0) return;
     if (!confirm(`Delete ${selected.size} photo${selected.size > 1 ? "s" : ""}? This can't be undone.`)) return;
     setDeleting(true);
-    try {
-      await Promise.all([...selected].map((id) => deleteMut.mutateAsync({ id })));
-      await utils.photo.list.invalidate();
-      clearSel();
-    } finally { setDeleting(false); }
+    try { await Promise.all([...selected].map((id) => deleteMut.mutateAsync({ id }))); await refresh(); clearSel(); }
+    finally { setDeleting(false); }
   }
 
-  /* Drag-and-drop from the OS */
+  async function moveSelected(folderId: string | null) {
+    if (selected.size === 0) return;
+    await moveMut.mutateAsync({ photoIds: [...selected], folderId });
+    await refresh();
+    clearSel();
+  }
+
+  async function newFolder() {
+    const name = window.prompt("New folder name");
+    if (!name?.trim()) return;
+    await createFolderMut.mutateAsync({ name: name.trim() });
+    await utils.photo.listFolders.invalidate();
+  }
+  async function renameActiveFolder() {
+    if (!activeFolderObj) return;
+    const name = window.prompt("Rename folder", activeFolderObj.name);
+    if (!name?.trim()) return;
+    await renameFolderMut.mutateAsync({ id: activeFolderObj.id, name: name.trim() });
+    await utils.photo.listFolders.invalidate();
+  }
+  async function deleteActiveFolder() {
+    if (!activeFolderObj) return;
+    if (!confirm(`Delete folder "${activeFolderObj.name}"? The photos inside will be moved back to your library (not deleted).`)) return;
+    await deleteFolderMut.mutateAsync({ id: activeFolderObj.id });
+    setActiveFolder(null);
+    await refresh();
+  }
+
   function onDrop(e: React.DragEvent) {
     e.preventDefault(); setDragOver(false);
     const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"));
     void doUpload(files);
   }
 
+  const showFolders = activeFolder === null && folders.length > 0;
+
   return (
-    <div
-      className="min-h-full relative"
+    <div className="min-h-full relative"
       onDragOver={(e) => { e.preventDefault(); if (!dragOver) setDragOver(true); }}
       onDragLeave={(e) => { if (e.relatedTarget === null) setDragOver(false); }}
-      onDrop={onDrop}
-    >
+      onDrop={onDrop}>
       <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={onFiles} />
 
       {/* Header */}
       <div className="bg-[var(--bg)] border-b border-[var(--border)] px-5 py-3">
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="font-sans font-black text-[var(--fg)] text-lg leading-none">Gallery</h1>
-            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">
-              {isLoading ? "Loading…" : `${photos.length} photo${photos.length !== 1 ? "s" : ""}`}
-              {uploading && ` · uploading ${progress.done}/${progress.total}…`}
-            </p>
+          <div className="flex items-center gap-2 min-w-0">
+            {activeFolder !== null && (
+              <button onClick={() => { setActiveFolder(null); clearSel(); }} className="p-1.5 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors shrink-0"><BackIcon /></button>
+            )}
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h1 className="font-sans font-black text-[var(--fg)] text-lg leading-none truncate">{activeFolderObj ? activeFolderObj.name : "Gallery"}</h1>
+                {activeFolderObj && (
+                  <>
+                    <button onClick={renameActiveFolder} className="p-1 rounded text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors" title="Rename folder"><PencilIcon /></button>
+                    <button onClick={deleteActiveFolder} className="p-1 rounded text-[var(--fg-muted)] hover:text-red-400 hover:bg-[var(--bg-subtle)] transition-colors" title="Delete folder"><TrashIcon /></button>
+                  </>
+                )}
+              </div>
+              <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">
+                {isLoading ? "Loading…" : `${photos.length} photo${photos.length !== 1 ? "s" : ""}`}
+                {uploading && ` · uploading ${progress.done}/${progress.total}…`}
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {photos.length > 0 && (
-              selectMode ? (
-                <button onClick={clearSel} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">Done</button>
-              ) : (
-                <button onClick={() => setSelectMode(true)} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">Select</button>
-              )
+              selectMode
+                ? <button onClick={clearSel} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">Done</button>
+                : <button onClick={() => setSelectMode(true)} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">Select</button>
+            )}
+            {activeFolder === null && (
+              <button onClick={newFolder} className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--border)] bg-[var(--bg-card)] text-[var(--fg)] text-xs font-sans font-medium hover:border-[var(--fg-muted)] transition-colors rounded-lg">
+                <FolderIcon /> New folder
+              </button>
             )}
             <button onClick={() => fileRef.current?.click()} disabled={uploading}
               className="btn-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-sans font-semibold disabled:opacity-50">
@@ -128,24 +184,43 @@ export default function GalleryPage() {
         {error && <p className="font-mono text-[10px] text-red-400 mt-2">{error}</p>}
       </div>
 
-      {/* Body */}
+      {/* Folders (root only) */}
+      {showFolders && (
+        <div className="px-5 pt-4">
+          <p className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest mb-2">Folders</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-2">
+            {folders.map((f) => (
+              <button key={f.id} onClick={() => { setActiveFolder(f.id); clearSel(); }}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-card)] hover:border-[var(--fg-muted)] transition-colors text-left">
+                <span className="text-yellow shrink-0"><FolderIcon /></span>
+                <span className="flex-1 min-w-0">
+                  <span className="font-sans text-xs font-semibold text-[var(--fg)] truncate block">{f.name}</span>
+                  <span className="font-mono text-[9px] text-[var(--fg-muted)]">{f.count} photo{f.count !== 1 ? "s" : ""}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Photos */}
       {isLoading ? (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6" style={{ gap: "1px", backgroundColor: "var(--border)" }}>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 mt-4" style={{ gap: "1px", backgroundColor: "var(--border)" }}>
           {Array.from({ length: 18 }).map((_, i) => <div key={i} className="aspect-square bg-[var(--bg-subtle)] animate-pulse" />)}
         </div>
       ) : photos.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-28 text-center px-6">
+        <div className="flex flex-col items-center justify-center py-24 text-center px-6">
           <div className="w-16 h-16 rounded-2xl bg-[var(--bg-subtle)] flex items-center justify-center mb-4 text-[var(--fg-muted)]">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           </div>
-          <p className="font-sans font-semibold text-[var(--fg)] mb-1">Your gallery is empty</p>
+          <p className="font-sans font-semibold text-[var(--fg)] mb-1">{activeFolderObj ? "This folder is empty" : "Your gallery is empty"}</p>
           <p className="font-serif text-sm text-[var(--fg-muted)] mb-5">Drag photos here, or upload from your device.</p>
           <button onClick={() => fileRef.current?.click()} disabled={uploading} className="btn-primary px-5 py-2.5 rounded-xl font-sans font-bold text-sm disabled:opacity-50">
             {uploading ? `Uploading ${progress.done}/${progress.total}…` : "Upload photos"}
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6" style={{ gap: "1px", backgroundColor: "var(--border)" }}>
+        <div className={`grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 ${showFolders ? "mt-2" : "mt-4"}`} style={{ gap: "1px", backgroundColor: "var(--border)" }}>
           {photos.map((photo, i) => {
             const isSel = selected.has(photo.id);
             return (
@@ -154,8 +229,7 @@ export default function GalleryPage() {
                 style={{ boxShadow: isSel ? "inset 0 0 0 3px #fad502" : "none" }}
                 onClick={() => { if (selectMode) toggle(photo.id); else setLightboxIdx(i); }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photo.url} alt={photo.filename} loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                <img src={photo.url} alt={photo.filename} loading="lazy" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                 <div className="absolute bottom-0 inset-x-0 px-1.5 py-1 bg-gradient-to-t from-black/70 to-transparent translate-y-full group-hover:translate-y-0 transition-transform">
                   <p className="font-mono text-[9px] text-white truncate">{photo.filename}</p>
@@ -179,6 +253,29 @@ export default function GalleryPage() {
             transition={{ type: "spring", stiffness: 400, damping: 32 }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] shadow-2xl">
             <span className="font-mono text-[11px] text-[var(--fg-muted)]">{selected.size} selected</span>
+
+            {/* Move to folder */}
+            <div className="relative">
+              <button onClick={() => setMoveMenu((v) => !v)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg)] font-sans text-xs font-medium hover:border-[var(--fg-muted)] transition-colors">
+                <MoveIcon /> Move to
+              </button>
+              {moveMenu && (
+                <div className="absolute bottom-full mb-2 left-0 w-48 max-h-60 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl py-1">
+                  <button onClick={async () => { await newFolder(); }} className="w-full text-left px-3 py-2 font-sans text-xs text-yellow hover:bg-[var(--bg-subtle)] transition-colors">+ New folder…</button>
+                  {activeFolder !== null && (
+                    <button onClick={() => moveSelected(null)} className="w-full text-left px-3 py-2 font-sans text-xs text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">Remove from folder</button>
+                  )}
+                  {folders.filter((f) => f.id !== activeFolder).map((f) => (
+                    <button key={f.id} onClick={() => moveSelected(f.id)} className="w-full text-left px-3 py-2 font-sans text-xs text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors flex items-center gap-2">
+                      <span className="text-[var(--fg-muted)]"><FolderIcon /></span>{f.name}
+                    </button>
+                  ))}
+                  {folders.length === 0 && <p className="px-3 py-2 font-sans text-[11px] text-[var(--fg-muted)]">No folders yet</p>}
+                </div>
+              )}
+            </div>
+
             <button onClick={deleteSelected} disabled={deleting}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/40 text-red-400 font-sans text-xs font-bold hover:bg-red-500/10 disabled:opacity-50 transition-colors">
               <TrashIcon /> {deleting ? "Deleting…" : "Delete"}
@@ -195,7 +292,7 @@ export default function GalleryPage() {
             className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--bg)]/80 backdrop-blur-sm pointer-events-none">
             <div className="flex flex-col items-center gap-3 px-10 py-8 rounded-2xl border-2 border-dashed border-yellow">
               <span className="text-yellow"><UploadIcon /></span>
-              <p className="font-sans font-bold text-[var(--fg)]">Drop to upload</p>
+              <p className="font-sans font-bold text-[var(--fg)]">Drop to upload{activeFolderObj ? ` to ${activeFolderObj.name}` : ""}</p>
             </div>
           </motion.div>
         )}

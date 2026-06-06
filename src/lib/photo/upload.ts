@@ -42,7 +42,7 @@ export function useUploadPhotos() {
   const [progress, setProgress]   = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [error, setError]         = useState<string | null>(null);
 
-  async function upload(files: File[]): Promise<UploadedPhoto[]> {
+  async function upload(files: File[], opts?: { folderId?: string | null }): Promise<UploadedPhoto[]> {
     const images = files.filter((f) => f.type.startsWith("image/"));
     if (images.length === 0) return [];
 
@@ -76,6 +76,7 @@ export function useUploadPhotos() {
           size:     file.size,
           width:    dims?.w,
           height:   dims?.h,
+          folderId: opts?.folderId ?? null,
         });
 
         created.push({ id: photo.id, url: photo.url, filename: photo.filename });

@@ -21,11 +21,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  photos     Photo[]
-  portfolios Portfolio[]
-  linksPages LinksPage[]
-  deliveries Delivery[]
-  messages   Message[]
+  photos       Photo[]
+  photoFolders PhotoFolder[]
+  portfolios   Portfolio[]
+  linksPages   LinksPage[]
+  deliveries   Delivery[]
+  messages     Message[]
 }
 
 // ── Community chat ────────────────────────────────────────────────────────────
@@ -60,7 +61,27 @@ model Photo {
   mimeType    String   @default("image/jpeg")
   createdAt   DateTime @default(now())
 
+  folderId String?
+  folder   PhotoFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
   deliveryPhotos DeliveryPhoto[]
+
+  @@index([userId])
+  @@index([folderId])
+}
+
+// ── Photo library folders ─────────────────────────────────────────────────────
+// Optional grouping for the gallery. Deleting a folder un-files its photos
+// (SetNull) rather than deleting them.
+
+model PhotoFolder {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  createdAt DateTime @default(now())
+
+  photos Photo[]
 
   @@index([userId])
 }

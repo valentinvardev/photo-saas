@@ -29,6 +29,11 @@ export type Message = $Result.DefaultSelection<Prisma.$MessagePayload>
  */
 export type Photo = $Result.DefaultSelection<Prisma.$PhotoPayload>
 /**
+ * Model PhotoFolder
+ * 
+ */
+export type PhotoFolder = $Result.DefaultSelection<Prisma.$PhotoFolderPayload>
+/**
  * Model Portfolio
  * 
  */
@@ -201,6 +206,16 @@ export class PrismaClient<
     * ```
     */
   get photo(): Prisma.PhotoDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.photoFolder`: Exposes CRUD operations for the **PhotoFolder** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PhotoFolders
+    * const photoFolders = await prisma.photoFolder.findMany()
+    * ```
+    */
+  get photoFolder(): Prisma.PhotoFolderDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.portfolio`: Exposes CRUD operations for the **Portfolio** model.
@@ -695,6 +710,7 @@ export namespace Prisma {
     User: 'User',
     Message: 'Message',
     Photo: 'Photo',
+    PhotoFolder: 'PhotoFolder',
     Portfolio: 'Portfolio',
     LinksPage: 'LinksPage',
     LinkItem: 'LinkItem',
@@ -718,7 +734,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "message" | "photo" | "portfolio" | "linksPage" | "linkItem" | "delivery" | "deliveryPhoto"
+      modelProps: "user" | "message" | "photo" | "photoFolder" | "portfolio" | "linksPage" | "linkItem" | "delivery" | "deliveryPhoto"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -941,6 +957,80 @@ export namespace Prisma {
           count: {
             args: Prisma.PhotoCountArgs<ExtArgs>
             result: $Utils.Optional<PhotoCountAggregateOutputType> | number
+          }
+        }
+      }
+      PhotoFolder: {
+        payload: Prisma.$PhotoFolderPayload<ExtArgs>
+        fields: Prisma.PhotoFolderFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PhotoFolderFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PhotoFolderFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload>
+          }
+          findFirst: {
+            args: Prisma.PhotoFolderFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PhotoFolderFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload>
+          }
+          findMany: {
+            args: Prisma.PhotoFolderFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload>[]
+          }
+          create: {
+            args: Prisma.PhotoFolderCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload>
+          }
+          createMany: {
+            args: Prisma.PhotoFolderCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PhotoFolderCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload>[]
+          }
+          delete: {
+            args: Prisma.PhotoFolderDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload>
+          }
+          update: {
+            args: Prisma.PhotoFolderUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload>
+          }
+          deleteMany: {
+            args: Prisma.PhotoFolderDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PhotoFolderUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PhotoFolderUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload>[]
+          }
+          upsert: {
+            args: Prisma.PhotoFolderUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhotoFolderPayload>
+          }
+          aggregate: {
+            args: Prisma.PhotoFolderAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePhotoFolder>
+          }
+          groupBy: {
+            args: Prisma.PhotoFolderGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PhotoFolderGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PhotoFolderCountArgs<ExtArgs>
+            result: $Utils.Optional<PhotoFolderCountAggregateOutputType> | number
           }
         }
       }
@@ -1413,6 +1503,7 @@ export namespace Prisma {
     user?: UserOmit
     message?: MessageOmit
     photo?: PhotoOmit
+    photoFolder?: PhotoFolderOmit
     portfolio?: PortfolioOmit
     linksPage?: LinksPageOmit
     linkItem?: LinkItemOmit
@@ -1499,6 +1590,7 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     photos: number
+    photoFolders: number
     portfolios: number
     linksPages: number
     deliveries: number
@@ -1507,6 +1599,7 @@ export namespace Prisma {
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     photos?: boolean | UserCountOutputTypeCountPhotosArgs
+    photoFolders?: boolean | UserCountOutputTypeCountPhotoFoldersArgs
     portfolios?: boolean | UserCountOutputTypeCountPortfoliosArgs
     linksPages?: boolean | UserCountOutputTypeCountLinksPagesArgs
     deliveries?: boolean | UserCountOutputTypeCountDeliveriesArgs
@@ -1529,6 +1622,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountPhotosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PhotoWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPhotoFoldersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PhotoFolderWhereInput
   }
 
   /**
@@ -1588,6 +1688,37 @@ export namespace Prisma {
    */
   export type PhotoCountOutputTypeCountDeliveryPhotosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DeliveryPhotoWhereInput
+  }
+
+
+  /**
+   * Count Type PhotoFolderCountOutputType
+   */
+
+  export type PhotoFolderCountOutputType = {
+    photos: number
+  }
+
+  export type PhotoFolderCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    photos?: boolean | PhotoFolderCountOutputTypeCountPhotosArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * PhotoFolderCountOutputType without action
+   */
+  export type PhotoFolderCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolderCountOutputType
+     */
+    select?: PhotoFolderCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * PhotoFolderCountOutputType without action
+   */
+  export type PhotoFolderCountOutputTypeCountPhotosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PhotoWhereInput
   }
 
 
@@ -1830,6 +1961,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     photos?: boolean | User$photosArgs<ExtArgs>
+    photoFolders?: boolean | User$photoFoldersArgs<ExtArgs>
     portfolios?: boolean | User$portfoliosArgs<ExtArgs>
     linksPages?: boolean | User$linksPagesArgs<ExtArgs>
     deliveries?: boolean | User$deliveriesArgs<ExtArgs>
@@ -1867,6 +1999,7 @@ export namespace Prisma {
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "avatarUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     photos?: boolean | User$photosArgs<ExtArgs>
+    photoFolders?: boolean | User$photoFoldersArgs<ExtArgs>
     portfolios?: boolean | User$portfoliosArgs<ExtArgs>
     linksPages?: boolean | User$linksPagesArgs<ExtArgs>
     deliveries?: boolean | User$deliveriesArgs<ExtArgs>
@@ -1880,6 +2013,7 @@ export namespace Prisma {
     name: "User"
     objects: {
       photos: Prisma.$PhotoPayload<ExtArgs>[]
+      photoFolders: Prisma.$PhotoFolderPayload<ExtArgs>[]
       portfolios: Prisma.$PortfolioPayload<ExtArgs>[]
       linksPages: Prisma.$LinksPagePayload<ExtArgs>[]
       deliveries: Prisma.$DeliveryPayload<ExtArgs>[]
@@ -2287,6 +2421,7 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     photos<T extends User$photosArgs<ExtArgs> = {}>(args?: Subset<T, User$photosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    photoFolders<T extends User$photoFoldersArgs<ExtArgs> = {}>(args?: Subset<T, User$photoFoldersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     portfolios<T extends User$portfoliosArgs<ExtArgs> = {}>(args?: Subset<T, User$portfoliosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PortfolioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     linksPages<T extends User$linksPagesArgs<ExtArgs> = {}>(args?: Subset<T, User$linksPagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LinksPagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     deliveries<T extends User$deliveriesArgs<ExtArgs> = {}>(args?: Subset<T, User$deliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2735,6 +2870,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PhotoScalarFieldEnum | PhotoScalarFieldEnum[]
+  }
+
+  /**
+   * User.photoFolders
+   */
+  export type User$photoFoldersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    where?: PhotoFolderWhereInput
+    orderBy?: PhotoFolderOrderByWithRelationInput | PhotoFolderOrderByWithRelationInput[]
+    cursor?: PhotoFolderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PhotoFolderScalarFieldEnum | PhotoFolderScalarFieldEnum[]
   }
 
   /**
@@ -3945,6 +4104,7 @@ export namespace Prisma {
     height: number | null
     mimeType: string | null
     createdAt: Date | null
+    folderId: string | null
   }
 
   export type PhotoMaxAggregateOutputType = {
@@ -3958,6 +4118,7 @@ export namespace Prisma {
     height: number | null
     mimeType: string | null
     createdAt: Date | null
+    folderId: string | null
   }
 
   export type PhotoCountAggregateOutputType = {
@@ -3971,6 +4132,7 @@ export namespace Prisma {
     height: number
     mimeType: number
     createdAt: number
+    folderId: number
     _all: number
   }
 
@@ -3998,6 +4160,7 @@ export namespace Prisma {
     height?: true
     mimeType?: true
     createdAt?: true
+    folderId?: true
   }
 
   export type PhotoMaxAggregateInputType = {
@@ -4011,6 +4174,7 @@ export namespace Prisma {
     height?: true
     mimeType?: true
     createdAt?: true
+    folderId?: true
   }
 
   export type PhotoCountAggregateInputType = {
@@ -4024,6 +4188,7 @@ export namespace Prisma {
     height?: true
     mimeType?: true
     createdAt?: true
+    folderId?: true
     _all?: true
   }
 
@@ -4124,6 +4289,7 @@ export namespace Prisma {
     height: number | null
     mimeType: string
     createdAt: Date
+    folderId: string | null
     _count: PhotoCountAggregateOutputType | null
     _avg: PhotoAvgAggregateOutputType | null
     _sum: PhotoSumAggregateOutputType | null
@@ -4156,7 +4322,9 @@ export namespace Prisma {
     height?: boolean
     mimeType?: boolean
     createdAt?: boolean
+    folderId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    folder?: boolean | Photo$folderArgs<ExtArgs>
     deliveryPhotos?: boolean | Photo$deliveryPhotosArgs<ExtArgs>
     _count?: boolean | PhotoCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["photo"]>
@@ -4172,7 +4340,9 @@ export namespace Prisma {
     height?: boolean
     mimeType?: boolean
     createdAt?: boolean
+    folderId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    folder?: boolean | Photo$folderArgs<ExtArgs>
   }, ExtArgs["result"]["photo"]>
 
   export type PhotoSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4186,7 +4356,9 @@ export namespace Prisma {
     height?: boolean
     mimeType?: boolean
     createdAt?: boolean
+    folderId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    folder?: boolean | Photo$folderArgs<ExtArgs>
   }, ExtArgs["result"]["photo"]>
 
   export type PhotoSelectScalar = {
@@ -4200,25 +4372,30 @@ export namespace Prisma {
     height?: boolean
     mimeType?: boolean
     createdAt?: boolean
+    folderId?: boolean
   }
 
-  export type PhotoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "url" | "storagePath" | "filename" | "size" | "width" | "height" | "mimeType" | "createdAt", ExtArgs["result"]["photo"]>
+  export type PhotoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "url" | "storagePath" | "filename" | "size" | "width" | "height" | "mimeType" | "createdAt" | "folderId", ExtArgs["result"]["photo"]>
   export type PhotoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    folder?: boolean | Photo$folderArgs<ExtArgs>
     deliveryPhotos?: boolean | Photo$deliveryPhotosArgs<ExtArgs>
     _count?: boolean | PhotoCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PhotoIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    folder?: boolean | Photo$folderArgs<ExtArgs>
   }
   export type PhotoIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    folder?: boolean | Photo$folderArgs<ExtArgs>
   }
 
   export type $PhotoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Photo"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      folder: Prisma.$PhotoFolderPayload<ExtArgs> | null
       deliveryPhotos: Prisma.$DeliveryPhotoPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -4232,6 +4409,7 @@ export namespace Prisma {
       height: number | null
       mimeType: string
       createdAt: Date
+      folderId: string | null
     }, ExtArgs["result"]["photo"]>
     composites: {}
   }
@@ -4627,6 +4805,7 @@ export namespace Prisma {
   export interface Prisma__PhotoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    folder<T extends Photo$folderArgs<ExtArgs> = {}>(args?: Subset<T, Photo$folderArgs<ExtArgs>>): Prisma__PhotoFolderClient<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     deliveryPhotos<T extends Photo$deliveryPhotosArgs<ExtArgs> = {}>(args?: Subset<T, Photo$deliveryPhotosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeliveryPhotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -4667,6 +4846,7 @@ export namespace Prisma {
     readonly height: FieldRef<"Photo", 'Int'>
     readonly mimeType: FieldRef<"Photo", 'String'>
     readonly createdAt: FieldRef<"Photo", 'DateTime'>
+    readonly folderId: FieldRef<"Photo", 'String'>
   }
     
 
@@ -5063,6 +5243,25 @@ export namespace Prisma {
   }
 
   /**
+   * Photo.folder
+   */
+  export type Photo$folderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    where?: PhotoFolderWhereInput
+  }
+
+  /**
    * Photo.deliveryPhotos
    */
   export type Photo$deliveryPhotosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5102,6 +5301,1081 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: PhotoInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PhotoFolder
+   */
+
+  export type AggregatePhotoFolder = {
+    _count: PhotoFolderCountAggregateOutputType | null
+    _min: PhotoFolderMinAggregateOutputType | null
+    _max: PhotoFolderMaxAggregateOutputType | null
+  }
+
+  export type PhotoFolderMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    createdAt: Date | null
+  }
+
+  export type PhotoFolderMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    createdAt: Date | null
+  }
+
+  export type PhotoFolderCountAggregateOutputType = {
+    id: number
+    userId: number
+    name: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type PhotoFolderMinAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    createdAt?: true
+  }
+
+  export type PhotoFolderMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    createdAt?: true
+  }
+
+  export type PhotoFolderCountAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type PhotoFolderAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PhotoFolder to aggregate.
+     */
+    where?: PhotoFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhotoFolders to fetch.
+     */
+    orderBy?: PhotoFolderOrderByWithRelationInput | PhotoFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PhotoFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhotoFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhotoFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PhotoFolders
+    **/
+    _count?: true | PhotoFolderCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PhotoFolderMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PhotoFolderMaxAggregateInputType
+  }
+
+  export type GetPhotoFolderAggregateType<T extends PhotoFolderAggregateArgs> = {
+        [P in keyof T & keyof AggregatePhotoFolder]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePhotoFolder[P]>
+      : GetScalarType<T[P], AggregatePhotoFolder[P]>
+  }
+
+
+
+
+  export type PhotoFolderGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PhotoFolderWhereInput
+    orderBy?: PhotoFolderOrderByWithAggregationInput | PhotoFolderOrderByWithAggregationInput[]
+    by: PhotoFolderScalarFieldEnum[] | PhotoFolderScalarFieldEnum
+    having?: PhotoFolderScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PhotoFolderCountAggregateInputType | true
+    _min?: PhotoFolderMinAggregateInputType
+    _max?: PhotoFolderMaxAggregateInputType
+  }
+
+  export type PhotoFolderGroupByOutputType = {
+    id: string
+    userId: string
+    name: string
+    createdAt: Date
+    _count: PhotoFolderCountAggregateOutputType | null
+    _min: PhotoFolderMinAggregateOutputType | null
+    _max: PhotoFolderMaxAggregateOutputType | null
+  }
+
+  type GetPhotoFolderGroupByPayload<T extends PhotoFolderGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PhotoFolderGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PhotoFolderGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PhotoFolderGroupByOutputType[P]>
+            : GetScalarType<T[P], PhotoFolderGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PhotoFolderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    photos?: boolean | PhotoFolder$photosArgs<ExtArgs>
+    _count?: boolean | PhotoFolderCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["photoFolder"]>
+
+  export type PhotoFolderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["photoFolder"]>
+
+  export type PhotoFolderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["photoFolder"]>
+
+  export type PhotoFolderSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    createdAt?: boolean
+  }
+
+  export type PhotoFolderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "createdAt", ExtArgs["result"]["photoFolder"]>
+  export type PhotoFolderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    photos?: boolean | PhotoFolder$photosArgs<ExtArgs>
+    _count?: boolean | PhotoFolderCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type PhotoFolderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type PhotoFolderIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $PhotoFolderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PhotoFolder"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      photos: Prisma.$PhotoPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      name: string
+      createdAt: Date
+    }, ExtArgs["result"]["photoFolder"]>
+    composites: {}
+  }
+
+  type PhotoFolderGetPayload<S extends boolean | null | undefined | PhotoFolderDefaultArgs> = $Result.GetResult<Prisma.$PhotoFolderPayload, S>
+
+  type PhotoFolderCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PhotoFolderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PhotoFolderCountAggregateInputType | true
+    }
+
+  export interface PhotoFolderDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PhotoFolder'], meta: { name: 'PhotoFolder' } }
+    /**
+     * Find zero or one PhotoFolder that matches the filter.
+     * @param {PhotoFolderFindUniqueArgs} args - Arguments to find a PhotoFolder
+     * @example
+     * // Get one PhotoFolder
+     * const photoFolder = await prisma.photoFolder.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PhotoFolderFindUniqueArgs>(args: SelectSubset<T, PhotoFolderFindUniqueArgs<ExtArgs>>): Prisma__PhotoFolderClient<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PhotoFolder that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PhotoFolderFindUniqueOrThrowArgs} args - Arguments to find a PhotoFolder
+     * @example
+     * // Get one PhotoFolder
+     * const photoFolder = await prisma.photoFolder.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PhotoFolderFindUniqueOrThrowArgs>(args: SelectSubset<T, PhotoFolderFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PhotoFolderClient<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PhotoFolder that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhotoFolderFindFirstArgs} args - Arguments to find a PhotoFolder
+     * @example
+     * // Get one PhotoFolder
+     * const photoFolder = await prisma.photoFolder.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PhotoFolderFindFirstArgs>(args?: SelectSubset<T, PhotoFolderFindFirstArgs<ExtArgs>>): Prisma__PhotoFolderClient<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PhotoFolder that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhotoFolderFindFirstOrThrowArgs} args - Arguments to find a PhotoFolder
+     * @example
+     * // Get one PhotoFolder
+     * const photoFolder = await prisma.photoFolder.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PhotoFolderFindFirstOrThrowArgs>(args?: SelectSubset<T, PhotoFolderFindFirstOrThrowArgs<ExtArgs>>): Prisma__PhotoFolderClient<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PhotoFolders that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhotoFolderFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PhotoFolders
+     * const photoFolders = await prisma.photoFolder.findMany()
+     * 
+     * // Get first 10 PhotoFolders
+     * const photoFolders = await prisma.photoFolder.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const photoFolderWithIdOnly = await prisma.photoFolder.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PhotoFolderFindManyArgs>(args?: SelectSubset<T, PhotoFolderFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PhotoFolder.
+     * @param {PhotoFolderCreateArgs} args - Arguments to create a PhotoFolder.
+     * @example
+     * // Create one PhotoFolder
+     * const PhotoFolder = await prisma.photoFolder.create({
+     *   data: {
+     *     // ... data to create a PhotoFolder
+     *   }
+     * })
+     * 
+     */
+    create<T extends PhotoFolderCreateArgs>(args: SelectSubset<T, PhotoFolderCreateArgs<ExtArgs>>): Prisma__PhotoFolderClient<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PhotoFolders.
+     * @param {PhotoFolderCreateManyArgs} args - Arguments to create many PhotoFolders.
+     * @example
+     * // Create many PhotoFolders
+     * const photoFolder = await prisma.photoFolder.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PhotoFolderCreateManyArgs>(args?: SelectSubset<T, PhotoFolderCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PhotoFolders and returns the data saved in the database.
+     * @param {PhotoFolderCreateManyAndReturnArgs} args - Arguments to create many PhotoFolders.
+     * @example
+     * // Create many PhotoFolders
+     * const photoFolder = await prisma.photoFolder.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PhotoFolders and only return the `id`
+     * const photoFolderWithIdOnly = await prisma.photoFolder.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PhotoFolderCreateManyAndReturnArgs>(args?: SelectSubset<T, PhotoFolderCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PhotoFolder.
+     * @param {PhotoFolderDeleteArgs} args - Arguments to delete one PhotoFolder.
+     * @example
+     * // Delete one PhotoFolder
+     * const PhotoFolder = await prisma.photoFolder.delete({
+     *   where: {
+     *     // ... filter to delete one PhotoFolder
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PhotoFolderDeleteArgs>(args: SelectSubset<T, PhotoFolderDeleteArgs<ExtArgs>>): Prisma__PhotoFolderClient<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PhotoFolder.
+     * @param {PhotoFolderUpdateArgs} args - Arguments to update one PhotoFolder.
+     * @example
+     * // Update one PhotoFolder
+     * const photoFolder = await prisma.photoFolder.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PhotoFolderUpdateArgs>(args: SelectSubset<T, PhotoFolderUpdateArgs<ExtArgs>>): Prisma__PhotoFolderClient<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PhotoFolders.
+     * @param {PhotoFolderDeleteManyArgs} args - Arguments to filter PhotoFolders to delete.
+     * @example
+     * // Delete a few PhotoFolders
+     * const { count } = await prisma.photoFolder.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PhotoFolderDeleteManyArgs>(args?: SelectSubset<T, PhotoFolderDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PhotoFolders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhotoFolderUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PhotoFolders
+     * const photoFolder = await prisma.photoFolder.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PhotoFolderUpdateManyArgs>(args: SelectSubset<T, PhotoFolderUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PhotoFolders and returns the data updated in the database.
+     * @param {PhotoFolderUpdateManyAndReturnArgs} args - Arguments to update many PhotoFolders.
+     * @example
+     * // Update many PhotoFolders
+     * const photoFolder = await prisma.photoFolder.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PhotoFolders and only return the `id`
+     * const photoFolderWithIdOnly = await prisma.photoFolder.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PhotoFolderUpdateManyAndReturnArgs>(args: SelectSubset<T, PhotoFolderUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PhotoFolder.
+     * @param {PhotoFolderUpsertArgs} args - Arguments to update or create a PhotoFolder.
+     * @example
+     * // Update or create a PhotoFolder
+     * const photoFolder = await prisma.photoFolder.upsert({
+     *   create: {
+     *     // ... data to create a PhotoFolder
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PhotoFolder we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PhotoFolderUpsertArgs>(args: SelectSubset<T, PhotoFolderUpsertArgs<ExtArgs>>): Prisma__PhotoFolderClient<$Result.GetResult<Prisma.$PhotoFolderPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PhotoFolders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhotoFolderCountArgs} args - Arguments to filter PhotoFolders to count.
+     * @example
+     * // Count the number of PhotoFolders
+     * const count = await prisma.photoFolder.count({
+     *   where: {
+     *     // ... the filter for the PhotoFolders we want to count
+     *   }
+     * })
+    **/
+    count<T extends PhotoFolderCountArgs>(
+      args?: Subset<T, PhotoFolderCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PhotoFolderCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PhotoFolder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhotoFolderAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PhotoFolderAggregateArgs>(args: Subset<T, PhotoFolderAggregateArgs>): Prisma.PrismaPromise<GetPhotoFolderAggregateType<T>>
+
+    /**
+     * Group by PhotoFolder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhotoFolderGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PhotoFolderGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PhotoFolderGroupByArgs['orderBy'] }
+        : { orderBy?: PhotoFolderGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PhotoFolderGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPhotoFolderGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PhotoFolder model
+   */
+  readonly fields: PhotoFolderFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PhotoFolder.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PhotoFolderClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    photos<T extends PhotoFolder$photosArgs<ExtArgs> = {}>(args?: Subset<T, PhotoFolder$photosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PhotoFolder model
+   */
+  interface PhotoFolderFieldRefs {
+    readonly id: FieldRef<"PhotoFolder", 'String'>
+    readonly userId: FieldRef<"PhotoFolder", 'String'>
+    readonly name: FieldRef<"PhotoFolder", 'String'>
+    readonly createdAt: FieldRef<"PhotoFolder", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PhotoFolder findUnique
+   */
+  export type PhotoFolderFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which PhotoFolder to fetch.
+     */
+    where: PhotoFolderWhereUniqueInput
+  }
+
+  /**
+   * PhotoFolder findUniqueOrThrow
+   */
+  export type PhotoFolderFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which PhotoFolder to fetch.
+     */
+    where: PhotoFolderWhereUniqueInput
+  }
+
+  /**
+   * PhotoFolder findFirst
+   */
+  export type PhotoFolderFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which PhotoFolder to fetch.
+     */
+    where?: PhotoFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhotoFolders to fetch.
+     */
+    orderBy?: PhotoFolderOrderByWithRelationInput | PhotoFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PhotoFolders.
+     */
+    cursor?: PhotoFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhotoFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhotoFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PhotoFolders.
+     */
+    distinct?: PhotoFolderScalarFieldEnum | PhotoFolderScalarFieldEnum[]
+  }
+
+  /**
+   * PhotoFolder findFirstOrThrow
+   */
+  export type PhotoFolderFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which PhotoFolder to fetch.
+     */
+    where?: PhotoFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhotoFolders to fetch.
+     */
+    orderBy?: PhotoFolderOrderByWithRelationInput | PhotoFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PhotoFolders.
+     */
+    cursor?: PhotoFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhotoFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhotoFolders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PhotoFolders.
+     */
+    distinct?: PhotoFolderScalarFieldEnum | PhotoFolderScalarFieldEnum[]
+  }
+
+  /**
+   * PhotoFolder findMany
+   */
+  export type PhotoFolderFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    /**
+     * Filter, which PhotoFolders to fetch.
+     */
+    where?: PhotoFolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhotoFolders to fetch.
+     */
+    orderBy?: PhotoFolderOrderByWithRelationInput | PhotoFolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PhotoFolders.
+     */
+    cursor?: PhotoFolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhotoFolders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhotoFolders.
+     */
+    skip?: number
+    distinct?: PhotoFolderScalarFieldEnum | PhotoFolderScalarFieldEnum[]
+  }
+
+  /**
+   * PhotoFolder create
+   */
+  export type PhotoFolderCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PhotoFolder.
+     */
+    data: XOR<PhotoFolderCreateInput, PhotoFolderUncheckedCreateInput>
+  }
+
+  /**
+   * PhotoFolder createMany
+   */
+  export type PhotoFolderCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PhotoFolders.
+     */
+    data: PhotoFolderCreateManyInput | PhotoFolderCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PhotoFolder createManyAndReturn
+   */
+  export type PhotoFolderCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * The data used to create many PhotoFolders.
+     */
+    data: PhotoFolderCreateManyInput | PhotoFolderCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PhotoFolder update
+   */
+  export type PhotoFolderUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PhotoFolder.
+     */
+    data: XOR<PhotoFolderUpdateInput, PhotoFolderUncheckedUpdateInput>
+    /**
+     * Choose, which PhotoFolder to update.
+     */
+    where: PhotoFolderWhereUniqueInput
+  }
+
+  /**
+   * PhotoFolder updateMany
+   */
+  export type PhotoFolderUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PhotoFolders.
+     */
+    data: XOR<PhotoFolderUpdateManyMutationInput, PhotoFolderUncheckedUpdateManyInput>
+    /**
+     * Filter which PhotoFolders to update
+     */
+    where?: PhotoFolderWhereInput
+    /**
+     * Limit how many PhotoFolders to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PhotoFolder updateManyAndReturn
+   */
+  export type PhotoFolderUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * The data used to update PhotoFolders.
+     */
+    data: XOR<PhotoFolderUpdateManyMutationInput, PhotoFolderUncheckedUpdateManyInput>
+    /**
+     * Filter which PhotoFolders to update
+     */
+    where?: PhotoFolderWhereInput
+    /**
+     * Limit how many PhotoFolders to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PhotoFolder upsert
+   */
+  export type PhotoFolderUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PhotoFolder to update in case it exists.
+     */
+    where: PhotoFolderWhereUniqueInput
+    /**
+     * In case the PhotoFolder found by the `where` argument doesn't exist, create a new PhotoFolder with this data.
+     */
+    create: XOR<PhotoFolderCreateInput, PhotoFolderUncheckedCreateInput>
+    /**
+     * In case the PhotoFolder was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PhotoFolderUpdateInput, PhotoFolderUncheckedUpdateInput>
+  }
+
+  /**
+   * PhotoFolder delete
+   */
+  export type PhotoFolderDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
+    /**
+     * Filter which PhotoFolder to delete.
+     */
+    where: PhotoFolderWhereUniqueInput
+  }
+
+  /**
+   * PhotoFolder deleteMany
+   */
+  export type PhotoFolderDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PhotoFolders to delete
+     */
+    where?: PhotoFolderWhereInput
+    /**
+     * Limit how many PhotoFolders to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PhotoFolder.photos
+   */
+  export type PhotoFolder$photosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Photo
+     */
+    select?: PhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Photo
+     */
+    omit?: PhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoInclude<ExtArgs> | null
+    where?: PhotoWhereInput
+    orderBy?: PhotoOrderByWithRelationInput | PhotoOrderByWithRelationInput[]
+    cursor?: PhotoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PhotoScalarFieldEnum | PhotoScalarFieldEnum[]
+  }
+
+  /**
+   * PhotoFolder without action
+   */
+  export type PhotoFolderDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhotoFolder
+     */
+    select?: PhotoFolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhotoFolder
+     */
+    omit?: PhotoFolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhotoFolderInclude<ExtArgs> | null
   }
 
 
@@ -11728,10 +13002,21 @@ export namespace Prisma {
     width: 'width',
     height: 'height',
     mimeType: 'mimeType',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    folderId: 'folderId'
   };
 
   export type PhotoScalarFieldEnum = (typeof PhotoScalarFieldEnum)[keyof typeof PhotoScalarFieldEnum]
+
+
+  export const PhotoFolderScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    name: 'name',
+    createdAt: 'createdAt'
+  };
+
+  export type PhotoFolderScalarFieldEnum = (typeof PhotoFolderScalarFieldEnum)[keyof typeof PhotoFolderScalarFieldEnum]
 
 
   export const PortfolioScalarFieldEnum: {
@@ -12005,6 +13290,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     photos?: PhotoListRelationFilter
+    photoFolders?: PhotoFolderListRelationFilter
     portfolios?: PortfolioListRelationFilter
     linksPages?: LinksPageListRelationFilter
     deliveries?: DeliveryListRelationFilter
@@ -12019,6 +13305,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     photos?: PhotoOrderByRelationAggregateInput
+    photoFolders?: PhotoFolderOrderByRelationAggregateInput
     portfolios?: PortfolioOrderByRelationAggregateInput
     linksPages?: LinksPageOrderByRelationAggregateInput
     deliveries?: DeliveryOrderByRelationAggregateInput
@@ -12036,6 +13323,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     photos?: PhotoListRelationFilter
+    photoFolders?: PhotoFolderListRelationFilter
     portfolios?: PortfolioListRelationFilter
     linksPages?: LinksPageListRelationFilter
     deliveries?: DeliveryListRelationFilter
@@ -12135,7 +13423,9 @@ export namespace Prisma {
     height?: IntNullableFilter<"Photo"> | number | null
     mimeType?: StringFilter<"Photo"> | string
     createdAt?: DateTimeFilter<"Photo"> | Date | string
+    folderId?: StringNullableFilter<"Photo"> | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    folder?: XOR<PhotoFolderNullableScalarRelationFilter, PhotoFolderWhereInput> | null
     deliveryPhotos?: DeliveryPhotoListRelationFilter
   }
 
@@ -12150,7 +13440,9 @@ export namespace Prisma {
     height?: SortOrderInput | SortOrder
     mimeType?: SortOrder
     createdAt?: SortOrder
+    folderId?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
+    folder?: PhotoFolderOrderByWithRelationInput
     deliveryPhotos?: DeliveryPhotoOrderByRelationAggregateInput
   }
 
@@ -12168,7 +13460,9 @@ export namespace Prisma {
     height?: IntNullableFilter<"Photo"> | number | null
     mimeType?: StringFilter<"Photo"> | string
     createdAt?: DateTimeFilter<"Photo"> | Date | string
+    folderId?: StringNullableFilter<"Photo"> | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    folder?: XOR<PhotoFolderNullableScalarRelationFilter, PhotoFolderWhereInput> | null
     deliveryPhotos?: DeliveryPhotoListRelationFilter
   }, "id">
 
@@ -12183,6 +13477,7 @@ export namespace Prisma {
     height?: SortOrderInput | SortOrder
     mimeType?: SortOrder
     createdAt?: SortOrder
+    folderId?: SortOrderInput | SortOrder
     _count?: PhotoCountOrderByAggregateInput
     _avg?: PhotoAvgOrderByAggregateInput
     _max?: PhotoMaxOrderByAggregateInput
@@ -12204,6 +13499,60 @@ export namespace Prisma {
     height?: IntNullableWithAggregatesFilter<"Photo"> | number | null
     mimeType?: StringWithAggregatesFilter<"Photo"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Photo"> | Date | string
+    folderId?: StringNullableWithAggregatesFilter<"Photo"> | string | null
+  }
+
+  export type PhotoFolderWhereInput = {
+    AND?: PhotoFolderWhereInput | PhotoFolderWhereInput[]
+    OR?: PhotoFolderWhereInput[]
+    NOT?: PhotoFolderWhereInput | PhotoFolderWhereInput[]
+    id?: StringFilter<"PhotoFolder"> | string
+    userId?: StringFilter<"PhotoFolder"> | string
+    name?: StringFilter<"PhotoFolder"> | string
+    createdAt?: DateTimeFilter<"PhotoFolder"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    photos?: PhotoListRelationFilter
+  }
+
+  export type PhotoFolderOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    photos?: PhotoOrderByRelationAggregateInput
+  }
+
+  export type PhotoFolderWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: PhotoFolderWhereInput | PhotoFolderWhereInput[]
+    OR?: PhotoFolderWhereInput[]
+    NOT?: PhotoFolderWhereInput | PhotoFolderWhereInput[]
+    userId?: StringFilter<"PhotoFolder"> | string
+    name?: StringFilter<"PhotoFolder"> | string
+    createdAt?: DateTimeFilter<"PhotoFolder"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    photos?: PhotoListRelationFilter
+  }, "id">
+
+  export type PhotoFolderOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    _count?: PhotoFolderCountOrderByAggregateInput
+    _max?: PhotoFolderMaxOrderByAggregateInput
+    _min?: PhotoFolderMinOrderByAggregateInput
+  }
+
+  export type PhotoFolderScalarWhereWithAggregatesInput = {
+    AND?: PhotoFolderScalarWhereWithAggregatesInput | PhotoFolderScalarWhereWithAggregatesInput[]
+    OR?: PhotoFolderScalarWhereWithAggregatesInput[]
+    NOT?: PhotoFolderScalarWhereWithAggregatesInput | PhotoFolderScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PhotoFolder"> | string
+    userId?: StringWithAggregatesFilter<"PhotoFolder"> | string
+    name?: StringWithAggregatesFilter<"PhotoFolder"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"PhotoFolder"> | Date | string
   }
 
   export type PortfolioWhereInput = {
@@ -12909,6 +14258,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
+    photoFolders?: PhotoFolderCreateNestedManyWithoutUserInput
     portfolios?: PortfolioCreateNestedManyWithoutUserInput
     linksPages?: LinksPageCreateNestedManyWithoutUserInput
     deliveries?: DeliveryCreateNestedManyWithoutUserInput
@@ -12923,6 +14273,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
+    photoFolders?: PhotoFolderUncheckedCreateNestedManyWithoutUserInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutUserInput
     linksPages?: LinksPageUncheckedCreateNestedManyWithoutUserInput
     deliveries?: DeliveryUncheckedCreateNestedManyWithoutUserInput
@@ -12937,6 +14288,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
+    photoFolders?: PhotoFolderUpdateManyWithoutUserNestedInput
     portfolios?: PortfolioUpdateManyWithoutUserNestedInput
     linksPages?: LinksPageUpdateManyWithoutUserNestedInput
     deliveries?: DeliveryUpdateManyWithoutUserNestedInput
@@ -12951,6 +14303,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
+    photoFolders?: PhotoFolderUncheckedUpdateManyWithoutUserNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutUserNestedInput
     linksPages?: LinksPageUncheckedUpdateManyWithoutUserNestedInput
     deliveries?: DeliveryUncheckedUpdateManyWithoutUserNestedInput
@@ -13050,6 +14403,7 @@ export namespace Prisma {
     mimeType?: string
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutPhotosInput
+    folder?: PhotoFolderCreateNestedOneWithoutPhotosInput
     deliveryPhotos?: DeliveryPhotoCreateNestedManyWithoutPhotoInput
   }
 
@@ -13064,6 +14418,7 @@ export namespace Prisma {
     height?: number | null
     mimeType?: string
     createdAt?: Date | string
+    folderId?: string | null
     deliveryPhotos?: DeliveryPhotoUncheckedCreateNestedManyWithoutPhotoInput
   }
 
@@ -13078,6 +14433,7 @@ export namespace Prisma {
     mimeType?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutPhotosNestedInput
+    folder?: PhotoFolderUpdateOneWithoutPhotosNestedInput
     deliveryPhotos?: DeliveryPhotoUpdateManyWithoutPhotoNestedInput
   }
 
@@ -13092,6 +14448,7 @@ export namespace Prisma {
     height?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    folderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryPhotos?: DeliveryPhotoUncheckedUpdateManyWithoutPhotoNestedInput
   }
 
@@ -13106,6 +14463,7 @@ export namespace Prisma {
     height?: number | null
     mimeType?: string
     createdAt?: Date | string
+    folderId?: string | null
   }
 
   export type PhotoUpdateManyMutationInput = {
@@ -13130,6 +14488,59 @@ export namespace Prisma {
     width?: NullableIntFieldUpdateOperationsInput | number | null
     height?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    folderId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PhotoFolderCreateInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutPhotoFoldersInput
+    photos?: PhotoCreateNestedManyWithoutFolderInput
+  }
+
+  export type PhotoFolderUncheckedCreateInput = {
+    id?: string
+    userId: string
+    name: string
+    createdAt?: Date | string
+    photos?: PhotoUncheckedCreateNestedManyWithoutFolderInput
+  }
+
+  export type PhotoFolderUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutPhotoFoldersNestedInput
+    photos?: PhotoUpdateManyWithoutFolderNestedInput
+  }
+
+  export type PhotoFolderUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    photos?: PhotoUncheckedUpdateManyWithoutFolderNestedInput
+  }
+
+  export type PhotoFolderCreateManyInput = {
+    id?: string
+    userId: string
+    name: string
+    createdAt?: Date | string
+  }
+
+  export type PhotoFolderUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhotoFolderUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -14022,6 +15433,12 @@ export namespace Prisma {
     none?: PhotoWhereInput
   }
 
+  export type PhotoFolderListRelationFilter = {
+    every?: PhotoFolderWhereInput
+    some?: PhotoFolderWhereInput
+    none?: PhotoFolderWhereInput
+  }
+
   export type PortfolioListRelationFilter = {
     every?: PortfolioWhereInput
     some?: PortfolioWhereInput
@@ -14052,6 +15469,10 @@ export namespace Prisma {
   }
 
   export type PhotoOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PhotoFolderOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -14199,6 +15620,11 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type PhotoFolderNullableScalarRelationFilter = {
+    is?: PhotoFolderWhereInput | null
+    isNot?: PhotoFolderWhereInput | null
+  }
+
   export type DeliveryPhotoListRelationFilter = {
     every?: DeliveryPhotoWhereInput
     some?: DeliveryPhotoWhereInput
@@ -14220,6 +15646,7 @@ export namespace Prisma {
     height?: SortOrder
     mimeType?: SortOrder
     createdAt?: SortOrder
+    folderId?: SortOrder
   }
 
   export type PhotoAvgOrderByAggregateInput = {
@@ -14239,6 +15666,7 @@ export namespace Prisma {
     height?: SortOrder
     mimeType?: SortOrder
     createdAt?: SortOrder
+    folderId?: SortOrder
   }
 
   export type PhotoMinOrderByAggregateInput = {
@@ -14252,6 +15680,7 @@ export namespace Prisma {
     height?: SortOrder
     mimeType?: SortOrder
     createdAt?: SortOrder
+    folderId?: SortOrder
   }
 
   export type PhotoSumOrderByAggregateInput = {
@@ -14290,6 +15719,27 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type PhotoFolderCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PhotoFolderMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PhotoFolderMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
   }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -14855,6 +16305,13 @@ export namespace Prisma {
     connect?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
   }
 
+  export type PhotoFolderCreateNestedManyWithoutUserInput = {
+    create?: XOR<PhotoFolderCreateWithoutUserInput, PhotoFolderUncheckedCreateWithoutUserInput> | PhotoFolderCreateWithoutUserInput[] | PhotoFolderUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhotoFolderCreateOrConnectWithoutUserInput | PhotoFolderCreateOrConnectWithoutUserInput[]
+    createMany?: PhotoFolderCreateManyUserInputEnvelope
+    connect?: PhotoFolderWhereUniqueInput | PhotoFolderWhereUniqueInput[]
+  }
+
   export type PortfolioCreateNestedManyWithoutUserInput = {
     create?: XOR<PortfolioCreateWithoutUserInput, PortfolioUncheckedCreateWithoutUserInput> | PortfolioCreateWithoutUserInput[] | PortfolioUncheckedCreateWithoutUserInput[]
     connectOrCreate?: PortfolioCreateOrConnectWithoutUserInput | PortfolioCreateOrConnectWithoutUserInput[]
@@ -14888,6 +16345,13 @@ export namespace Prisma {
     connectOrCreate?: PhotoCreateOrConnectWithoutUserInput | PhotoCreateOrConnectWithoutUserInput[]
     createMany?: PhotoCreateManyUserInputEnvelope
     connect?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+  }
+
+  export type PhotoFolderUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<PhotoFolderCreateWithoutUserInput, PhotoFolderUncheckedCreateWithoutUserInput> | PhotoFolderCreateWithoutUserInput[] | PhotoFolderUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhotoFolderCreateOrConnectWithoutUserInput | PhotoFolderCreateOrConnectWithoutUserInput[]
+    createMany?: PhotoFolderCreateManyUserInputEnvelope
+    connect?: PhotoFolderWhereUniqueInput | PhotoFolderWhereUniqueInput[]
   }
 
   export type PortfolioUncheckedCreateNestedManyWithoutUserInput = {
@@ -14942,6 +16406,20 @@ export namespace Prisma {
     update?: PhotoUpdateWithWhereUniqueWithoutUserInput | PhotoUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: PhotoUpdateManyWithWhereWithoutUserInput | PhotoUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: PhotoScalarWhereInput | PhotoScalarWhereInput[]
+  }
+
+  export type PhotoFolderUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PhotoFolderCreateWithoutUserInput, PhotoFolderUncheckedCreateWithoutUserInput> | PhotoFolderCreateWithoutUserInput[] | PhotoFolderUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhotoFolderCreateOrConnectWithoutUserInput | PhotoFolderCreateOrConnectWithoutUserInput[]
+    upsert?: PhotoFolderUpsertWithWhereUniqueWithoutUserInput | PhotoFolderUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PhotoFolderCreateManyUserInputEnvelope
+    set?: PhotoFolderWhereUniqueInput | PhotoFolderWhereUniqueInput[]
+    disconnect?: PhotoFolderWhereUniqueInput | PhotoFolderWhereUniqueInput[]
+    delete?: PhotoFolderWhereUniqueInput | PhotoFolderWhereUniqueInput[]
+    connect?: PhotoFolderWhereUniqueInput | PhotoFolderWhereUniqueInput[]
+    update?: PhotoFolderUpdateWithWhereUniqueWithoutUserInput | PhotoFolderUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PhotoFolderUpdateManyWithWhereWithoutUserInput | PhotoFolderUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PhotoFolderScalarWhereInput | PhotoFolderScalarWhereInput[]
   }
 
   export type PortfolioUpdateManyWithoutUserNestedInput = {
@@ -15012,6 +16490,20 @@ export namespace Prisma {
     update?: PhotoUpdateWithWhereUniqueWithoutUserInput | PhotoUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: PhotoUpdateManyWithWhereWithoutUserInput | PhotoUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: PhotoScalarWhereInput | PhotoScalarWhereInput[]
+  }
+
+  export type PhotoFolderUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PhotoFolderCreateWithoutUserInput, PhotoFolderUncheckedCreateWithoutUserInput> | PhotoFolderCreateWithoutUserInput[] | PhotoFolderUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhotoFolderCreateOrConnectWithoutUserInput | PhotoFolderCreateOrConnectWithoutUserInput[]
+    upsert?: PhotoFolderUpsertWithWhereUniqueWithoutUserInput | PhotoFolderUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PhotoFolderCreateManyUserInputEnvelope
+    set?: PhotoFolderWhereUniqueInput | PhotoFolderWhereUniqueInput[]
+    disconnect?: PhotoFolderWhereUniqueInput | PhotoFolderWhereUniqueInput[]
+    delete?: PhotoFolderWhereUniqueInput | PhotoFolderWhereUniqueInput[]
+    connect?: PhotoFolderWhereUniqueInput | PhotoFolderWhereUniqueInput[]
+    update?: PhotoFolderUpdateWithWhereUniqueWithoutUserInput | PhotoFolderUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PhotoFolderUpdateManyWithWhereWithoutUserInput | PhotoFolderUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PhotoFolderScalarWhereInput | PhotoFolderScalarWhereInput[]
   }
 
   export type PortfolioUncheckedUpdateManyWithoutUserNestedInput = {
@@ -15090,6 +16582,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type PhotoFolderCreateNestedOneWithoutPhotosInput = {
+    create?: XOR<PhotoFolderCreateWithoutPhotosInput, PhotoFolderUncheckedCreateWithoutPhotosInput>
+    connectOrCreate?: PhotoFolderCreateOrConnectWithoutPhotosInput
+    connect?: PhotoFolderWhereUniqueInput
+  }
+
   export type DeliveryPhotoCreateNestedManyWithoutPhotoInput = {
     create?: XOR<DeliveryPhotoCreateWithoutPhotoInput, DeliveryPhotoUncheckedCreateWithoutPhotoInput> | DeliveryPhotoCreateWithoutPhotoInput[] | DeliveryPhotoUncheckedCreateWithoutPhotoInput[]
     connectOrCreate?: DeliveryPhotoCreateOrConnectWithoutPhotoInput | DeliveryPhotoCreateOrConnectWithoutPhotoInput[]
@@ -15128,6 +16626,16 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPhotosInput, UserUpdateWithoutPhotosInput>, UserUncheckedUpdateWithoutPhotosInput>
   }
 
+  export type PhotoFolderUpdateOneWithoutPhotosNestedInput = {
+    create?: XOR<PhotoFolderCreateWithoutPhotosInput, PhotoFolderUncheckedCreateWithoutPhotosInput>
+    connectOrCreate?: PhotoFolderCreateOrConnectWithoutPhotosInput
+    upsert?: PhotoFolderUpsertWithoutPhotosInput
+    disconnect?: PhotoFolderWhereInput | boolean
+    delete?: PhotoFolderWhereInput | boolean
+    connect?: PhotoFolderWhereUniqueInput
+    update?: XOR<XOR<PhotoFolderUpdateToOneWithWhereWithoutPhotosInput, PhotoFolderUpdateWithoutPhotosInput>, PhotoFolderUncheckedUpdateWithoutPhotosInput>
+  }
+
   export type DeliveryPhotoUpdateManyWithoutPhotoNestedInput = {
     create?: XOR<DeliveryPhotoCreateWithoutPhotoInput, DeliveryPhotoUncheckedCreateWithoutPhotoInput> | DeliveryPhotoCreateWithoutPhotoInput[] | DeliveryPhotoUncheckedCreateWithoutPhotoInput[]
     connectOrCreate?: DeliveryPhotoCreateOrConnectWithoutPhotoInput | DeliveryPhotoCreateOrConnectWithoutPhotoInput[]
@@ -15154,6 +16662,62 @@ export namespace Prisma {
     update?: DeliveryPhotoUpdateWithWhereUniqueWithoutPhotoInput | DeliveryPhotoUpdateWithWhereUniqueWithoutPhotoInput[]
     updateMany?: DeliveryPhotoUpdateManyWithWhereWithoutPhotoInput | DeliveryPhotoUpdateManyWithWhereWithoutPhotoInput[]
     deleteMany?: DeliveryPhotoScalarWhereInput | DeliveryPhotoScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutPhotoFoldersInput = {
+    create?: XOR<UserCreateWithoutPhotoFoldersInput, UserUncheckedCreateWithoutPhotoFoldersInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPhotoFoldersInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type PhotoCreateNestedManyWithoutFolderInput = {
+    create?: XOR<PhotoCreateWithoutFolderInput, PhotoUncheckedCreateWithoutFolderInput> | PhotoCreateWithoutFolderInput[] | PhotoUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: PhotoCreateOrConnectWithoutFolderInput | PhotoCreateOrConnectWithoutFolderInput[]
+    createMany?: PhotoCreateManyFolderInputEnvelope
+    connect?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+  }
+
+  export type PhotoUncheckedCreateNestedManyWithoutFolderInput = {
+    create?: XOR<PhotoCreateWithoutFolderInput, PhotoUncheckedCreateWithoutFolderInput> | PhotoCreateWithoutFolderInput[] | PhotoUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: PhotoCreateOrConnectWithoutFolderInput | PhotoCreateOrConnectWithoutFolderInput[]
+    createMany?: PhotoCreateManyFolderInputEnvelope
+    connect?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+  }
+
+  export type UserUpdateOneRequiredWithoutPhotoFoldersNestedInput = {
+    create?: XOR<UserCreateWithoutPhotoFoldersInput, UserUncheckedCreateWithoutPhotoFoldersInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPhotoFoldersInput
+    upsert?: UserUpsertWithoutPhotoFoldersInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPhotoFoldersInput, UserUpdateWithoutPhotoFoldersInput>, UserUncheckedUpdateWithoutPhotoFoldersInput>
+  }
+
+  export type PhotoUpdateManyWithoutFolderNestedInput = {
+    create?: XOR<PhotoCreateWithoutFolderInput, PhotoUncheckedCreateWithoutFolderInput> | PhotoCreateWithoutFolderInput[] | PhotoUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: PhotoCreateOrConnectWithoutFolderInput | PhotoCreateOrConnectWithoutFolderInput[]
+    upsert?: PhotoUpsertWithWhereUniqueWithoutFolderInput | PhotoUpsertWithWhereUniqueWithoutFolderInput[]
+    createMany?: PhotoCreateManyFolderInputEnvelope
+    set?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+    disconnect?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+    delete?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+    connect?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+    update?: PhotoUpdateWithWhereUniqueWithoutFolderInput | PhotoUpdateWithWhereUniqueWithoutFolderInput[]
+    updateMany?: PhotoUpdateManyWithWhereWithoutFolderInput | PhotoUpdateManyWithWhereWithoutFolderInput[]
+    deleteMany?: PhotoScalarWhereInput | PhotoScalarWhereInput[]
+  }
+
+  export type PhotoUncheckedUpdateManyWithoutFolderNestedInput = {
+    create?: XOR<PhotoCreateWithoutFolderInput, PhotoUncheckedCreateWithoutFolderInput> | PhotoCreateWithoutFolderInput[] | PhotoUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: PhotoCreateOrConnectWithoutFolderInput | PhotoCreateOrConnectWithoutFolderInput[]
+    upsert?: PhotoUpsertWithWhereUniqueWithoutFolderInput | PhotoUpsertWithWhereUniqueWithoutFolderInput[]
+    createMany?: PhotoCreateManyFolderInputEnvelope
+    set?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+    disconnect?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+    delete?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+    connect?: PhotoWhereUniqueInput | PhotoWhereUniqueInput[]
+    update?: PhotoUpdateWithWhereUniqueWithoutFolderInput | PhotoUpdateWithWhereUniqueWithoutFolderInput[]
+    updateMany?: PhotoUpdateManyWithWhereWithoutFolderInput | PhotoUpdateManyWithWhereWithoutFolderInput[]
+    deleteMany?: PhotoScalarWhereInput | PhotoScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutPortfoliosInput = {
@@ -15599,6 +17163,7 @@ export namespace Prisma {
     height?: number | null
     mimeType?: string
     createdAt?: Date | string
+    folder?: PhotoFolderCreateNestedOneWithoutPhotosInput
     deliveryPhotos?: DeliveryPhotoCreateNestedManyWithoutPhotoInput
   }
 
@@ -15612,6 +17177,7 @@ export namespace Prisma {
     height?: number | null
     mimeType?: string
     createdAt?: Date | string
+    folderId?: string | null
     deliveryPhotos?: DeliveryPhotoUncheckedCreateNestedManyWithoutPhotoInput
   }
 
@@ -15622,6 +17188,30 @@ export namespace Prisma {
 
   export type PhotoCreateManyUserInputEnvelope = {
     data: PhotoCreateManyUserInput | PhotoCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PhotoFolderCreateWithoutUserInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    photos?: PhotoCreateNestedManyWithoutFolderInput
+  }
+
+  export type PhotoFolderUncheckedCreateWithoutUserInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    photos?: PhotoUncheckedCreateNestedManyWithoutFolderInput
+  }
+
+  export type PhotoFolderCreateOrConnectWithoutUserInput = {
+    where: PhotoFolderWhereUniqueInput
+    create: XOR<PhotoFolderCreateWithoutUserInput, PhotoFolderUncheckedCreateWithoutUserInput>
+  }
+
+  export type PhotoFolderCreateManyUserInputEnvelope = {
+    data: PhotoFolderCreateManyUserInput | PhotoFolderCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -15897,6 +17487,33 @@ export namespace Prisma {
     height?: IntNullableFilter<"Photo"> | number | null
     mimeType?: StringFilter<"Photo"> | string
     createdAt?: DateTimeFilter<"Photo"> | Date | string
+    folderId?: StringNullableFilter<"Photo"> | string | null
+  }
+
+  export type PhotoFolderUpsertWithWhereUniqueWithoutUserInput = {
+    where: PhotoFolderWhereUniqueInput
+    update: XOR<PhotoFolderUpdateWithoutUserInput, PhotoFolderUncheckedUpdateWithoutUserInput>
+    create: XOR<PhotoFolderCreateWithoutUserInput, PhotoFolderUncheckedCreateWithoutUserInput>
+  }
+
+  export type PhotoFolderUpdateWithWhereUniqueWithoutUserInput = {
+    where: PhotoFolderWhereUniqueInput
+    data: XOR<PhotoFolderUpdateWithoutUserInput, PhotoFolderUncheckedUpdateWithoutUserInput>
+  }
+
+  export type PhotoFolderUpdateManyWithWhereWithoutUserInput = {
+    where: PhotoFolderScalarWhereInput
+    data: XOR<PhotoFolderUpdateManyMutationInput, PhotoFolderUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type PhotoFolderScalarWhereInput = {
+    AND?: PhotoFolderScalarWhereInput | PhotoFolderScalarWhereInput[]
+    OR?: PhotoFolderScalarWhereInput[]
+    NOT?: PhotoFolderScalarWhereInput | PhotoFolderScalarWhereInput[]
+    id?: StringFilter<"PhotoFolder"> | string
+    userId?: StringFilter<"PhotoFolder"> | string
+    name?: StringFilter<"PhotoFolder"> | string
+    createdAt?: DateTimeFilter<"PhotoFolder"> | Date | string
   }
 
   export type PortfolioUpsertWithWhereUniqueWithoutUserInput = {
@@ -16086,6 +17703,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
+    photoFolders?: PhotoFolderCreateNestedManyWithoutUserInput
     portfolios?: PortfolioCreateNestedManyWithoutUserInput
     linksPages?: LinksPageCreateNestedManyWithoutUserInput
     deliveries?: DeliveryCreateNestedManyWithoutUserInput
@@ -16099,6 +17717,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
+    photoFolders?: PhotoFolderUncheckedCreateNestedManyWithoutUserInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutUserInput
     linksPages?: LinksPageUncheckedCreateNestedManyWithoutUserInput
     deliveries?: DeliveryUncheckedCreateNestedManyWithoutUserInput
@@ -16128,6 +17747,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
+    photoFolders?: PhotoFolderUpdateManyWithoutUserNestedInput
     portfolios?: PortfolioUpdateManyWithoutUserNestedInput
     linksPages?: LinksPageUpdateManyWithoutUserNestedInput
     deliveries?: DeliveryUpdateManyWithoutUserNestedInput
@@ -16141,6 +17761,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
+    photoFolders?: PhotoFolderUncheckedUpdateManyWithoutUserNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutUserNestedInput
     linksPages?: LinksPageUncheckedUpdateManyWithoutUserNestedInput
     deliveries?: DeliveryUncheckedUpdateManyWithoutUserNestedInput
@@ -16153,6 +17774,7 @@ export namespace Prisma {
     avatarUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    photoFolders?: PhotoFolderCreateNestedManyWithoutUserInput
     portfolios?: PortfolioCreateNestedManyWithoutUserInput
     linksPages?: LinksPageCreateNestedManyWithoutUserInput
     deliveries?: DeliveryCreateNestedManyWithoutUserInput
@@ -16166,6 +17788,7 @@ export namespace Prisma {
     avatarUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    photoFolders?: PhotoFolderUncheckedCreateNestedManyWithoutUserInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutUserInput
     linksPages?: LinksPageUncheckedCreateNestedManyWithoutUserInput
     deliveries?: DeliveryUncheckedCreateNestedManyWithoutUserInput
@@ -16175,6 +17798,25 @@ export namespace Prisma {
   export type UserCreateOrConnectWithoutPhotosInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutPhotosInput, UserUncheckedCreateWithoutPhotosInput>
+  }
+
+  export type PhotoFolderCreateWithoutPhotosInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutPhotoFoldersInput
+  }
+
+  export type PhotoFolderUncheckedCreateWithoutPhotosInput = {
+    id?: string
+    userId: string
+    name: string
+    createdAt?: Date | string
+  }
+
+  export type PhotoFolderCreateOrConnectWithoutPhotosInput = {
+    where: PhotoFolderWhereUniqueInput
+    create: XOR<PhotoFolderCreateWithoutPhotosInput, PhotoFolderUncheckedCreateWithoutPhotosInput>
   }
 
   export type DeliveryPhotoCreateWithoutPhotoInput = {
@@ -16217,6 +17859,7 @@ export namespace Prisma {
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    photoFolders?: PhotoFolderUpdateManyWithoutUserNestedInput
     portfolios?: PortfolioUpdateManyWithoutUserNestedInput
     linksPages?: LinksPageUpdateManyWithoutUserNestedInput
     deliveries?: DeliveryUpdateManyWithoutUserNestedInput
@@ -16230,10 +17873,36 @@ export namespace Prisma {
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    photoFolders?: PhotoFolderUncheckedUpdateManyWithoutUserNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutUserNestedInput
     linksPages?: LinksPageUncheckedUpdateManyWithoutUserNestedInput
     deliveries?: DeliveryUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type PhotoFolderUpsertWithoutPhotosInput = {
+    update: XOR<PhotoFolderUpdateWithoutPhotosInput, PhotoFolderUncheckedUpdateWithoutPhotosInput>
+    create: XOR<PhotoFolderCreateWithoutPhotosInput, PhotoFolderUncheckedCreateWithoutPhotosInput>
+    where?: PhotoFolderWhereInput
+  }
+
+  export type PhotoFolderUpdateToOneWithWhereWithoutPhotosInput = {
+    where?: PhotoFolderWhereInput
+    data: XOR<PhotoFolderUpdateWithoutPhotosInput, PhotoFolderUncheckedUpdateWithoutPhotosInput>
+  }
+
+  export type PhotoFolderUpdateWithoutPhotosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutPhotoFoldersNestedInput
+  }
+
+  export type PhotoFolderUncheckedUpdateWithoutPhotosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DeliveryPhotoUpsertWithWhereUniqueWithoutPhotoInput = {
@@ -16262,6 +17931,132 @@ export namespace Prisma {
     order?: IntFilter<"DeliveryPhoto"> | number
   }
 
+  export type UserCreateWithoutPhotoFoldersInput = {
+    id: string
+    email: string
+    name?: string | null
+    avatarUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    photos?: PhotoCreateNestedManyWithoutUserInput
+    portfolios?: PortfolioCreateNestedManyWithoutUserInput
+    linksPages?: LinksPageCreateNestedManyWithoutUserInput
+    deliveries?: DeliveryCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutPhotoFoldersInput = {
+    id: string
+    email: string
+    name?: string | null
+    avatarUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
+    portfolios?: PortfolioUncheckedCreateNestedManyWithoutUserInput
+    linksPages?: LinksPageUncheckedCreateNestedManyWithoutUserInput
+    deliveries?: DeliveryUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutPhotoFoldersInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPhotoFoldersInput, UserUncheckedCreateWithoutPhotoFoldersInput>
+  }
+
+  export type PhotoCreateWithoutFolderInput = {
+    id?: string
+    url: string
+    storagePath: string
+    filename: string
+    size: number
+    width?: number | null
+    height?: number | null
+    mimeType?: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutPhotosInput
+    deliveryPhotos?: DeliveryPhotoCreateNestedManyWithoutPhotoInput
+  }
+
+  export type PhotoUncheckedCreateWithoutFolderInput = {
+    id?: string
+    userId: string
+    url: string
+    storagePath: string
+    filename: string
+    size: number
+    width?: number | null
+    height?: number | null
+    mimeType?: string
+    createdAt?: Date | string
+    deliveryPhotos?: DeliveryPhotoUncheckedCreateNestedManyWithoutPhotoInput
+  }
+
+  export type PhotoCreateOrConnectWithoutFolderInput = {
+    where: PhotoWhereUniqueInput
+    create: XOR<PhotoCreateWithoutFolderInput, PhotoUncheckedCreateWithoutFolderInput>
+  }
+
+  export type PhotoCreateManyFolderInputEnvelope = {
+    data: PhotoCreateManyFolderInput | PhotoCreateManyFolderInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutPhotoFoldersInput = {
+    update: XOR<UserUpdateWithoutPhotoFoldersInput, UserUncheckedUpdateWithoutPhotoFoldersInput>
+    create: XOR<UserCreateWithoutPhotoFoldersInput, UserUncheckedCreateWithoutPhotoFoldersInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPhotoFoldersInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPhotoFoldersInput, UserUncheckedUpdateWithoutPhotoFoldersInput>
+  }
+
+  export type UserUpdateWithoutPhotoFoldersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    photos?: PhotoUpdateManyWithoutUserNestedInput
+    portfolios?: PortfolioUpdateManyWithoutUserNestedInput
+    linksPages?: LinksPageUpdateManyWithoutUserNestedInput
+    deliveries?: DeliveryUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPhotoFoldersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
+    portfolios?: PortfolioUncheckedUpdateManyWithoutUserNestedInput
+    linksPages?: LinksPageUncheckedUpdateManyWithoutUserNestedInput
+    deliveries?: DeliveryUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type PhotoUpsertWithWhereUniqueWithoutFolderInput = {
+    where: PhotoWhereUniqueInput
+    update: XOR<PhotoUpdateWithoutFolderInput, PhotoUncheckedUpdateWithoutFolderInput>
+    create: XOR<PhotoCreateWithoutFolderInput, PhotoUncheckedCreateWithoutFolderInput>
+  }
+
+  export type PhotoUpdateWithWhereUniqueWithoutFolderInput = {
+    where: PhotoWhereUniqueInput
+    data: XOR<PhotoUpdateWithoutFolderInput, PhotoUncheckedUpdateWithoutFolderInput>
+  }
+
+  export type PhotoUpdateManyWithWhereWithoutFolderInput = {
+    where: PhotoScalarWhereInput
+    data: XOR<PhotoUpdateManyMutationInput, PhotoUncheckedUpdateManyWithoutFolderInput>
+  }
+
   export type UserCreateWithoutPortfoliosInput = {
     id: string
     email: string
@@ -16270,6 +18065,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
+    photoFolders?: PhotoFolderCreateNestedManyWithoutUserInput
     linksPages?: LinksPageCreateNestedManyWithoutUserInput
     deliveries?: DeliveryCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -16283,6 +18079,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
+    photoFolders?: PhotoFolderUncheckedCreateNestedManyWithoutUserInput
     linksPages?: LinksPageUncheckedCreateNestedManyWithoutUserInput
     deliveries?: DeliveryUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -16312,6 +18109,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
+    photoFolders?: PhotoFolderUpdateManyWithoutUserNestedInput
     linksPages?: LinksPageUpdateManyWithoutUserNestedInput
     deliveries?: DeliveryUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -16325,6 +18123,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
+    photoFolders?: PhotoFolderUncheckedUpdateManyWithoutUserNestedInput
     linksPages?: LinksPageUncheckedUpdateManyWithoutUserNestedInput
     deliveries?: DeliveryUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -16338,6 +18137,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
+    photoFolders?: PhotoFolderCreateNestedManyWithoutUserInput
     portfolios?: PortfolioCreateNestedManyWithoutUserInput
     deliveries?: DeliveryCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -16351,6 +18151,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
+    photoFolders?: PhotoFolderUncheckedCreateNestedManyWithoutUserInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutUserInput
     deliveries?: DeliveryUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -16424,6 +18225,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
+    photoFolders?: PhotoFolderUpdateManyWithoutUserNestedInput
     portfolios?: PortfolioUpdateManyWithoutUserNestedInput
     deliveries?: DeliveryUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -16437,6 +18239,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
+    photoFolders?: PhotoFolderUncheckedUpdateManyWithoutUserNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutUserNestedInput
     deliveries?: DeliveryUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -16635,6 +18438,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoCreateNestedManyWithoutUserInput
+    photoFolders?: PhotoFolderCreateNestedManyWithoutUserInput
     portfolios?: PortfolioCreateNestedManyWithoutUserInput
     linksPages?: LinksPageCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -16648,6 +18452,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     photos?: PhotoUncheckedCreateNestedManyWithoutUserInput
+    photoFolders?: PhotoFolderUncheckedCreateNestedManyWithoutUserInput
     portfolios?: PortfolioUncheckedCreateNestedManyWithoutUserInput
     linksPages?: LinksPageUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -16699,6 +18504,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUpdateManyWithoutUserNestedInput
+    photoFolders?: PhotoFolderUpdateManyWithoutUserNestedInput
     portfolios?: PortfolioUpdateManyWithoutUserNestedInput
     linksPages?: LinksPageUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -16712,6 +18518,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     photos?: PhotoUncheckedUpdateManyWithoutUserNestedInput
+    photoFolders?: PhotoFolderUncheckedUpdateManyWithoutUserNestedInput
     portfolios?: PortfolioUncheckedUpdateManyWithoutUserNestedInput
     linksPages?: LinksPageUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -16845,6 +18652,7 @@ export namespace Prisma {
     mimeType?: string
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutPhotosInput
+    folder?: PhotoFolderCreateNestedOneWithoutPhotosInput
   }
 
   export type PhotoUncheckedCreateWithoutDeliveryPhotosInput = {
@@ -16858,6 +18666,7 @@ export namespace Prisma {
     height?: number | null
     mimeType?: string
     createdAt?: Date | string
+    folderId?: string | null
   }
 
   export type PhotoCreateOrConnectWithoutDeliveryPhotosInput = {
@@ -16994,6 +18803,7 @@ export namespace Prisma {
     mimeType?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutPhotosNestedInput
+    folder?: PhotoFolderUpdateOneWithoutPhotosNestedInput
   }
 
   export type PhotoUncheckedUpdateWithoutDeliveryPhotosInput = {
@@ -17007,6 +18817,7 @@ export namespace Prisma {
     height?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    folderId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PhotoCreateManyUserInput = {
@@ -17018,6 +18829,13 @@ export namespace Prisma {
     width?: number | null
     height?: number | null
     mimeType?: string
+    createdAt?: Date | string
+    folderId?: string | null
+  }
+
+  export type PhotoFolderCreateManyUserInput = {
+    id?: string
+    name: string
     createdAt?: Date | string
   }
 
@@ -17130,6 +18948,7 @@ export namespace Prisma {
     height?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    folder?: PhotoFolderUpdateOneWithoutPhotosNestedInput
     deliveryPhotos?: DeliveryPhotoUpdateManyWithoutPhotoNestedInput
   }
 
@@ -17143,6 +18962,7 @@ export namespace Prisma {
     height?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    folderId?: NullableStringFieldUpdateOperationsInput | string | null
     deliveryPhotos?: DeliveryPhotoUncheckedUpdateManyWithoutPhotoNestedInput
   }
 
@@ -17155,6 +18975,27 @@ export namespace Prisma {
     width?: NullableIntFieldUpdateOperationsInput | number | null
     height?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    folderId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PhotoFolderUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    photos?: PhotoUpdateManyWithoutFolderNestedInput
+  }
+
+  export type PhotoFolderUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    photos?: PhotoUncheckedUpdateManyWithoutFolderNestedInput
+  }
+
+  export type PhotoFolderUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -17481,6 +19322,60 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     deliveryId?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type PhotoCreateManyFolderInput = {
+    id?: string
+    userId: string
+    url: string
+    storagePath: string
+    filename: string
+    size: number
+    width?: number | null
+    height?: number | null
+    mimeType?: string
+    createdAt?: Date | string
+  }
+
+  export type PhotoUpdateWithoutFolderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    storagePath?: StringFieldUpdateOperationsInput | string
+    filename?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    mimeType?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutPhotosNestedInput
+    deliveryPhotos?: DeliveryPhotoUpdateManyWithoutPhotoNestedInput
+  }
+
+  export type PhotoUncheckedUpdateWithoutFolderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    storagePath?: StringFieldUpdateOperationsInput | string
+    filename?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    mimeType?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveryPhotos?: DeliveryPhotoUncheckedUpdateManyWithoutPhotoNestedInput
+  }
+
+  export type PhotoUncheckedUpdateManyWithoutFolderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    storagePath?: StringFieldUpdateOperationsInput | string
+    filename?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    mimeType?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type LinkItemCreateManyLinksPageInput = {

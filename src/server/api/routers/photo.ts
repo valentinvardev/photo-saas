@@ -19,15 +19,16 @@ const EXT_BY_MIME: Record<string, string> = {
 };
 
 export const photoRouter = createTRPCRouter({
-  /** List the user's photo library, newest first. URLs resolved via CDN/presign. */
+  /** List the user's photos. Pass folderId to view a folder; omit for the whole library. */
   list: protectedProcedure
     .input(z.object({
-      limit:  z.number().min(1).max(200).default(100),
-      cursor: z.string().optional(),
+      limit:    z.number().min(1).max(200).default(100),
+      cursor:   z.string().optional(),
+      folderId: z.string().nullable().optional(),
     }))
     .query(async ({ ctx, input }) => {
       const rows = await ctx.db.photo.findMany({
-        where:   { userId: ctx.userId },
+        where:   { userId: ctx.userId, ...(input.folderId !== undefined ? { folderId: input.folderId } : {}) },
         orderBy: { createdAt: "desc" },
         take:    input.limit + 1,
         cursor:  input.cursor ? { id: input.cursor } : undefined,
@@ -42,6 +43,61 @@ export const photoRouter = createTRPCRouter({
       );
 
       return { items, nextCursor };
+    }),
+
+  /** Folders in the user's library, with photo counts. */
+  listFolders: protectedProcedure.query(async ({ ctx }) => {
+    const folders = await ctx.db.photoFolder.findMany({
+      where:   { userId: ctx.userId },
+      orderBy: { createdAt: "asc" },
+      include: { _count: { select: { photos: true } } },
+    });
+    return folders.map((f) => ({ id: f.id, name: f.name, count: f._count.photos }));
+  }),
+
+  createFolder: protectedProcedure
+    .input(z.object({ name: z.string().trim().min(1).max(80) }))
+    .mutation(({ ctx, input }) =>
+      ctx.db.photoFolder.create({ data: { userId: ctx.userId, name: input.name } }),
+    ),
+
+  renameFolder: protectedProcedure
+    .input(z.object({ id: z.string(), name: z.string().trim().min(1).max(80) }))
+    .mutation(async ({ ctx, input }) => {
+      const { count } = await ctx.db.photoFolder.updateMany({
+        where: { id: input.id, userId: ctx.userId },
+        data:  { name: input.name },
+      });
+      if (count === 0) throw new TRPCError({ code: "NOT_FOUND" });
+      return { ok: true };
+    }),
+
+  /** Delete a folder — its photos are un-filed (folderId → null), not deleted. */
+  deleteFolder: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { count } = await ctx.db.photoFolder.deleteMany({
+        where: { id: input.id, userId: ctx.userId },
+      });
+      if (count === 0) throw new TRPCError({ code: "NOT_FOUND" });
+      return { ok: true };
+    }),
+
+  /** Move photos into a folder (folderId=null un-files them). */
+  moveToFolder: protectedProcedure
+    .input(z.object({ photoIds: z.array(z.string()).min(1), folderId: z.string().nullable() }))
+    .mutation(async ({ ctx, input }) => {
+      if (input.folderId) {
+        const folder = await ctx.db.photoFolder.findFirst({
+          where: { id: input.folderId, userId: ctx.userId }, select: { id: true },
+        });
+        if (!folder) throw new TRPCError({ code: "NOT_FOUND", message: "Folder not found" });
+      }
+      await ctx.db.photo.updateMany({
+        where: { id: { in: input.photoIds }, userId: ctx.userId },
+        data:  { folderId: input.folderId },
+      });
+      return { ok: true };
     }),
 
   /**
@@ -79,6 +135,7 @@ export const photoRouter = createTRPCRouter({
       size:     z.number().int().positive(),
       width:    z.number().optional(),
       height:   z.number().optional(),
+      folderId: z.string().nullable().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       // Guard: the key must live in this user's namespace.
@@ -97,6 +154,7 @@ export const photoRouter = createTRPCRouter({
           size:        input.size,
           width:       input.width,
           height:      input.height,
+          folderId:    input.folderId ?? null,
         },
       });
 
