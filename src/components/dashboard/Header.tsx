@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { createClient } from "~/lib/supabase/client";
 import { useTheme } from "~/components/providers/ThemeProvider";
 import { useT } from "~/components/providers/LangProvider";
 import { LOCALES, type Locale } from "~/lib/i18n";
@@ -171,11 +172,11 @@ function ThemeTester() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+            initial={{ opacity: 0, x: 6, scale: 0.97 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 6, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-72 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-lg overflow-hidden z-50"
+            className="absolute right-full bottom-0 mr-2 w-72 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-lg overflow-hidden z-50"
           >
             <div className="px-4 py-3 border-b border-[var(--border)] flex items-center justify-between">
               <p className="font-sans text-xs font-semibold text-[var(--fg)]">CSS variables</p>
@@ -372,6 +373,8 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard":           "Home",
   "/dashboard/gallery":   "Gallery",
   "/dashboard/portfolio": "Portfolio",
+  "/dashboard/delivery":  "Client delivery",
+  "/dashboard/links":     "Link builder",
   "/dashboard/templates": "Templates",
   "/dashboard/sales":     "Sales",
   "/dashboard/clients":   "Clients",
@@ -468,19 +471,42 @@ function NotificationPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
+/* ── Current signed-in user ─────────────────────────────── */
+function useCurrentUser() {
+  const [user, setUser] = useState<{ name: string; email: string; initial: string } | null>(null);
+  useEffect(() => {
+    const supabase = createClient();
+    void supabase.auth.getUser().then(({ data }) => {
+      const u = data.user;
+      if (!u) return;
+      const meta = (u.user_metadata ?? {}) as { full_name?: string; name?: string };
+      const name = meta.full_name ?? meta.name ?? (u.email?.split("@")[0] ?? "Account");
+      setUser({ name, email: u.email ?? "", initial: (name.trim()[0] ?? "?").toUpperCase() });
+    });
+  }, []);
+  return user;
+}
+
 /* ── Profile dropdown ───────────────────────────────────── */
 function ProfileDropdown({ onClose }: { onClose: () => void }) {
   const { theme, toggle } = useTheme();
+  const router = useRouter();
+  const user = useCurrentUser();
+
+  async function signOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    onClose();
+    router.push("/login");
+    router.refresh();
+  }
+
   return (
-    <div className="absolute top-full right-0 mt-2 w-52 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-lg)] overflow-hidden z-50">
+    <div className="absolute top-full right-0 mt-2 w-56 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-lg)] z-50">
       {/* User info */}
       <div className="px-4 py-3 border-b border-[var(--border)]">
-        <div className="font-sans text-sm font-semibold text-[var(--fg)]">Sofia Chen</div>
-        <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">sofia@example.com</div>
-        <div className="mt-2 inline-flex items-center gap-1.5 bg-yellow/10 border border-yellow/30 rounded-full px-2 py-0.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-yellow" />
-          <span className="font-mono text-[10px] text-yellow font-semibold">Pro plan</span>
-        </div>
+        <div className="font-sans text-sm font-semibold text-[var(--fg)] truncate">{user?.name ?? "—"}</div>
+        <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 truncate">{user?.email ?? ""}</div>
       </div>
 
       {/* Links */}
@@ -508,11 +534,16 @@ function ProfileDropdown({ onClose }: { onClose: () => void }) {
           {theme === "dark" ? <SunIcon /> : <MoonIcon />}
           <span className="font-sans">{theme === "dark" ? "Light mode" : "Dark mode"}</span>
         </button>
+        {/* Color palette (moved from the top bar) */}
+        <div className="flex items-center gap-2.5 px-4 py-2 text-sm text-[var(--fg-muted)]">
+          <ThemeTester />
+          <span className="font-sans">Theme colors</span>
+        </div>
       </div>
 
       <div className="border-t border-[var(--border)] py-1">
         <button
-          onClick={onClose}
+          onClick={signOut}
           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/5 transition-colors"
         >
           <LogoutIcon />
@@ -584,7 +615,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
 
   const title   = PAGE_TITLES[pathname] ?? "Dashboard";
   const unread  = NOTIFICATIONS.filter((n) => n.unread).length;
-  const balance = "$124.50";
+  const user    = useCurrentUser();
 
   /* close notif/profile dropdowns on outside click. The search modal is
      fixed-positioned and handles its own backdrop click — we'd close it
@@ -1016,23 +1047,8 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
       {/* Spacer */}
       <div className="flex-1" />
 
-      {/* Balance chip */}
-      <div className="hidden sm:flex items-center gap-1.5 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg px-3 py-1.5 cursor-default select-none">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0">
-          <circle cx="12" cy="12" r="9"/>
-          <path d="M12 7v1m0 8v1"/>
-          <path d="M15.2 9.8a3.2 3.2 0 00-3.2-1.8c-1.8 0-3 1-3 2.5s1.2 2.5 3 2.5 3 1 3 2.5-1.2 2.5-3 2.5a3.2 3.2 0 01-3.2-1.8"/>
-        </svg>
-        <span className="text-[11px] text-[var(--fg-muted)] font-sans">Balance</span>
-        <span className="font-mono text-xs font-semibold text-[var(--fg)]">{balance}</span>
-        <button className="ml-1 text-[10px] font-sans font-semibold text-yellow hover:text-yellow-dark transition-colors">
-          Withdraw
-        </button>
-      </div>
-
-      {/* Dev testers */}
+      {/* Language */}
       <LangTester />
-      <ThemeTester />
 
       {/* Cart — only visible when there's something in it */}
       {cartItems.length > 0 && (
@@ -1054,11 +1070,14 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
       {/* Community chat */}
       <button
         onClick={onChatClick}
-        className={`relative p-1.5 sm:p-2 rounded-lg transition-colors shrink-0 ${chatOpen ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
+        className={`relative flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors shrink-0 ${chatOpen ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
         aria-label="Community chat"
       >
-        <ChatIcon />
-        <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full ring-2 ring-[var(--bg-card)]" />
+        <span className="relative">
+          <ChatIcon />
+          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full ring-2 ring-[var(--bg-card)]" />
+        </span>
+        <span className="hidden sm:block font-sans text-xs font-medium">Chat</span>
       </button>
 
       {/* Notifications */}
@@ -1084,9 +1103,9 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
           aria-label="Profile menu"
         >
           <div className="w-7 h-7 rounded-full bg-yellow flex items-center justify-center shrink-0">
-            <span className="font-sans font-black text-[#111] text-[10px]">S</span>
+            <span className="font-sans font-black text-[#111] text-[10px]">{user?.initial ?? "?"}</span>
           </div>
-          <span className="hidden md:block font-sans text-xs font-semibold text-[var(--fg)]">Sofia</span>
+          <span className="hidden md:block font-sans text-xs font-semibold text-[var(--fg)]">{user?.name?.split(" ")[0] ?? ""}</span>
           <span className="hidden md:block text-[var(--fg-muted)]"><ChevronDown /></span>
         </button>
         {profileOpen && <ProfileDropdown onClose={() => setProfileOpen(false)} />}

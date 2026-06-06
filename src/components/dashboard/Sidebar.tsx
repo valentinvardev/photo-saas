@@ -134,6 +134,8 @@ const navMain = [
   { labelKey: "nav.dashboard", label: "Home",      href: "/dashboard",           icon: HomeIcon, exact: true },
   { labelKey: "nav.gallery",   label: "Gallery",   href: "/dashboard/gallery",   icon: GalleryIcon },
   { labelKey: "nav.portfolio", label: "Portfolio", href: "/dashboard/portfolio", icon: PortfolioIcon },
+  { label: "Client delivery",  href: "/dashboard/delivery", icon: DeliveryIcon, soon: true },
+  { label: "Link builder",     href: "/dashboard/links",    icon: LinksIcon,    soon: true },
 ];
 
 function ProfileIcon() {
@@ -151,12 +153,20 @@ function NavItem({ labelKey, label, href, icon: Icon, soon, exact }: { labelKey?
   const displayLabel = labelKey ? t(labelKey) : label;
 
   if (soon) {
+    // Clickable, but visually muted — links to its "coming soon" page.
     return (
-      <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-35 cursor-not-allowed select-none">
-        <span className="text-[var(--fg-muted)]"><Icon /></span>
-        <span className="font-sans text-sm text-[var(--fg-muted)] flex-1">{displayLabel}</span>
+      <Link
+        href={href}
+        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group
+          ${active
+            ? "bg-yellow/10 text-[var(--fg)]"
+            : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"
+          }`}
+      >
+        <span className={active ? "text-yellow" : "text-[var(--fg-muted)] group-hover:text-[var(--fg)]"}><Icon /></span>
+        <span className="font-sans text-sm font-medium flex-1">{displayLabel}</span>
         <span className="font-mono text-[9px] bg-[var(--bg-subtle)] text-[var(--fg-muted)] px-1.5 py-0.5 rounded tracking-wider uppercase">Soon</span>
-      </div>
+      </Link>
     );
   }
 
