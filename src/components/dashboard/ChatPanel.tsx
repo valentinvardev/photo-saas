@@ -84,6 +84,7 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
   const [draft, setDraft]       = useState("");
   const [meId, setMeId]         = useState<string | null>(null);
   const [meName, setMeName]     = useState("You");
+  const [meReady, setMeReady]   = useState(false);
   const [connected, setConnected] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const seen = useRef<Set<string>>(new Set());
@@ -99,14 +100,18 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
     });
   }, []);
 
-  /* Who am I (for own-message styling + optimistic sends) */
+  /* Who am I (for own-message styling + optimistic sends).
+     meReady gates the message list so bubbles never render on the wrong
+     side before we know the current user's id. */
   useEffect(() => {
     const supabase = createClient();
-    void supabase.auth.getUser().then(({ data }) => {
-      setMeId(data.user?.id ?? null);
-      const meta = (data.user?.user_metadata ?? {}) as { full_name?: string; name?: string };
-      setMeName(meta.full_name ?? meta.name ?? data.user?.email?.split("@")[0] ?? "You");
-    });
+    void supabase.auth.getUser()
+      .then(({ data }) => {
+        setMeId(data.user?.id ?? null);
+        const meta = (data.user?.user_metadata ?? {}) as { full_name?: string; name?: string };
+        setMeName(meta.full_name ?? meta.name ?? data.user?.email?.split("@")[0] ?? "You");
+      })
+      .finally(() => setMeReady(true));
   }, []);
 
   /* Seed from history */
@@ -184,9 +189,10 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-3">
-        {/* Keep the skeleton up until history is fetched AND merged into state,
-            so the empty placeholder never flashes between the two. */}
-        {(isLoading || (messages.length === 0 && (history?.length ?? 0) > 0)) ? (
+        {/* Keep the skeleton up until: history is fetched AND merged into state
+            (so the empty placeholder never flashes), and we know who the current
+            user is (so own messages never render on the wrong side first). */}
+        {(isLoading || !meReady || (messages.length === 0 && (history?.length ?? 0) > 0)) ? (
           <ChatSkeleton />
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-10 text-center text-[var(--fg-muted)]">
