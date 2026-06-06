@@ -1,7 +1,7 @@
 /* Editor-scoped styles — isolated from the dashboard */
 
 .editor-root {
-  --ed-topbar-h: 48px;
+  --ed-topbar-h: 60px;
   --ed-sidebar-w: 280px;
   --ed-canvas-bg: #1a1a1a;
   --ed-selection: #2563eb;
