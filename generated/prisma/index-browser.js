@@ -170,6 +170,11 @@ exports.Prisma.PortfolioScalarFieldEnum = {
   customDomain: 'customDomain',
   content: 'content',
   editorState: 'editorState',
+  seoTitle: 'seoTitle',
+  seoDescription: 'seoDescription',
+  ogImageUrl: 'ogImageUrl',
+  passwordEnabled: 'passwordEnabled',
+  password: 'password',
   views: 'views',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

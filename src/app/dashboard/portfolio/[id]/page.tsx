@@ -6,10 +6,17 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { DevicePreviewModal, LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
 import { ContentTree } from "~/components/portfolio/ContentTree";
+import { PhotoPickerModal } from "~/components/portfolio/PhotoPickerModal";
 import { TEMPLATE_URL, TEMPLATES, type Portfolio } from "~/lib/portfolio/mock";
 import { dbToView } from "~/lib/portfolio/adapt";
 import { usePortfolioContentSync } from "~/lib/portfolio/useContentSync";
-import { api } from "~/trpc/react";
+import { api, type RouterOutputs } from "~/trpc/react";
+
+type DbPortfolio = NonNullable<RouterOutputs["portfolio"]["get"]>;
+type SaveFn = (patch: Partial<{
+  customDomain: string | null; seoTitle: string | null; seoDescription: string | null;
+  ogImageUrl: string | null; passwordEnabled: boolean; password: string;
+}>) => void;
 
 type Tab = "content" | "template" | "domain" | "seo" | "analytics" | "settings";
 
@@ -38,6 +45,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
     onSuccess: () => { void utils.portfolio.get.invalidate({ id }); void utils.portfolio.list.invalidate(); },
   });
   const deleteMut  = api.portfolio.delete.useMutation();
+  const save: SaveFn = (patch) => publishMut.mutate({ id, ...patch });
 
   const { saving } = usePortfolioContentSync(id);
 
@@ -214,27 +222,27 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
             </motion.div>
           )}
 
-          {tab === "domain" && (
+          {tab === "domain" && dbP && (
             <motion.div key="domain" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <DomainTab portfolio={portfolio} />
+              <DomainTab dbP={dbP} save={save} />
             </motion.div>
           )}
 
-          {tab === "seo" && (
+          {tab === "seo" && dbP && (
             <motion.div key="seo" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <SeoTab portfolio={portfolio} />
+              <SeoTab dbP={dbP} save={save} />
             </motion.div>
           )}
 
-          {tab === "analytics" && (
+          {tab === "analytics" && dbP && (
             <motion.div key="analytics" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <AnalyticsTab portfolio={portfolio} />
+              <AnalyticsTab dbP={dbP} />
             </motion.div>
           )}
 
-          {tab === "settings" && (
+          {tab === "settings" && dbP && (
             <motion.div key="settings" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <SettingsTab portfolio={portfolio} onDelete={async () => {
+              <SettingsTab dbP={dbP} save={save} onDelete={async () => {
                 await deleteMut.mutateAsync({ id });
                 void utils.portfolio.list.invalidate();
                 router.push("/dashboard/portfolio");
@@ -339,9 +347,12 @@ function TemplateTab({ portfolio }: { portfolio: Portfolio }) {
   );
 }
 
-function DomainTab({ portfolio }: { portfolio: Portfolio }) {
-  const url    = portfolio.customDomain ?? `${portfolio.slug}.frame.co`;
-  const isFree = !portfolio.customDomain;
+function DomainTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
+  const liveUrl = (typeof window !== "undefined" ? window.location.origin : "https://portapic.com") + `/p/${dbP.slug}`;
+  const [domain, setDomain]   = useState(dbP.customDomain ?? "");
+  const [copied, setCopied]   = useState(false);
+  const clean = domain.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const dirty = (clean || null) !== (dbP.customDomain ?? null);
 
   return (
     <div className="max-w-2xl space-y-5">
@@ -352,46 +363,66 @@ function DomainTab({ portfolio }: { portfolio: Portfolio }) {
         </p>
       </div>
 
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)] shrink-0">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-          </div>
-          <div className="min-w-0">
-            <div className="font-mono text-sm text-[var(--fg)] truncate">{url}</div>
-            <div className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mt-0.5">
-              {isFree ? "Free subdomain" : "Custom domain · Connected"}
-            </div>
-          </div>
+      {/* Live address */}
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+        <div className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest mb-2">Live address</div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <code className="font-mono text-sm text-[var(--fg)] bg-[var(--bg-subtle)] px-2 py-1 rounded truncate flex-1 min-w-0">{liveUrl}</code>
+          <button
+            onClick={() => { navigator.clipboard.writeText(liveUrl).catch(() => {}); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
+            className="px-3 py-1.5 rounded-lg border border-[var(--border)] font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors whitespace-nowrap"
+          >{copied ? "Copied" : "Copy"}</button>
+          <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 transition-colors">Open</a>
         </div>
-        <Link
-          href="/dashboard/domain"
-          className="px-3 py-2 rounded-lg border border-[var(--border)] font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors whitespace-nowrap"
-        >
-          Manage domain →
-        </Link>
       </div>
 
-      {isFree && (
-        <div className="rounded-xl border border-yellow/30 bg-yellow/5 p-4 flex items-start gap-3">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#facc15" stroke="none" className="shrink-0 mt-0.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <div className="flex-1 min-w-0">
-            <p className="font-sans text-sm font-semibold text-[var(--fg)]">Connect a custom domain</p>
-            <p className="font-sans text-xs text-[var(--fg-muted)] mt-1">Clients trust a branded address. Buy or connect <code className="font-mono text-[11px] bg-[var(--bg-subtle)] px-1 rounded">{portfolio.slug}.com</code> to upgrade your portfolio.</p>
-            <Link href="/dashboard/domain" className="inline-block mt-3 px-3 py-1.5 rounded-lg bg-[#111] text-yellow font-sans text-xs font-bold hover:opacity-90 transition-opacity">
-              Connect domain
-            </Link>
-          </div>
+      {/* Custom domain */}
+      <div>
+        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">Custom domain (optional)</label>
+        <div className="flex gap-2">
+          <input
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder="yourname.com"
+            className="flex-1 rounded-lg px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] focus:outline-none focus:border-yellow transition-colors"
+          />
+          <button
+            disabled={!dirty}
+            onClick={() => save({ customDomain: clean || null })}
+            className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+          >Save domain</button>
+        </div>
+        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1.5">Leave empty to use the free address above.</p>
+      </div>
+
+      {/* DNS instructions when a custom domain is set */}
+      {dbP.customDomain && (
+        <div className="rounded-xl border border-yellow/30 bg-yellow/5 p-4 space-y-2">
+          <p className="font-sans text-sm font-semibold text-[var(--fg)]">Point your DNS</p>
+          <p className="font-sans text-xs text-[var(--fg-muted)]">At your domain registrar, add a CNAME record:</p>
+          <code className="block font-mono text-[11px] bg-[var(--bg-subtle)] px-3 py-2 rounded text-[var(--fg)]">CNAME&nbsp;&nbsp;@&nbsp;→&nbsp;cname.vercel-dns.com</code>
+          <p className="font-mono text-[10px] text-yellow/80">Saved. Domain routing activates once verified — coming soon. For now the portfolio is live at the address above.</p>
         </div>
       )}
     </div>
   );
 }
 
-function SeoTab({ portfolio }: { portfolio: Portfolio }) {
-  const url = portfolio.customDomain ?? `${portfolio.slug}.frame.co`;
-  const [title, setTitle]   = useState(portfolio.seo.title);
-  const [desc,  setDesc]    = useState(portfolio.seo.description);
+function SeoTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
+  const liveUrl = (typeof window !== "undefined" ? window.location.origin : "https://portapic.com") + `/p/${dbP.slug}`;
+  const [title, setTitle] = useState(dbP.seoTitle ?? "");
+  const [desc,  setDesc]  = useState(dbP.seoDescription ?? "");
+  const [og,    setOg]    = useState(dbP.ogImageUrl ?? "");
+  const [picker, setPicker] = useState(false);
+
+  const dirty =
+    (title.trim() || null) !== (dbP.seoTitle ?? null) ||
+    (desc.trim()  || null) !== (dbP.seoDescription ?? null) ||
+    (og.trim()    || null) !== (dbP.ogImageUrl ?? null);
+
+  function handleSave() {
+    save({ seoTitle: title.trim() || null, seoDescription: desc.trim() || null, ogImageUrl: og.trim() || null });
+  }
 
   return (
     <div className="max-w-2xl space-y-5">
@@ -407,9 +438,10 @@ function SeoTab({ portfolio }: { portfolio: Portfolio }) {
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          placeholder={dbP.title}
           className="w-full rounded-lg px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] focus:outline-none focus:border-yellow transition-colors"
         />
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">{title.length}/60 characters</p>
+        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">{title.length}/60 · blank uses the portfolio title</p>
       </div>
 
       <div>
@@ -425,186 +457,101 @@ function SeoTab({ portfolio }: { portfolio: Portfolio }) {
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
         <p className="font-mono text-[10px] text-[var(--fg-muted)] mb-3 uppercase tracking-widest">Search preview</p>
-        <div className="font-sans text-base text-blue-400 hover:underline cursor-default truncate">{title || portfolio.name}</div>
-        <div className="font-mono text-[11px] text-green-600 truncate">https://{url}</div>
+        <div className="font-sans text-base text-blue-400 hover:underline cursor-default truncate">{title || dbP.title}</div>
+        <div className="font-mono text-[11px] text-green-600 truncate">{liveUrl}</div>
         <div className="font-sans text-xs text-[var(--fg-muted)] mt-1 line-clamp-2">{desc || "No description set."}</div>
       </div>
 
       <div>
-        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">OG Image</label>
-        <div className="rounded-lg border-2 border-dashed border-[var(--border)] h-32 flex flex-col items-center justify-center gap-2 text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors cursor-pointer">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <span className="font-mono text-xs">Upload OG image (1200×630)</span>
-        </div>
+        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">Social / OG image</label>
+        {og ? (
+          <div className="rounded-lg border border-[var(--border)] overflow-hidden relative group">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={og} alt="" className="w-full aspect-[1200/630] object-cover" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+              <button onClick={() => setPicker(true)} className="px-3 py-1.5 rounded-lg bg-white text-[#111] font-sans text-xs font-bold">Change</button>
+              <button onClick={() => setOg("")} className="px-3 py-1.5 rounded-lg bg-white/90 text-red-500 font-sans text-xs font-bold">Remove</button>
+            </div>
+          </div>
+        ) : (
+          <button onClick={() => setPicker(true)} className="w-full rounded-lg border-2 border-dashed border-[var(--border)] h-32 flex flex-col items-center justify-center gap-2 text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span className="font-mono text-xs">Choose from your library (1200×630 ideal)</span>
+          </button>
+        )}
       </div>
 
-      <button className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 transition-colors">
+      <button
+        onClick={handleSave}
+        disabled={!dirty}
+        className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
         Save SEO settings
       </button>
+
+      {picker && (
+        <PhotoPickerModal multi={false} onPick={(urls) => { if (urls[0]) setOg(urls[0]); }} onClose={() => setPicker(false)} />
+      )}
     </div>
   );
 }
 
-function AnalyticsTab({ portfolio }: { portfolio: Portfolio }) {
-  const week7 = portfolio.weeklyViews.reduce((a, b) => a + b, 0);
-
-  const STATS = [
-    { label: "Total views",      value: portfolio.visits.toLocaleString(), delta: "+12%", up: true  },
-    { label: "Unique visitors",  value: portfolio.uniqueVisitors.toLocaleString(), delta: "+8%", up: true },
-    { label: "Avg session",      value: "2:14",  delta: "+0:22", up: true  },
-    { label: "Inquiries",        value: "7",     delta: "+3",    up: true  },
-  ];
-
-  const INSIGHTS = [
-    {
-      icon: (
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="2" y="2" width="20" height="20" rx="5"/>
-          <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-        </svg>
-      ),
-      color: "#e1306c",
-      title: "Instagram is your top referrer",
-      body:  "31% of traffic comes from Instagram. Pin your portfolio link in your bio.",
-    },
-    {
-      icon: (
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-      ),
-      color: "#fad502",
-      title: "Weddings page gets 4× more time",
-      body:  "Visitors spend 4:32 average on /weddings — your strongest content.",
-    },
-    {
-      icon: (
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
-          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-          <polyline points="17 6 23 6 23 12"/>
-        </svg>
-      ),
-      color: "#34d399",
-      title: "Tuesday is your peak day",
-      body:  `${week7} views last 7 days. Tuesday drives 34% more traffic than average.`,
-    },
-  ];
-
-  const TOP_CONTENT = [
-    { slug: "weddings",  label: "Weddings 2024",  views: Math.round(portfolio.visits * 0.46), seed: "wed2024" },
-    { slug: "portraits", label: "Portraits",       views: Math.round(portfolio.visits * 0.29), seed: "port1"   },
-    { slug: "about",     label: "About",           views: Math.round(portfolio.visits * 0.14), seed: "about1"  },
-    { slug: "contact",   label: "Contact",         views: Math.round(portfolio.visits * 0.07), seed: "cont1"   },
-    { slug: "shop",      label: "Shop",            views: Math.round(portfolio.visits * 0.04), seed: "shop1"   },
-  ];
-  const topMax = TOP_CONTENT[0]!.views;
-
-  const SOURCES = [
-    { label: "Direct",      pct: 42, color: "var(--fg-muted)" },
-    { label: "Instagram",   pct: 31, color: "#e1306c"         },
-    { label: "Google",      pct: 18, color: "#4285f4"         },
-    { label: "Twitter / X", pct:  9, color: "var(--fg-muted)" },
-  ];
-
+function AnalyticsTab({ dbP }: { dbP: DbPortfolio }) {
+  const published = dbP.status === "published";
   return (
     <div className="space-y-5 max-w-4xl">
       <div>
         <h2 className="font-sans font-bold text-[var(--fg)] text-base">Analytics</h2>
         <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
-          What's resonating and where visitors come from.
+          How your published portfolio is performing.
         </p>
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {STATS.map((s) => (
-          <div key={s.label} className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
-            <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{s.label}</div>
-            <div className="font-sans font-black text-2xl text-[var(--fg)] mb-1">{s.value}</div>
-            <span className={`inline-flex items-center gap-0.5 font-mono text-[9px] ${s.up ? "text-green-400" : "text-red-400"}`}>
-              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                {s.up ? <polyline points="18 15 12 9 6 15"/> : <polyline points="6 9 12 15 18 9"/>}
-              </svg>
-              {s.delta} vs last week
-            </span>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
+          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">Total views</div>
+          <div className="font-sans font-black text-2xl text-[var(--fg)]">{dbP.views.toLocaleString()}</div>
+        </div>
+        <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
+          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">Status</div>
+          <div className={`font-sans font-black text-2xl ${published ? "text-green-400" : "text-[var(--fg-muted)]"}`}>{published ? "Live" : "Draft"}</div>
+        </div>
+        <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
+          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">Last updated</div>
+          <div className="font-sans font-bold text-base text-[var(--fg)]">{new Date(dbP.updatedAt).toLocaleDateString()}</div>
+        </div>
       </div>
 
-      {/* Insights */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {INSIGHTS.map((ins) => (
-          <div key={ins.title} className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col gap-2">
-            <span style={{ color: ins.color }}>{ins.icon}</span>
-            <p className="font-sans text-sm font-semibold text-[var(--fg)] leading-tight">{ins.title}</p>
-            <p className="font-sans text-xs text-[var(--fg-muted)] leading-relaxed">{ins.body}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Top content + Traffic sources */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-
-        {/* Top content with thumbnails */}
-        <div className="rounded-xl border border-[var(--border)] overflow-hidden">
-          <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--bg-subtle)]">
-            <span className="font-sans font-semibold text-sm text-[var(--fg)]">Top content</span>
-          </div>
-          {TOP_CONTENT.map((row) => (
-            <div key={row.slug} className="flex items-center gap-3 px-4 py-2.5 border-b border-[var(--border)] last:border-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`https://picsum.photos/seed/${row.seed}/60/60?grayscale`}
-                alt=""
-                className="w-8 h-8 rounded-md object-cover shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="font-sans text-xs font-medium text-[var(--fg)] truncate">{row.label}</div>
-                <div className="mt-1 h-1 rounded-full bg-[var(--bg-subtle)] overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-yellow"
-                    style={{ width: `${(row.views / topMax) * 100}%` }}
-                  />
-                </div>
-              </div>
-              <span className="font-mono text-[10px] text-[var(--fg-muted)] shrink-0 tabular-nums">
-                {row.views.toLocaleString()}
-              </span>
-            </div>
-          ))}
+      {!published && (
+        <div className="rounded-xl border border-yellow/30 bg-yellow/5 p-4">
+          <p className="font-sans text-sm font-semibold text-[var(--fg)]">Not published yet</p>
+          <p className="font-sans text-xs text-[var(--fg-muted)] mt-1">Publish this portfolio to start counting views.</p>
         </div>
+      )}
 
-        {/* Traffic sources */}
-        <div className="rounded-xl border border-[var(--border)] overflow-hidden">
-          <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--bg-subtle)]">
-            <span className="font-sans font-semibold text-sm text-[var(--fg)]">Traffic sources</span>
-          </div>
-          <div className="px-4 py-3 space-y-3">
-            {SOURCES.map((s) => (
-              <div key={s.label}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-sans text-xs text-[var(--fg)]">{s.label}</span>
-                  <span className="font-mono text-[10px] text-[var(--fg-muted)]">{s.pct}%</span>
-                </div>
-                <div className="h-1.5 rounded-full bg-[var(--bg-subtle)] overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{ width: `${s.pct}%`, background: s.color }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5 flex items-start gap-3">
+        <span className="text-[var(--fg-muted)] mt-0.5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </span>
+        <div>
+          <p className="font-sans text-sm font-semibold text-[var(--fg)]">More analytics coming soon</p>
+          <p className="font-sans text-xs text-[var(--fg-muted)] mt-1 leading-relaxed">Total views are tracked in real time. Traffic sources, top content, sessions and per-day trends will land here once event tracking is in place — shown only when there's real data, never placeholders.</p>
         </div>
-
       </div>
     </div>
   );
 }
 
-function SettingsTab({ portfolio, onDelete }: { portfolio: Portfolio; onDelete: () => void }) {
-  const [pwOn, setPwOn] = useState(portfolio.passwordProtected);
+function SettingsTab({ dbP, save, onDelete }: { dbP: DbPortfolio; save: SaveFn; onDelete: () => void }) {
+  const [pwOn, setPwOn] = useState(dbP.passwordEnabled);
+  const [pw, setPw]     = useState(dbP.password ?? "");
+
+  function toggle() {
+    const next = !pwOn;
+    setPwOn(next);
+    if (!next) save({ passwordEnabled: false });   // turning off is immediate
+  }
+  const pwDirty = pwOn && (pw.trim().length > 0) && (!dbP.passwordEnabled || pw !== dbP.password);
 
   return (
     <div className="max-w-2xl space-y-5">
@@ -615,29 +562,49 @@ function SettingsTab({ portfolio, onDelete }: { portfolio: Portfolio; onDelete: 
         </p>
       </div>
 
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex items-center justify-between gap-3">
-        <div>
-          <div className="font-sans text-sm font-semibold text-[var(--fg)]">Password protection</div>
-          <div className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">Visitors need a password to view this portfolio.</div>
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="font-sans text-sm font-semibold text-[var(--fg)]">Password protection</div>
+            <div className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">Visitors need a password to view this portfolio.</div>
+          </div>
+          <button
+            onClick={toggle}
+            role="switch" aria-checked={pwOn}
+            className={`relative inline-flex flex-shrink-0 w-9 h-5 rounded-full transition-colors ${pwOn ? "bg-yellow" : "bg-[var(--bg-subtle)] border border-[var(--fg-muted)]"}`}
+          >
+            <span className="absolute top-0.5 w-4 h-4 rounded-full transition-all" style={{ left: pwOn ? 18 : 2, background: pwOn ? "#111" : "var(--fg)" }} />
+          </button>
         </div>
-        <button
-          onClick={() => setPwOn((v) => !v)}
-          role="switch" aria-checked={pwOn}
-          className={`relative inline-flex flex-shrink-0 w-9 h-5 rounded-full transition-colors ${pwOn ? "bg-yellow" : "bg-[var(--bg-subtle)] border border-[var(--fg-muted)]"}`}
-        >
-          <span className="absolute top-0.5 w-4 h-4 rounded-full transition-all"
-            style={{ left: pwOn ? 18 : 2, background: pwOn ? "#111" : "var(--fg)" }}
-          />
-        </button>
+
+        {pwOn && (
+          <div className="flex gap-2 pt-1">
+            <input
+              type="text"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              placeholder="Set a password"
+              className="flex-1 rounded-lg px-3 py-2 font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] focus:outline-none focus:border-yellow transition-colors"
+            />
+            <button
+              onClick={() => save({ passwordEnabled: true, password: pw.trim() })}
+              disabled={!pwDirty}
+              className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+            >Save</button>
+          </div>
+        )}
+        {pwOn && dbP.passwordEnabled && dbP.password && pw === dbP.password && (
+          <p className="font-mono text-[10px] text-green-400">Password active — visitors must enter it.</p>
+        )}
       </div>
 
       <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4">
         <div className="font-sans text-sm font-semibold text-red-400 mb-1">Danger zone</div>
         <p className="font-sans text-xs text-[var(--fg-muted)] mb-3">
-          Deleting "{portfolio.name}" can't be undone. All categories, folders, and photos under this portfolio will be permanently removed.
+          Deleting "{dbP.title}" can't be undone. All categories, folders, and photos under this portfolio will be permanently removed.
         </p>
         <button
-          onClick={() => { if (confirm(`Delete "${portfolio.name}"? This cannot be undone.`)) onDelete(); }}
+          onClick={() => { if (confirm(`Delete "${dbP.title}"? This cannot be undone.`)) onDelete(); }}
           className="px-3 py-2 rounded-lg border border-red-500/40 text-red-400 font-sans text-xs font-bold hover:bg-red-500/10 transition-colors"
         >
           Delete portfolio

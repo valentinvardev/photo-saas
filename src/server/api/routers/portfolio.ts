@@ -4,9 +4,13 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 export const portfolioRouter = createTRPCRouter({
-  /** Public — fetch a published portfolio by slug for the /p/[slug] site. */
+  /**
+   * Public — fetch a published portfolio by slug for the /p/[slug] site.
+   * If the portfolio is password-protected, content/editorState are withheld
+   * (locked:true) until the correct password is supplied.
+   */
   getPublicBySlug: publicProcedure
-    .input(z.object({ slug: z.string() }))
+    .input(z.object({ slug: z.string(), password: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const portfolio = await ctx.db.portfolio.findFirst({
         where: { slug: input.slug, status: "published" },
@@ -18,11 +22,35 @@ export const portfolioRouter = createTRPCRouter({
           content: true,
           editorState: true,
           updatedAt: true,
+          seoTitle: true,
+          seoDescription: true,
+          ogImageUrl: true,
+          passwordEnabled: true,
+          password: true,
           user: { select: { name: true, avatarUrl: true } },
         },
       });
       if (!portfolio) throw new TRPCError({ code: "NOT_FOUND" });
-      return portfolio;
+
+      const locked = portfolio.passwordEnabled && input.password !== portfolio.password;
+      const { password: _pw, ...safe } = portfolio;
+      return {
+        ...safe,
+        locked,
+        content:     locked ? null : safe.content,
+        editorState: locked ? null : safe.editorState,
+      };
+    }),
+
+  /** Public — increment the view counter for a published portfolio. */
+  trackView: publicProcedure
+    .input(z.object({ slug: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.portfolio.updateMany({
+        where: { slug: input.slug, status: "published" },
+        data:  { views: { increment: 1 } },
+      });
+      return { ok: true };
     }),
 
   /** Save the visual website-builder design for a portfolio. */
@@ -101,13 +129,18 @@ export const portfolioRouter = createTRPCRouter({
    */
   update: protectedProcedure
     .input(z.object({
-      id:           z.string(),
-      title:        z.string().optional(),
-      slug:         z.string().optional(),
-      status:       z.string().optional(),
-      template:     z.string().optional(),
-      customDomain: z.string().nullable().optional(),
-      content:      z.unknown().optional(),
+      id:              z.string(),
+      title:           z.string().optional(),
+      slug:            z.string().optional(),
+      status:          z.string().optional(),
+      template:        z.string().optional(),
+      customDomain:    z.string().nullable().optional(),
+      content:         z.unknown().optional(),
+      seoTitle:        z.string().nullable().optional(),
+      seoDescription:  z.string().nullable().optional(),
+      ogImageUrl:      z.string().nullable().optional(),
+      passwordEnabled: z.boolean().optional(),
+      password:        z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const { id, content, ...rest } = input;

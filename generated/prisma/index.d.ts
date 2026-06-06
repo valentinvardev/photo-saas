@@ -6420,6 +6420,11 @@ export namespace Prisma {
     status: string | null
     template: string | null
     customDomain: string | null
+    seoTitle: string | null
+    seoDescription: string | null
+    ogImageUrl: string | null
+    passwordEnabled: boolean | null
+    password: string | null
     views: number | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6433,6 +6438,11 @@ export namespace Prisma {
     status: string | null
     template: string | null
     customDomain: string | null
+    seoTitle: string | null
+    seoDescription: string | null
+    ogImageUrl: string | null
+    passwordEnabled: boolean | null
+    password: string | null
     views: number | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6448,6 +6458,11 @@ export namespace Prisma {
     customDomain: number
     content: number
     editorState: number
+    seoTitle: number
+    seoDescription: number
+    ogImageUrl: number
+    passwordEnabled: number
+    password: number
     views: number
     createdAt: number
     updatedAt: number
@@ -6471,6 +6486,11 @@ export namespace Prisma {
     status?: true
     template?: true
     customDomain?: true
+    seoTitle?: true
+    seoDescription?: true
+    ogImageUrl?: true
+    passwordEnabled?: true
+    password?: true
     views?: true
     createdAt?: true
     updatedAt?: true
@@ -6484,6 +6504,11 @@ export namespace Prisma {
     status?: true
     template?: true
     customDomain?: true
+    seoTitle?: true
+    seoDescription?: true
+    ogImageUrl?: true
+    passwordEnabled?: true
+    password?: true
     views?: true
     createdAt?: true
     updatedAt?: true
@@ -6499,6 +6524,11 @@ export namespace Prisma {
     customDomain?: true
     content?: true
     editorState?: true
+    seoTitle?: true
+    seoDescription?: true
+    ogImageUrl?: true
+    passwordEnabled?: true
+    password?: true
     views?: true
     createdAt?: true
     updatedAt?: true
@@ -6601,6 +6631,11 @@ export namespace Prisma {
     customDomain: string | null
     content: JsonValue
     editorState: JsonValue | null
+    seoTitle: string | null
+    seoDescription: string | null
+    ogImageUrl: string | null
+    passwordEnabled: boolean
+    password: string
     views: number
     createdAt: Date
     updatedAt: Date
@@ -6635,6 +6670,11 @@ export namespace Prisma {
     customDomain?: boolean
     content?: boolean
     editorState?: boolean
+    seoTitle?: boolean
+    seoDescription?: boolean
+    ogImageUrl?: boolean
+    passwordEnabled?: boolean
+    password?: boolean
     views?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6651,6 +6691,11 @@ export namespace Prisma {
     customDomain?: boolean
     content?: boolean
     editorState?: boolean
+    seoTitle?: boolean
+    seoDescription?: boolean
+    ogImageUrl?: boolean
+    passwordEnabled?: boolean
+    password?: boolean
     views?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6667,6 +6712,11 @@ export namespace Prisma {
     customDomain?: boolean
     content?: boolean
     editorState?: boolean
+    seoTitle?: boolean
+    seoDescription?: boolean
+    ogImageUrl?: boolean
+    passwordEnabled?: boolean
+    password?: boolean
     views?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6683,12 +6733,17 @@ export namespace Prisma {
     customDomain?: boolean
     content?: boolean
     editorState?: boolean
+    seoTitle?: boolean
+    seoDescription?: boolean
+    ogImageUrl?: boolean
+    passwordEnabled?: boolean
+    password?: boolean
     views?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PortfolioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "slug" | "status" | "template" | "customDomain" | "content" | "editorState" | "views" | "createdAt" | "updatedAt", ExtArgs["result"]["portfolio"]>
+  export type PortfolioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "slug" | "status" | "template" | "customDomain" | "content" | "editorState" | "seoTitle" | "seoDescription" | "ogImageUrl" | "passwordEnabled" | "password" | "views" | "createdAt" | "updatedAt", ExtArgs["result"]["portfolio"]>
   export type PortfolioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -6714,6 +6769,11 @@ export namespace Prisma {
       customDomain: string | null
       content: Prisma.JsonValue
       editorState: Prisma.JsonValue | null
+      seoTitle: string | null
+      seoDescription: string | null
+      ogImageUrl: string | null
+      passwordEnabled: boolean
+      password: string
       views: number
       createdAt: Date
       updatedAt: Date
@@ -7150,6 +7210,11 @@ export namespace Prisma {
     readonly customDomain: FieldRef<"Portfolio", 'String'>
     readonly content: FieldRef<"Portfolio", 'Json'>
     readonly editorState: FieldRef<"Portfolio", 'Json'>
+    readonly seoTitle: FieldRef<"Portfolio", 'String'>
+    readonly seoDescription: FieldRef<"Portfolio", 'String'>
+    readonly ogImageUrl: FieldRef<"Portfolio", 'String'>
+    readonly passwordEnabled: FieldRef<"Portfolio", 'Boolean'>
+    readonly password: FieldRef<"Portfolio", 'String'>
     readonly views: FieldRef<"Portfolio", 'Int'>
     readonly createdAt: FieldRef<"Portfolio", 'DateTime'>
     readonly updatedAt: FieldRef<"Portfolio", 'DateTime'>
@@ -13052,6 +13117,11 @@ export namespace Prisma {
     customDomain: 'customDomain',
     content: 'content',
     editorState: 'editorState',
+    seoTitle: 'seoTitle',
+    seoDescription: 'seoDescription',
+    ogImageUrl: 'ogImageUrl',
+    passwordEnabled: 'passwordEnabled',
+    password: 'password',
     views: 'views',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -13605,6 +13675,11 @@ export namespace Prisma {
     customDomain?: StringNullableFilter<"Portfolio"> | string | null
     content?: JsonFilter<"Portfolio">
     editorState?: JsonNullableFilter<"Portfolio">
+    seoTitle?: StringNullableFilter<"Portfolio"> | string | null
+    seoDescription?: StringNullableFilter<"Portfolio"> | string | null
+    ogImageUrl?: StringNullableFilter<"Portfolio"> | string | null
+    passwordEnabled?: BoolFilter<"Portfolio"> | boolean
+    password?: StringFilter<"Portfolio"> | string
     views?: IntFilter<"Portfolio"> | number
     createdAt?: DateTimeFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeFilter<"Portfolio"> | Date | string
@@ -13621,6 +13696,11 @@ export namespace Prisma {
     customDomain?: SortOrderInput | SortOrder
     content?: SortOrder
     editorState?: SortOrderInput | SortOrder
+    seoTitle?: SortOrderInput | SortOrder
+    seoDescription?: SortOrderInput | SortOrder
+    ogImageUrl?: SortOrderInput | SortOrder
+    passwordEnabled?: SortOrder
+    password?: SortOrder
     views?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13640,6 +13720,11 @@ export namespace Prisma {
     template?: StringFilter<"Portfolio"> | string
     content?: JsonFilter<"Portfolio">
     editorState?: JsonNullableFilter<"Portfolio">
+    seoTitle?: StringNullableFilter<"Portfolio"> | string | null
+    seoDescription?: StringNullableFilter<"Portfolio"> | string | null
+    ogImageUrl?: StringNullableFilter<"Portfolio"> | string | null
+    passwordEnabled?: BoolFilter<"Portfolio"> | boolean
+    password?: StringFilter<"Portfolio"> | string
     views?: IntFilter<"Portfolio"> | number
     createdAt?: DateTimeFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeFilter<"Portfolio"> | Date | string
@@ -13656,6 +13741,11 @@ export namespace Prisma {
     customDomain?: SortOrderInput | SortOrder
     content?: SortOrder
     editorState?: SortOrderInput | SortOrder
+    seoTitle?: SortOrderInput | SortOrder
+    seoDescription?: SortOrderInput | SortOrder
+    ogImageUrl?: SortOrderInput | SortOrder
+    passwordEnabled?: SortOrder
+    password?: SortOrder
     views?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13679,6 +13769,11 @@ export namespace Prisma {
     customDomain?: StringNullableWithAggregatesFilter<"Portfolio"> | string | null
     content?: JsonWithAggregatesFilter<"Portfolio">
     editorState?: JsonNullableWithAggregatesFilter<"Portfolio">
+    seoTitle?: StringNullableWithAggregatesFilter<"Portfolio"> | string | null
+    seoDescription?: StringNullableWithAggregatesFilter<"Portfolio"> | string | null
+    ogImageUrl?: StringNullableWithAggregatesFilter<"Portfolio"> | string | null
+    passwordEnabled?: BoolWithAggregatesFilter<"Portfolio"> | boolean
+    password?: StringWithAggregatesFilter<"Portfolio"> | string
     views?: IntWithAggregatesFilter<"Portfolio"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Portfolio"> | Date | string
@@ -14602,6 +14697,11 @@ export namespace Prisma {
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: string | null
+    seoDescription?: string | null
+    ogImageUrl?: string | null
+    passwordEnabled?: boolean
+    password?: string
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14618,6 +14718,11 @@ export namespace Prisma {
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: string | null
+    seoDescription?: string | null
+    ogImageUrl?: string | null
+    passwordEnabled?: boolean
+    password?: string
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14632,6 +14737,11 @@ export namespace Prisma {
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    ogImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordEnabled?: BoolFieldUpdateOperationsInput | boolean
+    password?: StringFieldUpdateOperationsInput | string
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14648,6 +14758,11 @@ export namespace Prisma {
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    ogImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordEnabled?: BoolFieldUpdateOperationsInput | boolean
+    password?: StringFieldUpdateOperationsInput | string
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14663,6 +14778,11 @@ export namespace Prisma {
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: string | null
+    seoDescription?: string | null
+    ogImageUrl?: string | null
+    passwordEnabled?: boolean
+    password?: string
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14677,6 +14797,11 @@ export namespace Prisma {
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    ogImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordEnabled?: BoolFieldUpdateOperationsInput | boolean
+    password?: StringFieldUpdateOperationsInput | string
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14692,6 +14817,11 @@ export namespace Prisma {
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    ogImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordEnabled?: BoolFieldUpdateOperationsInput | boolean
+    password?: StringFieldUpdateOperationsInput | string
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15870,6 +16000,11 @@ export namespace Prisma {
     customDomain?: SortOrder
     content?: SortOrder
     editorState?: SortOrder
+    seoTitle?: SortOrder
+    seoDescription?: SortOrder
+    ogImageUrl?: SortOrder
+    passwordEnabled?: SortOrder
+    password?: SortOrder
     views?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -15887,6 +16022,11 @@ export namespace Prisma {
     status?: SortOrder
     template?: SortOrder
     customDomain?: SortOrder
+    seoTitle?: SortOrder
+    seoDescription?: SortOrder
+    ogImageUrl?: SortOrder
+    passwordEnabled?: SortOrder
+    password?: SortOrder
     views?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -15900,6 +16040,11 @@ export namespace Prisma {
     status?: SortOrder
     template?: SortOrder
     customDomain?: SortOrder
+    seoTitle?: SortOrder
+    seoDescription?: SortOrder
+    ogImageUrl?: SortOrder
+    passwordEnabled?: SortOrder
+    password?: SortOrder
     views?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -17358,6 +17503,11 @@ export namespace Prisma {
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: string | null
+    seoDescription?: string | null
+    ogImageUrl?: string | null
+    passwordEnabled?: boolean
+    password?: string
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -17372,6 +17522,11 @@ export namespace Prisma {
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: string | null
+    seoDescription?: string | null
+    ogImageUrl?: string | null
+    passwordEnabled?: boolean
+    password?: string
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -17682,6 +17837,11 @@ export namespace Prisma {
     customDomain?: StringNullableFilter<"Portfolio"> | string | null
     content?: JsonFilter<"Portfolio">
     editorState?: JsonNullableFilter<"Portfolio">
+    seoTitle?: StringNullableFilter<"Portfolio"> | string | null
+    seoDescription?: StringNullableFilter<"Portfolio"> | string | null
+    ogImageUrl?: StringNullableFilter<"Portfolio"> | string | null
+    passwordEnabled?: BoolFilter<"Portfolio"> | boolean
+    password?: StringFilter<"Portfolio"> | string
     views?: IntFilter<"Portfolio"> | number
     createdAt?: DateTimeFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeFilter<"Portfolio"> | Date | string
@@ -18993,6 +19153,11 @@ export namespace Prisma {
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: string | null
+    seoDescription?: string | null
+    ogImageUrl?: string | null
+    passwordEnabled?: boolean
+    password?: string
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19157,6 +19322,11 @@ export namespace Prisma {
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    ogImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordEnabled?: BoolFieldUpdateOperationsInput | boolean
+    password?: StringFieldUpdateOperationsInput | string
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19171,6 +19341,11 @@ export namespace Prisma {
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    ogImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordEnabled?: BoolFieldUpdateOperationsInput | boolean
+    password?: StringFieldUpdateOperationsInput | string
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19185,6 +19360,11 @@ export namespace Prisma {
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
     editorState?: NullableJsonNullValueInput | InputJsonValue
+    seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    ogImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordEnabled?: BoolFieldUpdateOperationsInput | boolean
+    password?: StringFieldUpdateOperationsInput | string
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

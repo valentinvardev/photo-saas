@@ -109,6 +109,15 @@ model Portfolio {
   // logo, hiddenSections }. Null until the user edits the site in the builder.
   editorState Json?
 
+  // SEO
+  seoTitle       String?
+  seoDescription String?
+  ogImageUrl     String?
+
+  // Password protection (plaintext for v1, like Delivery)
+  passwordEnabled Boolean @default(false)
+  password        String  @default("")
+
   views     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
