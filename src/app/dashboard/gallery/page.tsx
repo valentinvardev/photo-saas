@@ -105,7 +105,9 @@ export default function GalleryPage() {
 
   const { data: foldersData } = api.photo.listFolders.useQuery();
   const folders: GFolder[] = foldersData ?? [];
-  const { data, isLoading } = api.photo.list.useQuery({ limit: 200, folderId: activeFolder ?? undefined });
+  // At root (activeFolder === null) pass folderId:null so the main grid shows
+  // only un-filed photos — photos inside a folder stay in that folder only.
+  const { data, isLoading } = api.photo.list.useQuery({ limit: 200, folderId: activeFolder });
   const photos: GPhoto[] = data?.items ?? [];
 
   const { upload, uploading, progress, error } = useUploadPhotos();
