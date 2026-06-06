@@ -2,11 +2,8 @@
 
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
-
-const GALLERY_SEEDS = [
-  20, 37, 48, 63, 71, 82, 95, 108, 133, 145, 156, 167,
-  201, 202, 210, 220, 230, 240, 250, 300,
-];
+import { api } from "~/trpc/react";
+import { useUploadPhotos } from "~/lib/photo/upload";
 
 export function ImageGalleryModal({
   value,
@@ -22,19 +19,23 @@ export function ImageGalleryModal({
   const [selected, setSelected] = useState(value);
   const [tab, setTab] = useState<"gallery" | "url">("gallery");
   const [urlDraft, setUrlDraft] = useState(value);
-  const [uploaded, setUploaded] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setUploaded((prev) => [url, ...prev]);
-    setSelected(url);
-    e.target.value = "";
-  }
+  const utils = api.useUtils();
+  const { data, isLoading } = api.photo.list.useQuery({ limit: 200 });
+  const photos = data?.items ?? [];
+  const { upload, uploading, progress } = useUploadPhotos();
 
-  const allSeeds = [...uploaded, ...GALLERY_SEEDS.map((s) => `https://picsum.photos/seed/${s}/800/800?grayscale`)];
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (files.length === 0) return;
+    try {
+      const made = await upload(files);
+      await utils.photo.list.invalidate();
+      if (made[0]) setSelected(made[0].url);
+    } catch { /* hook surfaces error */ }
+  }
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
     flex: 1, background: "none", border: "none",
@@ -66,52 +67,60 @@ export function ImageGalleryModal({
           {/* Left: gallery */}
           <div style={{ width: 360, borderRight: "1px solid var(--ec-raised)", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
-              <button style={tabStyle(tab === "gallery")} onClick={() => setTab("gallery")}>Gallery</button>
+              <button style={tabStyle(tab === "gallery")} onClick={() => setTab("gallery")}>Library</button>
               <button style={tabStyle(tab === "url")}     onClick={() => setTab("url")}>URL</button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: 10 }}>
               {tab === "gallery" ? (
                 <>
-                  <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFileChange} />
+                  <input ref={fileRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleFileChange} />
                   <button
                     onClick={() => fileRef.current?.click()}
+                    disabled={uploading}
                     style={{
                       width: "100%", marginBottom: 8, background: "none",
                       border: "1px dashed var(--ec-border)", color: "var(--ec-sub)", fontSize: 11,
-                      padding: "7px", borderRadius: 4, cursor: "pointer",
-                      fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                      padding: "7px", borderRadius: 4, cursor: uploading ? "default" : "pointer",
+                      fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, opacity: uploading ? 0.6 : 1,
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#facc15"; e.currentTarget.style.color = "#facc15"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--ec-border)"; e.currentTarget.style.color = "var(--ec-sub)"; }}
                   >
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                    Upload photo
+                    {uploading ? `Uploading ${progress.done}/${progress.total}…` : "Upload photo"}
                   </button>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
-                    {allSeeds.map((url, i) => {
-                      const isActive = selected === url;
-                      const thumb = url.startsWith("blob:") ? url : url.replace("800/800", "200/200");
-                      return (
-                        <div
-                          key={i}
-                          onClick={() => setSelected(url)}
-                          style={{
-                            aspectRatio: "1/1", overflow: "hidden", cursor: "pointer", borderRadius: 3,
-                            border: isActive ? "2px solid #2563eb" : "2px solid transparent",
-                            position: "relative",
-                          }}
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={thumb} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                          {isActive && (
-                            <div style={{ position: "absolute", top: 3, right: 3, width: 14, height: 14, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+
+                  {isLoading ? (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
+                      {Array.from({ length: 12 }).map((_, i) => <div key={i} style={{ aspectRatio: "1/1", borderRadius: 3, background: "var(--ec-raised)" }} />)}
+                    </div>
+                  ) : photos.length === 0 ? (
+                    <p style={{ color: "var(--ec-dim)", fontSize: 11, textAlign: "center", padding: "24px 8px" }}>Your library is empty — upload a photo to use it here.</p>
+                  ) : (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
+                      {photos.map((photo) => {
+                        const isActive = selected === photo.url;
+                        return (
+                          <div
+                            key={photo.id}
+                            onClick={() => setSelected(photo.url)}
+                            title={photo.filename}
+                            style={{
+                              aspectRatio: "1/1", overflow: "hidden", cursor: "pointer", borderRadius: 3,
+                              border: isActive ? "2px solid #2563eb" : "2px solid transparent",
+                              position: "relative",
+                            }}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={photo.url} alt={photo.filename} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                            {isActive && (
+                              <div style={{ position: "absolute", top: 3, right: 3, width: 14, height: 14, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </>
               ) : (
                 <div>

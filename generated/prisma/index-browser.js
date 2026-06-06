@@ -169,6 +169,7 @@ exports.Prisma.PortfolioScalarFieldEnum = {
   template: 'template',
   customDomain: 'customDomain',
   content: 'content',
+  editorState: 'editorState',
   views: 'views',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -286,6 +287,11 @@ exports.Prisma.SortOrder = {
 };
 
 exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 

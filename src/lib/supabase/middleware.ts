@@ -34,9 +34,10 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Guard the dashboard — send anonymous visitors to login, remembering where
-  // they were headed so we can bounce them back after sign-in.
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
+  // Guard the dashboard + website builder — send anonymous visitors to login,
+  // remembering where they were headed so we can bounce them back after sign-in.
+  const guarded = request.nextUrl.pathname.startsWith("/dashboard") || request.nextUrl.pathname.startsWith("/editor");
+  if (!user && guarded) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", request.nextUrl.pathname);

@@ -6,6 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "~/components/ui/Logo";
 import { api } from "~/trpc/react";
 import type { PortfolioContent, Photo, Category, Folder } from "~/lib/portfolio/data";
+import { flattenContentPhotos } from "~/lib/portfolio/contentPhotos";
+import { PortfolioSiteRender } from "~/components/portfolio/PortfolioSiteRender";
+import type { PortfolioDesign } from "~/lib/editor/store";
+
+function isDesign(v: unknown): v is PortfolioDesign {
+  return !!v && typeof v === "object" && (("nodes" in v) || ("templateId" in v) || ("palette" in v));
+}
 
 /* ── Content helpers ─────────────────────────────────────────── */
 
@@ -154,6 +161,11 @@ export default function PublicPortfolioPage({ params }: { params: Promise<{ user
   const { data, isLoading, isError } = api.portfolio.getPublicBySlug.useQuery({ slug });
 
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+
+  // If the portfolio was built in the website builder, render that design.
+  if (data && isDesign(data.editorState)) {
+    return <PortfolioSiteRender design={data.editorState} galleryPhotos={flattenContentPhotos(data.content)} />;
+  }
 
   const content = data && isContent(data.content) ? data.content : null;
   const allPhotos = content ? collectPhotos(content) : [];

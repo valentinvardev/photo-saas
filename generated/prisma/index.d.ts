@@ -6447,6 +6447,7 @@ export namespace Prisma {
     template: number
     customDomain: number
     content: number
+    editorState: number
     views: number
     createdAt: number
     updatedAt: number
@@ -6497,6 +6498,7 @@ export namespace Prisma {
     template?: true
     customDomain?: true
     content?: true
+    editorState?: true
     views?: true
     createdAt?: true
     updatedAt?: true
@@ -6598,6 +6600,7 @@ export namespace Prisma {
     template: string
     customDomain: string | null
     content: JsonValue
+    editorState: JsonValue | null
     views: number
     createdAt: Date
     updatedAt: Date
@@ -6631,6 +6634,7 @@ export namespace Prisma {
     template?: boolean
     customDomain?: boolean
     content?: boolean
+    editorState?: boolean
     views?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6646,6 +6650,7 @@ export namespace Prisma {
     template?: boolean
     customDomain?: boolean
     content?: boolean
+    editorState?: boolean
     views?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6661,6 +6666,7 @@ export namespace Prisma {
     template?: boolean
     customDomain?: boolean
     content?: boolean
+    editorState?: boolean
     views?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6676,12 +6682,13 @@ export namespace Prisma {
     template?: boolean
     customDomain?: boolean
     content?: boolean
+    editorState?: boolean
     views?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PortfolioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "slug" | "status" | "template" | "customDomain" | "content" | "views" | "createdAt" | "updatedAt", ExtArgs["result"]["portfolio"]>
+  export type PortfolioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "slug" | "status" | "template" | "customDomain" | "content" | "editorState" | "views" | "createdAt" | "updatedAt", ExtArgs["result"]["portfolio"]>
   export type PortfolioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -6706,6 +6713,7 @@ export namespace Prisma {
       template: string
       customDomain: string | null
       content: Prisma.JsonValue
+      editorState: Prisma.JsonValue | null
       views: number
       createdAt: Date
       updatedAt: Date
@@ -7141,6 +7149,7 @@ export namespace Prisma {
     readonly template: FieldRef<"Portfolio", 'String'>
     readonly customDomain: FieldRef<"Portfolio", 'String'>
     readonly content: FieldRef<"Portfolio", 'Json'>
+    readonly editorState: FieldRef<"Portfolio", 'Json'>
     readonly views: FieldRef<"Portfolio", 'Int'>
     readonly createdAt: FieldRef<"Portfolio", 'DateTime'>
     readonly updatedAt: FieldRef<"Portfolio", 'DateTime'>
@@ -13042,6 +13051,7 @@ export namespace Prisma {
     template: 'template',
     customDomain: 'customDomain',
     content: 'content',
+    editorState: 'editorState',
     views: 'views',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -13181,6 +13191,14 @@ export namespace Prisma {
   };
 
   export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const QueryMode: {
@@ -13586,6 +13604,7 @@ export namespace Prisma {
     template?: StringFilter<"Portfolio"> | string
     customDomain?: StringNullableFilter<"Portfolio"> | string | null
     content?: JsonFilter<"Portfolio">
+    editorState?: JsonNullableFilter<"Portfolio">
     views?: IntFilter<"Portfolio"> | number
     createdAt?: DateTimeFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeFilter<"Portfolio"> | Date | string
@@ -13601,6 +13620,7 @@ export namespace Prisma {
     template?: SortOrder
     customDomain?: SortOrderInput | SortOrder
     content?: SortOrder
+    editorState?: SortOrderInput | SortOrder
     views?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13619,6 +13639,7 @@ export namespace Prisma {
     status?: StringFilter<"Portfolio"> | string
     template?: StringFilter<"Portfolio"> | string
     content?: JsonFilter<"Portfolio">
+    editorState?: JsonNullableFilter<"Portfolio">
     views?: IntFilter<"Portfolio"> | number
     createdAt?: DateTimeFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeFilter<"Portfolio"> | Date | string
@@ -13634,6 +13655,7 @@ export namespace Prisma {
     template?: SortOrder
     customDomain?: SortOrderInput | SortOrder
     content?: SortOrder
+    editorState?: SortOrderInput | SortOrder
     views?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13656,6 +13678,7 @@ export namespace Prisma {
     template?: StringWithAggregatesFilter<"Portfolio"> | string
     customDomain?: StringNullableWithAggregatesFilter<"Portfolio"> | string | null
     content?: JsonWithAggregatesFilter<"Portfolio">
+    editorState?: JsonNullableWithAggregatesFilter<"Portfolio">
     views?: IntWithAggregatesFilter<"Portfolio"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Portfolio"> | Date | string
@@ -14578,6 +14601,7 @@ export namespace Prisma {
     template?: string
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14593,6 +14617,7 @@ export namespace Prisma {
     template?: string
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14606,6 +14631,7 @@ export namespace Prisma {
     template?: StringFieldUpdateOperationsInput | string
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14621,6 +14647,7 @@ export namespace Prisma {
     template?: StringFieldUpdateOperationsInput | string
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14635,6 +14662,7 @@ export namespace Prisma {
     template?: string
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14648,6 +14676,7 @@ export namespace Prisma {
     template?: StringFieldUpdateOperationsInput | string
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14662,6 +14691,7 @@ export namespace Prisma {
     template?: StringFieldUpdateOperationsInput | string
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15806,6 +15836,29 @@ export namespace Prisma {
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type PortfolioCountOrderByAggregateInput = {
     id?: SortOrder
@@ -15816,6 +15869,7 @@ export namespace Prisma {
     template?: SortOrder
     customDomain?: SortOrder
     content?: SortOrder
+    editorState?: SortOrder
     views?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -15879,6 +15933,32 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedJsonFilter<$PrismaModel>
     _max?: NestedJsonFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type FloatFilter<$PrismaModel = never> = {
@@ -17140,6 +17220,29 @@ export namespace Prisma {
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
@@ -17254,6 +17357,7 @@ export namespace Prisma {
     template?: string
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -17267,6 +17371,7 @@ export namespace Prisma {
     template?: string
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -17576,6 +17681,7 @@ export namespace Prisma {
     template?: StringFilter<"Portfolio"> | string
     customDomain?: StringNullableFilter<"Portfolio"> | string | null
     content?: JsonFilter<"Portfolio">
+    editorState?: JsonNullableFilter<"Portfolio">
     views?: IntFilter<"Portfolio"> | number
     createdAt?: DateTimeFilter<"Portfolio"> | Date | string
     updatedAt?: DateTimeFilter<"Portfolio"> | Date | string
@@ -18886,6 +18992,7 @@ export namespace Prisma {
     template?: string
     customDomain?: string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19049,6 +19156,7 @@ export namespace Prisma {
     template?: StringFieldUpdateOperationsInput | string
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19062,6 +19170,7 @@ export namespace Prisma {
     template?: StringFieldUpdateOperationsInput | string
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19075,6 +19184,7 @@ export namespace Prisma {
     template?: StringFieldUpdateOperationsInput | string
     customDomain?: NullableStringFieldUpdateOperationsInput | string | null
     content?: JsonNullValueInput | InputJsonValue
+    editorState?: NullableJsonNullValueInput | InputJsonValue
     views?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

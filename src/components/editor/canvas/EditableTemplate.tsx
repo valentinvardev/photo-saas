@@ -40,7 +40,7 @@ function EditableNode({
   style?: React.CSSProperties;
   tag?: "div" | "h1" | "h2" | "h3" | "p" | "span" | "blockquote";
 }) {
-  const { selectedId, editingId, selectNode, setEditing, nodes } = useEditorStore();
+  const { selectedId, editingId, selectNode, setEditing, nodes, readOnly } = useEditorStore();
   const node     = nodes[id];
   const selected = selectedId === id;
   const editing  = editingId  === id;
@@ -56,6 +56,12 @@ function EditableNode({
   if (node?.textAlign)     overrides.textAlign     = node.textAlign;
 
   const El = Tag as "div";
+
+  // Read-only (public site): no selection/editing affordances.
+  if (readOnly) {
+    return <El style={{ position: "relative", ...style, ...overrides }}>{children}</El>;
+  }
+
   return (
     <El
       data-editor-node=""
@@ -125,7 +131,18 @@ const WORKS = [
 ];
 
 
-type Work = typeof WORKS[0];
+type Work = { id: number | string; seed?: number; src?: string; title: string; year?: string; cat?: string; w?: number; h?: number };
+
+/** Source URL for a work — real photo when present, else the demo picsum seed. */
+const cellSrc  = (w: Work) => w.src ?? `https://picsum.photos/seed/${w.seed}/800/1000?grayscale`;
+const lightSrc = (w: Work) => w.src ?? `https://picsum.photos/seed/${w.seed}/1400/900?grayscale`;
+
+/** The gallery's works: the portfolio's real photos when present, else the demo set. */
+function useWorks(): Work[] {
+  const galleryPhotos = useEditorStore((s) => s.galleryPhotos);
+  if (galleryPhotos.length === 0) return WORKS;
+  return galleryPhotos.map((p, i) => ({ id: `g${i}`, src: p.src, title: p.title ?? "" }));
+}
 
 /* ═══════════════════════════════════════════
    PHOTO CELL
@@ -139,16 +156,18 @@ function Cell({ w, onClick }: { w: Work; onClick?: () => void }) {
       onClick={onClick}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={`https://picsum.photos/seed/${w.seed}/800/1000?grayscale`} alt={w.title}
+      <img src={cellSrc(w)} alt={w.title}
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block",
           filter: hov ? "brightness(0.5)" : "brightness(0.88)",
           transform: hov ? "scale(1.05)" : "scale(1)",
           transition: "filter 0.5s ease, transform 0.65s ease" }} />
       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "flex-end",
         padding: "1rem", opacity: hov ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: "none" }}>
+        {w.cat && (
         <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em", textTransform: "uppercase" as const, marginBottom: "0.25rem" }}>
           {w.cat} · {w.year}
         </span>
+        )}
         <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "var(--ed-bg, #fafafa)", lineHeight: 1.2 }}>
           {w.title}
         </span>
@@ -226,7 +245,7 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
       <div ref={containerRef} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "64px 48px", cursor: zoom > 1 ? (dragging ? "grabbing" : "grab") : "default", overflow: "hidden" }}
         onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`https://picsum.photos/seed/${w.seed}/1400/900?grayscale`} alt={w.title} draggable={false}
+        <img src={lightSrc(w)} alt={w.title} draggable={false}
           style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", pointerEvents: "none", display: "block",
             transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`, transformOrigin: "center",
             transition: dragging ? "none" : "transform 0.15s ease" }} />
@@ -236,9 +255,9 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "12px 20px", background: "linear-gradient(to top, rgba(0,0,0,0.6), transparent)", display: "flex", justifyContent: "space-between", alignItems: "flex-end", pointerEvents: "none" }}>
         <div>
           <div style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "#fff", marginBottom: "2px" }}>{w.title}</div>
-          <div style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.15em", textTransform: "uppercase" }}>{w.cat} · {w.year}</div>
+          {w.cat && <div style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.15em", textTransform: "uppercase" }}>{w.cat} · {w.year}</div>}
         </div>
-        <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "rgba(255,255,255,0.3)" }}>{w.w} × {w.h}px</span>
+        {w.w ? <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "rgba(255,255,255,0.3)" }}>{w.w} × {w.h}px</span> : <span />}
       </div>
     </div>
   );
@@ -251,8 +270,9 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [filter, setFilter]               = useState("All");
 
-  const cats    = ["All", ...Array.from(new Set(WORKS.map((w) => w.cat)))];
-  const visible = filter === "All" ? WORKS : WORKS.filter((w) => w.cat === filter);
+  const works   = useWorks();
+  const cats    = ["All", ...Array.from(new Set(works.map((w) => w.cat).filter((c): c is string => !!c)))];
+  const visible = filter === "All" ? works : works.filter((w) => w.cat === filter);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -457,7 +477,8 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
   const isTablet  = viewport === "tablet";
 
   const px = isMobile ? "1.5rem" : isTablet ? "5vw" : "7vw";
-  const featured = WORKS.slice(0, 8);
+  const allWorks = useWorks();
+  const featured = allWorks.slice(0, 8);
 
   return (
     <div
@@ -574,7 +595,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
             style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", borderBottom: "1px solid #0a0a0a", paddingBottom: "2px" }}
             onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.45"; }}
             onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}>
-            All projects ({WORKS.length})
+            All projects ({allWorks.length})
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         </div>

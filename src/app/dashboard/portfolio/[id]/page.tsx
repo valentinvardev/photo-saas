@@ -125,7 +125,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
             Preview
           </button>
           <Link
-            href={`/editor/minimal-bw`}
+            href={`/editor/${id}`}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors font-sans text-xs font-medium"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>

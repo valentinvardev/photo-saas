@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
-import { useEditorStore } from "~/lib/editor/store";
+import { useEffect, useRef } from "react";
+import { useEditorStore, type PortfolioDesign } from "~/lib/editor/store";
 import { loadState } from "~/lib/editor/localStorage";
 import { EditorThemeProvider, THEME_VARS, useEditorTheme } from "~/lib/editor/editorTheme";
+import { api } from "~/trpc/react";
 import { TopBar } from "./TopBar";
 import { Canvas } from "./Canvas";
 import { Sidebar } from "./Sidebar";
@@ -13,26 +14,67 @@ import type { TemplateId } from "~/lib/editor/templates/registry";
 // Side-effect: load all @fontsource CSS
 import "~/lib/editor/fonts";
 
-function EditorShellInner({ templateId }: { templateId?: TemplateId }) {
+interface ShellProps {
+  templateId?:    TemplateId;
+  portfolioId?:   string;
+  initialDesign?: PortfolioDesign;
+  galleryPhotos?: { src: string; title?: string }[];
+}
+
+function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhotos }: ShellProps) {
   const {
     setTemplate, updateNode, setPalette, setTypography, setLogo,
-    palette, typography, selectedSection, hoveredSection,
-    hiddenSections,
+    hydrateDesign, setGalleryPhotos, setReadOnly,
+    palette, typography, selectedSection, hoveredSection, hiddenSections,
+    nodes, logo,
   } = useEditorStore();
 
   const { theme } = useEditorTheme();
+  const saveDesign = api.portfolio.saveDesign.useMutation();
 
+  const hydrated  = useRef(false);
+  const lastSaved = useRef<string | null>(null);
+
+  /* ── DB-backed editor (tied to a portfolio) ── */
   useEffect(() => {
+    if (!portfolioId) return;
+    setReadOnly(false);
+    hydrateDesign(initialDesign ?? { templateId: "minimal-bw" });
+    setGalleryPhotos(galleryPhotos ?? []);
+    lastSaved.current = JSON.stringify(initialDesign ?? {});
+    hydrated.current = true;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [portfolioId]);
+
+  /* Debounced autosave of the design to the DB. */
+  useEffect(() => {
+    if (!portfolioId || !hydrated.current) return;
+    const design: PortfolioDesign = {
+      templateId: useEditorStore.getState().templateId,
+      nodes, palette, typography, logo, hiddenSections,
+    };
+    const json = JSON.stringify(design);
+    if (json === lastSaved.current) return;
+    const t = setTimeout(() => {
+      saveDesign.mutate({ id: portfolioId, editorState: design });
+      lastSaved.current = json;
+    }, 1000);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodes, palette, typography, logo, hiddenSections, portfolioId]);
+
+  /* ── Legacy localStorage editor (/editor/minimal-bw) ── */
+  useEffect(() => {
+    if (portfolioId) return;          // DB path handles its own load
     if (templateId) setTemplate(templateId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId]);
 
   useEffect(() => {
+    if (portfolioId) return;
     const saved = loadState();
     if (!saved) return;
-    for (const [id, node] of Object.entries(saved.nodes)) {
-      updateNode(id, node);
-    }
+    for (const [id, node] of Object.entries(saved.nodes)) updateNode(id, node);
     setPalette(saved.palette);
     if (saved.typography) setTypography(saved.typography);
     if (saved.logo) setLogo(saved.logo);
@@ -47,7 +89,7 @@ function EditorShellInner({ templateId }: { templateId?: TemplateId }) {
         ...THEME_VARS[theme],
       }}
     >
-      <TopBar />
+      <TopBar portfolioId={portfolioId} saving={saveDesign.isPending} />
 
       <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
         <Sidebar />
@@ -85,10 +127,10 @@ function EditorShellInner({ templateId }: { templateId?: TemplateId }) {
   );
 }
 
-export function EditorShell({ templateId }: { templateId?: TemplateId } = {}) {
+export function EditorShell(props: ShellProps = {}) {
   return (
     <EditorThemeProvider>
-      <EditorShellInner templateId={templateId} />
+      <EditorShellInner {...props} />
     </EditorThemeProvider>
   );
 }

@@ -6,8 +6,23 @@ import type { EditorNode, EditorState, ColorPalette, Typography, Viewport, LogoS
 import { DEFAULT_PALETTE, DEFAULT_TYPOGRAPHY, DEFAULT_LOGO } from "./types";
 import { TEMPLATES, DEFAULT_TEMPLATE_ID, type TemplateId } from "./templates/registry";
 
+/** Serializable design saved per-portfolio (Portfolio.editorState). */
+export interface PortfolioDesign {
+  templateId?:     TemplateId;
+  nodes?:          Record<string, EditorNode>;
+  palette?:        ColorPalette;
+  typography?:     Typography;
+  logo?:           LogoSettings;
+  hiddenSections?: string[];
+}
+
 interface EditorStore extends EditorState {
   templateId:         TemplateId;
+  readOnly:           boolean;
+  galleryPhotos:      { src: string; title?: string }[];
+  setReadOnly:        (v: boolean) => void;
+  setGalleryPhotos:   (p: { src: string; title?: string }[]) => void;
+  hydrateDesign:      (design: PortfolioDesign) => void;
   setTemplate:        (id: TemplateId) => void;
   selectNode:         (id: string | null) => void;
   setEditing:         (id: string | null) => void;
@@ -27,6 +42,8 @@ export const useEditorStore = create<EditorStore>()(
   temporal(
     (set) => ({
       templateId:      DEFAULT_TEMPLATE_ID,
+      readOnly:        false,
+      galleryPhotos:   [],
       nodes:           TEMPLATES[DEFAULT_TEMPLATE_ID]!.initialNodes,
       palette:         DEFAULT_PALETTE,
       typography:      DEFAULT_TYPOGRAPHY,
@@ -37,6 +54,26 @@ export const useEditorStore = create<EditorStore>()(
       selectedSection: null,
       hoveredSection:  null,
       hiddenSections:  [],
+
+      setReadOnly: (v) => set({ readOnly: v }),
+      setGalleryPhotos: (p) => set({ galleryPhotos: p }),
+
+      /** Load a saved design into the store (used by the editor + public render). */
+      hydrateDesign: (d) => set((s) => {
+        const templateId = d.templateId && TEMPLATES[d.templateId] ? d.templateId : s.templateId;
+        return {
+          templateId,
+          nodes:           d.nodes ?? TEMPLATES[templateId]!.initialNodes,
+          palette:         d.palette ?? DEFAULT_PALETTE,
+          typography:      d.typography ?? DEFAULT_TYPOGRAPHY,
+          logo:            d.logo ?? DEFAULT_LOGO,
+          hiddenSections:  d.hiddenSections ?? [],
+          selectedId:      null,
+          editingId:       null,
+          selectedSection: null,
+          hoveredSection:  null,
+        };
+      }),
 
       setTemplate: (id) => set({
         templateId:      id,

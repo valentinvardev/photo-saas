@@ -16,12 +16,29 @@ export const portfolioRouter = createTRPCRouter({
           slug: true,
           template: true,
           content: true,
+          editorState: true,
           updatedAt: true,
           user: { select: { name: true, avatarUrl: true } },
         },
       });
       if (!portfolio) throw new TRPCError({ code: "NOT_FOUND" });
       return portfolio;
+    }),
+
+  /** Save the visual website-builder design for a portfolio. */
+  saveDesign: protectedProcedure
+    .input(z.object({ id: z.string(), editorState: z.unknown() }))
+    .mutation(async ({ ctx, input }) => {
+      const existing = await ctx.db.portfolio.findFirst({
+        where: { id: input.id, userId: ctx.userId },
+        select: { id: true },
+      });
+      if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
+      await ctx.db.portfolio.update({
+        where: { id: input.id },
+        data:  { editorState: (input.editorState ?? null) as object },
+      });
+      return { ok: true };
     }),
 
   /** List all portfolios for the current user. */

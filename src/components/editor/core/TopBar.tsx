@@ -83,8 +83,9 @@ const VIEWPORT_LABELS: Record<Viewport, string> = {
   mobile:  "Mobile (375px)",
 };
 
-export function TopBar() {
+export function TopBar({ portfolioId, saving }: { portfolioId?: string; saving?: boolean } = {}) {
   const { nodes, palette, typography, logo, reset, viewport, setViewport } = useEditorStore();
+  const exitTo = portfolioId ? `/dashboard/portfolio/${portfolioId}` : "/dashboard/templates";
   const { undo, redo, pastStates, futureStates } = useStore(useEditorStore.temporal);
   const { theme, toggle } = useEditorTheme();
   const router = useRouter();
@@ -95,17 +96,18 @@ export function TopBar() {
   const hasChanges = pastStates.length > 0;
 
   function handleBack() {
-    if (hasChanges) setShowExitModal(true);
-    else router.push("/dashboard/templates");
+    // With a portfolioId the design autosaves, so leaving is always safe.
+    if (hasChanges && !portfolioId) setShowExitModal(true);
+    else router.push(exitTo);
   }
 
   function handleSaveAndExit() {
     saveState({ nodes, palette, typography, logo });
-    router.push("/dashboard/templates");
+    router.push(exitTo);
   }
 
   function handleDiscard() {
-    router.push("/dashboard/templates");
+    router.push(exitTo);
   }
 
   const divider = <div style={{ width: 1, height: 18, background: "var(--ec-border)", margin: "0 2px" }} />;
@@ -223,13 +225,20 @@ export function TopBar() {
         Preview
       </a>
 
-      {/* Save */}
-      <button
-        onClick={() => saveState({ nodes, palette, typography, logo })}
-        style={{ background: "#facc15", border: "none", cursor: "pointer", color: "#111", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}
-      >
-        <SaveIcon /> Save
-      </button>
+      {/* Save — DB autosave indicator when tied to a portfolio, else manual localStorage save */}
+      {portfolioId ? (
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--ec-fg-muted, #888)", padding: "4px 8px" }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: saving ? "#facc15" : "#22c55e" }} />
+          {saving ? "Saving…" : "Saved"}
+        </span>
+      ) : (
+        <button
+          onClick={() => saveState({ nodes, palette, typography, logo })}
+          style={{ background: "#facc15", border: "none", cursor: "pointer", color: "#111", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}
+        >
+          <SaveIcon /> Save
+        </button>
+      )}
     </header>
 
       {/* Exit confirmation modal */}
