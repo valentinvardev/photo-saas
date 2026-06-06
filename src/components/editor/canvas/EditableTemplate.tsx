@@ -147,8 +147,9 @@ function useWorks(): Work[] {
 /* ═══════════════════════════════════════════
    PHOTO CELL
 ═══════════════════════════════════════════ */
-function Cell({ w, onClick }: { w: Work; onClick?: () => void }) {
+function Cell({ w, onClick }: { w?: Work; onClick?: () => void }) {
   const [hov, setHov] = useState(false);
+  if (!w) return <div style={{ width: "100%", height: "100%", background: "#111" }} />;
   return (
     <div
       style={{ position: "relative", overflow: "hidden", cursor: "pointer", width: "100%", height: "100%", background: "#111" }}
@@ -563,25 +564,25 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       <section id="work" style={{ padding: `5rem ${px}` }}>
         <Label index="01" text="Selected Work" />
 
-        {!isMobile && (
-          <div style={{ display: "grid", gridTemplateColumns: isTablet ? "1fr 1fr" : "2fr 1fr 1fr", gridTemplateRows: isTablet ? "240px 240px 240px 240px" : "280px 280px 360px 320px", gap: "3px" }}>
-            {isTablet ? (
-              featured.map((w) => <div key={w.id}><Cell w={w} onClick={() => setGalleryOpen(true)} /></div>)
-            ) : (
-              <>
-                <div style={{ gridRow: "1/3", gridColumn: "1" }}>   <Cell w={featured[0]!} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "1",   gridColumn: "2" }}>   <Cell w={featured[1]!} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "1",   gridColumn: "3" }}>   <Cell w={featured[2]!} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "2",   gridColumn: "2" }}>   <Cell w={featured[3]!} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "2",   gridColumn: "3" }}>   <Cell w={featured[4]!} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "3",   gridColumn: "1/3" }}> <Cell w={featured[5]!} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "3",   gridColumn: "3" }}>   <Cell w={featured[6]!} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "4",   gridColumn: "1" }}>   <Cell w={featured[7]!} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "4",   gridColumn: "2/4" }}> <Cell w={featured[0]!} onClick={() => setGalleryOpen(true)} /></div>
-              </>
-            )}
+        {!isMobile && (!isTablet && featured.length >= 8 ? (
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "280px 280px 360px 320px", gap: "3px" }}>
+            <div style={{ gridRow: "1/3", gridColumn: "1" }}>   <Cell w={featured[0]} onClick={() => setGalleryOpen(true)} /></div>
+            <div style={{ gridRow: "1",   gridColumn: "2" }}>   <Cell w={featured[1]} onClick={() => setGalleryOpen(true)} /></div>
+            <div style={{ gridRow: "1",   gridColumn: "3" }}>   <Cell w={featured[2]} onClick={() => setGalleryOpen(true)} /></div>
+            <div style={{ gridRow: "2",   gridColumn: "2" }}>   <Cell w={featured[3]} onClick={() => setGalleryOpen(true)} /></div>
+            <div style={{ gridRow: "2",   gridColumn: "3" }}>   <Cell w={featured[4]} onClick={() => setGalleryOpen(true)} /></div>
+            <div style={{ gridRow: "3",   gridColumn: "1/3" }}> <Cell w={featured[5]} onClick={() => setGalleryOpen(true)} /></div>
+            <div style={{ gridRow: "3",   gridColumn: "3" }}>   <Cell w={featured[6]} onClick={() => setGalleryOpen(true)} /></div>
+            <div style={{ gridRow: "4",   gridColumn: "1" }}>   <Cell w={featured[7]} onClick={() => setGalleryOpen(true)} /></div>
+            <div style={{ gridRow: "4",   gridColumn: "2/4" }}> <Cell w={featured[0]} onClick={() => setGalleryOpen(true)} /></div>
           </div>
-        )}
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: isTablet ? "1fr 1fr" : "1fr 1fr 1fr", gap: "3px" }}>
+            {featured.map((w) => (
+              <div key={w.id} style={{ aspectRatio: "4/5" }}><Cell w={w} onClick={() => setGalleryOpen(true)} /></div>
+            ))}
+          </div>
+        ))}
         {isMobile && (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px" }}>
             {featured.map((w) => (
