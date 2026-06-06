@@ -172,14 +172,19 @@ export default function RegisterPage() {
       setSubmitting(false);
       return;
     }
-    // If email confirmation is on, there's no active session yet.
-    if (data.session) {
-      router.push("/dashboard");
-      router.refresh();
-    } else {
-      setCheckEmail(true);
-      setSubmitting(false);
+    // Users are auto-confirmed at the DB level (see migration 003), so when
+    // signUp doesn't return a session we can sign in immediately.
+    if (!data.session) {
+      const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInErr) {
+        // Fallback: confirmation really is required (trigger removed for prod).
+        setCheckEmail(true);
+        setSubmitting(false);
+        return;
+      }
     }
+    router.push("/dashboard");
+    router.refresh();
   }
 
   async function handleGoogle() {
