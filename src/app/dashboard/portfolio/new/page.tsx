@@ -1,26 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { LivePreviewThumbnail, DevicePreviewModal } from "~/components/dashboard/DevicePreviewModal";
 import { TEMPLATE_URL, TEMPLATES } from "~/lib/portfolio/mock";
+import { useUploadPhotos } from "~/lib/photo/upload";
 import { api } from "~/trpc/react";
 
 const STEPS = ["Name & Photos", "Structure", "Template", "Domain", "Done"] as const;
 
-/* ── Mock data ───────────────────────────────────────────────── */
-const MOCK_FOLDERS = [
-  { id: "f1", name: "Weddings",   seeds: ["w1","w2","w3","w4","w5","w6"] },
-  { id: "f2", name: "Portraits",  seeds: ["p1","p2","p3","p4"] },
-  { id: "f3", name: "Landscapes", seeds: ["l1","l2","l3","l4","l5"] },
-  { id: "f4", name: "Commercial", seeds: ["c1","c2","c3"] },
-];
-const STANDALONE = [
-  { id: "s1", seed: "sp1" },{ id: "s2", seed: "sp2" },
-  { id: "s3", seed: "sp3" },{ id: "s4", seed: "sp4" },
-  { id: "s5", seed: "sp5" },{ id: "s6", seed: "sp6" },
-];
+type LibPhoto = { id: string; url: string; filename: string };
+
+/** Build a portfolio content tree from the photos picked at creation time —
+ *  one default category holding them, so they show up in the editor + public site. */
+function buildContent(photos: LibPhoto[], categoryName: string) {
+  const catId = "cat-" + Date.now();
+  const photoMap: Record<string, { id: string; src: string; title?: string; visibility: string }> = {};
+  const directPhotoIds: string[] = [];
+  for (const p of photos) {
+    const pid = "ph-" + p.id;
+    photoMap[pid] = { id: pid, src: p.url, title: p.filename, visibility: "public" };
+    directPhotoIds.push(pid);
+  }
+  return {
+    categoryIds: [catId],
+    categories: { [catId]: { id: catId, name: categoryName || "Gallery", slug: "gallery", folderIds: [], directPhotoIds, visibility: "public" } },
+    folders: {},
+    photos: photoMap,
+  };
+}
 
 /* ── Step dots ───────────────────────────────────────────────── */
 function StepDots({ current, total }: { current: number; total: number }) {
@@ -35,133 +44,87 @@ function StepDots({ current, total }: { current: number; total: number }) {
   );
 }
 
-/* ── Photo + folder picker grid ──────────────────────────────── */
+/* ── Real photo picker grid (from the user's library) ────────── */
 function PickerGrid({
-  selectedFolders, selectedPhotos,
-  onToggleFolder, onTogglePhoto,
+  library, isLoading, selectedPhotos, onTogglePhoto, onUploadClick, uploading, progress,
 }: {
-  selectedFolders: Set<string>; selectedPhotos: Set<string>;
-  onToggleFolder: (id: string) => void; onTogglePhoto: (id: string) => void;
+  library: LibPhoto[]; isLoading: boolean; selectedPhotos: Set<string>;
+  onTogglePhoto: (id: string) => void; onUploadClick: () => void;
+  uploading: boolean; progress: { done: number; total: number };
 }) {
-  const totalSelected = selectedFolders.size + selectedPhotos.size;
-
   return (
     <div>
-      {/* All tiles same size — no col-span mixing */}
-      <div className="grid grid-cols-4 gap-[3px]">
-
-        {MOCK_FOLDERS.map((folder) => {
-          const on = selectedFolders.has(folder.id);
-          return (
-            <button
-              key={folder.id}
-              onClick={() => onToggleFolder(folder.id)}
-              className={`relative aspect-[4/3] overflow-hidden transition-all ${
-                on ? "ring-2 ring-yellow ring-inset" : "hover:opacity-90"
-              }`}
-            >
-              {/* 2×2 photo collage */}
-              <div className="absolute inset-0 grid grid-cols-2 gap-[1px]">
-                {folder.seeds.slice(0, 4).map((seed, i) => (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img key={i} src={`https://picsum.photos/seed/${seed}/120/90?grayscale`} alt="" className="w-full h-full object-cover" draggable={false} />
-                ))}
-              </div>
-              {/* Folder name overlay */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-1 flex items-center gap-1">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-                <span className="font-sans text-[9px] font-semibold text-white truncate">{folder.name}</span>
-                <span className="font-mono text-[8px] text-white/50 ml-auto shrink-0">{folder.seeds.length}</span>
-              </div>
-              {on && (
-                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-yellow flex items-center justify-center">
-                  <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="4" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-              )}
-            </button>
-          );
-        })}
-
-        {STANDALONE.map((ph) => {
-          const on = selectedPhotos.has(ph.id);
-          return (
-            <button
-              key={ph.id}
-              onClick={() => onTogglePhoto(ph.id)}
-              className={`relative aspect-[4/3] overflow-hidden transition-all ${
-                on ? "ring-2 ring-yellow ring-inset" : "hover:opacity-90"
-              }`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`https://picsum.photos/seed/${ph.seed}/300/225?grayscale`} alt="" className="w-full h-full object-cover" draggable={false} />
-              {on && (
-                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-yellow flex items-center justify-center">
-                  <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="4" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-              )}
-            </button>
-          );
-        })}
-
+      <div className="flex items-center justify-between mb-2">
+        <p className="font-mono text-[10px] text-[var(--fg-muted)]">
+          {selectedPhotos.size > 0 ? `${selectedPhotos.size} selected` : "Tap photos to include them"}
+        </p>
+        <button onClick={onUploadClick} disabled={uploading}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow text-[#111] font-sans text-[11px] font-bold hover:bg-yellow/90 disabled:opacity-50 transition-colors">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          {uploading ? `${progress.done}/${progress.total}…` : "Upload"}
+        </button>
       </div>
 
-      <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-2">
-        {totalSelected > 0
-          ? `${selectedFolders.size > 0 ? `${selectedFolders.size} folder${selectedFolders.size !== 1 ? "s" : ""}` : ""}${selectedFolders.size > 0 && selectedPhotos.size > 0 ? " + " : ""}${selectedPhotos.size > 0 ? `${selectedPhotos.size} photo${selectedPhotos.size !== 1 ? "s" : ""}` : ""} selected`
-          : "Select folders or individual photos — you can add more later"}
-      </p>
+      {isLoading ? (
+        <div className="grid grid-cols-4 gap-[3px]">
+          {Array.from({ length: 8 }).map((_, i) => <div key={i} className="aspect-[4/3] bg-[var(--bg-subtle)] animate-pulse rounded" />)}
+        </div>
+      ) : library.length === 0 ? (
+        <div className="py-10 text-center border border-dashed border-[var(--border)] rounded-xl">
+          <p className="font-sans text-sm font-medium text-[var(--fg)]">Your library is empty</p>
+          <p className="font-sans text-xs text-[var(--fg-muted)] mt-1 mb-3">Upload photos to include them now, or add them later in the editor.</p>
+          <button onClick={onUploadClick} disabled={uploading}
+            className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-50 transition-colors">
+            {uploading ? `Uploading ${progress.done}/${progress.total}…` : "Upload photos"}
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-4 gap-[3px]">
+          {library.map((ph) => {
+            const on = selectedPhotos.has(ph.id);
+            return (
+              <button key={ph.id} onClick={() => onTogglePhoto(ph.id)}
+                className={`relative aspect-[4/3] overflow-hidden rounded transition-all ${on ? "ring-2 ring-yellow ring-inset" : "hover:opacity-90"}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={ph.url} alt={ph.filename} className="w-full h-full object-cover" draggable={false} />
+                {on && (
+                  <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-yellow flex items-center justify-center">
+                    <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="4" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
 
 /* ── Confirm structure panel ─────────────────────────────────── */
-function StructurePreview({
-  selectedFolders, selectedPhotos,
-}: {
-  selectedFolders: Set<string>; selectedPhotos: Set<string>;
-}) {
-  const folders = MOCK_FOLDERS.filter((f) => selectedFolders.has(f.id));
-  const photos  = STANDALONE.filter((p) => selectedPhotos.has(p.id));
-
+function StructurePreview({ photos }: { photos: LibPhoto[] }) {
+  if (photos.length === 0) {
+    return (
+      <div className="py-8 text-center">
+        <p className="font-sans text-sm text-[var(--fg-muted)]">No photos selected — you can add them in the editor after creating.</p>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-4 overflow-y-auto max-h-[60vh]">
-      {folders.map((folder) => (
-        <div key={folder.id} className="border border-[var(--border)] rounded-lg overflow-hidden">
-          <div className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-subtle)] border-b border-[var(--border)]">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-            <span className="font-sans text-xs font-semibold text-[var(--fg)]">{folder.name}</span>
-            <span className="font-mono text-[9px] text-[var(--fg-muted)] ml-auto">{folder.seeds.length} photos</span>
-          </div>
-          <div className="grid grid-cols-6 gap-px bg-[var(--border)] p-px">
-            {folder.seeds.map((seed) => (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img key={seed} src={`https://picsum.photos/seed/${seed}/80/80?grayscale`} alt="" className="w-full aspect-square object-cover" />
-            ))}
-          </div>
+      <div className="border border-[var(--border)] rounded-lg overflow-hidden">
+        <div className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-subtle)] border-b border-[var(--border)]">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span className="font-sans text-xs font-semibold text-[var(--fg)]">Gallery</span>
+          <span className="font-mono text-[9px] text-[var(--fg-muted)] ml-auto">{photos.length} photo{photos.length !== 1 ? "s" : ""}</span>
         </div>
-      ))}
-
-      {photos.length > 0 && (
-        <div className="border border-[var(--border)] rounded-lg overflow-hidden">
-          <div className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-subtle)] border-b border-[var(--border)]">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span className="font-sans text-xs font-semibold text-[var(--fg)]">Unsorted photos</span>
-            <span className="font-mono text-[9px] text-[var(--fg-muted)] ml-auto">{photos.length} photos</span>
-          </div>
-          <div className="grid grid-cols-6 gap-px bg-[var(--border)] p-px">
-            {photos.map((ph) => (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img key={ph.id} src={`https://picsum.photos/seed/${ph.seed}/80/80?grayscale`} alt="" className="w-full aspect-square object-cover" />
-            ))}
-          </div>
+        <div className="grid grid-cols-6 gap-px bg-[var(--border)] p-px">
+          {photos.map((ph) => (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img key={ph.id} src={ph.url} alt={ph.filename} className="w-full aspect-square object-cover" />
+          ))}
         </div>
-      )}
-
-      {folders.length === 0 && photos.length === 0 && (
-        <div className="py-8 text-center">
-          <p className="font-sans text-sm text-[var(--fg-muted)]">No content selected — you can add photos in the editor.</p>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -171,7 +134,6 @@ export default function NewPortfolioPage() {
   const router = useRouter();
   const [step,            setStep]            = useState(0);
   const [name,            setName]            = useState("");
-  const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set());
   const [selectedPhotos,  setSelectedPhotos]  = useState<Set<string>>(new Set());
   const [template,        setTemplate]        = useState(TEMPLATES[0]!);
   const [domain,          setDomain]          = useState<"free" | "custom">("free");
@@ -184,13 +146,32 @@ export default function NewPortfolioPage() {
   const utils = api.useUtils();
   const createMut = api.portfolio.create.useMutation();
 
+  /* Real photo library */
+  const { data: libData, isLoading: libLoading } = api.photo.list.useQuery({ limit: 200 });
+  const library: LibPhoto[] = (libData?.items ?? []).map((p) => ({ id: p.id, url: p.url, filename: p.filename }));
+  const { upload, uploading, progress } = useUploadPhotos();
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (files.length === 0) return;
+    try { const made = await upload(files); await utils.photo.list.invalidate();
+      // auto-select freshly uploaded photos
+      setSelectedPhotos((p) => { const n = new Set(p); made.forEach((m) => n.add(m.id)); return n; });
+    } catch { /* hook surfaces error */ }
+  }
+
+  const pickedPhotos = library.filter((p) => selectedPhotos.has(p.id));
+
   /** Persist the portfolio, then advance to the success step. Retries once
    *  with a suffixed slug if the chosen slug is already taken. */
   async function createPortfolio() {
     if (creating) return;
     setCreating(true);
     setCreateError(null);
-    const payload = { title: name.trim(), template };
+    const content = pickedPhotos.length > 0 ? buildContent(pickedPhotos, name.trim()) : undefined;
+    const payload = { title: name.trim(), template, content };
     try {
       let made;
       try {
@@ -217,9 +198,6 @@ export default function NewPortfolioPage() {
   const isDone    = step === 4;
   const previewUrl = TEMPLATE_URL[template];
 
-  function toggleFolder(id: string) {
-    setSelectedFolders((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  }
   function togglePhoto(id: string) {
     setSelectedPhotos((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
   }
@@ -230,7 +208,7 @@ export default function NewPortfolioPage() {
 
   const slug      = name ? name.toLowerCase().replace(/\s+/g, "-") : "your-portfolio";
   const domainStr = domain === "custom" && customDomain ? customDomain : `${slug}.portapic.app`;
-  const totalSel  = selectedFolders.size + selectedPhotos.size;
+  const totalSel  = selectedPhotos.size;
 
   /* Right panel content */
   function rightPanel() {
@@ -238,11 +216,13 @@ export default function NewPortfolioPage() {
       <div className="flex flex-col gap-3">
         <div>
           <h2 className="font-sans font-bold text-[var(--fg)] text-lg">Your gallery</h2>
-          <p className="font-sans text-sm text-[var(--fg-muted)] mt-0.5">Select folders or individual photos to include.</p>
+          <p className="font-sans text-sm text-[var(--fg-muted)] mt-0.5">Pick photos from your library to include — or upload new ones.</p>
         </div>
+        <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={onFiles} />
         <PickerGrid
-          selectedFolders={selectedFolders} selectedPhotos={selectedPhotos}
-          onToggleFolder={toggleFolder} onTogglePhoto={togglePhoto}
+          library={library} isLoading={libLoading}
+          selectedPhotos={selectedPhotos} onTogglePhoto={togglePhoto}
+          onUploadClick={() => fileRef.current?.click()} uploading={uploading} progress={progress}
         />
       </div>
     );
@@ -252,10 +232,10 @@ export default function NewPortfolioPage() {
         <div>
           <h2 className="font-sans font-bold text-[var(--fg)] text-lg">Content overview</h2>
           <p className="font-sans text-sm text-[var(--fg-muted)] mt-0.5">
-            {totalSel > 0 ? "Your portfolio will be organized like this." : "Nothing selected yet — that's fine, add photos later."}
+            {totalSel > 0 ? "These photos will be added to your portfolio." : "Nothing selected yet — that's fine, add photos later."}
           </p>
         </div>
-        <StructurePreview selectedFolders={selectedFolders} selectedPhotos={selectedPhotos} />
+        <StructurePreview photos={pickedPhotos} />
       </div>
     );
 
@@ -382,7 +362,7 @@ export default function NewPortfolioPage() {
               <h1 className="font-sans font-black text-[var(--fg)] text-3xl mb-2">Ready to go!</h1>
               <p className="font-sans text-sm text-[var(--fg-muted)] leading-relaxed max-w-sm mx-auto">
                 <span className="text-[var(--fg)] font-medium">{name}</span> is set up with the {template} template
-                {totalSel > 0 && ` · ${selectedFolders.size > 0 ? `${selectedFolders.size} folder${selectedFolders.size !== 1 ? "s" : ""}` : ""}${selectedFolders.size > 0 && selectedPhotos.size > 0 ? " + " : ""}${selectedPhotos.size > 0 ? `${selectedPhotos.size} photo${selectedPhotos.size !== 1 ? "s" : ""}` : ""}`}.
+                {totalSel > 0 && ` · ${selectedPhotos.size} photo${selectedPhotos.size !== 1 ? "s" : ""}`}.
               </p>
             </motion.div>
 
@@ -425,9 +405,7 @@ export default function NewPortfolioPage() {
                       />
                       {totalSel > 0 && (
                         <p className="font-mono text-[10px] text-yellow">
-                          {selectedFolders.size > 0 && `${selectedFolders.size} folder${selectedFolders.size !== 1 ? "s" : ""}`}
-                          {selectedFolders.size > 0 && selectedPhotos.size > 0 && " + "}
-                          {selectedPhotos.size > 0 && `${selectedPhotos.size} photo${selectedPhotos.size !== 1 ? "s" : ""}`} selected →
+                          {selectedPhotos.size} photo{selectedPhotos.size !== 1 ? "s" : ""} selected →
                         </p>
                       )}
                     </div>
@@ -440,27 +418,11 @@ export default function NewPortfolioPage() {
                         Review how your portfolio will be organized. You can rename folders and reorganize anytime in the editor.
                       </p>
                       <div className="rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] px-4 py-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                        <div className="flex items-center gap-2">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                           <span className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest">
-                            {selectedFolders.size} folder{selectedFolders.size !== 1 ? "s" : ""} · {selectedPhotos.size} unsorted photo{selectedPhotos.size !== 1 ? "s" : ""}
+                            {selectedPhotos.size} photo{selectedPhotos.size !== 1 ? "s" : ""} selected
                           </span>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          {MOCK_FOLDERS.filter((f) => selectedFolders.has(f.id)).map((f) => (
-                            <div key={f.id} className="flex items-center gap-2 text-[var(--fg)] font-sans text-xs py-0.5">
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-                              {f.name}
-                              <span className="text-[var(--fg-muted)] ml-auto">{f.seeds.length} photos</span>
-                            </div>
-                          ))}
-                          {selectedPhotos.size > 0 && (
-                            <div className="flex items-center gap-2 text-[var(--fg-muted)] font-sans text-xs py-0.5">
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                              Unsorted
-                              <span className="ml-auto">{selectedPhotos.size} photos</span>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
