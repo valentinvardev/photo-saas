@@ -51,6 +51,28 @@ function ensureContent(byPortfolio: Record<string, PortfolioContent>, portfolioI
   return byPortfolio[portfolioId] ?? emptyContent();
 }
 
+/* Unique id generator. Date.now() alone collides when several ids are created
+   in the same millisecond (e.g. adding multiple photos in a loop), which used
+   to overwrite photos and duplicate ids in photoIds. The seq + random suffix
+   guarantees uniqueness within a session. */
+let _idSeq = 0;
+function uid(prefix: string): string {
+  _idSeq = (_idSeq + 1) % 1_000_000;
+  return `${prefix}-${Date.now().toString(36)}${_idSeq.toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+}
+
+/* De-duplicate photo id lists — repairs content corrupted by the old id
+   collisions so existing folders stop showing duplicate tiles. */
+function dedupeContent(c: PortfolioContent): PortfolioContent {
+  const folders = Object.fromEntries(
+    Object.entries(c.folders).map(([fid, f]) => [fid, { ...f, photoIds: [...new Set(f.photoIds)] }]),
+  );
+  const categories = Object.fromEntries(
+    Object.entries(c.categories).map(([cid, cat]) => [cid, { ...cat, directPhotoIds: [...new Set(cat.directPhotoIds)] }]),
+  );
+  return { ...c, folders, categories };
+}
+
 /* ─── Store ──────────────────────────────────────────────────── */
 
 export const usePortfolioContentStore = create<PortfolioContentStore>()(
@@ -69,7 +91,7 @@ export const usePortfolioContentStore = create<PortfolioContentStore>()(
 
       /* ── Categories ── */
       addCategory: (portfolioId, name) => {
-        const id = `cat-${Date.now()}`;
+        const id = uid("cat");
         set((s) => {
           const c = ensureContent(s.byPortfolio, portfolioId);
           const cat: Category = {
@@ -144,7 +166,7 @@ export const usePortfolioContentStore = create<PortfolioContentStore>()(
 
       /* ── Folders ── */
       addFolder: (portfolioId, categoryId, title) => {
-        const id = `fol-${Date.now()}`;
+        const id = uid("fol");
         set((s) => {
           const c = ensureContent(s.byPortfolio, portfolioId);
           const cat = c.categories[categoryId]; if (!cat) return s;
@@ -201,7 +223,7 @@ export const usePortfolioContentStore = create<PortfolioContentStore>()(
 
       /* ── Photos ── */
       addPhoto: (portfolioId, parent, src, title) => {
-        const id = `ph-${Date.now()}`;
+        const id = uid("ph");
         set((s) => {
           const c = ensureContent(s.byPortfolio, portfolioId);
           const photo: Photo = { id, src, title, visibility: "public" };
@@ -307,7 +329,18 @@ export const usePortfolioContentStore = create<PortfolioContentStore>()(
     }),
     {
       name:    "frame-portfolio-content",
-      version: 1,
+      version: 2,
+      /* v2: repair duplicate photo ids left behind by the old Date.now() id
+         collisions, so existing folders stop rendering duplicate tiles. */
+      migrate: (persisted) => {
+        const state = persisted as { byPortfolio?: Record<string, PortfolioContent> } | undefined;
+        if (state?.byPortfolio) {
+          state.byPortfolio = Object.fromEntries(
+            Object.entries(state.byPortfolio).map(([pid, c]) => [pid, dedupeContent(c)]),
+          );
+        }
+        return state as never;
+      },
       onRehydrateStorage: () => (state) => { state?.setHydrated(); },
     },
   ),
