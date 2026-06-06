@@ -338,7 +338,14 @@ export function ContentTree({ portfolioId }: { portfolioId: string }) {
         <div className="rounded-xl border border-dashed border-[var(--border)] p-12 text-center text-[var(--fg-muted)]">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mx-auto mb-3 opacity-40" strokeLinecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
           <p className="font-sans text-sm font-semibold text-[var(--fg)] mb-1">No folders yet</p>
-          <p className="font-sans text-xs">Click "New folder" to create your first one.</p>
+          <p className="font-sans text-xs mb-4">Create your first one to start organizing photos.</p>
+          <button
+            onClick={addFolder}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-semibold hover:bg-yellow-dark transition-colors"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New folder
+          </button>
         </div>
       ) : (
         <div className="space-y-3">
