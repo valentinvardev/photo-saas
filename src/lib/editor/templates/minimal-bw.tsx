@@ -13,6 +13,11 @@ function FooterIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" f
 
 export const MINIMAL_BW_NODES: Record<string, EditorNode> = {
   "nav-logo":         { id: "nav-logo",         type: "logo",      content: "J·H" },
+  "nav-item-1":       { id: "nav-item-1",       type: "paragraph", content: "Work" },
+  "nav-item-2":       { id: "nav-item-2",       type: "paragraph", content: "About" },
+  "nav-item-3":       { id: "nav-item-3",       type: "paragraph", content: "Press" },
+  "nav-item-4":       { id: "nav-item-4",       type: "paragraph", content: "Contact" },
+  "nav-cta":          { id: "nav-cta",          type: "paragraph", content: "Hire me" },
 
   "hero-heading":     { id: "hero-heading",     type: "heading",   content: "James<br/><em>Hollis</em>" },
   "hero-sub":         { id: "hero-sub",         type: "paragraph", content: "Documenting the quiet tension between presence and absence. Work exhibited across North America and Europe." },
@@ -54,7 +59,14 @@ export const MINIMAL_BW_NODES: Record<string, EditorNode> = {
 
 export const MINIMAL_BW_SECTIONS: SectionDef[] = [
   { id: "section-nav", label: "Navigation", icon: <NavIcon />, locked: true,
-    elements: [{ nodeId: "nav-logo", label: "Logo", type: "text" }] },
+    elements: [
+      { nodeId: "nav-logo",   label: "Logo",        type: "text" },
+      { nodeId: "nav-item-1", label: "Link 1",      type: "text" },
+      { nodeId: "nav-item-2", label: "Link 2",      type: "text" },
+      { nodeId: "nav-item-3", label: "Link 3",      type: "text" },
+      { nodeId: "nav-item-4", label: "Link 4",      type: "text" },
+      { nodeId: "nav-cta",    label: "Button",      type: "text" },
+    ] },
   { id: "section-hero", label: "Hero", icon: <HeroIcon />, locked: false,
     elements: [
       { nodeId: "hero-heading",  label: "Heading",       type: "text"  },

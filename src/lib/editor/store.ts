@@ -61,9 +61,13 @@ export const useEditorStore = create<EditorStore>()(
       /** Load a saved design into the store (used by the editor + public render). */
       hydrateDesign: (d) => set((s) => {
         const templateId = d.templateId && TEMPLATES[d.templateId] ? d.templateId : s.templateId;
+        const base = TEMPLATES[templateId]!.initialNodes;
         return {
           templateId,
-          nodes:           d.nodes ?? TEMPLATES[templateId]!.initialNodes,
+          // Merge saved node edits over the template defaults so designs saved
+          // before new nodes existed (e.g. nav links / CTA) still get defaults
+          // instead of rendering empty.
+          nodes:           d.nodes ? { ...base, ...d.nodes } : base,
           palette:         d.palette ?? DEFAULT_PALETTE,
           typography:      d.typography ?? DEFAULT_TYPOGRAPHY,
           logo:            d.logo ?? DEFAULT_LOGO,

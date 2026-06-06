@@ -330,9 +330,20 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
 ═══════════════════════════════════════════ */
 function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { logo } = useEditorStore();
+  const { logo, readOnly } = useEditorStore();
   const mono = { fontFamily: "var(--tpl-mono,monospace)" } as const;
   const sans = { fontFamily: "var(--tpl-sans,sans-serif)" } as const;
+
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  /* Editable nav links + CTA. The label text is editable via EditableText;
+     the action only fires on the live site (readOnly) — in the editor a click
+     selects the node so it can be edited instead of navigating. */
+  const navItems = [
+    { id: "nav-item-1", fn: onOpenGallery },
+    { id: "nav-item-2", fn: () => scrollTo("about") },
+    { id: "nav-item-3", fn: () => scrollTo("press") },
+    { id: "nav-item-4", fn: () => scrollTo("contact") },
+  ];
 
   // Renders the logo based on Settings mode
   function LogoMark({ dark = false }: { dark?: boolean }) {
@@ -403,21 +414,19 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
               </button>
             </div>
             <nav style={{ flex: 1, padding: "2rem 1.5rem", display: "flex", flexDirection: "column" }}>
-              {[
-                { label: "Work",    action: () => { setMenuOpen(false); onOpenGallery(); } },
-                { label: "About",   action: () => { setMenuOpen(false); document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }); } },
-                { label: "Press",   action: () => { setMenuOpen(false); document.getElementById("press")?.scrollIntoView({ behavior: "smooth" }); } },
-                { label: "Contact", action: () => { setMenuOpen(false); document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); } },
-              ].map((item, i) => (
-                <button key={item.label} onClick={item.action}
+              {navItems.map((item, i) => (
+                <button key={item.id} onClick={() => { if (readOnly) { setMenuOpen(false); item.fn(); } }}
                   style={{ ...sans, textAlign: "left", background: "none", border: "none", borderBottom: "1px solid #f0f0f0", padding: "1.25rem 0", fontSize: "22px", fontWeight: 300, color: "var(--ed-fg, #0a0a0a)", cursor: "pointer",
                     fontFamily: i === 0 ? "var(--tpl-serif,serif)" : "var(--tpl-sans,sans-serif)", fontStyle: i === 0 ? "italic" : "normal" }}>
-                  {item.label}
+                  <EditableNode id={item.id} tag="span"><EditableText id={item.id} /></EditableNode>
                 </button>
               ))}
             </nav>
             <div style={{ padding: "1.5rem", borderTop: "1px solid #e8e8e8" }}>
-              <button style={{ ...sans, width: "100%", padding: "13px", background: "var(--ed-fg, #0a0a0a)", color: "var(--ed-bg, #fafafa)", border: "none", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>Hire me</button>
+              <button onClick={() => { if (readOnly) { setMenuOpen(false); scrollTo("contact"); } }}
+                style={{ ...sans, width: "100%", padding: "13px", background: "var(--ed-fg, #0a0a0a)", color: "var(--ed-bg, #fafafa)", border: "none", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
+                <EditableNode id="nav-cta" tag="span"><EditableText id="nav-cta" /></EditableNode>
+              </button>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "1rem" }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />
                 <span style={{ ...mono, fontSize: "9px", color: "#888", letterSpacing: "0.12em" }}>Available for commissions — Q4 2025</span>
@@ -433,23 +442,19 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
     <nav id="section-nav" style={navBase}>
       <LogoMark />
       <div style={{ display: "flex", gap: "2.5rem", alignItems: "center", marginLeft: "auto" }}>
-        {[
-          { label: "Work",    fn: onOpenGallery },
-          { label: "About",   fn: () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }) },
-          { label: "Press",   fn: () => document.getElementById("press")?.scrollIntoView({ behavior: "smooth" }) },
-          { label: "Contact", fn: () => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }) },
-        ].map((item) => (
-          <button key={item.label} onClick={item.fn}
+        {navItems.map((item) => (
+          <button key={item.id} onClick={() => { if (readOnly) item.fn(); }}
             style={{ ...sans, background: "none", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 400, letterSpacing: "0.06em", color: "var(--ed-fg, #0a0a0a)", opacity: 0.55, transition: "opacity 0.2s", padding: 0 }}
             onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
             onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.55"; }}>
-            {item.label}
+            <EditableNode id={item.id} tag="span"><EditableText id={item.id} /></EditableNode>
           </button>
         ))}
-        <button style={{ ...sans, fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: "var(--ed-bg, #fafafa)", background: "var(--ed-fg, #0a0a0a)", padding: "7px 18px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
+        <button onClick={() => { if (readOnly) scrollTo("contact"); }}
+          style={{ ...sans, fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: "var(--ed-bg, #fafafa)", background: "var(--ed-fg, #0a0a0a)", padding: "7px 18px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
           onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}>
-          Hire me
+          <EditableNode id="nav-cta" tag="span"><EditableText id="nav-cta" /></EditableNode>
         </button>
       </div>
     </nav>
