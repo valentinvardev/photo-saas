@@ -564,7 +564,7 @@ function SettingsTab() {
           </div>
           <div>
             <label style={labelStyle}>Domain</label>
-            <input defaultValue="jameshollis.frame.co" style={{ ...inputStyle, color: "var(--ec-dim)" }} disabled />
+            <input defaultValue="portapic.com/jameshollis" style={{ ...inputStyle, color: "var(--ec-dim)" }} disabled />
             <p style={{ color: "var(--ec-border)", fontSize: 10, margin: "4px 0 0" }}>Custom domains — upgrade to Pro</p>
           </div>
         </div>

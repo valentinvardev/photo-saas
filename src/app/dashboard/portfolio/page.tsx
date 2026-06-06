@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
 import { TEMPLATE_URL, type Portfolio } from "~/lib/portfolio/mock";
 import { dbToView } from "~/lib/portfolio/adapt";
+import { portfolioPublicLabel } from "~/lib/portfolio/url";
 import { api } from "~/trpc/react";
 
 /* ── New-portfolio tile — sits in the grid as the last "card" ── */
@@ -125,7 +126,7 @@ function PortfolioCard({ p }: { p: Portfolio }) {
           <div className="min-w-0">
             <h3 className="font-sans font-bold text-[var(--fg)] text-xs truncate">{p.name}</h3>
             <span className="font-mono text-[10px] text-[var(--fg-muted)] truncate block">
-              {p.customDomain ?? `${p.slug}.frame.co`}
+              {p.customDomain ?? portfolioPublicLabel(p.slug)}
             </span>
           </div>
         </div>

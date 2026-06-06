@@ -53,7 +53,7 @@ function PortfolioMockup({ inView }: { inView: boolean }) {
             color: "var(--mockup-text-muted)",
           }}
         >
-          sofia-chen.frame.co
+          portapic.com/sofia-chen
         </div>
         {/* Layout switcher */}
         <div className="flex gap-1">

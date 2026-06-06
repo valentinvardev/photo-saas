@@ -227,7 +227,7 @@ function DesktopFrame({ contentRef }: { contentRef: React.RefObject<HTMLDivEleme
           }}
         >
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <span style={{ fontFamily: "monospace", fontSize: 11, color: "#666" }}>jameshollis.frame.co</span>
+          <span style={{ fontFamily: "monospace", fontSize: 11, color: "#666" }}>portapic.com/jameshollis</span>
         </div>
       </div>
 

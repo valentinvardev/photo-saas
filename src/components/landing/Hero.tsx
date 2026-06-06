@@ -60,7 +60,7 @@ function BrowserMockup() {
                 color: "var(--mockup-text-muted)",
               }}
             >
-              alexmorgan.frame.co
+              portapic.com/alexmorgan
             </div>
           </div>
           <div className="w-16" />
