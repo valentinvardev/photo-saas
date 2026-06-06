@@ -121,8 +121,8 @@ export function TopBar({ portfolioId, saving }: { portfolioId?: string; saving?:
         borderBottom: "1px solid var(--ec-line)",
         display: "flex",
         alignItems: "center",
-        padding: "0 12px",
-        gap: 6,
+        padding: "0 18px",
+        gap: 10,
         flexShrink: 0,
         zIndex: 50,
       }}
@@ -215,11 +215,12 @@ export function TopBar({ portfolioId, saving }: { portfolioId?: string; saving?:
         Reset
       </button>
 
-      {/* Preview */}
+      {/* Preview — opens the actual built site (read-only render of the design) */}
       <a
-        href="/templates/minimal-bw"
+        href={portfolioId ? `/editor/${portfolioId}/preview` : "/templates/minimal-bw"}
         target="_blank"
-        style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-label)", padding: "3px 9px", borderRadius: 4, fontSize: 11, textDecoration: "none" }}
+        rel="noopener noreferrer"
+        style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-label)", padding: "5px 11px", borderRadius: 4, fontSize: 11, textDecoration: "none" }}
       >
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Preview
@@ -227,9 +228,19 @@ export function TopBar({ portfolioId, saving }: { portfolioId?: string; saving?:
 
       {/* Save — DB autosave indicator when tied to a portfolio, else manual localStorage save */}
       {portfolioId ? (
-        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--ec-fg-muted, #888)", padding: "4px 8px" }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: saving ? "#facc15" : "#22c55e" }} />
-          {saving ? "Saving…" : "Saved"}
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--ec-sub)", padding: "5px 12px", minWidth: 74 }}>
+          {saving ? (
+            <>
+              <span style={{ width: 11, height: 11, borderRadius: "50%", border: "1.5px solid var(--ec-border)", borderTopColor: "#facc15", display: "inline-block", animation: "ed-spin 0.7s linear infinite" }} />
+              Saving
+            </>
+          ) : (
+            <>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
+              Saved
+            </>
+          )}
+          <style>{`@keyframes ed-spin { to { transform: rotate(360deg); } }`}</style>
         </span>
       ) : (
         <button
