@@ -37,9 +37,14 @@ export const photoRouter = createTRPCRouter({
       let nextCursor: string | undefined;
       if (rows.length > input.limit) nextCursor = rows.pop()!.id;
 
-      // Resolve a fresh display URL per row (CloudFront is sync; presign fallback is async).
+      // url = optimized WebP preview when available (fast grids / public sites);
+      // originalUrl = full-resolution original (lightbox / downloads).
       const items = await Promise.all(
-        rows.map(async (p) => ({ ...p, url: await resolveMediaUrl(p.storagePath) })),
+        rows.map(async (p) => ({
+          ...p,
+          url:         await resolveMediaUrl(p.hasPreview ? photoPreviewKey(ctx.userId, p.id) : p.storagePath),
+          originalUrl: await resolveMediaUrl(p.storagePath),
+        })),
       );
 
       return { items, nextCursor };
@@ -123,14 +128,20 @@ export const photoRouter = createTRPCRouter({
       const ext = EXT_BY_MIME[input.mimeType] ?? (input.filename.split(".").pop() ?? "jpg");
       const photoId = randomUUID();
       const key = photoKey(ctx.userId, photoId, ext);
+      const previewKey = photoPreviewKey(ctx.userId, photoId);
 
-      const { url } = await getPresignedUploadUrl({
+      const [orig, preview] = await Promise.all([
+        getPresignedUploadUrl({ key, contentType: input.mimeType, contentLength: input.size }),
+        getPresignedUploadUrl({ key: previewKey, contentType: "image/webp" }),
+      ]);
+
+      return {
+        uploadUrl:        orig.url,
         key,
-        contentType:   input.mimeType,
-        contentLength: input.size,
-      });
-
-      return { uploadUrl: url, key, photoId };
+        photoId,
+        previewUploadUrl: preview.url,
+        previewKey,
+      };
     }),
 
   /** Step 2 of upload: create the Photo row once the S3 PUT succeeded. */
@@ -141,9 +152,10 @@ export const photoRouter = createTRPCRouter({
       filename: z.string(),
       mimeType: z.string(),
       size:     z.number().int().positive(),
-      width:    z.number().optional(),
-      height:   z.number().optional(),
-      folderId: z.string().nullable().optional(),
+      width:      z.number().optional(),
+      height:     z.number().optional(),
+      folderId:   z.string().nullable().optional(),
+      hasPreview: z.boolean().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       // Guard: the key must live in this user's namespace.
@@ -163,10 +175,12 @@ export const photoRouter = createTRPCRouter({
           width:       input.width,
           height:      input.height,
           folderId:    input.folderId ?? null,
+          hasPreview:  input.hasPreview ?? false,
         },
       });
 
-      return { ...row, url: await resolveMediaUrl(input.key) };
+      const displayKey = row.hasPreview ? photoPreviewKey(ctx.userId, row.id) : input.key;
+      return { ...row, url: await resolveMediaUrl(displayKey), originalUrl: await resolveMediaUrl(input.key) };
     }),
 
   /** Delete a photo — removes the S3 objects (original + any preview) and the row. */

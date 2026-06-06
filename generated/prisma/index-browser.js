@@ -148,6 +148,7 @@ exports.Prisma.PhotoScalarFieldEnum = {
   width: 'width',
   height: 'height',
   mimeType: 'mimeType',
+  hasPreview: 'hasPreview',
   createdAt: 'createdAt',
   folderId: 'folderId'
 };

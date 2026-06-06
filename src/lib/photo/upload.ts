@@ -20,6 +20,28 @@ function readImageSize(file: File): Promise<{ w: number; h: number }> {
   });
 }
 
+/**
+ * Generate an optimized WebP preview in-browser (resized + re-encoded).
+ * Returns null if the browser can't decode the image (e.g. some RAW/HEIC).
+ */
+async function makeWebpPreview(file: File, maxDim = 1600, quality = 0.82): Promise<Blob | null> {
+  try {
+    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+    const w = Math.max(1, Math.round(bitmap.width * scale));
+    const h = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) { bitmap.close(); return null; }
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    bitmap.close();
+    return await new Promise((resolve) => canvas.toBlob((b) => resolve(b), "image/webp", quality));
+  } catch {
+    return null;
+  }
+}
+
 export type UploadedPhoto = {
   id: string;
   url: string;
@@ -53,19 +75,33 @@ export function useUploadPhotos() {
 
     try {
       for (const file of images) {
-        const { uploadUrl, key, photoId } = await createUpload.mutateAsync({
+        const { uploadUrl, key, photoId, previewUploadUrl } = await createUpload.mutateAsync({
           filename: file.name,
           mimeType: file.type,
           size:     file.size,
         });
 
-        // Direct browser → S3 PUT. Content-Type must match what was signed.
+        // 1) Direct browser → S3 PUT of the original.
         const put = await fetch(uploadUrl, {
           method:  "PUT",
           headers: { "Content-Type": file.type },
           body:    file,
         });
         if (!put.ok) throw new Error(`Upload failed (HTTP ${put.status})`);
+
+        // 2) Generate + upload a WebP preview (best-effort; original still works without it).
+        let hasPreview = false;
+        try {
+          const previewBlob = await makeWebpPreview(file);
+          if (previewBlob) {
+            const pr = await fetch(previewUploadUrl, {
+              method:  "PUT",
+              headers: { "Content-Type": "image/webp" },
+              body:    previewBlob,
+            });
+            hasPreview = pr.ok;
+          }
+        } catch { hasPreview = false; }
 
         const dims = await readImageSize(file).catch(() => undefined);
         const photo = await confirm.mutateAsync({
@@ -77,6 +113,7 @@ export function useUploadPhotos() {
           width:    dims?.w,
           height:   dims?.h,
           folderId: opts?.folderId ?? null,
+          hasPreview,
         });
 
         created.push({ id: photo.id, url: photo.url, filename: photo.filename });

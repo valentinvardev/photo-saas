@@ -59,6 +59,7 @@ model Photo {
     width       Int?
     height      Int?
     mimeType    String   @default("image/jpeg")
+    hasPreview  Boolean  @default(false) // a WebP preview exists at photoPreviewKey
     createdAt   DateTime @default(now())
 
     folderId String?

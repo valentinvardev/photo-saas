@@ -20,7 +20,7 @@ function fmtSize(bytes: number) {
   return `${bytes} B`;
 }
 
-type GPhoto = { id: string; url: string; filename: string; size: number; width: number | null; height: number | null };
+type GPhoto = { id: string; url: string; originalUrl: string; filename: string; size: number; width: number | null; height: number | null };
 type GFolder = { id: string; name: string; count: number; coverUrl: string | null };
 type FolderModalState = { mode: "create" | "rename"; id?: string; moveAfter?: boolean } | null;
 
@@ -90,7 +90,7 @@ function Lightbox({ photos, index, onIndex, onClose }: { photos: GPhoto[]; index
       {index > 0 && <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>}
       {index < photos.length - 1 && <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={photo.url} alt={photo.filename} className="max-w-full max-h-full object-contain rounded" />
+      <img src={photo.originalUrl} alt={photo.filename} className="max-w-full max-h-full object-contain rounded" />
       <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[11px] text-white/50">
         {photo.filename} · {fmtSize(photo.size)}{photo.width ? ` · ${photo.width}×${photo.height}px` : ""} · {index + 1}/{photos.length}
       </div>

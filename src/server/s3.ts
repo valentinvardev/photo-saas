@@ -78,7 +78,7 @@ export async function resolveMediaUrl(key: string, opts: { expiresIn?: number } 
 export async function getPresignedUploadUrl(opts: {
   key: string;
   contentType: string;
-  contentLength: number;
+  contentLength?: number;
   expiresIn?: number;
 }): Promise<{ url: string; key: string }> {
   if (!bucket) throw new Error("AWS_S3_BUCKET is not configured");
@@ -86,7 +86,7 @@ export async function getPresignedUploadUrl(opts: {
     Bucket: bucket,
     Key: opts.key,
     ContentType: opts.contentType,
-    ContentLength: opts.contentLength,
+    ...(opts.contentLength !== undefined ? { ContentLength: opts.contentLength } : {}),
   });
   const url = await getSignedUrl(s3, cmd, { expiresIn: opts.expiresIn ?? 60 * 15 });
   return { url, key: opts.key };
