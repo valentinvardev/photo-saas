@@ -23,8 +23,13 @@ function colorFor(name: string) {
 function initialOf(name: string) {
   return (name.trim()[0] ?? "?").toUpperCase();
 }
+function toISO(v: unknown): string {
+  const d = new Date(v as string | number | Date);
+  return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+}
 function timeOf(iso: string) {
   const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
   return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
@@ -69,27 +74,33 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     if (!history) return;
     for (const m of history) {
-      addMessage({ id: m.id, userId: m.userId, authorName: m.authorName, body: m.body, createdAt: new Date(m.createdAt).toISOString() });
+      addMessage({ id: m.id, userId: m.userId, authorName: m.authorName, body: m.body, createdAt: toISO(m.createdAt) });
     }
   }, [history, addMessage]);
 
-  /* Live updates via Supabase Realtime */
+  /* Live updates via Supabase Realtime — failure here must never crash the chat */
   useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel("community-chat")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "Message" }, (payload) => {
-        const r = payload.new as Record<string, unknown>;
-        addMessage({
-          id: String(r.id),
-          userId: String(r.userId),
-          authorName: String(r.authorName ?? ""),
-          body: String(r.body ?? ""),
-          createdAt: String(r.createdAt ?? new Date().toISOString()),
-        });
-      })
-      .subscribe((status) => setConnected(status === "SUBSCRIBED"));
-    return () => { void supabase.removeChannel(channel); };
+    let cleanup = () => { /* noop */ };
+    try {
+      const supabase = createClient();
+      const channel = supabase
+        .channel("community-chat")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "Message" }, (payload) => {
+          const r = payload.new as Record<string, unknown>;
+          addMessage({
+            id: String(r.id),
+            userId: String(r.userId),
+            authorName: String(r.authorName ?? ""),
+            body: String(r.body ?? ""),
+            createdAt: String(r.createdAt ?? new Date().toISOString()),
+          });
+        })
+        .subscribe((status) => setConnected(status === "SUBSCRIBED"));
+      cleanup = () => { void supabase.removeChannel(channel); };
+    } catch (err) {
+      console.error("[chat] realtime setup failed:", err);
+    }
+    return () => cleanup();
   }, [addMessage]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
@@ -101,7 +112,7 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
     try {
       const created = await sendMut.mutateAsync({ body });
       // Realtime usually delivers it too; addMessage dedupes by id.
-      addMessage({ id: created.id, userId: created.userId, authorName: created.authorName, body: created.body, createdAt: new Date(created.createdAt).toISOString() });
+      addMessage({ id: created.id, userId: created.userId, authorName: created.authorName, body: created.body, createdAt: toISO(created.createdAt) });
     } catch {
       setDraft(body); // restore on failure
     }

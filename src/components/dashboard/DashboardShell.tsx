@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import { Sidebar } from "./Sidebar";
 import { DashboardHeader } from "./Header";
 import { ChatPanel } from "./ChatPanel";
+import { ChatErrorBoundary } from "./ChatErrorBoundary";
 import { CartPanel } from "./CartPanel";
 import { LangProvider } from "~/components/providers/LangProvider";
 
@@ -73,13 +74,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
           {chatOpen && (
             <div className="w-80 shrink-0 hidden md:flex flex-col border-l border-[var(--border)] h-full">
-              <ChatPanel onClose={() => setChatOpen(false)} />
+              <ChatErrorBoundary onClose={() => setChatOpen(false)}>
+                <ChatPanel onClose={() => setChatOpen(false)} />
+              </ChatErrorBoundary>
             </div>
           )}
 
           {chatOpen && (
             <div className="md:hidden fixed inset-0 z-50 flex flex-col bg-[var(--bg-card)]">
-              <ChatPanel onClose={() => setChatOpen(false)} />
+              <ChatErrorBoundary onClose={() => setChatOpen(false)}>
+                <ChatPanel onClose={() => setChatOpen(false)} />
+              </ChatErrorBoundary>
             </div>
           )}
         </div>
