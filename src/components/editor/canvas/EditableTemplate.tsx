@@ -442,14 +442,18 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
     <nav id="section-nav" style={navBase}>
       <LogoMark />
       <div style={{ display: "flex", gap: "2.5rem", alignItems: "center", marginLeft: "auto" }}>
-        {navItems.map((item) => (
-          <button key={item.id} onClick={() => { if (readOnly) item.fn(); }}
-            style={{ ...sans, background: "none", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 400, letterSpacing: "0.06em", color: "var(--ed-fg, #0a0a0a)", opacity: 0.55, transition: "opacity 0.2s", padding: 0 }}
-            onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.55"; }}>
-            <EditableNode id={item.id} tag="span"><EditableText id={item.id} /></EditableNode>
-          </button>
-        ))}
+        {/* nav-links container: select it to set the font size for every link at
+            once. The buttons use fontSize:"inherit" so they follow this node. */}
+        <EditableNode id="nav-links" tag="div" style={{ display: "flex", gap: "2.5rem", alignItems: "center", fontSize: "12px" }}>
+          {navItems.map((item) => (
+            <button key={item.id} onClick={() => { if (readOnly) item.fn(); }}
+              style={{ ...sans, background: "none", border: "none", cursor: "pointer", fontSize: "inherit", fontWeight: 400, letterSpacing: "0.06em", color: "var(--ed-fg, #0a0a0a)", opacity: 0.55, transition: "opacity 0.2s", padding: 0 }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.55"; }}>
+              <EditableNode id={item.id} tag="span"><EditableText id={item.id} /></EditableNode>
+            </button>
+          ))}
+        </EditableNode>
         <button onClick={() => { if (readOnly) scrollTo("contact"); }}
           style={{ ...sans, fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: "var(--ed-bg, #fafafa)", background: "var(--ed-fg, #0a0a0a)", padding: "7px 18px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
           onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}
@@ -514,9 +518,9 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       >
         {/* Left — text */}
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: isMobile ? "3rem 1.5rem 2.5rem" : isTablet ? "4rem 3rem 4rem 5vw" : "5rem 5rem 5rem 7vw" }}>
-          <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", letterSpacing: "0.25em", color: "#999", textTransform: "uppercase", marginBottom: "2rem" }}>
-            Documentary &amp; Portrait · New York
-          </span>
+          <EditableNode id="hero-eyebrow" tag="span" style={{ display: "block", fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", letterSpacing: "0.25em", color: "#999", textTransform: "uppercase", marginBottom: "2rem" }}>
+            <EditableText id="hero-eyebrow" />
+          </EditableNode>
 
           <EditableNode id="hero-heading" tag="h1" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "72px" : "clamp(72px,8vw,128px)", lineHeight: 0.92, letterSpacing: "-0.02em", color: "var(--ed-fg, #0a0a0a)", margin: "0 0 2rem" }}>
             <EditableText id="hero-heading" />
