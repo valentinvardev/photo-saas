@@ -51,6 +51,25 @@ function NewPortfolioTile({ onClick }: { onClick: () => void }) {
   );
 }
 
+/* ── Loading placeholder — mirrors the PortfolioCard layout ── */
+function PortfolioCardSkeleton() {
+  return (
+    <div className="border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden rounded-xl">
+      <div className="h-32 bg-[var(--bg-subtle)] animate-pulse" />
+      <div className="p-3">
+        <div className="space-y-2 mb-3">
+          <div className="h-3 w-2/3 rounded bg-[var(--bg-subtle)] animate-pulse" />
+          <div className="h-2.5 w-1/2 rounded bg-[var(--bg-subtle)] animate-pulse" />
+        </div>
+        <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
+          <div className="h-2.5 w-20 rounded bg-[var(--bg-subtle)] animate-pulse" />
+          <div className="h-2.5 w-10 rounded bg-[var(--bg-subtle)] animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Compute week trend from weeklyViews ── */
 function weekTrend(views: number[]): "up" | "down" | "flat" | "none" {
   const total = views.reduce((a, b) => a + b, 0);
@@ -176,8 +195,8 @@ export default function PortfolioPage() {
       {/* ── Grid ── */}
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-52 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] animate-pulse" />
+          {Array.from({ length: 8 }).map((_, i) => (
+            <PortfolioCardSkeleton key={i} />
           ))}
         </div>
       ) : portfolios.length === 0 ? (

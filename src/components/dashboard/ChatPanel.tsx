@@ -48,9 +48,36 @@ function Avatar({ name, size = 28 }: { name: string; size?: number }) {
   );
 }
 
+/* Loading placeholder — mimics a few incoming/outgoing message bubbles. */
+function ChatSkeleton() {
+  const rows = [
+    { own: false, w: "62%" },
+    { own: false, w: "44%" },
+    { own: true,  w: "54%" },
+    { own: false, w: "70%" },
+    { own: true,  w: "38%" },
+    { own: false, w: "50%" },
+  ];
+  return (
+    <div className="flex flex-col gap-3" aria-hidden>
+      {rows.map((r, i) => (
+        <div key={i} className={`flex gap-2 ${r.own ? "flex-row-reverse" : ""}`}>
+          <div className="shrink-0 w-7">
+            {!r.own && <div className="w-7 h-7 rounded-full bg-[var(--bg-subtle)] animate-pulse" />}
+          </div>
+          <div className={`flex flex-col gap-1.5 ${r.own ? "items-end" : "items-start"}`} style={{ width: r.w }}>
+            <div className="h-2.5 w-16 rounded bg-[var(--bg-subtle)] animate-pulse" />
+            <div className={`h-9 w-full bg-[var(--bg-subtle)] animate-pulse rounded-2xl ${r.own ? "rounded-tr-sm" : "rounded-tl-sm"}`} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ── Panel ── */
 export function ChatPanel({ onClose }: { onClose: () => void }) {
-  const { data: history } = api.chat.list.useQuery({ limit: 50 });
+  const { data: history, isLoading } = api.chat.list.useQuery({ limit: 50 });
   const sendMut = api.chat.send.useMutation();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -157,9 +184,18 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-3">
-        {messages.length === 0 && (
-          <p className="font-sans text-xs text-[var(--fg-muted)] text-center py-8">No messages yet — say hello 👋</p>
-        )}
+        {/* Keep the skeleton up until history is fetched AND merged into state,
+            so the empty placeholder never flashes between the two. */}
+        {(isLoading || (messages.length === 0 && (history?.length ?? 0) > 0)) ? (
+          <ChatSkeleton />
+        ) : messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-10 text-center text-[var(--fg-muted)]">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50">
+              <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>
+            </svg>
+            <p className="font-sans text-xs">No messages yet — say hello.</p>
+          </div>
+        ) : null}
         {messages.map((msg, i) => {
           const own = !!meId && msg.userId === meId;
           const prev = messages[i - 1];
