@@ -14,10 +14,10 @@ function NewPortfolioTile({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="group flex flex-col border border-dashed border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-yellow hover:bg-yellow/5 transition-all duration-200 rounded-xl text-left"
+      className="group flex flex-col border border-dashed border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-yellow hover:bg-yellow/5 transition-all duration-200 rounded-2xl text-left"
     >
       {/* Cover area — animated icon */}
-      <div className="relative h-32 flex items-center justify-center bg-[var(--bg-subtle)] group-hover:bg-yellow/5 transition-colors">
+      <div className="relative aspect-square flex items-center justify-center bg-[var(--bg-subtle)] group-hover:bg-yellow/5 transition-colors">
         <motion.div
           /* gentle idle breathing */
           animate={{ scale: [1, 1.05, 1] }}
@@ -44,8 +44,8 @@ function NewPortfolioTile({ onClick }: { onClick: () => void }) {
       </div>
 
       {/* Body */}
-      <div className="p-3 flex flex-col gap-1 flex-1 justify-center">
-        <h3 className="font-sans font-bold text-[var(--fg)] text-xs">New portfolio</h3>
+      <div className="p-4 flex flex-col gap-1 flex-1 justify-center">
+        <h3 className="font-sans font-bold text-[var(--fg)] text-sm">New portfolio</h3>
         <span className="font-mono text-[10px] text-[var(--fg-muted)] block">Start a fresh site from scratch</span>
       </div>
     </button>
@@ -55,14 +55,14 @@ function NewPortfolioTile({ onClick }: { onClick: () => void }) {
 /* ── Loading placeholder — mirrors the PortfolioCard layout ── */
 function PortfolioCardSkeleton() {
   return (
-    <div className="border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden rounded-xl">
-      <div className="h-32 bg-[var(--bg-subtle)] animate-pulse" />
-      <div className="p-3">
+    <div className="bg-[var(--bg-card)] overflow-hidden rounded-2xl">
+      <div className="aspect-square bg-[var(--bg-subtle)] animate-pulse" />
+      <div className="p-4">
         <div className="space-y-2 mb-3">
           <div className="h-3 w-2/3 rounded bg-[var(--bg-subtle)] animate-pulse" />
           <div className="h-2.5 w-1/2 rounded bg-[var(--bg-subtle)] animate-pulse" />
         </div>
-        <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
+        <div className="flex items-center justify-between pt-2">
           <div className="h-2.5 w-20 rounded bg-[var(--bg-subtle)] animate-pulse" />
           <div className="h-2.5 w-10 rounded bg-[var(--bg-subtle)] animate-pulse" />
         </div>
@@ -89,20 +89,20 @@ function PortfolioCard({ p }: { p: Portfolio }) {
   return (
     <Link
       href={`/dashboard/portfolio/${p.id}`}
-      className="group block border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:border-[var(--fg-muted)] transition-all duration-200 rounded-xl"
+      className="group block bg-[var(--bg-card)] overflow-hidden rounded-2xl transition-shadow duration-200 hover:shadow-[var(--shadow-lg)]"
     >
       {/* Cover — live render of the template */}
-      <div className="relative h-32 overflow-hidden bg-[var(--bg-subtle)]">
+      <div className="relative aspect-square overflow-hidden bg-[var(--bg-subtle)]">
         {previewUrl ? (
           <LivePreviewThumbnail
             url={previewUrl}
             baseWidth={1280}
-            className="w-full h-full transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full"
           />
         ) : (
           /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={`https://picsum.photos/seed/${p.seed}/600/338?grayscale`} alt={p.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <img src={`https://picsum.photos/seed/${p.seed}/600/600?grayscale`} alt={p.name}
+            className="w-full h-full object-cover" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
@@ -121,11 +121,11 @@ function PortfolioCard({ p }: { p: Portfolio }) {
       </div>
 
       {/* Card body */}
-      <div className="p-3">
+      <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="min-w-0">
-            <h3 className="font-sans font-bold text-[var(--fg)] text-xs truncate">{p.name}</h3>
-            <span className="font-mono text-[10px] text-[var(--fg-muted)] truncate block">
+            <h3 className="font-sans font-bold text-[var(--fg)] text-sm truncate">{p.name}</h3>
+            <span className="font-mono text-[10px] text-[var(--fg-muted)] truncate block mt-0.5">
               {p.customDomain ?? portfolioPublicLabel(p.slug)}
             </span>
           </div>
@@ -136,7 +136,7 @@ function PortfolioCard({ p }: { p: Portfolio }) {
           const weekTotal = p.weeklyViews.reduce((a, b) => a + b, 0);
           const trend = weekTrend(p.weeklyViews);
           return (
-            <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
+            <div className="flex items-center justify-between pt-2">
               {p.status === "published" ? (
                 <div className="flex items-center gap-2">
                   <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)]">
@@ -195,7 +195,7 @@ export default function PortfolioPage() {
 
       {/* ── Grid ── */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <PortfolioCardSkeleton key={i} />
           ))}
@@ -212,7 +212,7 @@ export default function PortfolioPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <NewPortfolioTile onClick={goNew} />
           {portfolios.map((p) => <PortfolioCard key={p.id} p={p} />)}
         </div>
