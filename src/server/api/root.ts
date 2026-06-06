@@ -1,15 +1,17 @@
 import { postRouter }      from "~/server/api/routers/post";
 import { portfolioRouter } from "~/server/api/routers/portfolio";
 import { photoRouter }     from "~/server/api/routers/photo";
+import { chatRouter }      from "~/server/api/routers/chat";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
-// MVP scope: portfolio + gallery (photo) only. The links & delivery routers
-// are built and kept in src/server/api/routers/ but unregistered here. To
-// re-enable, re-import and add them back to the router map below.
+// MVP scope: portfolio + gallery (photo) + community chat. The links & delivery
+// routers are built and kept in src/server/api/routers/ but unregistered here.
+// To re-enable, re-import and add them back to the router map below.
 export const appRouter = createTRPCRouter({
   post:      postRouter,
   portfolio: portfolioRouter,
   photo:     photoRouter,
+  chat:      chatRouter,
 });
 
 // export type definition of API

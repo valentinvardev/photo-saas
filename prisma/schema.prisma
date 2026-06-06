@@ -25,6 +25,22 @@ model User {
     portfolios Portfolio[]
     linksPages LinksPage[]
     deliveries Delivery[]
+    messages   Message[]
+}
+
+// ── Community chat ────────────────────────────────────────────────────────────
+// Single global room for now. authorName is denormalized so Supabase Realtime
+// INSERT payloads can render without an extra join.
+
+model Message {
+    id         String   @id @default(cuid())
+    userId     String
+    user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    authorName String   @default("")
+    body       String
+    createdAt  DateTime @default(now())
+
+    @@index([createdAt])
 }
 
 // ── Photo library ─────────────────────────────────────────────────────────────

@@ -130,6 +130,14 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  authorName: 'authorName',
+  body: 'body',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.PhotoScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -291,6 +299,7 @@ exports.Prisma.JsonNullValueFilter = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  Message: 'Message',
   Photo: 'Photo',
   Portfolio: 'Portfolio',
   LinksPage: 'LinksPage',
