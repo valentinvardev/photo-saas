@@ -4,6 +4,7 @@ import { use } from "react";
 import dynamic from "next/dynamic";
 import { api } from "~/trpc/react";
 import { flattenContentPhotos } from "~/lib/portfolio/contentPhotos";
+import { ErrorBoundary } from "~/components/ui/ErrorBoundary";
 import type { PortfolioDesign } from "~/lib/editor/store";
 
 const EditorShell = dynamic(
@@ -38,5 +39,9 @@ export default function EditorByPortfolioPage({ params }: { params: Promise<{ po
   const design: PortfolioDesign = isDesign(data.editorState) ? data.editorState : { templateId: "minimal-bw" };
   const galleryPhotos = flattenContentPhotos(data.content);
 
-  return <EditorShell portfolioId={portfolioId} initialDesign={design} galleryPhotos={galleryPhotos} />;
+  return (
+    <ErrorBoundary>
+      <EditorShell portfolioId={portfolioId} initialDesign={design} galleryPhotos={galleryPhotos} />
+    </ErrorBoundary>
+  );
 }
