@@ -8,7 +8,6 @@ import type { SectionDef } from "~/lib/editor/templates/types";
 import { deviceContentRef } from "~/lib/editor/deviceRef";
 import { ColorPalettePanel } from "~/components/editor/panels/ColorPalettePanel";
 import { TypographyPanel } from "~/components/editor/panels/TypographyPanel";
-import { TextPanel } from "~/components/editor/panels/TextPanel";
 import { ImagePickerButton } from "~/components/editor/panels/ImageGalleryModal";
 import { ImageCropModal } from "~/components/editor/panels/ImageCropModal";
 
@@ -301,32 +300,6 @@ function MenuItem({ label, onClick, disabled, danger }: { label: string; onClick
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   ELEMENT PANEL — shown below section tree when a node is selected
-═══════════════════════════════════════════════════════════════════════ */
-function ElementPanel({ nodeId }: { nodeId: string }) {
-  const { nodes } = useEditorStore();
-  const node = nodes[nodeId];
-  /* For images, all editing lives in the right-side InspectorPanel
-     (source picker + fit/focus). The main sidebar only shows a TextPanel
-     for text nodes — images don't get a duplicate panel here. */
-  if (!node || node.type === "image") return null;
-
-  return (
-    <div style={{ borderTop: "1px solid var(--ec-raised)", marginTop: 4 }}>
-      <div style={{ padding: "8px 14px", display: "flex", alignItems: "center", gap: 6 }}>
-        <span style={{ color: "#2563eb", display: "flex" }}>
-          <TextNodeIcon />
-        </span>
-        <span style={{ color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
-          Text — <span style={{ color: "var(--ec-dim)" }}>{nodeId}</span>
-        </span>
-      </div>
-      <TextPanel nodeId={nodeId} />
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
    DESIGN TAB
 ═══════════════════════════════════════════════════════════════════════ */
 function DesignTab() {
@@ -613,7 +586,6 @@ type SidebarTab = "pages" | "design" | "settings";
 
 export function Sidebar() {
   const [tab, setTab] = useState<SidebarTab>("pages");
-  const { selectedId } = useEditorStore();
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
     flex: 1,
@@ -651,13 +623,9 @@ export function Sidebar() {
 
       {/* Content */}
       <div style={{ flex: 1, overflowY: "auto" }}>
-        {tab === "pages" && (
-          <>
-            <PagesTab />
-            {/* Element panel — appears below tree when a node is selected */}
-            {selectedId && <ElementPanel nodeId={selectedId} />}
-          </>
-        )}
+        {/* Text formatting lives in the floating toolbar above the selected
+            text; the sidebar only holds the section tree now. */}
+        {tab === "pages"    && <PagesTab />}
         {tab === "design"   && <DesignTab />}
         {tab === "settings" && <SettingsTab />}
       </div>

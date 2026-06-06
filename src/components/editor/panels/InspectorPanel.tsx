@@ -21,153 +21,10 @@ function Divider() {
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   Text Inspector
-───────────────────────────────────────────────────────────────── */
-const SIZE_PRESETS = [
-  { label: "XS",   value: "10px"  },
-  { label: "SM",   value: "12px"  },
-  { label: "Base", value: "14px"  },
-  { label: "MD",   value: "16px"  },
-  { label: "LG",   value: "20px"  },
-  { label: "XL",   value: "24px"  },
-  { label: "2XL",  value: "32px"  },
-  { label: "3XL",  value: "48px"  },
-  { label: "Disp", value: "72px"  },
-];
-
-const WEIGHT_PRESETS = [
-  { label: "Thin",   value: 100 },
-  { label: "Light",  value: 300 },
-  { label: "Reg",    value: 400 },
-  { label: "Med",    value: 500 },
-  { label: "Semi",   value: 600 },
-  { label: "Bold",   value: 700 },
-  { label: "Black",  value: 900 },
-];
-
-function TextInspector({ node, update }: { node: EditorNode; update: (patch: Partial<EditorNode>) => void }) {
-  const currentSize   = node.fontSize   ?? "";
-  const currentWeight = node.fontWeight ?? "";
-  const isItalic      = node.fontStyle  === "italic";
-  const align         = node.textAlign  ?? "";
-
-  return (
-    <div>
-      {/* Font size */}
-      <SectionLabel>Size</SectionLabel>
-      <div style={{ display: "flex", gap: 2, flexWrap: "wrap", marginBottom: 6 }}>
-        {SIZE_PRESETS.map((p) => {
-          const active = currentSize === p.value;
-          return (
-            <button
-              key={p.label}
-              onClick={() => update({ fontSize: active ? undefined : p.value })}
-              style={{
-                background: active ? "#2563eb" : "var(--ec-raised)",
-                border: `1px solid ${active ? "#2563eb" : "var(--ec-lift)"}`,
-                color: active ? "#fff" : "var(--ec-sub)",
-                fontSize: 9, padding: "3px 6px", borderRadius: 3, cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
-              {p.label}
-            </button>
-          );
-        })}
-      </div>
-      {/* Custom size input */}
-      <input
-        value={currentSize}
-        onChange={(e) => update({ fontSize: e.target.value || undefined })}
-        placeholder="e.g. 18px, 1.5rem, clamp(…)"
-        style={{
-          width: "100%", background: "var(--ec-bg)", border: "1px solid var(--ec-lift)", color: "var(--ec-label)",
-          fontSize: 11, padding: "5px 8px", borderRadius: 4, outline: "none",
-          boxSizing: "border-box", fontFamily: "monospace",
-        }}
-      />
-
-      <Divider />
-
-      {/* Font weight */}
-      <SectionLabel>Weight</SectionLabel>
-      <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-        {WEIGHT_PRESETS.map((p) => {
-          const active = String(currentWeight) === String(p.value);
-          return (
-            <button
-              key={p.label}
-              onClick={() => update({ fontWeight: active ? undefined : p.value })}
-              style={{
-                background: active ? "#2563eb" : "var(--ec-raised)",
-                border: `1px solid ${active ? "#2563eb" : "var(--ec-lift)"}`,
-                color: active ? "#fff" : "var(--ec-sub)",
-                fontSize: 9, padding: "3px 6px", borderRadius: 3, cursor: "pointer",
-                fontFamily: "inherit", fontWeight: p.value,
-              }}
-            >
-              {p.label}
-            </button>
-          );
-        })}
-      </div>
-
-      <Divider />
-
-      {/* Style & Alignment */}
-      <SectionLabel>Style &amp; Alignment</SectionLabel>
-      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-        {/* Italic toggle */}
-        <button
-          onClick={() => update({ fontStyle: isItalic ? "normal" : "italic" })}
-          title="Italic"
-          style={{
-            background: isItalic ? "#2563eb" : "var(--ec-raised)",
-            border: `1px solid ${isItalic ? "#2563eb" : "var(--ec-lift)"}`,
-            color: isItalic ? "#fff" : "var(--ec-sub)",
-            width: 28, height: 28, borderRadius: 4, cursor: "pointer", display: "flex",
-            alignItems: "center", justifyContent: "center",
-          }}
-        >
-          <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-            <text x="0" y="11" style={{ fontStyle: "italic", fontSize: "13px", fontFamily: "serif", fill: "currentColor" }}>I</text>
-          </svg>
-        </button>
-
-        <div style={{ width: 1, height: 20, background: "var(--ec-lift)" }} />
-
-        {/* Alignment */}
-        {(["left", "center", "right"] as const).map((a) => {
-          const active = align === a;
-          const icons: Record<string, React.ReactNode> = {
-            left:   <svg width="12" height="10" viewBox="0 0 12 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M0 1h12M0 5h8M0 9h10"/></svg>,
-            center: <svg width="12" height="10" viewBox="0 0 12 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M0 1h12M2 5h8M1 9h10"/></svg>,
-            right:  <svg width="12" height="10" viewBox="0 0 12 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M0 1h12M4 5h8M2 9h10"/></svg>,
-          };
-          return (
-            <button
-              key={a}
-              onClick={() => update({ textAlign: active ? undefined : a })}
-              title={`Align ${a}`}
-              style={{
-                background: active ? "#2563eb" : "var(--ec-raised)",
-                border: `1px solid ${active ? "#2563eb" : "var(--ec-lift)"}`,
-                color: active ? "#fff" : "var(--ec-sub)",
-                width: 28, height: 28, borderRadius: 4, cursor: "pointer", display: "flex",
-                alignItems: "center", justifyContent: "center",
-              }}
-            >
-              {icons[a]}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────
    Image Inspector
+
+   Text formatting (size / weight / style / alignment) now lives in the
+   floating toolbar above the selected text — see FloatingTextToolbar.
 ───────────────────────────────────────────────────────────────── */
 const FIT_OPTIONS = [
   { label: "Cover",   value: "cover"   as const, desc: "Fill — crops if needed" },
@@ -308,18 +165,15 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   Inspector Panel root
+   Inspector Panel root — images only. Text nodes are formatted via the
+   floating toolbar, so this panel collapses for them.
 ───────────────────────────────────────────────────────────────── */
 export function InspectorPanel() {
   const { selectedId, nodes, updateNode, selectNode } = useEditorStore();
 
   if (!selectedId) return null;
   const node = nodes[selectedId];
-  if (!node) return null;
-
-  const isText  = node.type === "heading" || node.type === "paragraph" || node.type === "logo";
-  const isImage = node.type === "image";
-  if (!isText && !isImage) return null;
+  if (!node || node.type !== "image") return null;
 
   function update(patch: Partial<EditorNode>) {
     updateNode(selectedId!, patch);
@@ -345,7 +199,7 @@ export function InspectorPanel() {
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#2563eb" }} />
           <span style={{ color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
-            {isImage ? "Image" : "Text"}
+            Image
           </span>
         </div>
         <button
@@ -363,8 +217,7 @@ export function InspectorPanel() {
 
       {/* Controls */}
       <div style={{ flex: 1, overflowY: "auto", padding: "14px 12px" }}>
-        {isText  && <TextInspector  node={node} update={update} />}
-        {isImage && <ImageInspector node={node} update={update} />}
+        <ImageInspector node={node} update={update} />
 
         <Divider />
 

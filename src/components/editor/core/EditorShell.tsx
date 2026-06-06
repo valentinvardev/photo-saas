@@ -9,6 +9,7 @@ import { TopBar } from "./TopBar";
 import { Canvas } from "./Canvas";
 import { Sidebar } from "./Sidebar";
 import { InspectorPanel } from "~/components/editor/panels/InspectorPanel";
+import { FloatingTextToolbar } from "~/components/editor/canvas/FloatingTextToolbar";
 import type { TemplateId } from "~/lib/editor/templates/registry";
 
 // Side-effect: load all @fontsource CSS
@@ -96,6 +97,9 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
         <InspectorPanel />
         <Canvas />
       </div>
+
+      {/* Floating formatting toolbar — appears above the selected text node */}
+      <FloatingTextToolbar />
 
       <style>{`
         :root {
