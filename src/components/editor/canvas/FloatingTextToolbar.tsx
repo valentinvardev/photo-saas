@@ -74,19 +74,40 @@ export function FloatingTextToolbar() {
   // Re-measure the selected element's position whenever it (or anything that
   // changes its box) updates, and on scroll/resize. The canvas frame isn't
   // CSS-scaled, so getBoundingClientRect maps straight to fixed coordinates.
+  // The toolbar is clamped to the visible region (device screen ∩ canvas
+  // viewport) so it never spills over the editor chrome, and hides when the
+  // selected element scrolls out of view.
   useLayoutEffect(() => {
     if (!isText || !selectedId) { setPos(null); return; }
 
     let raf = 0;
     const measure = () => {
-      const el = document.querySelector(`[data-node-id="${CSS.escape(selectedId)}"]`);
-      if (!el) { setPos(null); return; }
+      const el     = document.querySelector(`[data-node-id="${CSS.escape(selectedId)}"]`);
+      const screen = document.querySelector(".editor-canvas-scroll");
+      const vp     = document.querySelector(".editor-canvas-viewport");
+      if (!el || !screen || !vp) { setPos(null); return; }
+
       const r = el.getBoundingClientRect();
+      const s = screen.getBoundingClientRect();
+      const v = vp.getBoundingClientRect();
+
+      // Visible region = device screen clipped to the canvas viewport.
+      const minY = Math.max(s.top, v.top);
+      const maxY = Math.min(s.bottom, v.bottom);
+      const minX = Math.max(s.left, v.left);
+      const maxX = Math.min(s.right, v.right);
+
+      // Hide when the element is scrolled out of that region.
+      if (r.bottom < minY + 2 || r.top > maxY - 2) { setPos(null); return; }
+
       const w = barRef.current?.offsetWidth  ?? 360;
       const h = barRef.current?.offsetHeight ?? 34;
-      let top = r.top - GAP - h;
-      if (top < 8) top = r.bottom + GAP;               // flip below if no room above
-      const left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8));
+
+      let top = r.top - GAP - h;            // prefer above the element
+      if (top < minY + 4) top = r.bottom + GAP; // flip below if it would overflow the top
+      top = Math.max(minY + 4, Math.min(top, maxY - h - 4));
+      const left = Math.max(minX + 4, Math.min(r.left, maxX - w - 4));
+
       setPos({ top, left });
     };
     const onScrollResize = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(measure); };

@@ -254,6 +254,7 @@ export function Canvas() {
 
   return (
     <div
+      className="editor-canvas-viewport"
       style={{
         flex:           1,
         overflowY:      "auto",

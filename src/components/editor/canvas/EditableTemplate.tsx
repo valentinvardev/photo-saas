@@ -547,12 +547,12 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
             </a>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: isMobile ? "2rem" : "auto", paddingTop: isMobile ? "0" : "4rem" }}>
+          {/* The EditableNode is the whole row (dot + text), so deleting the
+              text removes its decoration and container too. */}
+          <EditableNode id="hero-avail" tag="div" style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: isMobile ? "2rem" : "auto", paddingTop: isMobile ? "0" : "4rem", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#888", letterSpacing: "0.12em" }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 8px rgba(34,197,94,0.5)", flexShrink: 0 }} />
-            <EditableNode id="hero-avail" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#888", letterSpacing: "0.12em" }}>
-              <EditableText id="hero-avail" />
-            </EditableNode>
-          </div>
+            <EditableText id="hero-avail" />
+          </EditableNode>
         </div>
 
         {/* Right — stacked photos (desktop/tablet editable, mobile single) */}
@@ -617,7 +617,9 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
       {/* ════ PULL QUOTE ════ */}
       <section id="section-quote" style={{ padding: `${isMobile ? "4rem" : "6rem"} ${px}`, background: "var(--ed-fg, #0a0a0a)", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
-        <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>On practice</span>
+        <EditableNode id="quote-eyebrow" tag="span" style={{ display: "block", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>
+          <EditableText id="quote-eyebrow" />
+        </EditableNode>
         <EditableNode id="quote-text" tag="blockquote" style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontWeight: 300, fontSize: isMobile ? "clamp(22px,7vw,36px)" : "clamp(28px,3.5vw,52px)", lineHeight: 1.3, color: "var(--ed-bg, #f0f0f0)", maxWidth: "900px", textAlign: "center", margin: 0, letterSpacing: "-0.01em" }}>
           <EditableText id="quote-text" />
         </EditableNode>
@@ -662,11 +664,11 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
               imgStyle={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", filter: "brightness(0.9)" }}
             />
           </div>
-          <div style={{ position: "absolute", bottom: "-16px", right: "0", zIndex: 2, background: "var(--ed-bg, #fafafa)", padding: "7px 12px", border: "1px solid #e8e8e8" }}>
-            <EditableNode id="about-caption" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase" }}>
-              <EditableText id="about-caption" />
-            </EditableNode>
-          </div>
+          {/* EditableNode is the bordered box itself, so deleting the caption
+              removes its frame too. */}
+          <EditableNode id="about-caption" tag="div" style={{ position: "absolute", bottom: "-16px", right: "0", zIndex: 2, background: "var(--ed-bg, #fafafa)", padding: "7px 12px", border: "1px solid #e8e8e8", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase" }}>
+            <EditableText id="about-caption" />
+          </EditableNode>
         </EditableNode>
       </section>
 

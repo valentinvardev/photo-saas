@@ -29,6 +29,7 @@ export const MINIMAL_BW_NODES: Record<string, EditorNode> = {
   "hero-image-1":     { id: "hero-image-1",     type: "image",     src: "https://picsum.photos/seed/201/900/1100?grayscale", alt: "" },
   "hero-image-2":     { id: "hero-image-2",     type: "image",     src: "https://picsum.photos/seed/202/900/700?grayscale",  alt: "" },
 
+  "quote-eyebrow":    { id: "quote-eyebrow",    type: "paragraph", content: "On practice" },
   "quote-text":       { id: "quote-text",       type: "paragraph", content: "“The camera is an instrument that teaches people how to see without a camera.”" },
   "quote-author":     { id: "quote-author",     type: "paragraph", content: "— Dorothea Lange" },
 
@@ -84,8 +85,9 @@ export const MINIMAL_BW_SECTIONS: SectionDef[] = [
   { id: "work", label: "Work", icon: <GridIcon />, locked: false, elements: [] },
   { id: "section-quote", label: "Quote", icon: <QuoteIcon />, locked: false,
     elements: [
-      { nodeId: "quote-text",   label: "Quote",  type: "text" },
-      { nodeId: "quote-author", label: "Author", type: "text" },
+      { nodeId: "quote-eyebrow", label: "Eyebrow", type: "text" },
+      { nodeId: "quote-text",    label: "Quote",   type: "text" },
+      { nodeId: "quote-author",  label: "Author",  type: "text" },
     ] },
   { id: "about", label: "About", icon: <UserIcon />, locked: false,
     elements: [
