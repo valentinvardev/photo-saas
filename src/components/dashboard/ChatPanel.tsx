@@ -11,6 +11,8 @@ type ChatMessage = {
   authorName: string;
   body: string;
   createdAt: string;
+  pending?: boolean;
+  failed?: boolean;
 };
 
 /* ── Helpers ── */
@@ -54,20 +56,30 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft]       = useState("");
   const [meId, setMeId]         = useState<string | null>(null);
+  const [meName, setMeName]     = useState("You");
   const [connected, setConnected] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const seen = useRef<Set<string>>(new Set());
 
   const addMessage = useCallback((m: ChatMessage) => {
     if (seen.current.has(m.id)) return;
-    seen.current.add(m.id);
-    setMessages((prev) => [...prev, m]);
+    setMessages((prev) => {
+      // Reconcile with an optimistic message we already showed (same author + body).
+      const idx = prev.findIndex((x) => x.pending && x.userId === m.userId && x.body === m.body);
+      seen.current.add(m.id);
+      if (idx >= 0) { const next = [...prev]; next[idx] = m; return next; }
+      return [...prev, m];
+    });
   }, []);
 
-  /* Who am I (for own-message styling) */
+  /* Who am I (for own-message styling + optimistic sends) */
   useEffect(() => {
     const supabase = createClient();
-    void supabase.auth.getUser().then(({ data }) => setMeId(data.user?.id ?? null));
+    void supabase.auth.getUser().then(({ data }) => {
+      setMeId(data.user?.id ?? null);
+      const meta = (data.user?.user_metadata ?? {}) as { full_name?: string; name?: string };
+      setMeName(meta.full_name ?? meta.name ?? data.user?.email?.split("@")[0] ?? "You");
+    });
   }, []);
 
   /* Seed from history */
@@ -107,14 +119,23 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
 
   async function send() {
     const body = draft.trim();
-    if (!body || sendMut.isPending) return;
+    if (!body) return;
     setDraft("");
+
+    // Optimistic: show it immediately as if sent.
+    const tempId = "temp-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6);
+    setMessages((prev) => [...prev, {
+      id: tempId, userId: meId ?? "me", authorName: meName, body,
+      createdAt: new Date().toISOString(), pending: true,
+    }]);
+
     try {
       const created = await sendMut.mutateAsync({ body });
-      // Realtime usually delivers it too; addMessage dedupes by id.
+      // Reconciles the optimistic message (replaces it) via addMessage.
       addMessage({ id: created.id, userId: created.userId, authorName: created.authorName, body: created.body, createdAt: toISO(created.createdAt) });
     } catch {
-      setDraft(body); // restore on failure
+      // Mark the optimistic message as failed instead of dropping it.
+      setMessages((prev) => prev.map((m) => m.id === tempId ? { ...m, pending: false, failed: true } : m));
     }
   }
 
@@ -154,9 +175,12 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
                     {own ? timeOf(msg.createdAt) : `${msg.authorName} · ${timeOf(msg.createdAt)}`}
                   </span>
                 )}
-                <p className={`font-sans text-[13px] leading-relaxed px-3 py-2 rounded-2xl break-words max-w-[260px] ${own ? "bg-yellow text-[#111] rounded-tr-sm" : "bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg)] rounded-tl-sm"}`}>
+                <p className={`font-sans text-[13px] leading-relaxed px-3 py-2 rounded-2xl break-words max-w-[260px] transition-opacity ${msg.pending ? "opacity-60" : ""} ${own ? "bg-yellow text-[#111] rounded-tr-sm" : "bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg)] rounded-tl-sm"}`}>
                   {msg.body}
                 </p>
+                {msg.failed && (
+                  <span className="font-mono text-[9px] text-red-400 mr-1">Not sent</span>
+                )}
               </div>
             </div>
           );
