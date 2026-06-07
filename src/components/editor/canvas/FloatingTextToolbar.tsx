@@ -50,9 +50,9 @@ const selectStyle: React.CSSProperties = {
 
 function iconBtn(active: boolean): React.CSSProperties {
   return {
-    background: active ? "#2563eb" : "transparent",
-    border: `1px solid ${active ? "#2563eb" : "transparent"}`,
-    color: active ? "#fff" : "var(--ec-sub)",
+    background: active ? "#facc15" : "transparent",
+    border: `1px solid ${active ? "#facc15" : "transparent"}`,
+    color: active ? "#111" : "var(--ec-sub)",
     width: 26, height: 26, borderRadius: 5, cursor: "pointer",
     display: "flex", alignItems: "center", justifyContent: "center",
     flexShrink: 0,

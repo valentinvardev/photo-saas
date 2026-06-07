@@ -39,8 +39,8 @@ export function ImageGalleryModal({
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
     flex: 1, background: "none", border: "none",
-    borderBottom: `2px solid ${active ? "#2563eb" : "transparent"}`,
-    color: active ? "#2563eb" : "var(--ec-dim)",
+    borderBottom: `2px solid ${active ? "#facc15" : "transparent"}`,
+    color: active ? "#facc15" : "var(--ec-dim)",
     fontSize: 11, padding: "7px 0", cursor: "pointer",
     fontFamily: "inherit",
   });
@@ -105,15 +105,15 @@ export function ImageGalleryModal({
                             title={photo.filename}
                             style={{
                               aspectRatio: "1/1", overflow: "hidden", cursor: "pointer", borderRadius: 3,
-                              border: isActive ? "2px solid #2563eb" : "2px solid transparent",
+                              border: isActive ? "2px solid #facc15" : "2px solid transparent",
                               position: "relative",
                             }}
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={photo.url} alt={photo.filename} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                             {isActive && (
-                              <div style={{ position: "absolute", top: 3, right: 3, width: 14, height: 14, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                              <div style={{ position: "absolute", top: 3, right: 3, width: 14, height: 14, background: "#facc15", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
                               </div>
                             )}
                           </div>
@@ -137,7 +137,7 @@ export function ImageGalleryModal({
                   />
                   <button
                     onClick={() => { if (urlDraft.trim()) setSelected(urlDraft.trim()); }}
-                    style={{ marginTop: 8, width: "100%", background: "rgba(37,99,235,0.12)", border: "1px solid #2563eb", color: "#2563eb", fontSize: 11, padding: "7px", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}
+                    style={{ marginTop: 8, width: "100%", background: "rgba(250,204,21,0.12)", border: "1px solid #facc15", color: "#facc15", fontSize: 11, padding: "7px", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}
                   >
                     Use URL
                   </button>
@@ -161,9 +161,9 @@ export function ImageGalleryModal({
                 onClick={() => { if (selected) { onChange(selected); onClose(); } }}
                 disabled={!selected}
                 style={{
-                  flex: 1, background: selected ? "rgba(37,99,235,0.12)" : "var(--ec-bg)",
-                  border: `1px solid ${selected ? "#2563eb" : "var(--ec-line)"}`,
-                  color: selected ? "#2563eb" : "var(--ec-ghost)",
+                  flex: 1, background: selected ? "rgba(250,204,21,0.12)" : "var(--ec-bg)",
+                  border: `1px solid ${selected ? "#facc15" : "var(--ec-line)"}`,
+                  color: selected ? "#facc15" : "var(--ec-ghost)",
                   fontSize: 11, padding: "8px", borderRadius: 4,
                   cursor: selected ? "pointer" : "default", fontFamily: "inherit", fontWeight: 600,
                 }}

@@ -29,8 +29,8 @@ export function ImagePanel({ nodeId }: Props) {
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
     flex: 1, background: "none", border: "none",
-    borderBottom: `2px solid ${active ? "#2563eb" : "transparent"}`,
-    color: active ? "#93c5fd" : "#444",
+    borderBottom: `2px solid ${active ? "#facc15" : "transparent"}`,
+    color: active ? "#facc15" : "#444",
     fontSize: 11, padding: "7px 0", cursor: "pointer",
     fontFamily: "inherit", transition: "color 0.15s",
   });
@@ -68,15 +68,15 @@ export function ImagePanel({ nodeId }: Props) {
                   onClick={() => applyFromGallery(seed)}
                   style={{
                     aspectRatio: "4/5", overflow: "hidden", cursor: "pointer", borderRadius: 3,
-                    border: isActive ? "2px solid #2563eb" : "2px solid transparent",
+                    border: isActive ? "2px solid #facc15" : "2px solid transparent",
                     position: "relative", transition: "border-color 0.15s",
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   {isActive && (
-                    <div style={{ position: "absolute", top: 3, right: 3, width: 14, height: 14, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                    <div style={{ position: "absolute", top: 3, right: 3, width: 14, height: 14, background: "#facc15", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
                     </div>
                   )}
                 </div>
@@ -106,8 +106,8 @@ export function ImagePanel({ nodeId }: Props) {
           <button
             onClick={applyUrl}
             style={{
-              width: "100%", background: "#1a2a3a", border: "1px solid #2563eb",
-              color: "#93c5fd", fontSize: 12, padding: "7px", borderRadius: 4,
+              width: "100%", background: "rgba(250,204,21,0.12)", border: "1px solid #facc15",
+              color: "#facc15", fontSize: 12, padding: "7px", borderRadius: 4,
               cursor: "pointer", fontFamily: "inherit",
             }}
           >

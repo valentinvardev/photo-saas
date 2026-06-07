@@ -45,7 +45,7 @@ export function TextPanel({ nodeId }: Props) {
           fontFamily: "inherit",
           boxSizing: "border-box",
         }}
-        onFocus={(e) => { e.currentTarget.style.borderColor = "#2563eb"; }}
+        onFocus={(e) => { e.currentTarget.style.borderColor = "#facc15"; }}
         onBlur={(e)  => { e.currentTarget.style.borderColor = "var(--ec-border)"; }}
       />
 

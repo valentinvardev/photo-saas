@@ -91,15 +91,15 @@ function FontPicker({
             key={f.value}
             onClick={() => onChange(f.stack)}
             style={{
-              background:   value.includes(f.value) ? "rgba(37,99,235,0.12)" : "var(--ec-bg)",
-              border:       `1px solid ${value.includes(f.value) ? "#2563eb" : "var(--ec-line)"}`,
+              background:   value.includes(f.value) ? "rgba(250,204,21,0.12)" : "var(--ec-bg)",
+              border:       `1px solid ${value.includes(f.value) ? "#facc15" : "var(--ec-line)"}`,
               borderRadius: 3,
               padding:      "5px 7px",
               cursor:       "pointer",
               textAlign:    "left",
             }}
           >
-            <span style={{ fontFamily: f.stack, fontSize: 13, color: value.includes(f.value) ? "#2563eb" : "var(--ec-sub)", display: "block", lineHeight: 1.2 }}>
+            <span style={{ fontFamily: f.stack, fontSize: 13, color: value.includes(f.value) ? "#facc15" : "var(--ec-sub)", display: "block", lineHeight: 1.2 }}>
               Ag
             </span>
             <span style={{ fontFamily: "inherit", fontSize: 9, color: "var(--ec-ghost)", display: "block", marginTop: 2 }}>

@@ -89,8 +89,8 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
         <button
           onClick={() => setGalleryOpen(true)}
           style={{
-            flex: 1, background: "rgba(37,99,235,0.12)", border: "1px solid #2563eb",
-            color: "#2563eb", fontSize: 10, padding: "6px", borderRadius: 4,
+            flex: 1, background: "rgba(250,204,21,0.12)", border: "1px solid #facc15",
+            color: "#facc15", fontSize: 10, padding: "6px", borderRadius: 4,
             cursor: "pointer", fontFamily: "inherit",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
           }}
@@ -122,15 +122,15 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
               onClick={() => update({ objectFit: o.value })}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
-                background: active ? "rgba(37,99,235,0.15)" : "var(--ec-bg)",
-                border: `1px solid ${active ? "#2563eb" : "var(--ec-line)"}`,
-                color: active ? "#2563eb" : "var(--ec-sub)",
+                background: active ? "rgba(250,204,21,0.15)" : "var(--ec-bg)",
+                border: `1px solid ${active ? "#facc15" : "var(--ec-line)"}`,
+                color: active ? "#facc15" : "var(--ec-sub)",
                 fontSize: 11, padding: "6px 10px", borderRadius: 4, cursor: "pointer",
                 fontFamily: "inherit", textAlign: "left",
               }}
             >
               <span style={{ fontWeight: active ? 600 : 400 }}>{o.label}</span>
-              <span style={{ fontSize: 9, color: active ? "#60a5fa" : "#333" }}>{o.desc}</span>
+              <span style={{ fontSize: 9, color: active ? "#facc15" : "#333" }}>{o.desc}</span>
             </button>
           );
         })}
@@ -148,9 +148,9 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
               key={o.value}
               onClick={() => update({ objectPosition: o.value })}
               style={{
-                background: active ? "#2563eb" : "var(--ec-raised)",
-                border: `1px solid ${active ? "#2563eb" : "var(--ec-lift)"}`,
-                color: active ? "#fff" : "var(--ec-sub)",
+                background: active ? "#facc15" : "var(--ec-raised)",
+                border: `1px solid ${active ? "#facc15" : "var(--ec-lift)"}`,
+                color: active ? "#111" : "var(--ec-sub)",
                 fontSize: 10, padding: "4px 8px", borderRadius: 3, cursor: "pointer",
                 fontFamily: "inherit",
               }}
@@ -197,7 +197,7 @@ export function InspectorPanel() {
         padding: "10px 12px", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#2563eb" }} />
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#facc15" }} />
           <span style={{ color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
             Image
           </span>

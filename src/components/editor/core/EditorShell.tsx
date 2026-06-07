@@ -102,7 +102,10 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
       />
 
       {view === "overview" ? (
-        <DesignHome onEnterPage={() => setView("page")} />
+        <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+          <DesignHome onEnterPage={() => setView("page")} />
+          <Canvas />
+        </div>
       ) : (
         <>
           <div style={{ display: "flex", flex: 1, minHeight: 0 }}>

@@ -116,13 +116,13 @@ function PagesTab() {
                   alignItems:  "center",
                   gap:         6,
                   width:       "100%",
-                  background:  isSelected ? "rgba(37,99,235,0.12)" : "none",
+                  background:  isSelected ? "rgba(250,204,21,0.12)" : "none",
                   border:      "none",
-                  borderLeft:  isSelected ? "2px solid #2563eb" : "2px solid transparent",
+                  borderLeft:  isSelected ? "2px solid #facc15" : "2px solid transparent",
                   cursor:      "pointer",
                   padding:     "5px 12px 5px 20px",
                   textAlign:   "left",
-                  color:       isSelected ? "#93c5fd" : "var(--ec-muted)",
+                  color:       isSelected ? "#facc15" : "var(--ec-muted)",
                   transition:  "background 0.1s, color 0.1s",
                 }}
                 onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "var(--ec-raised)"; }}
@@ -142,7 +142,7 @@ function PagesTab() {
                 </span>
 
                 {/* Icon */}
-                <span style={{ color: isSelected ? "#60a5fa" : "var(--ec-dim)", display: "flex" }}>{section.icon}</span>
+                <span style={{ color: isSelected ? "#facc15" : "var(--ec-dim)", display: "flex" }}>{section.icon}</span>
 
                 {/* Label */}
                 <span style={{ flex: 1, fontSize: 11, fontWeight: isSelected ? 500 : 400 }}>{section.label}</span>
@@ -181,18 +181,18 @@ function PagesTab() {
                         alignItems: "center",
                         gap:        6,
                         width:      "100%",
-                        background: elSelected ? "rgba(37,99,235,0.1)" : "none",
+                        background: elSelected ? "rgba(250,204,21,0.1)" : "none",
                         border:     "none",
-                        borderLeft: elSelected ? "2px solid #2563eb" : "2px solid transparent",
+                        borderLeft: elSelected ? "2px solid #facc15" : "2px solid transparent",
                         cursor:     "pointer",
                         padding:    "4px 10px 4px 10px",
                         textAlign:  "left",
-                        color:      elSelected ? "#93c5fd" : "var(--ec-sub)",
+                        color:      elSelected ? "#facc15" : "var(--ec-sub)",
                       }}
                       onMouseEnter={(e) => { if (!elSelected) e.currentTarget.style.background = "var(--ec-surface)"; }}
                       onMouseLeave={(e) => { if (!elSelected) e.currentTarget.style.background = "none"; }}
                     >
-                      <span style={{ color: el.type === "image" ? "#7c3aed" : "#2563eb", display: "flex" }}>
+                      <span style={{ color: el.type === "image" ? "#7c3aed" : "#facc15", display: "flex" }}>
                         {el.type === "image" ? <ImageNodeIcon /> : <TextNodeIcon />}
                       </span>
                       <span style={{ fontSize: 11 }}>{el.label}</span>
@@ -323,7 +323,7 @@ function LogoWidthSlider({
 }) {
   const pct = ((width - LOGO_WIDTH_MIN) / (LOGO_WIDTH_MAX - LOGO_WIDTH_MIN)) * 100;
   /* Custom-painted track: filled portion uses the editor's blue accent */
-  const trackBg = `linear-gradient(to right, #2563eb 0%, #2563eb ${pct}%, var(--ec-border) ${pct}%, var(--ec-border) 100%)`;
+  const trackBg = `linear-gradient(to right, #facc15 0%, #facc15 ${pct}%, var(--ec-border) ${pct}%, var(--ec-border) 100%)`;
 
   return (
     <div>
@@ -350,14 +350,14 @@ function LogoWidthSlider({
         .ed-logo-width-range::-webkit-slider-thumb {
           -webkit-appearance: none;
           width: 14px; height: 14px; border-radius: 50%;
-          background: var(--ec-bright); border: 2px solid #2563eb;
+          background: var(--ec-bright); border: 2px solid #facc15;
           cursor: grab; margin-top: 0;
           box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         .ed-logo-width-range::-webkit-slider-thumb:active { cursor: grabbing; }
         .ed-logo-width-range::-moz-range-thumb {
           width: 14px; height: 14px; border-radius: 50%;
-          background: var(--ec-bright); border: 2px solid #2563eb;
+          background: var(--ec-bright); border: 2px solid #facc15;
           cursor: grab;
           box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
@@ -400,7 +400,7 @@ function LogoCropButton({
         </svg>
         <span style={{ flex: 1 }}>{hasCrop ? "Adjust crop" : "Crop image"}</span>
         {hasCrop && (
-          <span style={{ fontFamily: "monospace", fontSize: 9, color: "#2563eb", background: "rgba(37,99,235,0.12)", border: "1px solid #2563eb", padding: "1px 5px", borderRadius: 3 }}>
+          <span style={{ fontFamily: "monospace", fontSize: 9, color: "#facc15", background: "rgba(250,204,21,0.12)", border: "1px solid #facc15", padding: "1px 5px", borderRadius: 3 }}>
             ON
           </span>
         )}
@@ -437,9 +437,9 @@ function SettingsTab() {
   };
 
   const modeStyle = (active: boolean): React.CSSProperties => ({
-    flex: 1, background: active ? "rgba(37,99,235,0.12)" : "var(--ec-raised)",
-    border: `1px solid ${active ? "#2563eb" : "var(--ec-border)"}`,
-    color: active ? "#2563eb" : "var(--ec-sub)",
+    flex: 1, background: active ? "rgba(250,204,21,0.12)" : "var(--ec-raised)",
+    border: `1px solid ${active ? "#facc15" : "var(--ec-border)"}`,
+    color: active ? "#facc15" : "var(--ec-sub)",
     fontSize: 10, padding: "5px 4px", borderRadius: 3,
     cursor: "pointer", fontFamily: "inherit", textAlign: "center",
   });

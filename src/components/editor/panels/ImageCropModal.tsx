@@ -285,8 +285,8 @@ export function ImageCropModal({
             onClick={apply}
             disabled={!imgSize}
             style={{
-              background: "#1a2a3a", border: "1px solid #2563eb",
-              color: "#93c5fd", fontSize: 11, padding: "7px 16px", borderRadius: 4,
+              background: "rgba(250,204,21,0.12)", border: "1px solid #facc15",
+              color: "#facc15", fontSize: 11, padding: "7px 16px", borderRadius: 4,
               cursor: imgSize ? "pointer" : "default", fontFamily: "inherit", fontWeight: 600,
             }}
           >
