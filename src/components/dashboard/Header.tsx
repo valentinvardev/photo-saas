@@ -245,14 +245,6 @@ function SearchIcon() {
     </svg>
   );
 }
-function BellIcon() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.73 21a2 2 0 01-3.46 0" />
-    </svg>
-  );
-}
 function ChevronDown() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -384,94 +376,6 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard/profile":   "Profile",
 };
 
-/* ── Notification icons ─────────────────────────────────── */
-function NotifIconSale() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
-    </svg>
-  );
-}
-function NotifIconView() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
-function NotifIconExport() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-    </svg>
-  );
-}
-function NotifIconStar() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
-function NotifIconStorage() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-    </svg>
-  );
-}
-
-/* ── Notifications data ─────────────────────────────────── */
-const NOTIFICATIONS = [
-  { id: 1, Icon: NotifIconSale,    title: "New sale",          body: "Portrait session license — $120.00",  time: "2m ago",  unread: true  },
-  { id: 2, Icon: NotifIconView,    title: "Portfolio viewed",  body: "Someone from Berlin viewed your work", time: "1h ago",  unread: true  },
-  { id: 3, Icon: NotifIconExport,  title: "Export ready",      body: "Wedding_final — 47 photos zipped",    time: "3h ago",  unread: false },
-  { id: 4, Icon: NotifIconStar,    title: "Review received",   body: "5 stars — \"Absolutely stunning!\"",  time: "1d ago",  unread: false },
-  { id: 5, Icon: NotifIconStorage, title: "Storage at 48%",    body: "2.4 TB of 5 TB used",                 time: "2d ago",  unread: false },
-];
-
-/* ── Notification panel ─────────────────────────────────── */
-function NotificationPanel({ onClose }: { onClose: () => void }) {
-  const unread = NOTIFICATIONS.filter((n) => n.unread).length;
-
-  return (
-    <div className="absolute top-full right-0 mt-2 w-80 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-lg)] overflow-hidden z-50">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
-        <span className="font-sans text-sm font-semibold text-[var(--fg)]">Notifications</span>
-        {unread > 0 && (
-          <span className="font-mono text-[10px] bg-yellow text-[#111] px-1.5 py-0.5 rounded-full font-bold">{unread} new</span>
-        )}
-      </div>
-      <div className="max-h-72 overflow-y-auto divide-y divide-[var(--border-subtle)]">
-        {NOTIFICATIONS.map((n) => (
-          <button
-            key={n.id}
-            onClick={onClose}
-            className="w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-[var(--bg-subtle)] transition-colors"
-          >
-            <span className="shrink-0 mt-0.5 w-7 h-7 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center text-[var(--fg-muted)]">
-              <n.Icon />
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-sans text-xs font-semibold text-[var(--fg)]">{n.title}</span>
-                {n.unread && <span className="w-1.5 h-1.5 rounded-full bg-yellow shrink-0" />}
-              </div>
-              <p className="font-sans text-xs text-[var(--fg-muted)] truncate mt-0.5">{n.body}</p>
-              <span className="font-mono text-[10px] text-[var(--fg-muted)]">{n.time}</span>
-            </div>
-          </button>
-        ))}
-      </div>
-      <div className="px-4 py-2 border-t border-[var(--border)]">
-        <button className="w-full font-sans text-xs text-[var(--fg-muted)] hover:text-[var(--fg)] text-center transition-colors py-1">
-          Mark all as read
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* ── Current signed-in user ───────────────────────────────
    Reads the DB profile (api.user.me) so the header reflects edits made on
    the /profile page (name + avatar), not the stale Supabase auth metadata. */
@@ -573,11 +477,9 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchQuery,   setSearchQuery]   = useState("");
   const [searchOpen,    setSearchOpen]    = useState(false);
-  const [notifOpen,     setNotifOpen]     = useState(false);
   const [profileOpen,   setProfileOpen]   = useState(false);
 
   const searchRef  = useRef<HTMLDivElement>(null);
-  const notifRef   = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const [searchTab, setSearchTab] = useState<SearchTab>("templates");
@@ -614,15 +516,13 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
   const tabCounts = { templates: tplMatches.length, social: peopleMatches.length, navigate: actionMatches.length };
 
   const title   = PAGE_TITLES[pathname] ?? "Dashboard";
-  const unread  = NOTIFICATIONS.filter((n) => n.unread).length;
   const user    = useCurrentUser();
 
-  /* close notif/profile dropdowns on outside click. The search modal is
+  /* close the profile dropdown on outside click. The search modal is
      fixed-positioned and handles its own backdrop click — we'd close it
      on every click inside the modal if we used a ref test here. */
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (notifRef.current && !notifRef.current.contains(e.target as Node))   setNotifOpen(false);
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
     }
     document.addEventListener("mousedown", handler);
@@ -1080,25 +980,10 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
         <span className="hidden sm:block font-sans text-xs font-medium">Chat</span>
       </button>
 
-      {/* Notifications */}
-      <div ref={notifRef} className="relative shrink-0">
-        <button
-          onClick={() => { setNotifOpen((p) => !p); setProfileOpen(false); }}
-          className="relative p-1.5 sm:p-2 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors"
-          aria-label="Notifications"
-        >
-          <BellIcon />
-          {unread > 0 && (
-            <span className="absolute top-1 right-1 w-2 h-2 bg-yellow rounded-full ring-2 ring-[var(--bg-card)]" />
-          )}
-        </button>
-        {notifOpen && <NotificationPanel onClose={() => setNotifOpen(false)} />}
-      </div>
-
       {/* Profile avatar */}
       <div ref={profileRef} className="relative shrink-0">
         <button
-          onClick={() => { setProfileOpen((p) => !p); setNotifOpen(false); }}
+          onClick={() => setProfileOpen((p) => !p)}
           className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors"
           aria-label="Profile menu"
         >
