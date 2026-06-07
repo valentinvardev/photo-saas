@@ -2,8 +2,8 @@
 
 import { create } from "zustand";
 import { temporal } from "zundo";
-import type { EditorNode, EditorState, ColorPalette, Typography, ButtonStyle, Viewport, LogoSettings } from "./types";
-import { DEFAULT_PALETTE, DEFAULT_TYPOGRAPHY, DEFAULT_BUTTONS, DEFAULT_LOGO } from "./types";
+import type { EditorNode, EditorState, ColorPalette, Typography, ButtonStyle, GridSettings, Viewport, LogoSettings } from "./types";
+import { DEFAULT_PALETTE, DEFAULT_TYPOGRAPHY, DEFAULT_BUTTONS, DEFAULT_GRID, DEFAULT_LOGO } from "./types";
 import { TEMPLATES, DEFAULT_TEMPLATE_ID, type TemplateId } from "./templates/registry";
 
 /** Serializable design saved per-portfolio (Portfolio.editorState). */
@@ -13,6 +13,7 @@ export interface PortfolioDesign {
   palette?:        ColorPalette;
   typography?:     Typography;
   buttons?:        ButtonStyle;
+  grid?:           GridSettings;
   logo?:           LogoSettings;
   hiddenSections?: string[];
 }
@@ -34,6 +35,7 @@ interface EditorStore extends EditorState {
   setPalette:         (patch: Partial<ColorPalette>) => void;
   setTypography:      (patch: Partial<Typography>) => void;
   setButtons:         (patch: Partial<ButtonStyle>) => void;
+  setGrid:            (patch: Partial<GridSettings>) => void;
   setLogo:            (patch: Partial<LogoSettings>) => void;
   hideSection:        (id: string) => void;
   showSection:        (id: string) => void;
@@ -50,6 +52,7 @@ export const useEditorStore = create<EditorStore>()(
       palette:         DEFAULT_PALETTE,
       typography:      DEFAULT_TYPOGRAPHY,
       buttons:         DEFAULT_BUTTONS,
+      grid:            DEFAULT_GRID,
       logo:            DEFAULT_LOGO,
       selectedId:      null,
       editingId:       null,
@@ -74,6 +77,7 @@ export const useEditorStore = create<EditorStore>()(
           palette:         d.palette ?? DEFAULT_PALETTE,
           typography:      d.typography ?? DEFAULT_TYPOGRAPHY,
           buttons:         d.buttons ? { ...DEFAULT_BUTTONS, ...d.buttons } : DEFAULT_BUTTONS,
+          grid:            d.grid ? { ...DEFAULT_GRID, ...d.grid } : DEFAULT_GRID,
           logo:            d.logo ?? DEFAULT_LOGO,
           hiddenSections:  d.hiddenSections ?? [],
           selectedId:      null,
@@ -110,6 +114,9 @@ export const useEditorStore = create<EditorStore>()(
       setButtons: (patch) =>
         set((s) => ({ buttons: { ...s.buttons, ...patch } })),
 
+      setGrid: (patch) =>
+        set((s) => ({ grid: { ...s.grid, ...patch } })),
+
       setLogo: (patch) =>
         set((s) => ({ logo: { ...s.logo, ...patch } })),
 
@@ -123,14 +130,14 @@ export const useEditorStore = create<EditorStore>()(
         set((s) => ({
           nodes: TEMPLATES[s.templateId]!.initialNodes,
           palette: DEFAULT_PALETTE, typography: DEFAULT_TYPOGRAPHY, buttons: DEFAULT_BUTTONS,
-          logo: DEFAULT_LOGO, selectedId: null, editingId: null,
+          grid: DEFAULT_GRID, logo: DEFAULT_LOGO, selectedId: null, editingId: null,
           viewport: "desktop", selectedSection: null, hiddenSections: [],
         })),
     }),
     {
       partialize: (s) => ({
         nodes: s.nodes, palette: s.palette, typography: s.typography,
-        buttons: s.buttons, logo: s.logo, hiddenSections: s.hiddenSections,
+        buttons: s.buttons, grid: s.grid, logo: s.logo, hiddenSections: s.hiddenSections,
       }),
     }
   )

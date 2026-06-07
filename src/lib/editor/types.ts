@@ -39,6 +39,18 @@ export interface Typography {
   mono: string;
 }
 
+/* Gallery grid for the "Selected work" section.
+   - mosaic  → the editorial masonry layout (current default).
+   - uniform → an even N-column grid; with `loadMore` it paginates every photo
+               behind a "Load more" button instead of the "All projects" link. */
+export interface GridSettings {
+  layout:   "mosaic" | "uniform";
+  columns:  number;  // 2..5 — uniform only
+  gap:      number;  // px between cells
+  loadMore: boolean; // uniform only
+  pageSize: number;  // initial + per-batch count when loadMore is on
+}
+
 /* Global button styling. Empty bg/fg means "follow the palette"
    (bg → palette.fg, fg → palette.bg). */
 export interface ButtonStyle {
@@ -74,6 +86,7 @@ export interface EditorState {
   palette: ColorPalette;
   typography: Typography;
   buttons: ButtonStyle;
+  grid: GridSettings;
   logo: LogoSettings;
   selectedId: string | null;
   editingId: string | null;
@@ -100,6 +113,14 @@ export const DEFAULT_BUTTONS: ButtonStyle = {
   radius: 0,
   bg:     "",
   fg:     "",
+};
+
+export const DEFAULT_GRID: GridSettings = {
+  layout:   "mosaic",
+  columns:  3,
+  gap:      3,
+  loadMore: false,
+  pageSize: 9,
 };
 
 export const DEFAULT_LOGO: LogoSettings = {

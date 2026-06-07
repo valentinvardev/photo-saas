@@ -27,7 +27,7 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
     setTemplate, updateNode, setPalette, setTypography, setLogo,
     hydrateDesign, setGalleryPhotos, setReadOnly,
     selectNode, setSelectedSection, setHoveredSection,
-    palette, typography, buttons, selectedSection, hoveredSection, hiddenSections,
+    palette, typography, buttons, grid, selectedSection, hoveredSection, hiddenSections,
     nodes, logo,
   } = useEditorStore();
 
@@ -67,7 +67,7 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
     if (!portfolioId || !hydrated.current) return;
     const design: PortfolioDesign = {
       templateId: useEditorStore.getState().templateId,
-      nodes, palette, typography, buttons, logo, hiddenSections,
+      nodes, palette, typography, buttons, grid, logo, hiddenSections,
     };
     const json = JSON.stringify(design);
     if (json === lastSaved.current) return;
@@ -77,7 +77,7 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
     }, 1000);
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes, palette, typography, buttons, logo, hiddenSections, portfolioId]);
+  }, [nodes, palette, typography, buttons, grid, logo, hiddenSections, portfolioId]);
 
   /* ── Legacy localStorage editor (/editor/minimal-bw) ── */
   useEffect(() => {

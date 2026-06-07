@@ -11,6 +11,7 @@ import { ImageCropModal } from "~/components/editor/panels/ImageCropModal";
 import { ColorPalettePanel } from "~/components/editor/panels/ColorPalettePanel";
 import { TypographyPanel } from "~/components/editor/panels/TypographyPanel";
 import { ButtonsPanel } from "~/components/editor/panels/ButtonsPanel";
+import { GridPanel } from "~/components/editor/panels/GridPanel";
 
 function LockIcon() {
   return <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
@@ -342,6 +343,10 @@ function DesignTab() {
       <SectionDivider />
       <PanelHeading title="Buttons" desc="Shape and color of every button." />
       <ButtonsPanel />
+
+      <SectionDivider />
+      <PanelHeading title="Gallery grid" desc="Layout, columns and spacing of your work grid." />
+      <GridPanel />
     </div>
   );
 }

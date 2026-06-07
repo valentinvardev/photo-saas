@@ -498,7 +498,7 @@ function Label({ index, text }: { index: string; text: string }) {
 ═══════════════════════════════════════════ */
 export function EditableTemplate({ viewport }: { viewport: Viewport }) {
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const { selectNode } = useEditorStore();
+  const { selectNode, grid } = useEditorStore();
 
   /* Derive breakpoint flags from the editor viewport prop
      instead of reading window.innerWidth */
@@ -508,6 +508,29 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
   const px = isMobile ? "1.5rem" : isTablet ? "5vw" : "7vw";
   const allWorks = useWorks();
   const featured = allWorks.slice(0, 8);
+
+  /* Grid settings (from the Design tab) */
+  const gap         = `${grid.gap}px`;
+  const uniformCols = isMobile ? Math.min(grid.columns, 2) : isTablet ? Math.min(grid.columns, 3) : grid.columns;
+
+  /* "Load more" pagination — reset when the relevant settings change */
+  const [visibleCount, setVisibleCount] = useState(grid.pageSize);
+  useEffect(() => { setVisibleCount(grid.pageSize); }, [grid.pageSize, grid.loadMore, grid.layout, allWorks.length]);
+  const uniformWorks = grid.loadMore ? allWorks.slice(0, visibleCount) : featured;
+  const canLoadMore  = grid.loadMore && visibleCount < allWorks.length;
+
+  /* Footer link to the full gallery — shared by mosaic + non-paginated grid */
+  const allProjectsLink = (
+    <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "flex-end" }}>
+      <button onClick={() => setGalleryOpen(true)}
+        style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", borderBottom: "1px solid #0a0a0a", paddingBottom: "2px" }}
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.45"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}>
+        All projects ({allWorks.length})
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  );
 
   return (
     <div
@@ -592,42 +615,64 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       <section id="work" style={{ padding: `5rem ${px}` }}>
         <Label index="01" text="Selected Work" />
 
-        {!isMobile && (!isTablet && featured.length >= 8 ? (
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "280px 280px 360px 320px", gap: "3px" }}>
-            <div style={{ gridRow: "1/3", gridColumn: "1" }}>   <Cell w={featured[0]} onClick={() => setGalleryOpen(true)} /></div>
-            <div style={{ gridRow: "1",   gridColumn: "2" }}>   <Cell w={featured[1]} onClick={() => setGalleryOpen(true)} /></div>
-            <div style={{ gridRow: "1",   gridColumn: "3" }}>   <Cell w={featured[2]} onClick={() => setGalleryOpen(true)} /></div>
-            <div style={{ gridRow: "2",   gridColumn: "2" }}>   <Cell w={featured[3]} onClick={() => setGalleryOpen(true)} /></div>
-            <div style={{ gridRow: "2",   gridColumn: "3" }}>   <Cell w={featured[4]} onClick={() => setGalleryOpen(true)} /></div>
-            <div style={{ gridRow: "3",   gridColumn: "1/3" }}> <Cell w={featured[5]} onClick={() => setGalleryOpen(true)} /></div>
-            <div style={{ gridRow: "3",   gridColumn: "3" }}>   <Cell w={featured[6]} onClick={() => setGalleryOpen(true)} /></div>
-            <div style={{ gridRow: "4",   gridColumn: "1" }}>   <Cell w={featured[7]} onClick={() => setGalleryOpen(true)} /></div>
-            <div style={{ gridRow: "4",   gridColumn: "2/4" }}> <Cell w={featured[0]} onClick={() => setGalleryOpen(true)} /></div>
-          </div>
+        {grid.layout === "uniform" ? (
+          /* ── Uniform N-column grid (optionally paginated with Load more) ── */
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${uniformCols}, 1fr)`, gap }}>
+              {uniformWorks.map((w, i) => (
+                <div key={`${w.id}-${i}`} style={{ aspectRatio: isMobile ? "1/1" : "4/5" }}>
+                  <Cell w={w} onClick={() => setGalleryOpen(true)} />
+                </div>
+              ))}
+            </div>
+            {grid.loadMore ? (
+              canLoadMore && (
+                <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "center" }}>
+                  <button onClick={() => setVisibleCount((c) => c + grid.pageSize)}
+                    style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "1px solid #0a0a0a", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.85rem 1.75rem" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}>
+                    Load more
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+                  </button>
+                </div>
+              )
+            ) : (
+              allProjectsLink
+            )}
+          </>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: isTablet ? "1fr 1fr" : "1fr 1fr 1fr", gap: "3px" }}>
-            {featured.map((w) => (
-              <div key={w.id} style={{ aspectRatio: "4/5" }}><Cell w={w} onClick={() => setGalleryOpen(true)} /></div>
+          /* ── Mosaic (editorial masonry) ── */
+          <>
+            {!isMobile && (!isTablet && featured.length >= 8 ? (
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "280px 280px 360px 320px", gap }}>
+                <div style={{ gridRow: "1/3", gridColumn: "1" }}>   <Cell w={featured[0]} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "1",   gridColumn: "2" }}>   <Cell w={featured[1]} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "1",   gridColumn: "3" }}>   <Cell w={featured[2]} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "2",   gridColumn: "2" }}>   <Cell w={featured[3]} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "2",   gridColumn: "3" }}>   <Cell w={featured[4]} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "3",   gridColumn: "1/3" }}> <Cell w={featured[5]} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "3",   gridColumn: "3" }}>   <Cell w={featured[6]} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "4",   gridColumn: "1" }}>   <Cell w={featured[7]} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "4",   gridColumn: "2/4" }}> <Cell w={featured[0]} onClick={() => setGalleryOpen(true)} /></div>
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: isTablet ? "1fr 1fr" : "1fr 1fr 1fr", gap }}>
+                {featured.map((w) => (
+                  <div key={w.id} style={{ aspectRatio: "4/5" }}><Cell w={w} onClick={() => setGalleryOpen(true)} /></div>
+                ))}
+              </div>
             ))}
-          </div>
-        ))}
-        {isMobile && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px" }}>
-            {featured.map((w) => (
-              <div key={w.id} style={{ aspectRatio: "1/1" }}><Cell w={w} onClick={() => setGalleryOpen(true)} /></div>
-            ))}
-          </div>
+            {isMobile && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap }}>
+                {featured.map((w) => (
+                  <div key={w.id} style={{ aspectRatio: "1/1" }}><Cell w={w} onClick={() => setGalleryOpen(true)} /></div>
+                ))}
+              </div>
+            )}
+            {allProjectsLink}
+          </>
         )}
-
-        <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={() => setGalleryOpen(true)}
-            style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", borderBottom: "1px solid #0a0a0a", paddingBottom: "2px" }}
-            onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.45"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}>
-            All projects ({allWorks.length})
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        </div>
       </section>
 
       {/* ════ PULL QUOTE ════ */}
