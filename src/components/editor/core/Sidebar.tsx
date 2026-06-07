@@ -6,8 +6,6 @@ import { useEditorStore } from "~/lib/editor/store";
 import { TEMPLATES } from "~/lib/editor/templates/registry";
 import type { SectionDef } from "~/lib/editor/templates/types";
 import { deviceContentRef } from "~/lib/editor/deviceRef";
-import { ColorPalettePanel } from "~/components/editor/panels/ColorPalettePanel";
-import { TypographyPanel } from "~/components/editor/panels/TypographyPanel";
 import { ImagePickerButton } from "~/components/editor/panels/ImageGalleryModal";
 import { ImageCropModal } from "~/components/editor/panels/ImageCropModal";
 
@@ -302,29 +300,6 @@ function MenuItem({ label, onClick, disabled, danger }: { label: string; onClick
 /* ═══════════════════════════════════════════════════════════════════════
    DESIGN TAB
 ═══════════════════════════════════════════════════════════════════════ */
-function DesignTab() {
-  const [section, setSection] = useState<"colors" | "type">("colors");
-
-  const pillStyle = (active: boolean): React.CSSProperties => ({
-    flex: 1, background: active ? "var(--ec-lift)" : "none", border: "none",
-    color: active ? "var(--ec-bright)" : "var(--ec-sub)", fontSize: 11, padding: "5px 0",
-    cursor: "pointer", borderRadius: 4, fontFamily: "inherit",
-  });
-
-  return (
-    <div>
-      {/* Sub-nav */}
-      <div style={{ display: "flex", gap: 2, padding: "10px 12px 6px", background: "var(--ec-bg)" }}>
-        <button style={pillStyle(section === "colors")} onClick={() => setSection("colors")}>Colors</button>
-        <button style={pillStyle(section === "type")}   onClick={() => setSection("type")}>Typography</button>
-      </div>
-
-      {section === "colors" ? <ColorPalettePanel /> : <TypographyPanel />}
-    </div>
-  );
-}
-
-
 /* ═══════════════════════════════════════════════════════════════════════
    SETTINGS TAB
 ═══════════════════════════════════════════════════════════════════════ */
@@ -582,7 +557,7 @@ function SettingsTab() {
 /* ═══════════════════════════════════════════════════════════════════════
    SIDEBAR ROOT
 ═══════════════════════════════════════════════════════════════════════ */
-type SidebarTab = "pages" | "design" | "settings";
+type SidebarTab = "pages" | "settings";
 
 export function Sidebar() {
   const [tab, setTab] = useState<SidebarTab>("pages");
@@ -614,10 +589,10 @@ export function Sidebar() {
         flexShrink:  0,
       }}
     >
-      {/* Tab bar */}
+      {/* Tab bar — global design lives in the overview ("Design system"),
+          so the page editor only has Page + Settings. */}
       <div style={{ display: "flex", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
         <button style={tabStyle(tab === "pages")}    onClick={() => setTab("pages")}>Page</button>
-        <button style={tabStyle(tab === "design")}   onClick={() => setTab("design")}>Design</button>
         <button style={tabStyle(tab === "settings")} onClick={() => setTab("settings")}>Settings</button>
       </div>
 
@@ -626,7 +601,6 @@ export function Sidebar() {
         {/* Text formatting lives in the floating toolbar above the selected
             text; the sidebar only holds the section tree now. */}
         {tab === "pages"    && <PagesTab />}
-        {tab === "design"   && <DesignTab />}
         {tab === "settings" && <SettingsTab />}
       </div>
     </aside>

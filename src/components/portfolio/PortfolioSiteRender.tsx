@@ -35,6 +35,7 @@ export function PortfolioSiteRender({ design, galleryPhotos }: {
   const setReadOnly      = useEditorStore((s) => s.setReadOnly);
   const palette          = useEditorStore((s) => s.palette);
   const typography       = useEditorStore((s) => s.typography);
+  const buttons          = useEditorStore((s) => s.buttons);
   const hiddenSections   = useEditorStore((s) => s.hiddenSections);
   const templateId       = useEditorStore((s) => s.templateId);
 
@@ -64,6 +65,9 @@ export function PortfolioSiteRender({ design, galleryPhotos }: {
           --tpl-serif: ${typography.serif};
           --tpl-sans: ${typography.sans};
           --tpl-mono: ${typography.mono};
+          --ed-btn-radius: ${buttons.radius}px;
+          --ed-btn-bg: ${buttons.bg || "var(--ed-fg)"};
+          --ed-btn-fg: ${buttons.fg || "var(--ed-bg)"};
         }
         ${hiddenSections.map((id) => `#${id} { display: none !important; }`).join("\n")}
       `}</style>

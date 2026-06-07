@@ -38,6 +38,14 @@ export interface Typography {
   mono: string;
 }
 
+/* Global button styling. Empty bg/fg means "follow the palette"
+   (bg → palette.fg, fg → palette.bg). */
+export interface ButtonStyle {
+  radius: number; // px
+  bg: string;
+  fg: string;
+}
+
 /* Crop region as percentages of the source image (0-100).
    `aspectRatio` is captured at crop time so renderers can size the wrapper
    without knowing the original image's intrinsic dimensions. */
@@ -64,6 +72,7 @@ export interface EditorState {
   nodes: Record<string, EditorNode>;
   palette: ColorPalette;
   typography: Typography;
+  buttons: ButtonStyle;
   logo: LogoSettings;
   selectedId: string | null;
   editingId: string | null;
@@ -84,6 +93,12 @@ export const DEFAULT_TYPOGRAPHY: Typography = {
   serif: "'Cormorant Garamond', Georgia, serif",
   sans:  "'DM Sans', system-ui, sans-serif",
   mono:  "'Space Mono', monospace",
+};
+
+export const DEFAULT_BUTTONS: ButtonStyle = {
+  radius: 0,
+  bg:     "",
+  fg:     "",
 };
 
 export const DEFAULT_LOGO: LogoSettings = {

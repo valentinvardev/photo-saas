@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditorStore, type PortfolioDesign } from "~/lib/editor/store";
 import { loadState } from "~/lib/editor/localStorage";
 import { EditorThemeProvider, THEME_VARS, useEditorTheme } from "~/lib/editor/editorTheme";
@@ -10,6 +10,7 @@ import { Canvas } from "./Canvas";
 import { Sidebar } from "./Sidebar";
 import { InspectorPanel } from "~/components/editor/panels/InspectorPanel";
 import { FloatingTextToolbar } from "~/components/editor/canvas/FloatingTextToolbar";
+import { DesignHome } from "./DesignHome";
 import type { TemplateId } from "~/lib/editor/templates/registry";
 
 // Side-effect: load all @fontsource CSS
@@ -26,9 +27,12 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
   const {
     setTemplate, updateNode, setPalette, setTypography, setLogo,
     hydrateDesign, setGalleryPhotos, setReadOnly,
-    palette, typography, selectedSection, hoveredSection, hiddenSections,
+    palette, typography, buttons, selectedSection, hoveredSection, hiddenSections,
     nodes, logo,
   } = useEditorStore();
+
+  // Overview ("design home") shows first; entering a page reveals the editor.
+  const [view, setView] = useState<"overview" | "page">("overview");
 
   const { theme } = useEditorTheme();
   const saveDesign = api.portfolio.saveDesign.useMutation();
@@ -52,7 +56,7 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
     if (!portfolioId || !hydrated.current) return;
     const design: PortfolioDesign = {
       templateId: useEditorStore.getState().templateId,
-      nodes, palette, typography, logo, hiddenSections,
+      nodes, palette, typography, buttons, logo, hiddenSections,
     };
     const json = JSON.stringify(design);
     if (json === lastSaved.current) return;
@@ -62,7 +66,7 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
     }, 1000);
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes, palette, typography, logo, hiddenSections, portfolioId]);
+  }, [nodes, palette, typography, buttons, logo, hiddenSections, portfolioId]);
 
   /* ── Legacy localStorage editor (/editor/minimal-bw) ── */
   useEffect(() => {
@@ -90,16 +94,27 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
         ...THEME_VARS[theme],
       }}
     >
-      <TopBar portfolioId={portfolioId} saving={saveDesign.isPending} />
+      <TopBar
+        portfolioId={portfolioId}
+        saving={saveDesign.isPending}
+        view={view}
+        onBackToOverview={() => setView("overview")}
+      />
 
-      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-        <Sidebar />
-        <InspectorPanel />
-        <Canvas />
-      </div>
+      {view === "overview" ? (
+        <DesignHome onEnterPage={() => setView("page")} />
+      ) : (
+        <>
+          <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+            <Sidebar />
+            <InspectorPanel />
+            <Canvas />
+          </div>
 
-      {/* Floating formatting toolbar — appears above the selected text node */}
-      <FloatingTextToolbar />
+          {/* Floating formatting toolbar — appears above the selected text node */}
+          <FloatingTextToolbar />
+        </>
+      )}
 
       <style>{`
         :root {
@@ -113,6 +128,9 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
           --tpl-serif: ${typography.serif};
           --tpl-sans:  ${typography.sans};
           --tpl-mono:  ${typography.mono};
+          --ed-btn-radius: ${buttons.radius}px;
+          --ed-btn-bg: ${buttons.bg || "var(--ed-fg)"};
+          --ed-btn-fg: ${buttons.fg || "var(--ed-bg)"};
         }
 
         ${hoveredSection && hoveredSection !== selectedSection

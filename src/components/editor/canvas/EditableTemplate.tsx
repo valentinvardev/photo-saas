@@ -424,7 +424,7 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
             </nav>
             <div style={{ padding: "1.5rem", borderTop: "1px solid #e8e8e8" }}>
               <button onClick={() => { if (readOnly) { setMenuOpen(false); scrollTo("contact"); } }}
-                style={{ ...sans, width: "100%", padding: "13px", background: "var(--ed-fg, #0a0a0a)", color: "var(--ed-bg, #fafafa)", border: "none", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
+                style={{ ...sans, width: "100%", padding: "13px", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", border: "none", borderRadius: "var(--ed-btn-radius, 0)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
                 <EditableNode id="nav-cta" tag="span"><EditableText id="nav-cta" /></EditableNode>
               </button>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "1rem" }}>
@@ -455,9 +455,9 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
           ))}
         </EditableNode>
         <button onClick={() => { if (readOnly) scrollTo("contact"); }}
-          style={{ ...sans, fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: "var(--ed-bg, #fafafa)", background: "var(--ed-fg, #0a0a0a)", padding: "7px 18px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}>
+          style={{ ...sans, fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", padding: "7px 18px", border: "1px solid var(--ed-btn-bg, #0a0a0a)", borderRadius: "var(--ed-btn-radius, 0)", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; e.currentTarget.style.color = "var(--ed-btn-fg, var(--ed-bg, #fafafa))"; }}>
           <EditableNode id="nav-cta" tag="span"><EditableText id="nav-cta" /></EditableNode>
         </button>
       </div>
@@ -534,13 +534,13 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
           <div style={{ display: "flex", gap: "0.75rem", marginTop: "2.5rem", flexWrap: "wrap" }}>
             <button onClick={() => setGalleryOpen(true)}
-              style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-bg, #fafafa)", background: "var(--ed-fg, #0a0a0a)", padding: "12px 24px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}>
+              style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", padding: "12px 24px", border: "1px solid var(--ed-btn-bg, #0a0a0a)", borderRadius: "var(--ed-btn-radius, 0)", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; e.currentTarget.style.color = "var(--ed-btn-fg, var(--ed-bg, #fafafa))"; }}>
               View work
             </button>
             <a href="#about"
-              style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", padding: "12px 24px", border: "1px solid #ccc", textDecoration: "none", transition: "border-color 0.2s", display: "inline-block" }}
+              style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", padding: "12px 24px", border: "1px solid #ccc", borderRadius: "var(--ed-btn-radius, 0)", textDecoration: "none", transition: "border-color 0.2s", display: "inline-block" }}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#ccc"; }}>
               About
@@ -734,9 +734,9 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
             onFocus={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
             onBlur={(e)  => { e.currentTarget.style.borderColor = "#d8d8d8"; }} />
           <button type="submit"
-            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-bg, #fafafa)", background: "var(--ed-fg, #0a0a0a)", border: "1px solid #0a0a0a", padding: "13px", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}>
+            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", border: "1px solid var(--ed-btn-bg, #0a0a0a)", borderRadius: "var(--ed-btn-radius, 0)", padding: "13px", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; e.currentTarget.style.color = "var(--ed-btn-fg, var(--ed-bg, #fafafa))"; }}>
             Send message
           </button>
         </form>
