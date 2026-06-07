@@ -26,7 +26,7 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
   const {
     setTemplate, updateNode, setPalette, setTypography, setLogo,
     hydrateDesign, setGalleryPhotos, setReadOnly,
-    selectNode, setSelectedSection, setHoveredSection,
+    setSelectedSection, setHoveredSection,
     palette, typography, buttons, grid, selectedSection, hoveredSection, hiddenSections,
     nodes, logo,
   } = useEditorStore();
@@ -34,11 +34,11 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
   // One left panel, three modes. Design (the global system) is shown first.
   const [tab, setTab] = useState<SidebarTab>("design");
 
-  // Leaving the Page tab clears any element/section selection so the
-  // inspector + outlines don't linger over Design/Settings.
+  // Canvas editing works in every tab, so the element selection is kept when
+  // switching. Only the Pages-tree section highlight is cleared on the way out
+  // so its big outline doesn't linger over Design/Settings.
   function changeTab(next: SidebarTab) {
     if (next !== "pages") {
-      selectNode(null);
       setSelectedSection(null);
       setHoveredSection(null);
     }
@@ -112,13 +112,14 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
 
       <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
         <Sidebar tab={tab} setTab={changeTab} />
-        {/* Image inspector + floating text toolbar only belong to Page mode */}
-        {tab === "pages" && <InspectorPanel />}
+        {/* Canvas editing is available in every tab: the image inspector and the
+            floating text toolbar self-hide until an element is selected. */}
+        <InspectorPanel />
         <Canvas />
       </div>
 
       {/* Floating formatting toolbar — appears above the selected text node */}
-      {tab === "pages" && <FloatingTextToolbar />}
+      <FloatingTextToolbar />
 
       <style>{`
         :root {
