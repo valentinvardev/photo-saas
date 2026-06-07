@@ -32,34 +32,32 @@ function PageCard({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      style={{ textAlign: "left", background: "var(--ec-raised)", border: "1px solid var(--ec-lift)", borderRadius: 9, overflow: "hidden", cursor: "pointer", display: "flex", flexDirection: "column", padding: 0 }}
+      style={{ textAlign: "left", background: "var(--ec-raised)", border: "1px solid var(--ec-lift)", borderRadius: 10, overflow: "hidden", cursor: "pointer", display: "flex", flexDirection: "column", padding: 0 }}
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#facc15"; }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--ec-lift)"; }}
     >
-      <div style={{ height: 70, background: "linear-gradient(135deg, var(--ec-lift), var(--ec-raised))", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ec-sub)" }}>
+      <div style={{ height: 132, background: "linear-gradient(135deg, var(--ec-lift), var(--ec-raised))", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ec-sub)" }}>
         <PageGlyph />
       </div>
-      <div style={{ padding: "8px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
+      <div style={{ padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--ec-text)" }}>Home</div>
-          <div style={{ fontSize: 9.5, color: "var(--ec-dim)", fontFamily: "monospace" }}>Portfolio page</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ec-text)" }}>Home</div>
+          <div style={{ fontSize: 10.5, color: "var(--ec-dim)", fontFamily: "monospace", marginTop: 2 }}>The portfolio page</div>
         </div>
-        <span style={{ fontSize: 9.5, fontWeight: 700, color: "#111", background: "#facc15", padding: "3px 7px", borderRadius: 5, whiteSpace: "nowrap" }}>Edit →</span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#111", background: "#facc15", padding: "6px 12px", borderRadius: 6, whiteSpace: "nowrap" }}>Edit →</span>
       </div>
     </button>
   );
 }
 
-function ComingSoonPageCard({ label }: { label: string }) {
+function ComingSoonRow({ label }: { label: string }) {
   return (
-    <div style={{ background: "var(--ec-bg)", border: "1px dashed var(--ec-lift)", borderRadius: 9, overflow: "hidden", display: "flex", flexDirection: "column", opacity: 0.6 }}>
-      <div style={{ height: 70, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ec-ghost)" }}>
-        <PageGlyph />
-      </div>
-      <div style={{ padding: "8px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ec-sub)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</div>
-        <span style={{ fontFamily: "monospace", fontSize: 8.5, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ec-dim)", border: "1px solid var(--ec-lift)", padding: "2px 5px", borderRadius: 4, flexShrink: 0 }}>Soon</span>
-      </div>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--ec-bg)", border: "1px dashed var(--ec-lift)", borderRadius: 9, padding: "11px 12px", opacity: 0.65 }}>
+      <span style={{ color: "var(--ec-ghost)", display: "flex", flexShrink: 0 }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18M7 3v5"/></svg>
+      </span>
+      <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: "var(--ec-sub)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+      <span style={{ fontFamily: "monospace", fontSize: 8.5, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ec-dim)", border: "1px solid var(--ec-lift)", padding: "2px 6px", borderRadius: 4, flexShrink: 0 }}>Soon</span>
     </div>
   );
 }
@@ -123,16 +121,16 @@ export function DesignHome({ onEnterPage }: { onEnterPage: () => void }) {
   return (
     <aside
       style={{
-        width: 340,
+        width: 372,
         flexShrink: 0,
         height: "100%",
         overflowY: "auto",
         background: "var(--ec-bg)",
         borderRight: "1px solid var(--ec-raised)",
-        padding: "16px 14px 60px",
+        padding: "18px 16px 72px",
         display: "flex",
         flexDirection: "column",
-        gap: 14,
+        gap: 16,
       }}
     >
       {/* Heading */}
@@ -145,10 +143,10 @@ export function DesignHome({ onEnterPage }: { onEnterPage: () => void }) {
 
       {/* Pages */}
       <Card title="Pages" desc="Open a page to edit it.">
-        <div style={{ padding: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        <div style={{ padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
           <PageCard onClick={onEnterPage} />
-          <ComingSoonPageCard label="Gallery" />
-          <ComingSoonPageCard label="Link in bio" />
+          <ComingSoonRow label="Standalone gallery" />
+          <ComingSoonRow label="Link in bio" />
         </div>
       </Card>
 
