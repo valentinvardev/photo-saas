@@ -86,6 +86,16 @@
 .editor-canvas-scroll::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
 .editor-canvas-scroll::-webkit-scrollbar-thumb:hover { background: #444; }
 
+/* ── Compact numeric input (floating text toolbar) ────────────────────── */
+.ed-num-input::-webkit-outer-spin-button,
+.ed-num-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ed-num-input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
 /* ── Viewport frame labels ────────────────────────────────────────────── */
 .viewport-label {
   font-family: monospace;

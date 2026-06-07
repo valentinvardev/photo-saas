@@ -20,6 +20,7 @@ export interface EditorNode {
   fontWeight?: number | string;
   fontStyle?: "normal" | "italic";
   textAlign?: "left" | "center" | "right";
+  color?: string;
   /* Image style overrides */
   objectFit?: "cover" | "contain" | "fill" | "none";
   objectPosition?: string;

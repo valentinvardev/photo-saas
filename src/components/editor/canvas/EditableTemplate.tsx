@@ -54,6 +54,7 @@ function EditableNode({
   if (node?.fontWeight)    overrides.fontWeight    = node.fontWeight;
   if (node?.fontStyle)     overrides.fontStyle     = node.fontStyle;
   if (node?.textAlign)     overrides.textAlign     = node.textAlign;
+  if (node?.color)         overrides.color         = node.color;
 
   const El = Tag as "div";
 
@@ -141,11 +142,23 @@ type Work = { id: number | string; seed?: number; src?: string; title: string; y
 const cellSrc  = (w: Work) => w.src ?? `https://picsum.photos/seed/${w.seed}/800/1000?grayscale`;
 const lightSrc = (w: Work) => w.src ?? `https://picsum.photos/seed/${w.seed}/1400/900?grayscale`;
 
+/** Hide raw file names so they never surface as a hover caption. A real,
+ *  human caption (e.g. "Cover candidate") still shows; "IMG_2043.jpg",
+ *  "DSC_0421" or "20240612_1030.png" are treated as file names and dropped. */
+function captionFromTitle(t?: string): string {
+  if (!t) return "";
+  const s = t.trim();
+  if (/\.(jpe?g|png|gif|webp|avif|tiff?|heic|heif|bmp)$/i.test(s)) return "";
+  if (/^(img|dsc|dscf|dji|gopr|pxl|photo|image|screenshot|untitled)[-_ ]?\d+/i.test(s)) return "";
+  if (/^[0-9._\- ]+$/.test(s)) return "";
+  return s;
+}
+
 /** The gallery's works: the portfolio's real photos when present, else the demo set. */
 function useWorks(): Work[] {
   const galleryPhotos = useEditorStore((s) => s.galleryPhotos);
   if (galleryPhotos.length === 0) return WORKS;
-  return galleryPhotos.map((p, i) => ({ id: `g${i}`, src: p.src, title: p.title ?? "" }));
+  return galleryPhotos.map((p, i) => ({ id: `g${i}`, src: p.src, title: captionFromTitle(p.title) }));
 }
 
 /* ═══════════════════════════════════════════
@@ -173,9 +186,11 @@ function Cell({ w, onClick }: { w?: Work; onClick?: () => void }) {
           {w.cat} · {w.year}
         </span>
         )}
+        {w.title && (
         <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "var(--ed-bg, #fafafa)", lineHeight: 1.2 }}>
           {w.title}
         </span>
+        )}
       </div>
     </div>
   );
@@ -242,7 +257,7 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
         <button style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.6)", padding: "4px 8px", fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", display: "flex", alignItems: "center", gap: "6px" }} onClick={onClose}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
         </button>
-        <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>{w.title} · {index + 1} / {works.length}</span>
+        <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>{w.title ? `${w.title} · ` : ""}{index + 1} / {works.length}</span>
         <div style={{ pointerEvents: "auto" }}>
           {zoom > 1 && <button onClick={resetView} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: "4px 10px", fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", borderRadius: "4px" }}>{Math.round(zoom * 100)}% · Reset</button>}
         </div>

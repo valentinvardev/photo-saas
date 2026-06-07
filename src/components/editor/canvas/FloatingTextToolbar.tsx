@@ -5,18 +5,8 @@ import { createPortal } from "react-dom";
 import { useEditorStore } from "~/lib/editor/store";
 import type { EditorNode } from "~/lib/editor/types";
 
-/* Presets — mirror the old InspectorPanel so behaviour is unchanged. */
-const SIZE_PRESETS = [
-  { label: "XS",   value: "10px" },
-  { label: "SM",   value: "12px" },
-  { label: "Base", value: "14px" },
-  { label: "MD",   value: "16px" },
-  { label: "LG",   value: "20px" },
-  { label: "XL",   value: "24px" },
-  { label: "2XL",  value: "32px" },
-  { label: "3XL",  value: "48px" },
-  { label: "Disp", value: "72px" },
-];
+/* Quick-pick sizes offered in the datalist next to the numeric px field. */
+const SIZE_STEPS = [10, 12, 14, 16, 20, 24, 32, 48, 72];
 const WEIGHT_PRESETS = [
   { label: "Thin",  value: 100 },
   { label: "Light", value: 300 },
@@ -48,6 +38,22 @@ const selectStyle: React.CSSProperties = {
   backgroundPosition: "right 5px center",
 };
 
+const numStyle: React.CSSProperties = {
+  appearance: "textfield",
+  MozAppearance: "textfield",
+  background: "var(--ec-raised)",
+  border: "1px solid var(--ec-lift)",
+  color: "var(--ec-label)",
+  fontSize: 11,
+  fontFamily: "inherit",
+  padding: "4px 5px 4px 7px",
+  borderRadius: 5,
+  outline: "none",
+  height: 26,
+  width: 42,
+  textAlign: "left",
+};
+
 function iconBtn(active: boolean): React.CSSProperties {
   return {
     background: active ? "#facc15" : "transparent",
@@ -69,6 +75,7 @@ export function FloatingTextToolbar() {
   const isText = !!node && (node.type === "heading" || node.type === "paragraph" || node.type === "logo");
 
   const barRef = useRef<HTMLDivElement>(null);
+  const colorRef = useRef<HTMLInputElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
 
   // Re-measure the selected element's position whenever it (or anything that
@@ -128,6 +135,8 @@ export function FloatingTextToolbar() {
   const update = (patch: Partial<EditorNode>) => updateNode(selectedId!, patch);
   const isItalic = node.fontStyle === "italic";
   const align    = node.textAlign ?? "";
+  const sizePx   = node.fontSize ? parseInt(node.fontSize, 10) : NaN;
+  const color    = node.color ?? "";
 
   const alignIcons: Record<string, React.ReactNode> = {
     left:   <svg width="12" height="10" viewBox="0 0 12 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M0 1h12M0 5h8M0 9h10"/></svg>,
@@ -149,16 +158,26 @@ export function FloatingTextToolbar() {
         fontFamily: "system-ui, sans-serif",
       }}
     >
-      {/* Size */}
-      <select
-        value={node.fontSize ?? ""}
-        onChange={(e) => update({ fontSize: e.target.value || undefined })}
-        title="Font size"
-        style={selectStyle}
-      >
-        <option value="">Size</option>
-        {SIZE_PRESETS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
-      </select>
+      {/* Size — exact px (datalist offers common presets) */}
+      <input
+        type="number"
+        min={6}
+        max={400}
+        step={1}
+        list="ftt-size-steps"
+        value={Number.isFinite(sizePx) ? sizePx : ""}
+        onChange={(e) => {
+          const v = e.target.value.trim();
+          update({ fontSize: v ? `${parseInt(v, 10)}px` : undefined });
+        }}
+        placeholder="Size"
+        title="Font size (px)"
+        className="ed-num-input"
+        style={numStyle}
+      />
+      <datalist id="ftt-size-steps">
+        {SIZE_STEPS.map((s) => <option key={s} value={s} />)}
+      </datalist>
 
       {/* Weight */}
       <select
@@ -170,6 +189,28 @@ export function FloatingTextToolbar() {
         <option value="">Weight</option>
         {WEIGHT_PRESETS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
       </select>
+
+      <Divider />
+
+      {/* Text color — click opens the native picker; right-click resets */}
+      <button
+        onClick={() => colorRef.current?.click()}
+        onContextMenu={(e) => { e.preventDefault(); update({ color: undefined }); }}
+        title="Text color (right-click to reset)"
+        style={{ ...iconBtn(false), position: "relative" }}
+      >
+        <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, lineHeight: 1 }}>
+          <span style={{ fontSize: 12, fontWeight: 800, color: "var(--ec-label)" }}>A</span>
+          <span style={{ width: 14, height: 3, borderRadius: 1, background: color || "var(--ec-sub)" }} />
+        </span>
+        <input
+          ref={colorRef}
+          type="color"
+          value={color || "#000000"}
+          onChange={(e) => update({ color: e.target.value })}
+          style={{ position: "absolute", left: 4, bottom: 0, width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+        />
+      </button>
 
       <Divider />
 
