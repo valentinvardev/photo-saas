@@ -8,6 +8,9 @@ import type { SectionDef } from "~/lib/editor/templates/types";
 import { deviceContentRef } from "~/lib/editor/deviceRef";
 import { ImagePickerButton } from "~/components/editor/panels/ImageGalleryModal";
 import { ImageCropModal } from "~/components/editor/panels/ImageCropModal";
+import { ColorPalettePanel } from "~/components/editor/panels/ColorPalettePanel";
+import { TypographyPanel } from "~/components/editor/panels/TypographyPanel";
+import { ButtonsPanel } from "~/components/editor/panels/ButtonsPanel";
 
 function LockIcon() {
   return <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
@@ -298,8 +301,51 @@ function MenuItem({ label, onClick, disabled, danger }: { label: string; onClick
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   DESIGN TAB
+   SHARED — panel heading + divider + coming-soon row
 ═══════════════════════════════════════════════════════════════════════ */
+function PanelHeading({ title, desc }: { title: string; desc?: string }) {
+  return (
+    <div style={{ padding: "18px 16px 10px" }}>
+      <h3 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--ec-bright)", letterSpacing: "-0.01em" }}>{title}</h3>
+      {desc && <p style={{ margin: "4px 0 0", fontSize: 11, color: "var(--ec-dim)", lineHeight: 1.5 }}>{desc}</p>}
+    </div>
+  );
+}
+
+function SectionDivider() {
+  return <div style={{ height: 1, background: "var(--ec-raised)", margin: "8px 0" }} />;
+}
+
+function ComingSoonRow({ label, icon }: { label: string; icon: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "11px 16px", opacity: 0.6 }}>
+      <span style={{ color: "var(--ec-ghost)", display: "flex", flexShrink: 0 }}>{icon}</span>
+      <span style={{ flex: 1, fontSize: 12.5, fontWeight: 500, color: "var(--ec-sub)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+      <span style={{ fontFamily: "monospace", fontSize: 8.5, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ec-dim)", border: "1px solid var(--ec-lift)", padding: "2px 6px", borderRadius: 4, flexShrink: 0 }}>Soon</span>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DESIGN TAB — global design system (applies to every page)
+═══════════════════════════════════════════════════════════════════════ */
+function DesignTab() {
+  return (
+    <div style={{ paddingBottom: 32 }}>
+      <PanelHeading title="Colors" desc="Applied across every page of your site." />
+      <ColorPalettePanel />
+
+      <SectionDivider />
+      <PanelHeading title="Typography" desc="Fonts for headings, body and labels." />
+      <TypographyPanel />
+
+      <SectionDivider />
+      <PanelHeading title="Buttons" desc="Shape and color of every button." />
+      <ButtonsPanel />
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    SETTINGS TAB
 ═══════════════════════════════════════════════════════════════════════ */
@@ -550,32 +596,45 @@ function SettingsTab() {
           Downloads a static HTML file of the current template with all your edits applied.
         </p>
       </div>
+
+      {/* More — coming soon */}
+      <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px", fontWeight: 600 }}>More</p>
+        <div style={{ margin: "0 -14px" }}>
+          <ComingSoonRow label="SEO manager" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>} />
+          <ComingSoonRow label="Tracking & analytics" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>} />
+          <ComingSoonRow label="Custom domain" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18"/></svg>} />
+          <ComingSoonRow label="Advanced" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg>} />
+        </div>
+      </div>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   SIDEBAR ROOT
+   SIDEBAR ROOT — one panel, three modes (Pages · Design · Settings)
 ═══════════════════════════════════════════════════════════════════════ */
-type SidebarTab = "pages" | "settings";
+export type SidebarTab = "pages" | "design" | "settings";
 
-export function Sidebar() {
-  const [tab, setTab] = useState<SidebarTab>("pages");
+const NAV_TABS: { id: SidebarTab; label: string; icon: React.ReactNode }[] = [
+  {
+    id: "pages",
+    label: "Page",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18M7 3v5"/></svg>,
+  },
+  {
+    id: "design",
+    label: "Design",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7a2.8 2.8 0 00-4-4l-7 7"/><path d="M8 15l-3 3a2 2 0 002.8 2.8L11 18"/><path d="M14.5 6.5l3 3"/></svg>,
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.2.62.78 1.05 1.43 1.09H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
+  },
+];
 
-  const tabStyle = (active: boolean): React.CSSProperties => ({
-    flex: 1,
-    background: "none",
-    border: "none",
-    borderBottom: `2px solid ${active ? "#facc15" : "transparent"}`,
-    color: active ? "var(--ec-bright)" : "var(--ec-dim)",
-    fontSize: 11,
-    padding: "9px 0",
-    cursor: "pointer",
-    letterSpacing: "0.04em",
-    fontFamily: "inherit",
-    transition: "color 0.15s",
-  });
-
+export function Sidebar({ tab, setTab }: { tab: SidebarTab; setTab: (t: SidebarTab) => void }) {
   return (
     <aside
       style={{
@@ -589,18 +648,46 @@ export function Sidebar() {
         flexShrink:  0,
       }}
     >
-      {/* Tab bar — global design lives in the overview ("Design system"),
-          so the page editor only has Page + Settings. */}
+      {/* Mode switcher — Page (content) · Design (system) · Settings */}
       <div style={{ display: "flex", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
-        <button style={tabStyle(tab === "pages")}    onClick={() => setTab("pages")}>Page</button>
-        <button style={tabStyle(tab === "settings")} onClick={() => setTab("settings")}>Settings</button>
+        {NAV_TABS.map((t) => {
+          const active = tab === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              title={t.label}
+              style={{
+                flex: 1,
+                background: active ? "rgba(250,204,21,0.07)" : "none",
+                border: "none",
+                borderBottom: `2px solid ${active ? "#facc15" : "transparent"}`,
+                color: active ? "#facc15" : "var(--ec-dim)",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                fontSize: 10.5,
+                fontWeight: active ? 600 : 500,
+                padding: "10px 0 8px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 4,
+                transition: "color 0.15s, background 0.15s",
+              }}
+              onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = "var(--ec-muted)"; }}
+              onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = "var(--ec-dim)"; }}
+            >
+              {t.icon}
+              {t.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Content */}
+      {/* Active panel */}
       <div style={{ flex: 1, overflowY: "auto" }}>
-        {/* Text formatting lives in the floating toolbar above the selected
-            text; the sidebar only holds the section tree now. */}
         {tab === "pages"    && <PagesTab />}
+        {tab === "design"   && <DesignTab />}
         {tab === "settings" && <SettingsTab />}
       </div>
     </aside>

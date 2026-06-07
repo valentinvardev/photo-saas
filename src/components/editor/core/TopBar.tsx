@@ -83,11 +83,9 @@ const VIEWPORT_LABELS: Record<Viewport, string> = {
   mobile:  "Mobile (375px)",
 };
 
-export function TopBar({ portfolioId, saving, view, onBackToOverview }: {
+export function TopBar({ portfolioId, saving }: {
   portfolioId?: string;
   saving?: boolean;
-  view?: "overview" | "page";
-  onBackToOverview?: () => void;
 } = {}) {
   const { nodes, palette, typography, logo, reset, viewport, setViewport } = useEditorStore();
   const exitTo = portfolioId ? `/dashboard/portfolio/${portfolioId}` : "/dashboard/templates";
@@ -146,23 +144,7 @@ export function TopBar({ portfolioId, saving, view, onBackToOverview }: {
         <div style={{ width: 20, height: 20, background: "#facc15", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <span style={{ fontWeight: 900, fontSize: 9, color: "#111", lineHeight: 1 }}>F</span>
         </div>
-        {/* Breadcrumb — click "Design" to return to the overview from a page */}
-        {view === "page" && onBackToOverview ? (
-          <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
-            <button
-              onClick={onBackToOverview}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ec-sub)", padding: 0, fontSize: 11 }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--ec-text)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--ec-sub)"; }}
-            >
-              Design
-            </button>
-            <span style={{ color: "var(--ec-ghost)" }}>/</span>
-            <span style={{ color: "var(--ec-muted)" }}>Home</span>
-          </span>
-        ) : (
-          <span style={{ color: "var(--ec-muted)", fontSize: 11, letterSpacing: "-0.01em" }}>Design system</span>
-        )}
+        <span style={{ color: "var(--ec-muted)", fontSize: 11, letterSpacing: "-0.01em" }}>Website builder</span>
       </div>
 
       {divider}

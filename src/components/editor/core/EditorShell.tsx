@@ -7,10 +7,9 @@ import { EditorThemeProvider, THEME_VARS, useEditorTheme } from "~/lib/editor/ed
 import { api } from "~/trpc/react";
 import { TopBar } from "./TopBar";
 import { Canvas } from "./Canvas";
-import { Sidebar } from "./Sidebar";
+import { Sidebar, type SidebarTab } from "./Sidebar";
 import { InspectorPanel } from "~/components/editor/panels/InspectorPanel";
 import { FloatingTextToolbar } from "~/components/editor/canvas/FloatingTextToolbar";
-import { DesignHome } from "./DesignHome";
 import type { TemplateId } from "~/lib/editor/templates/registry";
 
 // Side-effect: load all @fontsource CSS
@@ -27,12 +26,24 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
   const {
     setTemplate, updateNode, setPalette, setTypography, setLogo,
     hydrateDesign, setGalleryPhotos, setReadOnly,
+    selectNode, setSelectedSection, setHoveredSection,
     palette, typography, buttons, selectedSection, hoveredSection, hiddenSections,
     nodes, logo,
   } = useEditorStore();
 
-  // Overview ("design home") shows first; entering a page reveals the editor.
-  const [view, setView] = useState<"overview" | "page">("overview");
+  // One left panel, three modes. Design (the global system) is shown first.
+  const [tab, setTab] = useState<SidebarTab>("design");
+
+  // Leaving the Page tab clears any element/section selection so the
+  // inspector + outlines don't linger over Design/Settings.
+  function changeTab(next: SidebarTab) {
+    if (next !== "pages") {
+      selectNode(null);
+      setSelectedSection(null);
+      setHoveredSection(null);
+    }
+    setTab(next);
+  }
 
   const { theme } = useEditorTheme();
   const saveDesign = api.portfolio.saveDesign.useMutation();
@@ -97,27 +108,17 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
       <TopBar
         portfolioId={portfolioId}
         saving={saveDesign.isPending}
-        view={view}
-        onBackToOverview={() => setView("overview")}
       />
 
-      {view === "overview" ? (
-        <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-          <DesignHome onEnterPage={() => setView("page")} />
-          <Canvas />
-        </div>
-      ) : (
-        <>
-          <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-            <Sidebar />
-            <InspectorPanel />
-            <Canvas />
-          </div>
+      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+        <Sidebar tab={tab} setTab={changeTab} />
+        {/* Image inspector + floating text toolbar only belong to Page mode */}
+        {tab === "pages" && <InspectorPanel />}
+        <Canvas />
+      </div>
 
-          {/* Floating formatting toolbar — appears above the selected text node */}
-          <FloatingTextToolbar />
-        </>
-      )}
+      {/* Floating formatting toolbar — appears above the selected text node */}
+      {tab === "pages" && <FloatingTextToolbar />}
 
       <style>{`
         :root {
