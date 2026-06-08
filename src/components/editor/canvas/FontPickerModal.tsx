@@ -4,16 +4,12 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { FONT_OPTIONS, type FontOption } from "~/lib/editor/fonts";
 import { api } from "~/trpc/react";
+import { useT } from "~/components/providers/LangProvider";
 
 type Tab = "all" | "serif" | "sans" | "mono";
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: "all",   label: "All" },
-  { id: "serif", label: "Serif" },
-  { id: "sans",  label: "Sans" },
-  { id: "mono",  label: "Mono" },
-];
-const CATEGORY_LABELS: Record<string, string> = { serif: "Serif", sans: "Sans serif", mono: "Monospace" };
+const TABS: Tab[] = ["all", "serif", "sans", "mono"];
+const CATEGORY_LABEL_KEY: Record<string, string> = { serif: "catSerif", sans: "catSans", mono: "catMono" };
 const CATEGORY_ORDER: Array<FontOption["category"]> = ["serif", "sans", "mono"];
 
 interface Props {
@@ -26,6 +22,7 @@ interface Props {
 
 export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, onClose }: Props) {
   const { data: me } = api.user.me.useQuery();
+  const { t } = useT();
   const [hovered, setHovered] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>(initialTab ?? "all");
   const [query, setQuery] = useState("");
@@ -96,7 +93,7 @@ export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, o
         {/* Header */}
         <div style={{ padding: "16px 18px 14px", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <h2 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--ec-bright)", letterSpacing: "-0.01em" }}>Typography</h2>
+            <h2 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--ec-bright)", letterSpacing: "-0.01em" }}>{t("editor.fontModal.title")}</h2>
             <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ec-sub)", padding: 2, display: "flex" }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
@@ -119,7 +116,7 @@ export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, o
               className="ed-fontsearch"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search fonts…"
+              placeholder={t("editor.fontModal.search")}
               style={{
                 width: "100%", boxSizing: "border-box", background: "var(--ec-raised)",
                 border: "1px solid var(--ec-lift)", color: "var(--ec-label)", fontSize: 13,
@@ -133,12 +130,12 @@ export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, o
             )}
           </div>
           <div style={{ display: "flex", gap: 4 }}>
-            {TABS.map((t) => {
-              const active = tab === t.id;
+            {TABS.map((id) => {
+              const active = tab === id;
               return (
                 <button
-                  key={t.id}
-                  onClick={() => setTab(t.id)}
+                  key={id}
+                  onClick={() => setTab(id)}
                   style={{
                     flex: 1, background: active ? "rgba(250,204,21,0.14)" : "var(--ec-raised)",
                     border: `1px solid ${active ? "#facc15" : "var(--ec-lift)"}`,
@@ -146,7 +143,7 @@ export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, o
                     padding: "6px 4px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit",
                   }}
                 >
-                  {t.label}
+                  {t(`editor.fontModal.${id}`)}
                 </button>
               );
             })}
@@ -162,13 +159,13 @@ export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, o
               onMouseEnter={() => setHovered("var(--tpl-serif, serif)")}
               style={rowStyle(value === undefined)}
             >
-              <span style={{ fontSize: 14, color: value === undefined ? "#facc15" : "var(--ec-label)" }}>Template default</span>
+              <span style={{ fontSize: 14, color: value === undefined ? "#facc15" : "var(--ec-label)" }}>{t("editor.fontModal.templateDefault")}</span>
               {value === undefined && <Check />}
             </button>
           )}
 
           {filtered.length === 0 && (
-            <p style={{ textAlign: "center", color: "var(--ec-dim)", fontSize: 12, padding: "28px 0" }}>No fonts match “{query}”.</p>
+            <p style={{ textAlign: "center", color: "var(--ec-dim)", fontSize: 12, padding: "28px 0" }}>{t("editor.fontModal.noMatch", { q: query })}</p>
           )}
 
           {grouped
@@ -178,7 +175,7 @@ export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, o
                 return (
                   <div key={cat} style={{ marginTop: 8 }}>
                     <p style={{ margin: "8px 10px 4px", fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--ec-dim)", fontWeight: 600 }}>
-                      {CATEGORY_LABELS[cat]}
+                      {t(`editor.fontModal.${CATEGORY_LABEL_KEY[cat]}`)}
                     </p>
                     {fonts.map(fontRow)}
                   </div>

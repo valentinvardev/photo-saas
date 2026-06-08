@@ -5,6 +5,7 @@ import { useEditorStore } from "~/lib/editor/store";
 import { FONT_OPTIONS } from "~/lib/editor/fonts";
 import { DEFAULT_TYPOGRAPHY, type Typography } from "~/lib/editor/types";
 import { FontPickerModal } from "~/components/editor/canvas/FontPickerModal";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ─────────────────────────────────────────────────────────────────────────
    Font picker for a single type role (serif / sans / mono)
@@ -25,6 +26,7 @@ function FontPicker({
   const options  = FONT_OPTIONS.filter((f) => f.category === category);
   const active   = options.find((f) => value.includes(f.value));
   const [modalOpen, setModalOpen] = useState(false);
+  const { t } = useT();
 
   return (
     <div style={{ marginBottom: 14 }}>
@@ -99,7 +101,7 @@ function FontPicker({
       >
         <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7V5h16v2M9 5v14M7 19h4"/><path d="M14 19l3-9 3 9M14.8 16.5h4.4"/></svg>
-          View all fonts
+          {t("editor.typography.viewAll")}
         </span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--ec-sub)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
@@ -121,30 +123,31 @@ function FontPicker({
 ───────────────────────────────────────────────────────────────────────── */
 export function TypographyPanel() {
   const { typography, setTypography } = useEditorStore();
+  const { t } = useT();
 
   return (
     <div style={{ padding: "14px 12px" }}>
       <p style={{ color: "var(--ec-dim)", fontSize: 10, margin: "0 0 14px", lineHeight: 1.5 }}>
-        Changes apply site-wide via CSS variables.
+        {t("editor.typography.note")}
       </p>
 
       <FontPicker
         role="serif"
-        label="Serif — headings"
+        label={t("editor.typography.serif")}
         category="serif"
         value={typography.serif}
         onChange={(stack) => setTypography({ serif: stack })}
       />
       <FontPicker
         role="sans"
-        label="Sans — body"
+        label={t("editor.typography.sans")}
         category="sans"
         value={typography.sans}
         onChange={(stack) => setTypography({ sans: stack })}
       />
       <FontPicker
         role="mono"
-        label="Mono — labels"
+        label={t("editor.typography.mono")}
         category="mono"
         value={typography.mono}
         onChange={(stack) => setTypography({ mono: stack })}

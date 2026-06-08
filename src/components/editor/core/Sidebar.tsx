@@ -12,6 +12,7 @@ import { ColorPalettePanel } from "~/components/editor/panels/ColorPalettePanel"
 import { TypographyPanel } from "~/components/editor/panels/TypographyPanel";
 import { ButtonsPanel } from "~/components/editor/panels/ButtonsPanel";
 import { GridPanel } from "~/components/editor/panels/GridPanel";
+import { useT } from "~/components/providers/LangProvider";
 
 function LockIcon() {
   return <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
@@ -46,6 +47,7 @@ function scrollToSection(sectionId: string) {
 ═══════════════════════════════════════════════════════════════════════ */
 function PagesTab() {
   const { templateId, selectedSection, setSelectedSection, setHoveredSection, selectNode, selectedId, hiddenSections, hideSection, showSection } = useEditorStore();
+  const { t } = useT();
   const SECTIONS: SectionDef[] = TEMPLATES[templateId]!.sections;
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     const first = SECTIONS.find((s) => !s.locked);
@@ -79,8 +81,8 @@ function PagesTab() {
         }}
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#facc15" strokeWidth="1.75" strokeLinecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span style={{ color: "var(--ec-bright)", fontSize: 12, fontWeight: 600 }}>Home</span>
-        <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 9, color: "var(--ec-dim)", background: "var(--ec-raised)", padding: "1px 5px", borderRadius: 2 }}>page</span>
+        <span style={{ color: "var(--ec-bright)", fontSize: 12, fontWeight: 600 }}>{t("editor.pages.home")}</span>
+        <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 9, color: "var(--ec-dim)", background: "var(--ec-raised)", padding: "1px 5px", borderRadius: 2 }}>{t("editor.pages.pageBadge")}</span>
       </div>
 
       {/* Section rows */}
@@ -99,7 +101,7 @@ function PagesTab() {
                 onClick={() => showSection(section.id)}
                 style={{ background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-sub)", fontSize: 9, padding: "2px 6px", borderRadius: 3, cursor: "pointer", fontFamily: "inherit" }}
               >
-                Restore
+                {t("editor.pages.restore")}
               </button>
             </div>
           );
@@ -227,6 +229,7 @@ function ThreeDotMenu({ sectionId: _id, locked, isOpen, onOpen, onClose, onScrol
 }) {
   const btnRef = useRef<HTMLButtonElement>(null);
   const [pos, setPos] = useState({ top: 0, right: 0 });
+  const { t } = useT();
 
   function handleToggle(e: React.MouseEvent) {
     e.stopPropagation();
@@ -271,9 +274,9 @@ function ThreeDotMenu({ sectionId: _id, locked, isOpen, onOpen, onClose, onScrol
               minWidth: 140, overflow: "hidden", boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
             }}
           >
-            <MenuItem label="Scroll to" onClick={() => { onScrollTo(); onClose(); }} />
+            <MenuItem label={t("editor.pages.scrollTo")} onClick={() => { onScrollTo(); onClose(); }} />
             <div style={{ height: 1, background: "var(--ec-lift)", margin: "2px 0" }} />
-            <MenuItem label="Delete" onClick={onDelete} disabled={locked} danger />
+            <MenuItem label={t("editor.pages.delete")} onClick={onDelete} disabled={locked} danger />
           </div>
         </>,
         document.body
@@ -283,6 +286,7 @@ function ThreeDotMenu({ sectionId: _id, locked, isOpen, onOpen, onClose, onScrol
 }
 
 function MenuItem({ label, onClick, disabled, danger }: { label: string; onClick: () => void; disabled?: boolean; danger?: boolean }) {
+  const { t } = useT();
   return (
     <button
       onClick={disabled ? undefined : onClick}
@@ -296,7 +300,7 @@ function MenuItem({ label, onClick, disabled, danger }: { label: string; onClick
       onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.background = "var(--ec-lift)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
     >
-      {label} {disabled && <span style={{ fontSize: 9, color: "var(--ec-border)" }}>— template</span>}
+      {label} {disabled && <span style={{ fontSize: 9, color: "var(--ec-border)" }}>— {t("editor.pages.templateLocked")}</span>}
     </button>
   );
 }
@@ -318,11 +322,12 @@ function SectionDivider() {
 }
 
 function ComingSoonRow({ label, icon }: { label: string; icon: React.ReactNode }) {
+  const { t } = useT();
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "11px 16px", opacity: 0.6 }}>
       <span style={{ color: "var(--ec-ghost)", display: "flex", flexShrink: 0 }}>{icon}</span>
       <span style={{ flex: 1, fontSize: 12.5, fontWeight: 500, color: "var(--ec-sub)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
-      <span style={{ fontFamily: "monospace", fontSize: 8.5, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ec-dim)", border: "1px solid var(--ec-lift)", padding: "2px 6px", borderRadius: 4, flexShrink: 0 }}>Soon</span>
+      <span style={{ fontFamily: "monospace", fontSize: 8.5, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ec-dim)", border: "1px solid var(--ec-lift)", padding: "2px 6px", borderRadius: 4, flexShrink: 0 }}>{t("editor.settings.soon")}</span>
     </div>
   );
 }
@@ -331,21 +336,22 @@ function ComingSoonRow({ label, icon }: { label: string; icon: React.ReactNode }
    DESIGN TAB — global design system (applies to every page)
 ═══════════════════════════════════════════════════════════════════════ */
 function DesignTab() {
+  const { t } = useT();
   return (
     <div style={{ paddingBottom: 32 }}>
-      <PanelHeading title="Colors" desc="Applied across every page of your site." />
+      <PanelHeading title={t("editor.design.colors")} desc={t("editor.design.colorsDesc")} />
       <ColorPalettePanel />
 
       <SectionDivider />
-      <PanelHeading title="Typography" desc="Fonts for headings, body and labels." />
+      <PanelHeading title={t("editor.design.typography")} desc={t("editor.design.typographyDesc")} />
       <TypographyPanel />
 
       <SectionDivider />
-      <PanelHeading title="Buttons" desc="Shape and color of every button." />
+      <PanelHeading title={t("editor.design.buttons")} desc={t("editor.design.buttonsDesc")} />
       <ButtonsPanel />
 
       <SectionDivider />
-      <PanelHeading title="Gallery grid" desc="Layout, columns and spacing of your work grid." />
+      <PanelHeading title={t("editor.design.grid")} desc={t("editor.design.gridDesc")} />
       <GridPanel />
     </div>
   );
@@ -372,6 +378,7 @@ function LogoWidthSlider({
   onChange: (w: number) => void;
   labelStyle: React.CSSProperties;
 }) {
+  const { t } = useT();
   const pct = ((width - LOGO_WIDTH_MIN) / (LOGO_WIDTH_MAX - LOGO_WIDTH_MIN)) * 100;
   /* Custom-painted track: filled portion uses the editor's blue accent */
   const trackBg = `linear-gradient(to right, #facc15 0%, #facc15 ${pct}%, var(--ec-border) ${pct}%, var(--ec-border) 100%)`;
@@ -379,7 +386,7 @@ function LogoWidthSlider({
   return (
     <div>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 5 }}>
-        <label style={{ ...labelStyle, marginBottom: 0 }}>Logo width</label>
+        <label style={{ ...labelStyle, marginBottom: 0 }}>{t("editor.settings.logoWidth")}</label>
         <span style={{ fontFamily: "monospace", fontSize: 11, color: "var(--ec-muted)" }}>{width}<span style={{ color: "var(--ec-dim)" }}>px</span></span>
       </div>
       <input
@@ -430,10 +437,11 @@ function LogoCropButton({
 }) {
   const [open, setOpen] = useState(false);
   const hasCrop = !!crop;
+  const { t } = useT();
 
   return (
     <div>
-      <label style={labelStyle}>Crop</label>
+      <label style={labelStyle}>{t("editor.settings.crop")}</label>
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -449,7 +457,7 @@ function LogoCropButton({
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
           <path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/>
         </svg>
-        <span style={{ flex: 1 }}>{hasCrop ? "Adjust crop" : "Crop image"}</span>
+        <span style={{ flex: 1 }}>{hasCrop ? t("editor.settings.adjustCrop") : t("editor.settings.cropImage")}</span>
         {hasCrop && (
           <span style={{ fontFamily: "monospace", fontSize: 9, color: "#facc15", background: "rgba(250,204,21,0.12)", border: "1px solid #facc15", padding: "1px 5px", borderRadius: 3 }}>
             ON
@@ -470,6 +478,7 @@ function LogoCropButton({
 
 function SettingsTab() {
   const { logo, setLogo, templateId, updateNode } = useEditorStore();
+  const { t } = useT();
 
   function updateLogoText(value: string) {
     setLogo({ text: value });
@@ -500,14 +509,14 @@ function SettingsTab() {
 
       {/* Logo */}
       <div>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Logo</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.logo")}</p>
 
         {/* Mode selector */}
-        <label style={labelStyle}>Display mode</label>
+        <label style={labelStyle}>{t("editor.settings.displayMode")}</label>
         <div style={{ display: "flex", gap: 2, marginBottom: 12 }}>
           {(["text", "image", "image+text"] as const).map((m) => (
             <button key={m} style={modeStyle(logo.mode === m)} onClick={() => setLogo({ mode: m })}>
-              {m === "text" ? "Text" : m === "image" ? "Image" : "Both"}
+              {m === "text" ? t("editor.settings.modeText") : m === "image" ? t("editor.settings.modeImage") : t("editor.settings.modeBoth")}
             </button>
           ))}
         </div>
@@ -515,14 +524,14 @@ function SettingsTab() {
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {(logo.mode === "text" || logo.mode === "image+text") && (
             <div>
-              <label style={labelStyle}>Logo text</label>
+              <label style={labelStyle}>{t("editor.settings.logoText")}</label>
               <input value={logo.text} onChange={(e) => updateLogoText(e.target.value)} style={inputStyle} />
             </div>
           )}
           {(logo.mode === "image" || logo.mode === "image+text") && (
             <>
               <div>
-                <label style={labelStyle}>Logo image</label>
+                <label style={labelStyle}>{t("editor.settings.logoImage")}</label>
                 <ImagePickerButton
                   value={logo.imageUrl}
                   onChange={(url) => setLogo({ imageUrl: url, imageCrop: undefined })}
@@ -535,14 +544,14 @@ function SettingsTab() {
                 labelStyle={labelStyle}
               />
               <div>
-                <label style={labelStyle}>Alt logo (dark bg)</label>
+                <label style={labelStyle}>{t("editor.settings.altLogo")}</label>
                 <ImagePickerButton value={logo.altImageUrl} onChange={(url) => setLogo({ altImageUrl: url })} />
               </div>
               <LogoWidthSlider width={logo.width} onChange={(w) => setLogo({ width: w })} labelStyle={labelStyle} />
             </>
           )}
           <div>
-            <label style={labelStyle}>Favicon</label>
+            <label style={labelStyle}>{t("editor.settings.favicon")}</label>
             <ImagePickerButton value={logo.faviconUrl} onChange={(url) => setLogo({ faviconUrl: url })} />
           </div>
         </div>
@@ -550,28 +559,28 @@ function SettingsTab() {
 
       {/* Site info */}
       <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Site</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.site")}</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div>
-            <label style={labelStyle}>Title</label>
+            <label style={labelStyle}>{t("editor.settings.title")}</label>
             <input defaultValue="James Hollis Photography" style={inputStyle} />
           </div>
           <div>
-            <label style={labelStyle}>Description</label>
+            <label style={labelStyle}>{t("editor.settings.description")}</label>
             <textarea defaultValue="Documentary & portrait photography — New York."
               rows={3} style={{ ...inputStyle, resize: "vertical" }} />
           </div>
           <div>
-            <label style={labelStyle}>Domain</label>
+            <label style={labelStyle}>{t("editor.settings.domain")}</label>
             <input defaultValue="portapic.com/jameshollis" style={{ ...inputStyle, color: "var(--ec-dim)" }} disabled />
-            <p style={{ color: "var(--ec-border)", fontSize: 10, margin: "4px 0 0" }}>Custom domains — upgrade to Pro</p>
+            <p style={{ color: "var(--ec-border)", fontSize: 10, margin: "4px 0 0" }}>{t("editor.settings.customDomainsPro")}</p>
           </div>
         </div>
       </div>
 
       {/* SEO */}
       <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>Social links</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.socialLinks")}</p>
         {[
           { label: "Instagram", placeholder: "@jameshollis" },
           { label: "X / Twitter", placeholder: "@jhollis" },
@@ -585,9 +594,9 @@ function SettingsTab() {
 
       {/* Export */}
       <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px", fontWeight: 600 }}>Export</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px", fontWeight: 600 }}>{t("editor.settings.export")}</p>
         <button
-          onClick={() => alert("HTML export — coming soon.")}
+          onClick={() => alert(t("editor.settings.exportComingSoon"))}
           style={{
             width: "100%", background: "var(--ec-raised)", border: "1px solid var(--ec-border)",
             color: "var(--ec-muted)", fontSize: 11, padding: "8px", borderRadius: 4,
@@ -595,21 +604,21 @@ function SettingsTab() {
           }}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Export HTML
+          {t("editor.settings.exportHtml")}
         </button>
         <p style={{ color: "var(--ec-border)", fontSize: 10, margin: "6px 0 0", lineHeight: 1.4 }}>
-          Downloads a static HTML file of the current template with all your edits applied.
+          {t("editor.settings.exportDesc")}
         </p>
       </div>
 
       {/* More — coming soon */}
       <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px", fontWeight: 600 }}>More</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px", fontWeight: 600 }}>{t("editor.settings.more")}</p>
         <div style={{ margin: "0 -14px" }}>
-          <ComingSoonRow label="SEO manager" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>} />
-          <ComingSoonRow label="Tracking & analytics" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>} />
-          <ComingSoonRow label="Custom domain" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18"/></svg>} />
-          <ComingSoonRow label="Advanced" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg>} />
+          <ComingSoonRow label={t("editor.settings.seoManager")} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>} />
+          <ComingSoonRow label={t("editor.settings.tracking")} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>} />
+          <ComingSoonRow label={t("editor.settings.customDomain")} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18"/></svg>} />
+          <ComingSoonRow label={t("editor.settings.advanced")} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg>} />
         </div>
       </div>
     </div>
@@ -621,25 +630,26 @@ function SettingsTab() {
 ═══════════════════════════════════════════════════════════════════════ */
 export type SidebarTab = "pages" | "design" | "settings";
 
-const NAV_TABS: { id: SidebarTab; label: string; icon: React.ReactNode }[] = [
+const NAV_TABS: { id: SidebarTab; tkey: string; icon: React.ReactNode }[] = [
   {
     id: "pages",
-    label: "Page",
+    tkey: "page",
     icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18M7 3v5"/></svg>,
   },
   {
     id: "design",
-    label: "Design",
+    tkey: "design",
     icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7a2.8 2.8 0 00-4-4l-7 7"/><path d="M8 15l-3 3a2 2 0 002.8 2.8L11 18"/><path d="M14.5 6.5l3 3"/></svg>,
   },
   {
     id: "settings",
-    label: "Settings",
+    tkey: "settings",
     icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.2.62.78 1.05 1.43 1.09H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
   },
 ];
 
 export function Sidebar({ tab, setTab }: { tab: SidebarTab; setTab: (t: SidebarTab) => void }) {
+  const { t } = useT();
   return (
     <aside
       style={{
@@ -655,13 +665,14 @@ export function Sidebar({ tab, setTab }: { tab: SidebarTab; setTab: (t: SidebarT
     >
       {/* Mode switcher — Page (content) · Design (system) · Settings */}
       <div style={{ display: "flex", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
-        {NAV_TABS.map((t) => {
-          const active = tab === t.id;
+        {NAV_TABS.map((nav) => {
+          const active = tab === nav.id;
+          const label = t(`editor.tabs.${nav.tkey}`);
           return (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              title={t.label}
+              key={nav.id}
+              onClick={() => setTab(nav.id)}
+              title={label}
               style={{
                 flex: 1,
                 background: active ? "rgba(250,204,21,0.07)" : "none",
@@ -682,8 +693,8 @@ export function Sidebar({ tab, setTab }: { tab: SidebarTab; setTab: (t: SidebarT
               onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = "var(--ec-muted)"; }}
               onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = "var(--ec-dim)"; }}
             >
-              {t.icon}
-              {t.label}
+              {nav.icon}
+              {label}
             </button>
           );
         })}

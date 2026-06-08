@@ -2,21 +2,23 @@
 
 import { useEditorStore } from "~/lib/editor/store";
 import { ColorSwatch } from "~/components/editor/shared/ColorSwatch";
+import { useT } from "~/components/providers/LangProvider";
 
 export function ColorPalettePanel() {
   const { palette, setPalette } = useEditorStore();
+  const { t } = useT();
 
   const swatches: Array<{ key: keyof typeof palette; label: string }> = [
-    { key: "bg",     label: "Background" },
-    { key: "fg",     label: "Text"       },
-    { key: "accent", label: "Accent"     },
-    { key: "muted",  label: "Muted text" },
+    { key: "bg",     label: t("editor.colors.background") },
+    { key: "fg",     label: t("editor.colors.text")       },
+    { key: "accent", label: t("editor.colors.accent")     },
+    { key: "muted",  label: t("editor.colors.muted")      },
   ];
 
   return (
     <div style={{ padding: "16px 12px" }}>
       <p style={{ color: "var(--ec-sub)", fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>
-        Changes apply site-wide via CSS variables.
+        {t("editor.colors.note")}
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         {swatches.map(({ key, label }) => (
@@ -31,7 +33,7 @@ export function ColorPalettePanel() {
 
       {/* Preset palettes */}
       <div style={{ marginTop: 20, borderTop: "1px solid var(--ec-line)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-sub)", fontSize: 11, margin: "0 0 10px" }}>Presets</p>
+        <p style={{ color: "var(--ec-sub)", fontSize: 11, margin: "0 0 10px" }}>{t("editor.colors.presets")}</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {[
             { label: "Classic BW",  palette: { bg: "#fafafa", fg: "var(--ec-bg)", accent: "var(--ec-bg)", muted: "#6b7280" } },

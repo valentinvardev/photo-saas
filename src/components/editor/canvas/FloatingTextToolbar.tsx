@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useEditorStore } from "~/lib/editor/store";
 import type { EditorNode } from "~/lib/editor/types";
 import { FontPickerModal } from "./FontPickerModal";
+import { useT } from "~/components/providers/LangProvider";
 
 /** Plain-text sample from a node's HTML content (fallback preview text). */
 function sampleFromContent(html?: string): string {
@@ -14,13 +15,13 @@ function sampleFromContent(html?: string): string {
 /* Quick-pick sizes offered in the datalist next to the numeric px field. */
 const SIZE_STEPS = [10, 12, 14, 16, 20, 24, 32, 48, 72];
 const WEIGHT_PRESETS = [
-  { label: "Thin",  value: 100 },
-  { label: "Light", value: 300 },
-  { label: "Reg",   value: 400 },
-  { label: "Med",   value: 500 },
-  { label: "Semi",  value: 600 },
-  { label: "Bold",  value: 700 },
-  { label: "Black", value: 900 },
+  { tkey: "wThin",  value: 100 },
+  { tkey: "wLight", value: 300 },
+  { tkey: "wReg",   value: 400 },
+  { tkey: "wMed",   value: 500 },
+  { tkey: "wSemi",  value: 600 },
+  { tkey: "wBold",  value: 700 },
+  { tkey: "wBlack", value: 900 },
 ];
 
 const GAP = 10; // space between the toolbar and the text
@@ -77,6 +78,7 @@ function Divider() {
 
 export function FloatingTextToolbar() {
   const { selectedId, nodes, viewport, updateNode, selectNode } = useEditorStore();
+  const { t } = useT();
   const node = selectedId ? nodes[selectedId] : undefined;
   const isText = !!node && (node.type === "heading" || node.type === "paragraph" || node.type === "logo");
 
@@ -170,10 +172,10 @@ export function FloatingTextToolbar() {
       {/* Font family — opens the typography modal */}
       <button
         onClick={() => setFontModalOpen(true)}
-        title="Font family"
+        title={t("editor.toolbar.fontFamily")}
         style={{ display: "flex", alignItems: "center", gap: 5, height: 26, padding: "0 8px", background: "var(--ec-raised)", border: "1px solid var(--ec-lift)", borderRadius: 5, cursor: "pointer", color: "var(--ec-label)", flexShrink: 0 }}
       >
-        <span style={{ fontFamily: node.fontFamily || "inherit", fontSize: 12, fontWeight: 600, lineHeight: 1 }}>Font</span>
+        <span style={{ fontFamily: node.fontFamily || "inherit", fontSize: 12, fontWeight: 600, lineHeight: 1 }}>{t("editor.toolbar.font")}</span>
         <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M6 9l6 6 6-6"/></svg>
       </button>
 
@@ -191,8 +193,8 @@ export function FloatingTextToolbar() {
           const v = e.target.value.trim();
           update({ fontSize: v ? `${parseInt(v, 10)}px` : undefined });
         }}
-        placeholder="Size"
-        title="Font size (px)"
+        placeholder={t("editor.toolbar.size")}
+        title={t("editor.toolbar.fontSize")}
         className="ed-num-input"
         style={numStyle}
       />
@@ -204,11 +206,11 @@ export function FloatingTextToolbar() {
       <select
         value={node.fontWeight ?? ""}
         onChange={(e) => update({ fontWeight: e.target.value ? Number(e.target.value) : undefined })}
-        title="Font weight"
+        title={t("editor.toolbar.fontWeight")}
         style={selectStyle}
       >
-        <option value="">Weight</option>
-        {WEIGHT_PRESETS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+        <option value="">{t("editor.toolbar.weight")}</option>
+        {WEIGHT_PRESETS.map((p) => <option key={p.value} value={p.value}>{t(`editor.toolbar.${p.tkey}`)}</option>)}
       </select>
 
       <Divider />
@@ -217,7 +219,7 @@ export function FloatingTextToolbar() {
       <button
         onClick={() => colorRef.current?.click()}
         onContextMenu={(e) => { e.preventDefault(); update({ color: undefined }); }}
-        title="Text color (right-click to reset)"
+        title={t("editor.toolbar.textColor")}
         style={{ ...iconBtn(false), position: "relative" }}
       >
         <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, lineHeight: 1 }}>
@@ -236,13 +238,13 @@ export function FloatingTextToolbar() {
       <Divider />
 
       {/* Italic */}
-      <button onClick={() => update({ fontStyle: isItalic ? "normal" : "italic" })} title="Italic" style={iconBtn(isItalic)}>
+      <button onClick={() => update({ fontStyle: isItalic ? "normal" : "italic" })} title={t("editor.toolbar.italic")} style={iconBtn(isItalic)}>
         <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><text x="0" y="11" style={{ fontStyle: "italic", fontSize: "13px", fontFamily: "serif", fill: "currentColor" }}>I</text></svg>
       </button>
 
       {/* Alignment */}
       {(["left", "center", "right"] as const).map((a) => (
-        <button key={a} onClick={() => update({ textAlign: align === a ? undefined : a })} title={`Align ${a}`} style={iconBtn(align === a)}>
+        <button key={a} onClick={() => update({ textAlign: align === a ? undefined : a })} title={t(`editor.toolbar.align${a.charAt(0).toUpperCase()}${a.slice(1)}`)} style={iconBtn(align === a)}>
           {alignIcons[a]}
         </button>
       ))}
@@ -252,7 +254,7 @@ export function FloatingTextToolbar() {
       {/* Remove element */}
       <button
         onClick={() => { update({ hidden: true }); selectNode(null); }}
-        title="Remove element"
+        title={t("editor.toolbar.remove")}
         style={{ ...iconBtn(false), color: "#f87171" }}
         onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(248,113,113,0.12)"; }}
         onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}

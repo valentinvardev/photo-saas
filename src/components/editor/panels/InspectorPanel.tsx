@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import type { EditorNode } from "~/lib/editor/types";
 import { ImageGalleryModal } from "./ImageGalleryModal";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ─────────────────────────────────────────────────────────────────
    Shared primitives
@@ -27,21 +28,22 @@ function Divider() {
    floating toolbar above the selected text — see FloatingTextToolbar.
 ───────────────────────────────────────────────────────────────── */
 const FIT_OPTIONS = [
-  { label: "Cover",   value: "cover"   as const, desc: "Fill — crops if needed" },
-  { label: "Contain", value: "contain" as const, desc: "Fit — letterbox" },
-  { label: "Fill",    value: "fill"    as const, desc: "Stretch to fill" },
-  { label: "None",    value: "none"    as const, desc: "Original size" },
+  { labelKey: "fitCover",   value: "cover"   as const, descKey: "fitCoverDesc" },
+  { labelKey: "fitContain", value: "contain" as const, descKey: "fitContainDesc" },
+  { labelKey: "fitFill",    value: "fill"    as const, descKey: "fitFillDesc" },
+  { labelKey: "fitNone",    value: "none"    as const, descKey: "fitNoneDesc" },
 ];
 
 const POSITION_OPTIONS = [
-  { label: "Top",    value: "center top"    },
-  { label: "Center", value: "center center" },
-  { label: "Bottom", value: "center bottom" },
-  { label: "Left",   value: "left center"   },
-  { label: "Right",  value: "right center"  },
+  { labelKey: "top",    value: "center top"    },
+  { labelKey: "center", value: "center center" },
+  { labelKey: "bottom", value: "center bottom" },
+  { labelKey: "left",   value: "left center"   },
+  { labelKey: "right",  value: "right center"  },
 ];
 
 function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Partial<EditorNode>) => void }) {
+  const { t } = useT();
   const fit = node.objectFit ?? "cover";
   const pos = node.objectPosition ?? "center center";
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -55,7 +57,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
   return (
     <div>
       {/* Source */}
-      <SectionLabel>Source</SectionLabel>
+      <SectionLabel>{t("editor.inspector.source")}</SectionLabel>
       {node.src && (
         <div style={{ marginBottom: 8, borderRadius: 4, overflow: "hidden", aspectRatio: "4/3", background: "var(--ec-bg)" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -84,7 +86,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
             cursor: "pointer", fontFamily: "inherit",
           }}
         >
-          Apply URL
+          {t("editor.inspector.applyUrl")}
         </button>
         <button
           onClick={() => setGalleryOpen(true)}
@@ -96,14 +98,14 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
           }}
         >
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          Gallery
+          {t("editor.inspector.gallery")}
         </button>
       </div>
 
       {galleryOpen && (
         <ImageGalleryModal
           value={node.src ?? ""}
-          title="Select image"
+          title={t("editor.inspector.selectImage")}
           onChange={(url) => { update({ src: url }); setUrlDraft(url); }}
           onClose={() => setGalleryOpen(false)}
         />
@@ -112,7 +114,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
       <Divider />
 
       {/* Object fit */}
-      <SectionLabel>Fit</SectionLabel>
+      <SectionLabel>{t("editor.inspector.fit")}</SectionLabel>
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {FIT_OPTIONS.map((o) => {
           const active = fit === o.value;
@@ -129,8 +131,8 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
                 fontFamily: "inherit", textAlign: "left",
               }}
             >
-              <span style={{ fontWeight: active ? 600 : 400 }}>{o.label}</span>
-              <span style={{ fontSize: 9, color: active ? "#facc15" : "#333" }}>{o.desc}</span>
+              <span style={{ fontWeight: active ? 600 : 400 }}>{t(`editor.inspector.${o.labelKey}`)}</span>
+              <span style={{ fontSize: 9, color: active ? "#facc15" : "#333" }}>{t(`editor.inspector.${o.descKey}`)}</span>
             </button>
           );
         })}
@@ -139,7 +141,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
       <Divider />
 
       {/* Object position */}
-      <SectionLabel>Focus</SectionLabel>
+      <SectionLabel>{t("editor.inspector.focus")}</SectionLabel>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
         {POSITION_OPTIONS.map((o) => {
           const active = pos === o.value;
@@ -155,7 +157,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
                 fontFamily: "inherit",
               }}
             >
-              {o.label}
+              {t(`editor.inspector.${o.labelKey}`)}
             </button>
           );
         })}
@@ -170,6 +172,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
 ───────────────────────────────────────────────────────────────── */
 export function InspectorPanel() {
   const { selectedId, nodes, updateNode, selectNode } = useEditorStore();
+  const { t } = useT();
 
   if (!selectedId) return null;
   const node = nodes[selectedId];
@@ -199,7 +202,7 @@ export function InspectorPanel() {
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#facc15" }} />
           <span style={{ color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
-            Image
+            {t("editor.inspector.image")}
           </span>
         </div>
         <button
@@ -234,7 +237,7 @@ export function InspectorPanel() {
           onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
         >
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
-          Remove element
+          {t("editor.inspector.removeElement")}
         </button>
       </div>
     </aside>

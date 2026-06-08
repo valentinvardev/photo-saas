@@ -2,12 +2,14 @@
 
 import { useEditorStore } from "~/lib/editor/store";
 import { ColorSwatch } from "~/components/editor/shared/ColorSwatch";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ─────────────────────────────────────────────────────────────────
    Buttons — global button shape + colors. Lives in the Design tab.
 ───────────────────────────────────────────────────────────────── */
 export function ButtonsPanel() {
   const { buttons, setButtons, palette } = useEditorStore();
+  const { t } = useT();
   const bg = buttons.bg || palette.fg;
   const fg = buttons.fg || palette.bg;
   const labelStyle: React.CSSProperties = {
@@ -20,7 +22,7 @@ export function ButtonsPanel() {
       {/* Corner radius */}
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-          <label style={{ ...labelStyle, marginBottom: 0 }}>Corner radius</label>
+          <label style={{ ...labelStyle, marginBottom: 0 }}>{t("editor.buttonsPanel.radius")}</label>
           <span style={{ fontFamily: "monospace", fontSize: 11, color: "var(--ec-muted)" }}>{buttons.radius}px</span>
         </div>
         <input
@@ -33,24 +35,24 @@ export function ButtonsPanel() {
 
       {/* Colors */}
       <div>
-        <label style={labelStyle}>Colors</label>
+        <label style={labelStyle}>{t("editor.buttonsPanel.colors")}</label>
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          <ColorSwatch label="Button color" value={bg} onChange={(v) => setButtons({ bg: v })} />
-          <ColorSwatch label="Label color"  value={fg} onChange={(v) => setButtons({ fg: v })} />
+          <ColorSwatch label={t("editor.buttonsPanel.buttonColor")} value={bg} onChange={(v) => setButtons({ bg: v })} />
+          <ColorSwatch label={t("editor.buttonsPanel.labelColor")}  value={fg} onChange={(v) => setButtons({ fg: v })} />
         </div>
         {(buttons.bg || buttons.fg) && (
           <button
             onClick={() => setButtons({ bg: "", fg: "" })}
             style={{ marginTop: 10, background: "none", border: "1px solid var(--ec-lift)", color: "var(--ec-sub)", fontSize: 10, padding: "5px 10px", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}
           >
-            Reset to palette
+            {t("editor.buttonsPanel.resetToPalette")}
           </button>
         )}
       </div>
 
       {/* Live preview */}
       <div>
-        <label style={labelStyle}>Preview</label>
+        <label style={labelStyle}>{t("editor.buttonsPanel.preview")}</label>
         <div style={{ background: palette.bg, borderRadius: 8, border: "1px solid var(--ec-raised)", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: 22, flexWrap: "wrap" }}>
           <button style={{ background: bg, color: fg, border: `1px solid ${bg}`, borderRadius: buttons.radius, padding: "10px 18px", fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "default" }}>
             Hire me

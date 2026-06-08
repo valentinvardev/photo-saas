@@ -8,6 +8,9 @@ import { saveState } from "~/lib/editor/localStorage";
 import { useEditorTheme } from "~/lib/editor/editorTheme";
 import type { Viewport } from "~/lib/editor/types";
 import { api } from "~/trpc/react";
+import { useT } from "~/components/providers/LangProvider";
+
+const VIEWPORT_PX: Record<Viewport, number> = { desktop: 1280, tablet: 768, mobile: 375 };
 
 /* ── Icons ── */
 function UndoIcon() {
@@ -78,17 +81,13 @@ const VIEWPORT_ICONS: Record<Viewport, React.ReactNode> = {
   tablet:  <TabletIcon />,
   mobile:  <MobileIcon />,
 };
-const VIEWPORT_LABELS: Record<Viewport, string> = {
-  desktop: "Desktop (1280px)",
-  tablet:  "Tablet (768px)",
-  mobile:  "Mobile (375px)",
-};
-
 export function TopBar({ portfolioId, saving }: {
   portfolioId?: string;
   saving?: boolean;
 } = {}) {
   const { nodes, palette, typography, logo, reset, viewport, setViewport } = useEditorStore();
+  const { t } = useT();
+  const vpLabel = (v: Viewport) => t(`editor.viewport.${v}`, { w: VIEWPORT_PX[v] });
   const exitTo = portfolioId ? `/dashboard/portfolio/${portfolioId}` : "/dashboard/templates";
   const { undo, redo, pastStates, futureStates } = useStore(useEditorStore.temporal);
   const { theme, toggle } = useEditorTheme();
@@ -148,7 +147,7 @@ export function TopBar({ portfolioId, saving }: {
       {/* Back */}
       <button
         onClick={handleBack}
-        title="Back to dashboard"
+        title={t("editor.backToDashboard")}
         style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 4, background: "none", border: "none", cursor: "pointer", color: "var(--ec-sub)", padding: "4px 5px", borderRadius: 3 }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -159,17 +158,17 @@ export function TopBar({ portfolioId, saving }: {
         <div style={{ width: 20, height: 20, background: "#facc15", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <span style={{ fontWeight: 900, fontSize: 9, color: "#111", lineHeight: 1 }}>F</span>
         </div>
-        <span style={{ color: "var(--ec-muted)", fontSize: 11, letterSpacing: "-0.01em" }}>Website builder</span>
+        <span style={{ color: "var(--ec-muted)", fontSize: 11, letterSpacing: "-0.01em" }}>{t("editor.builder")}</span>
       </div>
 
       {divider}
 
       {/* Undo / Redo */}
-      <button onClick={() => undo()} disabled={!canUndo} title="Undo (Ctrl+Z)"
+      <button onClick={() => undo()} disabled={!canUndo} title={`${t("editor.undo")} (Ctrl+Z)`}
         style={{ background: "none", border: "none", cursor: canUndo ? "pointer" : "not-allowed", color: canUndo ? "var(--ec-label)" : "var(--ec-ghost)", padding: "4px 5px", borderRadius: 3, display: "flex", alignItems: "center" }}>
         <UndoIcon />
       </button>
-      <button onClick={() => redo()} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)"
+      <button onClick={() => redo()} disabled={!canRedo} title={`${t("editor.redo")} (Ctrl+Shift+Z)`}
         style={{ background: "none", border: "none", cursor: canRedo ? "pointer" : "not-allowed", color: canRedo ? "var(--ec-label)" : "var(--ec-ghost)", padding: "4px 5px", borderRadius: 3, display: "flex", alignItems: "center" }}>
         <RedoIcon />
       </button>
@@ -182,7 +181,7 @@ export function TopBar({ portfolioId, saving }: {
           <button
             key={v}
             onClick={() => setViewport(v)}
-            title={VIEWPORT_LABELS[v]}
+            title={vpLabel(v)}
             style={{
               background: viewport === v ? "var(--ec-border)" : "none",
               border: "none",
@@ -210,7 +209,7 @@ export function TopBar({ portfolioId, saving }: {
       {/* Light / Dark mode toggle */}
       <button
         onClick={toggle}
-        title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        title={theme === "dark" ? t("auth.lightMode") : t("auth.darkMode")}
         style={{
           background: "none", border: "none", cursor: "pointer",
           color: "var(--ec-sub)", padding: "4px 5px", borderRadius: 3,
@@ -227,12 +226,12 @@ export function TopBar({ portfolioId, saving }: {
 
       {/* Reset */}
       <button
-        onClick={() => { if (confirm("Reset all changes?")) reset(); }}
+        onClick={() => { if (confirm(t("editor.resetConfirm"))) reset(); }}
         style={{ background: "none", border: "1px solid rgba(248,113,113,0.4)", cursor: "pointer", color: "#f87171", padding: "3px 9px", borderRadius: 4, fontSize: 11 }}
         onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(248,113,113,0.1)"; e.currentTarget.style.borderColor = "#f87171"; }}
         onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.4)"; }}
       >
-        Reset
+        {t("editor.reset")}
       </button>
 
       {/* Preview — opens the actual built site (read-only render of the design) */}
@@ -243,7 +242,7 @@ export function TopBar({ portfolioId, saving }: {
         style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-label)", padding: "5px 11px", borderRadius: 4, fontSize: 11, textDecoration: "none" }}
       >
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Preview
+        {t("editor.preview")}
       </a>
 
       {/* Publish / Unpublish — reflects the portfolio's published state (DB editor only) */}
@@ -252,21 +251,21 @@ export function TopBar({ portfolioId, saving }: {
           <button
             onClick={togglePublish}
             disabled={updateStatus.isPending}
-            title="Live — click to unpublish"
+            title={t("editor.unpublishHint")}
             style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.5)", color: "#22c55e", padding: "5px 11px", borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: updateStatus.isPending ? "default" : "pointer" }}
           >
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
-            {updateStatus.isPending ? "Updating…" : "Published"}
+            {updateStatus.isPending ? t("editor.updating") : t("editor.published")}
           </button>
         ) : (
           <button
             onClick={togglePublish}
             disabled={updateStatus.isPending || portfolioQuery.isLoading}
-            title="Publish your site"
+            title={t("editor.publishHint")}
             style={{ display: "flex", alignItems: "center", gap: 5, background: "#facc15", border: "1px solid #facc15", color: "#111", padding: "5px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700, cursor: updateStatus.isPending ? "default" : "pointer" }}
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-            {updateStatus.isPending ? "Publishing…" : "Publish"}
+            {updateStatus.isPending ? t("editor.publishing") : t("editor.publish")}
           </button>
         )
       )}
@@ -277,12 +276,12 @@ export function TopBar({ portfolioId, saving }: {
           {saving ? (
             <>
               <span style={{ width: 11, height: 11, borderRadius: "50%", border: "1.5px solid var(--ec-border)", borderTopColor: "#facc15", display: "inline-block", animation: "ed-spin 0.7s linear infinite" }} />
-              Saving
+              {t("editor.saving")}
             </>
           ) : (
             <>
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
-              Saved
+              {t("editor.saved")}
             </>
           )}
           <style>{`@keyframes ed-spin { to { transform: rotate(360deg); } }`}</style>
@@ -292,7 +291,7 @@ export function TopBar({ portfolioId, saving }: {
           onClick={() => saveState({ nodes, palette, typography, logo })}
           style={{ background: "#facc15", border: "none", cursor: "pointer", color: "#111", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}
         >
-          <SaveIcon /> Save
+          <SaveIcon /> {t("editor.save")}
         </button>
       )}
     </header>
@@ -321,10 +320,10 @@ export function TopBar({ portfolioId, saving }: {
             {/* Header */}
             <div style={{ padding: "20px 22px 16px", borderBottom: "1px solid var(--ec-line)" }}>
               <p style={{ fontSize: 14, fontWeight: 700, color: "var(--ec-text)", margin: 0 }}>
-                Unsaved changes
+                {t("editor.exit.title")}
               </p>
               <p style={{ fontSize: 12, color: "var(--ec-muted)", marginTop: 4, lineHeight: 1.5 }}>
-                You have unsaved changes. Do you want to save them before leaving?
+                {t("editor.exit.body")}
               </p>
             </div>
 
@@ -340,7 +339,7 @@ export function TopBar({ portfolioId, saving }: {
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                 }}
               >
-                <SaveIcon /> Save & exit
+                <SaveIcon /> {t("editor.exit.saveAndExit")}
               </button>
 
               {/* Don't save */}
@@ -352,7 +351,7 @@ export function TopBar({ portfolioId, saving }: {
                   fontSize: 13, fontWeight: 500, color: "var(--ec-label)",
                 }}
               >
-                Don't save
+                {t("editor.exit.dontSave")}
               </button>
 
               {/* Cancel */}
@@ -364,7 +363,7 @@ export function TopBar({ portfolioId, saving }: {
                   fontSize: 12, color: "var(--ec-dim)",
                 }}
               >
-                Cancel
+                {t("editor.exit.cancel")}
               </button>
             </div>
           </div>

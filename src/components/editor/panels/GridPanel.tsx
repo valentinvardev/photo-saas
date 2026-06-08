@@ -1,6 +1,7 @@
 "use client";
 
 import { useEditorStore } from "~/lib/editor/store";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ─────────────────────────────────────────────────────────────────
    Gallery grid — layout, columns, spacing and "load more". Drives the
@@ -88,61 +89,61 @@ function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange:
   );
 }
 
-const LAYOUT_DESC: Record<string, string> = {
-  mosaic:  "An editorial layout with mixed, art-directed cell sizes.",
-  uniform: "An even grid of equal cells.",
-  masonry: "Keeps each photo’s aspect ratio — boxes vary in height (VSCO-style).",
-};
-
 export function GridPanel() {
   const { grid, setGrid } = useEditorStore();
+  const { t } = useT();
   const usesColumns = grid.layout !== "mosaic";   // uniform + masonry
   const fixedCells  = grid.layout !== "masonry";  // mosaic + uniform
   const canPaginate = grid.layout !== "mosaic";   // uniform + masonry
+  const layoutDesc: Record<string, string> = {
+    mosaic:  t("editor.grid.descMosaic"),
+    uniform: t("editor.grid.descUniform"),
+    masonry: t("editor.grid.descMasonry"),
+  };
 
   return (
     <div style={{ padding: "14px 14px 4px", display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Layout */}
       <div>
-        <label style={labelStyle}>Layout</label>
+        <label style={labelStyle}>{t("editor.grid.layout")}</label>
         <Segmented
           value={grid.layout}
           onChange={(v) => setGrid({ layout: v as "mosaic" | "uniform" | "masonry" })}
           options={[
-            { value: "mosaic",  label: "Mosaic" },
-            { value: "uniform", label: "Grid" },
-            { value: "masonry", label: "Masonry" },
+            { value: "mosaic",  label: t("editor.grid.mosaic") },
+            { value: "uniform", label: t("editor.grid.uniform") },
+            { value: "masonry", label: t("editor.grid.masonry") },
           ]}
         />
         <p style={{ margin: "8px 0 0", fontSize: 10.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
-          {LAYOUT_DESC[grid.layout]}
+          {layoutDesc[grid.layout]}
         </p>
       </div>
 
       {/* Columns — uniform + masonry */}
       {usesColumns && (
-        <Slider label="Columns" value={grid.columns} min={2} max={5} step={1}
+        <Slider label={t("editor.grid.columns")} value={grid.columns} min={2} max={5} step={1}
           onChange={(v) => setGrid({ columns: v })} />
       )}
 
       {/* Spacing */}
-      <Slider label="Spacing" value={grid.gap} suffix="px" min={0} max={24} step={1}
+      <Slider label={t("editor.grid.spacing")} value={grid.gap} suffix="px" min={0} max={24} step={1}
         onChange={(v) => setGrid({ gap: v })} />
 
       {/* Fit — fixed-cell layouts only (masonry keeps the natural ratio) */}
       {fixedCells && (
         <div>
-          <label style={labelStyle}>Photo fit</label>
+          <label style={labelStyle}>{t("editor.grid.fit")}</label>
           <Segmented
             value={grid.fit}
             onChange={(v) => setGrid({ fit: v as "cover" | "contain" })}
             options={[
-              { value: "cover",   label: "Crop" },
-              { value: "contain", label: "Fit" },
+              { value: "cover",   label: t("editor.grid.crop") },
+              { value: "contain", label: t("editor.grid.fitWhole") },
             ]}
           />
           <p style={{ margin: "8px 0 0", fontSize: 10.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
-            {grid.fit === "cover" ? "Photos fill each cell, cropping the edges." : "Whole photo shown, letterboxed inside the cell."}
+            {grid.fit === "cover" ? t("editor.grid.fitCropDesc") : t("editor.grid.fitWholeDesc")}
           </p>
         </div>
       )}
@@ -150,15 +151,13 @@ export function GridPanel() {
       {/* Load more — uniform + masonry */}
       {canPaginate && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <Toggle label="Load more" on={grid.loadMore} onChange={(v) => setGrid({ loadMore: v })} />
+          <Toggle label={t("editor.grid.loadMore")} on={grid.loadMore} onChange={(v) => setGrid({ loadMore: v })} />
           {grid.loadMore && (
-            <Slider label="Photos per batch" value={grid.pageSize} min={3} max={24} step={3}
+            <Slider label={t("editor.grid.perBatch")} value={grid.pageSize} min={3} max={24} step={3}
               onChange={(v) => setGrid({ pageSize: v })} />
           )}
           <p style={{ margin: "-4px 0 0", fontSize: 10.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
-            {grid.loadMore
-              ? "Shows photos in batches behind a “Load more” button."
-              : "Shows a selection with an “All projects” link."}
+            {grid.loadMore ? t("editor.grid.loadMoreOn") : t("editor.grid.loadMoreOff")}
           </p>
         </div>
       )}
