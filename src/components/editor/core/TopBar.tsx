@@ -7,6 +7,7 @@ import { useEditorStore } from "~/lib/editor/store";
 import { saveState } from "~/lib/editor/localStorage";
 import { useEditorTheme } from "~/lib/editor/editorTheme";
 import type { Viewport } from "~/lib/editor/types";
+import { api } from "~/trpc/react";
 
 /* ── Icons ── */
 function UndoIcon() {
@@ -97,6 +98,20 @@ export function TopBar({ portfolioId, saving }: {
   const canUndo = pastStates.length > 0;
   const canRedo = futureStates.length > 0;
   const hasChanges = pastStates.length > 0;
+
+  // Publish state (DB-backed editor only)
+  const portfolioQuery = api.portfolio.get.useQuery(
+    { id: portfolioId! },
+    { enabled: !!portfolioId },
+  );
+  const isPublished = portfolioQuery.data?.status === "published";
+  const updateStatus = api.portfolio.update.useMutation({
+    onSuccess: () => { void portfolioQuery.refetch(); },
+  });
+  function togglePublish() {
+    if (!portfolioId || updateStatus.isPending) return;
+    updateStatus.mutate({ id: portfolioId, status: isPublished ? "draft" : "published" });
+  }
 
   function handleBack() {
     // With a portfolioId the design autosaves, so leaving is always safe.
@@ -213,7 +228,9 @@ export function TopBar({ portfolioId, saving }: {
       {/* Reset */}
       <button
         onClick={() => { if (confirm("Reset all changes?")) reset(); }}
-        style={{ background: "none", border: "1px solid var(--ec-lift)", cursor: "pointer", color: "var(--ec-sub)", padding: "3px 9px", borderRadius: 4, fontSize: 11 }}
+        style={{ background: "none", border: "1px solid rgba(248,113,113,0.4)", cursor: "pointer", color: "#f87171", padding: "3px 9px", borderRadius: 4, fontSize: 11 }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(248,113,113,0.1)"; e.currentTarget.style.borderColor = "#f87171"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.4)"; }}
       >
         Reset
       </button>
@@ -228,6 +245,31 @@ export function TopBar({ portfolioId, saving }: {
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Preview
       </a>
+
+      {/* Publish / Unpublish — reflects the portfolio's published state (DB editor only) */}
+      {portfolioId && (
+        isPublished ? (
+          <button
+            onClick={togglePublish}
+            disabled={updateStatus.isPending}
+            title="Live — click to unpublish"
+            style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.5)", color: "#22c55e", padding: "5px 11px", borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: updateStatus.isPending ? "default" : "pointer" }}
+          >
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
+            {updateStatus.isPending ? "Updating…" : "Published"}
+          </button>
+        ) : (
+          <button
+            onClick={togglePublish}
+            disabled={updateStatus.isPending || portfolioQuery.isLoading}
+            title="Publish your site"
+            style={{ display: "flex", alignItems: "center", gap: 5, background: "#facc15", border: "1px solid #facc15", color: "#111", padding: "5px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700, cursor: updateStatus.isPending ? "default" : "pointer" }}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            {updateStatus.isPending ? "Publishing…" : "Publish"}
+          </button>
+        )
+      )}
 
       {/* Save — DB autosave indicator when tied to a portfolio, else manual localStorage save */}
       {portfolioId ? (
