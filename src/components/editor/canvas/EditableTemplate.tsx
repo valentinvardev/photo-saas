@@ -488,7 +488,7 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
     display: "flex",
     alignItems: "center",
     height: isMobile ? "56px" : "72px",
-    borderBottom: "1px solid #e8e8e8",
+    borderBottom: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)",
     background: "var(--ed-bg, #fafafa)",
     backdropFilter: "blur(12px)",
     padding: isMobile ? "0 1.25rem" : "0 3rem",
@@ -508,7 +508,7 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
             <LogoMark />
           </div>
           <button onClick={onOpenGallery}
-            style={{ ...sans, marginLeft: "auto", fontSize: "10px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "1px solid #0a0a0a", padding: "6px 14px", cursor: "pointer" }}>
+            style={{ ...sans, marginLeft: "auto", fontSize: "10px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "1px solid var(--ed-fg, #0a0a0a)", padding: "6px 14px", cursor: "pointer" }}>
             Work
           </button>
         </nav>
@@ -516,29 +516,29 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
         <div style={{ position: "fixed", inset: 0, zIndex: 1500, pointerEvents: menuOpen ? "auto" : "none" }}>
           <div onClick={() => setMenuOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", opacity: menuOpen ? 1 : 0, transition: "opacity 0.3s ease", backdropFilter: "blur(4px)" }} />
           <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: "80%", maxWidth: "320px", background: "var(--ed-bg, #fafafa)", transform: menuOpen ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.35s cubic-bezier(0.32,0.72,0,1)", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 1.5rem", height: "56px", borderBottom: "1px solid #e8e8e8" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 1.5rem", height: "56px", borderBottom: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
               <span style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--ed-fg, #0a0a0a)", textTransform: "uppercase" }}>J·H</span>
-              <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#888", padding: "4px" }}>
+              <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ed-muted, #9ca3af)", padding: "4px" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
               </button>
             </div>
             <nav style={{ flex: 1, padding: "2rem 1.5rem", display: "flex", flexDirection: "column" }}>
               {navItems.map((item, i) => (
                 <button key={item.id} onClick={() => { if (readOnly) { setMenuOpen(false); item.fn(); } }}
-                  style={{ ...sans, textAlign: "left", background: "none", border: "none", borderBottom: "1px solid #f0f0f0", padding: "1.25rem 0", fontSize: "22px", fontWeight: 300, color: "var(--ed-fg, #0a0a0a)", cursor: "pointer",
+                  style={{ ...sans, textAlign: "left", background: "none", border: "none", borderBottom: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", padding: "1.25rem 0", fontSize: "22px", fontWeight: 300, color: "var(--ed-fg, #0a0a0a)", cursor: "pointer",
                     fontFamily: i === 0 ? "var(--tpl-serif,serif)" : "var(--tpl-sans,sans-serif)", fontStyle: i === 0 ? "italic" : "normal" }}>
                   <EditableNode id={item.id} tag="span"><EditableText id={item.id} /></EditableNode>
                 </button>
               ))}
             </nav>
-            <div style={{ padding: "1.5rem", borderTop: "1px solid #e8e8e8" }}>
+            <div style={{ padding: "1.5rem", borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
               <button onClick={() => { if (readOnly) { setMenuOpen(false); scrollTo("contact"); } }}
                 style={{ ...sans, width: "100%", padding: "13px", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", border: "none", borderRadius: "var(--ed-btn-radius, 0)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
                 <EditableNode id="nav-cta" tag="span"><EditableText id="nav-cta" /></EditableNode>
               </button>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "1rem" }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />
-                <span style={{ ...mono, fontSize: "9px", color: "#888", letterSpacing: "0.12em" }}>Available for commissions — Q4 2025</span>
+                <span style={{ ...mono, fontSize: "9px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.12em" }}>Available for commissions — Q4 2025</span>
               </div>
             </div>
           </div>
@@ -580,9 +580,9 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
 function Label({ index, text }: { index: string; text: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2.5rem" }}>
-      <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", fontWeight: 700, color: "#bbb", letterSpacing: "0.2em", textTransform: "uppercase" as const }}>{index}</span>
-      <div style={{ flex: 1, height: "1px", background: "#e0e0e0" }} />
-      <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "#bbb", letterSpacing: "0.15em", textTransform: "uppercase" as const }}>{text}</span>
+      <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", fontWeight: 700, color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.2em", textTransform: "uppercase" as const }}>{index}</span>
+      <div style={{ flex: 1, height: "1px", background: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }} />
+      <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.15em", textTransform: "uppercase" as const }}>{text}</span>
     </div>
   );
 }
@@ -617,7 +617,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
   const allProjectsLink = (
     <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "flex-end" }}>
       <button onClick={() => setGalleryOpen(true)}
-        style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", borderBottom: "1px solid #0a0a0a", paddingBottom: "2px" }}
+        style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", borderBottom: "1px solid var(--ed-fg, #0a0a0a)", paddingBottom: "2px" }}
         onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.45"; }}
         onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}>
         All projects ({allWorks.length})
@@ -632,7 +632,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
     canLoadMore && (
       <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "center" }}>
         <button onClick={() => setVisibleCount((c) => c + grid.pageSize)}
-          style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "1px solid #0a0a0a", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.85rem 1.75rem" }}
+          style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "1px solid var(--ed-fg, #0a0a0a)", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.85rem 1.75rem" }}
           onMouseEnter={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}>
           Load more
@@ -668,7 +668,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       >
         {/* Left — text */}
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: isMobile ? "3rem 1.5rem 2.5rem" : isTablet ? "4rem 3rem 4rem 5vw" : "5rem 5rem 5rem 7vw" }}>
-          <EditableNode id="hero-eyebrow" tag="span" style={{ display: "block", fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", letterSpacing: "0.25em", color: "#999", textTransform: "uppercase", marginBottom: "2rem" }}>
+          <EditableNode id="hero-eyebrow" tag="span" style={{ display: "block", fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", letterSpacing: "0.25em", color: "var(--ed-muted, #9ca3af)", textTransform: "uppercase", marginBottom: "2rem" }}>
             <EditableText id="hero-eyebrow" />
           </EditableNode>
 
@@ -678,7 +678,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
           <div style={{ width: "40px", height: "1px", background: "var(--ed-fg, #0a0a0a)", margin: "0 0 2rem" }} />
 
-          <EditableNode id="hero-sub" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.7, color: "#555", maxWidth: "380px" }}>
+          <EditableNode id="hero-sub" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.7, color: "var(--ed-muted, #9ca3af)", maxWidth: "380px" }}>
             <EditableText id="hero-sub" />
           </EditableNode>
 
@@ -699,7 +699,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
           {/* The EditableNode is the whole row (dot + text), so deleting the
               text removes its decoration and container too. */}
-          <EditableNode id="hero-avail" tag="div" style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: isMobile ? "2rem" : "auto", paddingTop: isMobile ? "0" : "4rem", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#888", letterSpacing: "0.12em" }}>
+          <EditableNode id="hero-avail" tag="div" style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: isMobile ? "2rem" : "auto", paddingTop: isMobile ? "0" : "4rem", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.12em" }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 8px rgba(34,197,94,0.5)", flexShrink: 0 }} />
             <EditableText id="hero-avail" />
           </EditableNode>
@@ -787,13 +787,13 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
       {/* ════ PULL QUOTE ════ */}
       <section id="section-quote" style={{ padding: `${isMobile ? "4rem" : "6rem"} ${px}`, background: "var(--ed-fg, #0a0a0a)", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
-        <EditableNode id="quote-eyebrow" tag="span" style={{ display: "block", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>
+        <EditableNode id="quote-eyebrow" tag="span" style={{ display: "block", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "color-mix(in srgb, var(--ed-bg, #fafafa) 45%, transparent)" }}>
           <EditableText id="quote-eyebrow" />
         </EditableNode>
         <EditableNode id="quote-text" tag="blockquote" style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontWeight: 300, fontSize: isMobile ? "clamp(22px,7vw,36px)" : "clamp(28px,3.5vw,52px)", lineHeight: 1.3, color: "var(--ed-bg, #f0f0f0)", maxWidth: "900px", textAlign: "center", margin: 0, letterSpacing: "-0.01em" }}>
           <EditableText id="quote-text" />
         </EditableNode>
-        <EditableNode id="quote-author" tag="span" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em" }}>
+        <EditableNode id="quote-author" tag="span" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", color: "color-mix(in srgb, var(--ed-bg, #fafafa) 50%, transparent)", letterSpacing: "0.1em" }}>
           <EditableText id="quote-author" />
         </EditableNode>
       </section>
@@ -811,13 +811,13 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           <EditableNode id="about-body-2" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.8, color: "#4a4a4a", marginBottom: "2rem" }}>
             <EditableText id="about-body-2" />
           </EditableNode>
-          <div style={{ display: "flex", gap: isMobile ? "2rem" : "3rem", paddingTop: "2rem", borderTop: "1px solid #e0e0e0" }}>
+          <div style={{ display: "flex", gap: isMobile ? "2rem" : "3rem", paddingTop: "2rem", borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
             {([["stat-1-value","stat-1-label"],["stat-2-value","stat-2-label"],["stat-3-value","stat-3-label"]] as const).map(([vId, lId]) => (
               <div key={vId}>
                 <EditableNode id={vId} style={{ fontFamily: "var(--tpl-serif,serif)", fontSize: isMobile ? "28px" : "36px", fontWeight: 300, color: "var(--ed-fg, #0a0a0a)", lineHeight: 1 }}>
                   <EditableText id={vId} />
                 </EditableNode>
-                <EditableNode id={lId} style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", color: "#888", marginTop: "4px" }}>
+                <EditableNode id={lId} style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", color: "var(--ed-muted, #9ca3af)", marginTop: "4px" }}>
                   <EditableText id={lId} />
                 </EditableNode>
               </div>
@@ -827,7 +827,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
         {/* Portrait photo (editable image) */}
         <EditableNode id="about-image" style={{ position: "relative" }}>
-          <div style={{ position: "absolute", top: "12px", left: "12px", right: "-12px", bottom: "-12px", border: "1px solid #d8d8d8" }} />
+          <div style={{ position: "absolute", top: "12px", left: "12px", right: "-12px", bottom: "-12px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }} />
           <div style={{ position: "relative", zIndex: 1, width: "100%", aspectRatio: "4/5", overflow: "hidden" }}>
             <EditableImage
               id="about-image"
@@ -836,16 +836,16 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           </div>
           {/* EditableNode is the bordered box itself, so deleting the caption
               removes its frame too. */}
-          <EditableNode id="about-caption" tag="div" style={{ position: "absolute", bottom: "-16px", right: "0", zIndex: 2, background: "var(--ed-bg, #fafafa)", padding: "7px 12px", border: "1px solid #e8e8e8", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#aaa", letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          <EditableNode id="about-caption" tag="div" style={{ position: "absolute", bottom: "-16px", right: "0", zIndex: 2, background: "var(--ed-bg, #fafafa)", padding: "7px 12px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.18em", textTransform: "uppercase" }}>
             <EditableText id="about-caption" />
           </EditableNode>
         </EditableNode>
       </section>
 
       {/* ════ PRESS ════ */}
-      <section id="press" style={{ padding: `${isMobile ? "3.5rem" : "5rem"} ${px}`, background: "#f2f2f0", borderTop: "1px solid #e0e0e0" }}>
+      <section id="press" style={{ padding: `${isMobile ? "3.5rem" : "5rem"} ${px}`, background: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 4%, var(--ed-bg, #fafafa))", borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
         <Label index="03" text="Press &amp; Features" />
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : isTablet ? "repeat(3,1fr)" : "repeat(5,1fr)", gap: "1px", background: "#d8d8d8" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : isTablet ? "repeat(3,1fr)" : "repeat(5,1fr)", gap: "1px", background: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
           {(["press-1","press-2","press-3","press-4","press-5"] as const).map((id, i) => {
             if (isMobile && i >= 4) return null;
             return (
@@ -853,7 +853,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
                 <EditableNode id={id} style={{ fontFamily: "var(--tpl-serif,serif)", fontSize: isMobile ? "15px" : "18px", fontWeight: 400, color: "var(--ed-fg, #0a0a0a)", lineHeight: 1.2 }}>
                   <EditableText id={id} />
                 </EditableNode>
-                <EditableNode id={`${id}-year`} style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "#aaa", letterSpacing: "0.15em" }}>
+                <EditableNode id={`${id}-year`} style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.15em" }}>
                   <EditableText id={`${id}-year`} />
                 </EditableNode>
               </div>
@@ -869,7 +869,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           <EditableNode id="contact-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "clamp(36px,11vw,56px)" : "clamp(40px,5vw,72px)", lineHeight: 1.05, color: "var(--ed-fg, #0a0a0a)", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
             <EditableText id="contact-heading" />
           </EditableNode>
-          <EditableNode id="contact-body" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "14px", lineHeight: 1.7, color: "#666", marginBottom: "2rem" }}>
+          <EditableNode id="contact-body" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "14px", lineHeight: 1.7, color: "var(--ed-muted, #9ca3af)", marginBottom: "2rem" }}>
             <EditableText id="contact-body" />
           </EditableNode>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
@@ -879,8 +879,8 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
               { label: "Agent",    value: "+1 (212) 555 0184" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", gap: "1.25rem", alignItems: "baseline" }}>
-                <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#aaa", letterSpacing: "0.2em", textTransform: "uppercase", minWidth: "52px" }}>{row.label}</span>
-                <span style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", color: "#333" }}>{row.value}</span>
+                <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.2em", textTransform: "uppercase", minWidth: "52px" }}>{row.label}</span>
+                <span style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", color: "var(--ed-fg, #0a0a0a)" }}>{row.value}</span>
               </div>
             ))}
           </div>
@@ -890,19 +890,19 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
             {["First name", "Last name"].map((ph) => (
               <input key={ph} placeholder={ph}
-                style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
+                style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
                 onFocus={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
-                onBlur={(e)  => { e.currentTarget.style.borderColor = "#d8d8d8"; }} />
+                onBlur={(e)  => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)"; }} />
             ))}
           </div>
           <input type="email" placeholder="Email address"
-            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
+            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
             onFocus={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
-            onBlur={(e)  => { e.currentTarget.style.borderColor = "#d8d8d8"; }} />
+            onBlur={(e)  => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)"; }} />
           <textarea placeholder="Tell me about your project..." rows={5}
-            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", resize: "vertical", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
+            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", resize: "vertical", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
             onFocus={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
-            onBlur={(e)  => { e.currentTarget.style.borderColor = "#d8d8d8"; }} />
+            onBlur={(e)  => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)"; }} />
           <button type="submit"
             style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", border: "1px solid var(--ed-btn-bg, #0a0a0a)", borderRadius: "var(--ed-btn-radius, 0)", padding: "13px", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; }}
@@ -913,12 +913,12 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ════ FOOTER ════ */}
-      <footer id="section-footer" style={{ padding: `2rem ${px}`, borderTop: "1px solid #e0e0e0", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? "1.25rem" : "2rem", justifyContent: "space-between" }}>
+      <footer id="section-footer" style={{ padding: `2rem ${px}`, borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? "1.25rem" : "2rem", justifyContent: "space-between" }}>
         <EditableNode id="nav-logo" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--ed-fg, #0a0a0a)", textTransform: "uppercase" }}>
           <EditableText id="nav-logo" />
         </EditableNode>
         {!isMobile && (
-          <EditableNode id="footer-copyright" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#bbb", letterSpacing: "0.12em" }}>
+          <EditableNode id="footer-copyright" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.12em" }}>
             <EditableText id="footer-copyright" />
           </EditableNode>
         )}
@@ -930,15 +930,15 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
             { label: "Facebook",  href: "#", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
           ].map((s) => (
             <a key={s.label} href={s.href} aria-label={s.label}
-              style={{ color: "#aaa", textDecoration: "none", display: "flex", alignItems: "center", transition: "color 0.2s" }}
+              style={{ color: "var(--ed-muted, #9ca3af)", textDecoration: "none", display: "flex", alignItems: "center", transition: "color 0.2s" }}
               onMouseEnter={(e) => { e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "#aaa"; }}>
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--ed-muted, #9ca3af)"; }}>
               {s.icon}
             </a>
           ))}
         </div>
         {isMobile && (
-          <EditableNode id="footer-copyright" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#bbb", letterSpacing: "0.1em" }}>
+          <EditableNode id="footer-copyright" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.1em" }}>
             <EditableText id="footer-copyright" />
           </EditableNode>
         )}
