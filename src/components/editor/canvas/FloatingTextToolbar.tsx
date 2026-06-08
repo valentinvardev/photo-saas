@@ -173,7 +173,7 @@ export function FloatingTextToolbar() {
         title="Font family"
         style={{ display: "flex", alignItems: "center", gap: 5, height: 26, padding: "0 8px", background: "var(--ec-raised)", border: "1px solid var(--ec-lift)", borderRadius: 5, cursor: "pointer", color: "var(--ec-label)", flexShrink: 0 }}
       >
-        <span style={{ fontFamily: node.fontFamily || "inherit", fontSize: 13, fontWeight: 600, lineHeight: 1 }}>Aa</span>
+        <span style={{ fontFamily: node.fontFamily || "inherit", fontSize: 12, fontWeight: 600, lineHeight: 1 }}>Font</span>
         <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M6 9l6 6 6-6"/></svg>
       </button>
 

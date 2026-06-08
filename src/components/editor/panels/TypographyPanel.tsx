@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import { FONT_OPTIONS } from "~/lib/editor/fonts";
-import type { Typography } from "~/lib/editor/types";
+import { DEFAULT_TYPOGRAPHY, type Typography } from "~/lib/editor/types";
+import { FontPickerModal } from "~/components/editor/canvas/FontPickerModal";
 
 /* ─────────────────────────────────────────────────────────────────────────
    Font picker for a single type role (serif / sans / mono)
@@ -21,8 +23,8 @@ function FontPicker({
   onChange: (stack: string) => void;
 }) {
   const options  = FONT_OPTIONS.filter((f) => f.category === category);
-  const featured = options.filter((f) => f.featured);
   const active   = options.find((f) => value.includes(f.value));
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <div style={{ marginBottom: 14 }}>
@@ -30,7 +32,7 @@ function FontPicker({
         <label style={{ color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
           {label}
         </label>
-        <span style={{ fontFamily: "monospace", fontSize: 9, color: "var(--ec-ghost)", background: "var(--ec-raised)", padding: "1px 5px", borderRadius: 2 }}>
+        <span style={{ fontFamily: "monospace", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "#facc15", background: "rgba(250,204,21,0.12)", border: "1px solid rgba(250,204,21,0.35)", padding: "2px 7px", borderRadius: 4 }}>
           {category}
         </span>
       </div>
@@ -84,30 +86,32 @@ function FontPicker({
         </svg>
       </div>
 
-      {/* Font grid options — featured only */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, marginTop: 6 }}>
-        {featured.map((f) => (
-          <button
-            key={f.value}
-            onClick={() => onChange(f.stack)}
-            style={{
-              background:   value.includes(f.value) ? "rgba(250,204,21,0.12)" : "var(--ec-bg)",
-              border:       `1px solid ${value.includes(f.value) ? "#facc15" : "var(--ec-line)"}`,
-              borderRadius: 3,
-              padding:      "5px 7px",
-              cursor:       "pointer",
-              textAlign:    "left",
-            }}
-          >
-            <span style={{ fontFamily: f.stack, fontSize: 13, color: value.includes(f.value) ? "#facc15" : "var(--ec-sub)", display: "block", lineHeight: 1.2 }}>
-              Ag
-            </span>
-            <span style={{ fontFamily: "inherit", fontSize: 9, color: "var(--ec-ghost)", display: "block", marginTop: 2 }}>
-              {f.label}
-            </span>
-          </button>
-        ))}
-      </div>
+      {/* View all fonts — opens the searchable typography modal for this role */}
+      <button
+        onClick={() => setModalOpen(true)}
+        style={{
+          width: "100%", marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between",
+          gap: 6, background: "var(--ec-bg)", border: "1px solid var(--ec-line)", borderRadius: 4,
+          padding: "7px 10px", cursor: "pointer", color: "var(--ec-label)", fontFamily: "inherit", fontSize: 11,
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#facc15"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--ec-line)"; }}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7V5h16v2M9 5v14M7 19h4"/><path d="M14 19l3-9 3 9M14.8 16.5h4.4"/></svg>
+          View all fonts
+        </span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--ec-sub)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      {modalOpen && (
+        <FontPickerModal
+          value={value}
+          initialTab={category}
+          onSelect={(stack) => onChange(stack ?? DEFAULT_TYPOGRAPHY[role])}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

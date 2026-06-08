@@ -690,9 +690,9 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
               View work
             </button>
             <a href="#about"
-              style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", padding: "12px 24px", border: "1px solid #ccc", borderRadius: "var(--ed-btn-radius, 0)", textDecoration: "none", transition: "border-color 0.2s", display: "inline-block" }}
+              style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", padding: "12px 24px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 25%, transparent)", borderRadius: "var(--ed-btn-radius, 0)", textDecoration: "none", transition: "border-color 0.2s", display: "inline-block" }}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#ccc"; }}>
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--ed-fg, #0a0a0a) 25%, transparent)"; }}>
               About
             </a>
           </div>
@@ -805,10 +805,10 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           <EditableNode id="about-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 400, fontSize: isMobile ? "clamp(32px,10vw,48px)" : "clamp(36px,4vw,56px)", lineHeight: 1.1, color: "var(--ed-fg, #0a0a0a)", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
             <EditableText id="about-heading" />
           </EditableNode>
-          <EditableNode id="about-body-1" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.8, color: "#4a4a4a", marginBottom: "1.25rem" }}>
+          <EditableNode id="about-body-1" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.8, color: "var(--ed-muted, #9ca3af)", marginBottom: "1.25rem" }}>
             <EditableText id="about-body-1" />
           </EditableNode>
-          <EditableNode id="about-body-2" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.8, color: "#4a4a4a", marginBottom: "2rem" }}>
+          <EditableNode id="about-body-2" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.8, color: "var(--ed-muted, #9ca3af)", marginBottom: "2rem" }}>
             <EditableText id="about-body-2" />
           </EditableNode>
           <div style={{ display: "flex", gap: isMobile ? "2rem" : "3rem", paddingTop: "2rem", borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>

@@ -17,16 +17,17 @@ const CATEGORY_LABELS: Record<string, string> = { serif: "Serif", sans: "Sans se
 const CATEGORY_ORDER: Array<FontOption["category"]> = ["serif", "sans", "mono"];
 
 interface Props {
-  value?: string;          // current fontFamily stack (undefined = template default)
-  fallbackSample?: string; // node text, used when the owner has no name yet
+  value?: string;            // current fontFamily stack (undefined = template default)
+  fallbackSample?: string;   // node text, used when the owner has no name yet
+  initialTab?: Tab;          // open on a given category (defaults to All)
   onSelect: (stack: string | undefined) => void;
   onClose: () => void;
 }
 
-export function FontPickerModal({ value, fallbackSample, onSelect, onClose }: Props) {
+export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, onClose }: Props) {
   const { data: me } = api.user.me.useQuery();
   const [hovered, setHovered] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>("all");
+  const [tab, setTab] = useState<Tab>(initialTab ?? "all");
   const [query, setQuery] = useState("");
 
   // Esc closes
@@ -55,7 +56,7 @@ export function FontPickerModal({ value, fallbackSample, onSelect, onClose }: Pr
         style={rowStyle(active)}
       >
         <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2, minWidth: 0 }}>
-          <span style={{ fontFamily: f.stack, fontSize: 19, color: active ? "#facc15" : "var(--ec-label)", lineHeight: 1.1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 400 }}>
+          <span style={{ fontFamily: f.stack, fontSize: 19, color: active ? "#facc15" : "var(--ec-label)", lineHeight: 1.1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 420 }}>
             {sample}
           </span>
           <span style={{ fontSize: 10.5, color: "var(--ec-dim)" }}>{f.label}</span>
@@ -75,10 +76,18 @@ export function FontPickerModal({ value, fallbackSample, onSelect, onClose }: Pr
         fontFamily: "system-ui, sans-serif",
       }}
     >
+      <style>{`
+        .ed-fontlist::-webkit-scrollbar { width: 9px; }
+        .ed-fontlist::-webkit-scrollbar-track { background: transparent; }
+        .ed-fontlist::-webkit-scrollbar-thumb { background: var(--ec-lift, #333); border-radius: 5px; border: 2px solid var(--ec-bg, #111); }
+        .ed-fontlist::-webkit-scrollbar-thumb:hover { background: var(--ec-muted, #666); }
+        .ed-fontlist { scrollbar-width: thin; scrollbar-color: var(--ec-lift, #333) transparent; }
+        .ed-fontsearch::placeholder { color: var(--ec-sub, #999); font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 15px; opacity: 1; }
+      `}</style>
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: "100%", maxWidth: 560, maxHeight: "84vh",
+          width: "100%", maxWidth: 560, height: "min(680px, 90vh)",
           background: "var(--ec-bg, #111)", border: "1px solid var(--ec-raised, #222)",
           borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column",
           boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
@@ -93,8 +102,8 @@ export function FontPickerModal({ value, fallbackSample, onSelect, onClose }: Pr
             </button>
           </div>
           {/* Live preview of the sample name in the focused font */}
-          <div style={{ background: "var(--ec-raised)", borderRadius: 9, padding: "18px 16px", textAlign: "center", overflow: "hidden" }}>
-            <span style={{ fontFamily: previewStack, fontSize: 36, color: "var(--ec-bright)", lineHeight: 1.1, wordBreak: "break-word" }}>
+          <div style={{ background: "var(--ec-raised)", borderRadius: 9, padding: "16px", textAlign: "center", overflow: "hidden", height: 76, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ fontFamily: previewStack, fontSize: 34, color: "var(--ec-bright)", lineHeight: 1.1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>
               {sample}
             </span>
           </div>
@@ -107,13 +116,14 @@ export function FontPickerModal({ value, fallbackSample, onSelect, onClose }: Pr
             {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
             <input
               autoFocus
+              className="ed-fontsearch"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search fonts…"
               style={{
                 width: "100%", boxSizing: "border-box", background: "var(--ec-raised)",
-                border: "1px solid var(--ec-lift)", color: "var(--ec-label)", fontSize: 12,
-                padding: "8px 10px 8px 30px", borderRadius: 7, outline: "none", fontFamily: "inherit",
+                border: "1px solid var(--ec-lift)", color: "var(--ec-label)", fontSize: 13,
+                padding: "9px 10px 9px 30px", borderRadius: 7, outline: "none", fontFamily: "inherit",
               }}
             />
             {query && (
@@ -143,8 +153,8 @@ export function FontPickerModal({ value, fallbackSample, onSelect, onClose }: Pr
           </div>
         </div>
 
-        {/* Font list */}
-        <div style={{ overflowY: "auto", padding: "8px 8px 12px" }}>
+        {/* Font list — fills the remaining height and scrolls */}
+        <div className="ed-fontlist" style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "8px 8px 12px" }}>
           {/* Template default / reset — only on the unfiltered view */}
           {!q && (
             <button
