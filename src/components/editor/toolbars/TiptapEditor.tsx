@@ -70,7 +70,7 @@ export function TiptapEditor({ id, content, onUpdate, style }: Props) {
 
   return (
     <div
-      style={{ ...style, position: "relative", minWidth: 0, overflowWrap: "break-word", wordBreak: "break-word", whiteSpace: "pre-wrap" }}
+      style={{ ...style, position: "relative", minWidth: 0, overflowWrap: "break-word", wordBreak: "normal", whiteSpace: "pre-wrap" }}
       onClick={(e) => e.stopPropagation()}
       onDoubleClick={(e) => e.stopPropagation()}
     >

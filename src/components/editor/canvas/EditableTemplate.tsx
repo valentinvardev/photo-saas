@@ -20,7 +20,7 @@
  *     because it lets the designer preview the interaction.
  */
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import { TiptapEditor } from "~/components/editor/toolbars/TiptapEditor";
 import { LogoImage } from "./primitives";
@@ -60,7 +60,8 @@ function EditableNode({
 
   // minWidth:0 lets the node shrink inside flex/grid rows so text wraps to the
   // container instead of overflowing (and pushing siblings, e.g. images, out).
-  const base: React.CSSProperties = { position: "relative", minWidth: 0, overflowWrap: "break-word", wordBreak: "break-word" };
+  // wordBreak:normal keeps words intact — they wrap at spaces, not mid-word.
+  const base: React.CSSProperties = { position: "relative", minWidth: 0, overflowWrap: "break-word", wordBreak: "normal" };
 
   // Read-only (public site): no selection/editing affordances.
   if (readOnly) {
@@ -82,26 +83,69 @@ function EditableNode({
   );
 }
 
+/* Tiptap wraps loose inline content in a <p>; the template authors content as
+   inline HTML (e.g. "James<br/><em>Hollis</em>"), so a stray <p> would inject
+   block margins inside an <h1>/<span> and break the layout. Unwrap a single
+   paragraph back to inline HTML; leave true multi-paragraph content alone. */
+function unwrapParagraph(html: string): string {
+  const inner = /^<p>([\s\S]*?)<\/p>$/i.exec(html)?.[1];
+  return inner !== undefined && !/<p[\s>]/i.test(inner) ? inner : html;
+}
+
 /* ═══════════════════════════════════════════
    EDITABLE TEXT — shows Tiptap on dbl-click
 ═══════════════════════════════════════════ */
 function EditableText({ id, style }: { id: string; style?: React.CSSProperties }) {
   const { nodes, editingId, updateNode } = useEditorStore();
-  const content = nodes[id]?.content ?? "";
-  const editing = editingId === id;
+  const viewport = useEditorStore((s) => s.viewport);
+  const node     = nodes[id];
+  const content  = node?.content ?? "";
+  const editing  = editingId === id;
+  const isHeading = node?.type === "heading";
+  const ref = useRef<HTMLSpanElement>(null);
+
+  // Headings auto-shrink: if a single word is wider than the column it would
+  // otherwise overflow (we never break mid-word), so reduce the font until it
+  // fits. Multi-word text just wraps at spaces and never triggers this. We
+  // observe the PARENT width (stable, set by the grid) so resizing the font
+  // doesn't feed back into the observer.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || !isHeading || editing) return;
+    const fit = () => {
+      el.style.fontSize = "";
+      let guard = 0;
+      while (el.scrollWidth > el.clientWidth + 1 && guard < 14) {
+        const cur  = parseFloat(getComputedStyle(el).fontSize) || 16;
+        const next = cur * Math.max(0.9, (el.clientWidth - 1) / el.scrollWidth);
+        if (next < 10) { el.style.fontSize = "10px"; break; }
+        el.style.fontSize = `${next}px`;
+        guard++;
+      }
+    };
+    fit();
+    const parent = el.parentElement;
+    const ro = new ResizeObserver(fit);
+    if (parent) ro.observe(parent);
+    return () => ro.disconnect();
+  }, [content, viewport, isHeading, editing]);
 
   if (editing) {
     return (
       <TiptapEditor
         id={id}
         content={content}
-        onUpdate={(html) => updateNode(id, { content: html })}
+        onUpdate={(html) => updateNode(id, { content: unwrapParagraph(html) })}
         style={style}
       />
     );
   }
   return (
-    <span style={{ display: "block", overflowWrap: "break-word", wordBreak: "break-word", ...style }} dangerouslySetInnerHTML={{ __html: content }} />
+    <span
+      ref={ref}
+      style={{ display: "block", overflowWrap: isHeading ? "normal" : "break-word", wordBreak: "normal", ...style }}
+      dangerouslySetInnerHTML={{ __html: content }}
+    />
   );
 }
 
