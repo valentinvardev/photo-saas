@@ -44,6 +44,7 @@ function EditableNode({
   const node     = nodes[id];
   const selected = selectedId === id;
   const editing  = editingId  === id;
+  const isTextNode = node?.type === "heading" || node?.type === "paragraph" || node?.type === "logo";
 
   // Node is hidden (deleted by user)
   if (node?.hidden) return null;
@@ -74,7 +75,14 @@ function EditableNode({
       data-node-id={id}
       data-selected={selected ? "true" : undefined}
       data-editing={editing ? "true" : undefined}
-      onClick={(e) => { e.stopPropagation(); selectNode(id); }}
+      // One click selects; clicking an already-selected text node enters edit
+      // mode (more reliable than double-click after using the floating toolbar).
+      // Double-click still works as a shortcut from the unselected state.
+      onClick={(e) => {
+        e.stopPropagation();
+        if (selected && isTextNode && !editing) setEditing(id);
+        else selectNode(id);
+      }}
       onDoubleClick={(e) => { e.stopPropagation(); selectNode(id); setEditing(id); }}
       style={{ ...base, ...style, ...overrides }}
     >
