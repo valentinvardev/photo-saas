@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
 import { createClient } from "~/lib/supabase/client";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ── Plan tier badge ── */
 const TIER_CONFIG = {
@@ -124,6 +125,7 @@ function MiniAction({ href, icon, label, sub }: { href: string; icon: React.Reac
 }
 
 export default function DashboardHomePage() {
+  const { t } = useT();
   const [firstName, setFirstName] = useState<string>("");
   const { data: portfolios } = api.portfolio.list.useQuery();
   const portfolioProjects = portfolios?.length ?? 0;
@@ -143,25 +145,25 @@ export default function DashboardHomePage() {
       {/* ── Greeting ──────────────────────────────────────────────────── */}
       <section>
         <h1 className="font-sans text-2xl sm:text-3xl font-bold text-[var(--fg)] tracking-tight">
-          Welcome back{firstName ? <>, <span className="text-[var(--fg)]">{firstName}</span></> : ""}.
+          {t("home.welcome")}{firstName ? <>, <span className="text-[var(--fg)]">{firstName}</span></> : ""}.
         </h1>
       </section>
 
       {/* ── Web presence ──────────────────────────────────────────────── */}
       <section>
         <SectionLabel
-          title="Your web presence"
-          hint="Everything clients see — keep it current."
+          title={t("home.webPresence")}
+          hint={t("home.webPresenceHint")}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <ActionCard
             href="/dashboard/portfolio"
             icon={I.portfolio}
-            eyebrow="Portfolio"
-            title="Organize your portfolio"
-            body={`${portfolioProjects} projects · arrange covers, edit copy, swap photos.`}
-            cta="Manage portfolio"
-            status={{ dot: "green", label: "Live" }}
+            eyebrow={t("home.portfolioEyebrow")}
+            title={t("home.organizeTitle")}
+            body={t("home.organizeBody", { n: portfolioProjects })}
+            cta={t("home.managePortfolio")}
+            status={{ dot: "green", label: t("home.live") }}
           />
         </div>
       </section>
@@ -169,32 +171,32 @@ export default function DashboardHomePage() {
       {/* ── Gallery quick actions ─────────────────────────────────────── */}
       <section>
         <SectionLabel
-          title="Gallery"
-          hint="Upload, organize, and search your photos."
+          title={t("home.gallery")}
+          hint={t("home.galleryHint")}
           action={
             <Link href="/dashboard/gallery" className="font-sans text-xs font-semibold text-[var(--fg-muted)] hover:text-[var(--fg)] inline-flex items-center gap-1.5 transition-colors">
-              Open gallery <span>{I.arrow}</span>
+              {t("home.openGallery")} <span>{I.arrow}</span>
             </Link>
           }
         />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <MiniAction href="/dashboard/gallery?upload=1" icon={I.upload} label="Upload photos" sub="Drag & drop or pick files" />
-          <MiniAction href="/dashboard/gallery?new=folder" icon={I.folder} label="Create folder" sub="Group a session or shoot" />
-          <MiniAction href="/dashboard/gallery" icon={I.search} label="Browse all photos" sub="1,284 photos · 23 folders" />
+          <MiniAction href="/dashboard/gallery?upload=1" icon={I.upload} label={t("home.uploadPhotos")} sub={t("home.uploadPhotosSub")} />
+          <MiniAction href="/dashboard/gallery?new=folder" icon={I.folder} label={t("home.createFolder")} sub={t("home.createFolderSub")} />
+          <MiniAction href="/dashboard/gallery" icon={I.search} label={t("home.browseAll")} sub={t("home.browseAllSub")} />
         </div>
       </section>
 
       {/* ── Recent activity / quick chips ─────────────────────────────── */}
       <section>
         <SectionLabel
-          title="Recent activity"
-          hint="What's happened across your account."
+          title={t("home.recentActivity")}
+          hint={t("home.recentActivityHint")}
         />
         <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl divide-y divide-[var(--border-subtle)]">
           {[
-            { icon: I.upload,    title: "47 photos uploaded to 'Coastal'",  time: "2h ago"    },
-            { icon: I.portfolio, title: "Portfolio viewed from Berlin",     time: "Yesterday" },
-            { icon: I.portfolio, title: "Portfolio cover updated",          time: "2d ago"    },
+            { icon: I.upload,    title: t("home.act1"), time: t("home.act1Time") },
+            { icon: I.portfolio, title: t("home.act2"), time: t("home.act2Time") },
+            { icon: I.portfolio, title: t("home.act3"), time: t("home.act3Time") },
           ].map((row, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-3.5">
               <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[var(--bg-subtle)] text-[var(--fg-muted)]">

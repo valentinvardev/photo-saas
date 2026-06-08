@@ -2,25 +2,27 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-type Feature = { title: string; desc: string };
+import { useT } from "~/components/providers/LangProvider";
 
 /**
- * Generic "coming soon" screen for dashboard features that are scoped but not
- * yet built (Link builder, Client delivery). Explains what the feature will do
- * so the sidebar entry leads somewhere meaningful instead of a dead link.
+ * Generic "beta / coming soon" screen for dashboard features that are scoped but
+ * not yet built (Link builder, Client delivery). All copy comes from the `cs.{ns}`
+ * translation namespace so it follows the language switcher.
  */
 export function ComingSoon({
   icon,
-  title,
-  tagline,
-  features,
+  ns,
 }: {
   icon: React.ReactNode;
-  title: string;
-  tagline: string;
-  features: Feature[];
+  ns: "delivery" | "links";
 }) {
+  const { t } = useT();
+  const title = t(`cs.${ns}.title`);
+  const tagline = t(`cs.${ns}.tagline`);
+  const features = [1, 2, 3, 4].map((i) => ({
+    title: t(`cs.${ns}.f${i}t`),
+    desc: t(`cs.${ns}.f${i}d`),
+  }));
   return (
     <div className="px-5 sm:px-8 py-8 sm:py-12 max-w-3xl mx-auto">
       <motion.div
@@ -36,7 +38,7 @@ export function ComingSoon({
 
           <span className="inline-flex items-center gap-1.5 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-full px-3 py-1 mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-yellow animate-pulse" />
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--fg-muted)]">Coming soon</span>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--fg-muted)]">{t("cs.badge")}</span>
           </span>
 
           <h1 className="font-sans text-2xl sm:text-3xl font-bold text-[var(--fg)] tracking-tight">{title}</h1>
@@ -66,7 +68,7 @@ export function ComingSoon({
         {/* Footer */}
         <div className="mt-10 flex flex-col items-center gap-3 text-center">
           <p className="font-sans text-xs text-[var(--fg-muted)]">
-            We&apos;re building this next. Keep using your portfolio and gallery in the meantime.
+            {t("cs.footer")}
           </p>
           <Link
             href="/dashboard"
@@ -76,7 +78,7 @@ export function ComingSoon({
               <line x1="19" y1="12" x2="5" y2="12" />
               <polyline points="12 19 5 12 12 5" />
             </svg>
-            Back to dashboard
+            {t("cs.back")}
           </Link>
         </div>
       </motion.div>

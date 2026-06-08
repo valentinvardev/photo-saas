@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "~/trpc/react";
 import { useUploadPhotos } from "~/lib/photo/upload";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ── Icons ── */
 const UploadIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;
@@ -30,6 +31,7 @@ function FolderModal({ mode, initial, busy, onSubmit, onClose }: {
   onSubmit: (name: string) => void; onClose: () => void;
 }) {
   const [name, setName] = useState(initial);
+  const { t } = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => { inputRef.current?.focus(); inputRef.current?.select(); }, []);
   useEffect(() => {
@@ -48,23 +50,23 @@ function FolderModal({ mode, initial, busy, onSubmit, onClose }: {
         <div className="px-5 pt-5 pb-4">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-8 h-8 rounded-lg bg-yellow/10 border border-yellow/30 flex items-center justify-center text-yellow"><FolderIcon /></span>
-            <h2 className="font-sans text-base font-bold text-[var(--fg)]">{mode === "create" ? "New folder" : "Rename folder"}</h2>
+            <h2 className="font-sans text-base font-bold text-[var(--fg)]">{mode === "create" ? t("galleryPage.newFolder") : t("galleryPage.renameFolder")}</h2>
           </div>
           <input
             ref={inputRef}
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && valid && !busy) onSubmit(name.trim()); }}
-            placeholder="Folder name"
+            placeholder={t("galleryPage.folderName")}
             maxLength={80}
             className="w-full rounded-xl px-4 py-2.5 font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors"
           />
         </div>
         <div className="flex border-t border-[var(--border)]">
-          <button onClick={onClose} className="flex-1 font-sans text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] py-3 transition-colors border-r border-[var(--border)]">Cancel</button>
+          <button onClick={onClose} className="flex-1 font-sans text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] py-3 transition-colors border-r border-[var(--border)]">{t("galleryPage.cancel")}</button>
           <button onClick={() => valid && onSubmit(name.trim())} disabled={!valid || busy}
             className="flex-1 font-sans text-sm font-semibold text-yellow hover:bg-yellow/10 py-3 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-            {busy ? "Saving…" : mode === "create" ? "Create" : "Save"}
+            {busy ? t("galleryPage.saving") : mode === "create" ? t("galleryPage.create") : t("galleryPage.save")}
           </button>
         </div>
       </motion.div>
@@ -117,6 +119,7 @@ function Lightbox({ photos, index, onIndex, onClose }: { photos: GPhoto[]; index
 /* ── Page ── */
 export default function GalleryPage() {
   const utils = api.useUtils();
+  const { t } = useT();
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
 
   const { data: foldersData } = api.photo.listFolders.useQuery();
@@ -161,7 +164,7 @@ export default function GalleryPage() {
 
   async function deleteSelected() {
     if (selected.size === 0) return;
-    if (!confirm(`Delete ${selected.size} photo${selected.size > 1 ? "s" : ""}? This can't be undone.`)) return;
+    if (!confirm(selected.size === 1 ? t("galleryPage.deleteConfirmOne") : t("galleryPage.deleteConfirmMany", { n: selected.size }))) return;
     setDeleting(true);
     try { await Promise.all([...selected].map((id) => deleteMut.mutateAsync({ id }))); await refresh(); clearSel(); }
     finally { setDeleting(false); }
@@ -194,7 +197,7 @@ export default function GalleryPage() {
 
   async function deleteActiveFolder() {
     if (!activeFolderObj) return;
-    if (!confirm(`Delete folder "${activeFolderObj.name}"? The photos inside will be moved back to your library (not deleted).`)) return;
+    if (!confirm(t("galleryPage.deleteFolderConfirm", { name: activeFolderObj.name }))) return;
     await deleteFolderMut.mutateAsync({ id: activeFolderObj.id });
     setActiveFolder(null);
     await refresh();
@@ -224,34 +227,34 @@ export default function GalleryPage() {
             )}
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <h1 className="font-sans font-black text-[var(--fg)] text-lg leading-none truncate">{activeFolderObj ? activeFolderObj.name : "Gallery"}</h1>
+                <h1 className="font-sans font-black text-[var(--fg)] text-lg leading-none truncate">{activeFolderObj ? activeFolderObj.name : t("galleryPage.title")}</h1>
                 {activeFolderObj && (
                   <>
-                    <button onClick={() => setFolderModal({ mode: "rename", id: activeFolderObj.id })} className="p-1 rounded text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors" title="Rename folder"><PencilIcon /></button>
-                    <button onClick={deleteActiveFolder} className="p-1 rounded text-[var(--fg-muted)] hover:text-red-400 hover:bg-[var(--bg-subtle)] transition-colors" title="Delete folder"><TrashIcon /></button>
+                    <button onClick={() => setFolderModal({ mode: "rename", id: activeFolderObj.id })} className="p-1 rounded text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors" title={t("galleryPage.renameFolderTitle")}><PencilIcon /></button>
+                    <button onClick={deleteActiveFolder} className="p-1 rounded text-[var(--fg-muted)] hover:text-red-400 hover:bg-[var(--bg-subtle)] transition-colors" title={t("galleryPage.deleteFolderTitle")}><TrashIcon /></button>
                   </>
                 )}
               </div>
               <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">
-                {isLoading ? "Loading…" : `${photos.length} photo${photos.length !== 1 ? "s" : ""}`}
-                {uploading && ` · uploading ${progress.done}/${progress.total}…`}
+                {isLoading ? t("galleryPage.loading") : (photos.length === 1 ? t("galleryPage.photoOne") : t("galleryPage.photos", { n: photos.length }))}
+                {uploading && ` · ${t("galleryPage.uploadingInline", { done: progress.done, total: progress.total })}`}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {photos.length > 0 && (
               selectMode
-                ? <button onClick={clearSel} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">Done</button>
-                : <button onClick={() => setSelectMode(true)} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">Select</button>
+                ? <button onClick={clearSel} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">{t("galleryPage.done")}</button>
+                : <button onClick={() => setSelectMode(true)} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">{t("galleryPage.select")}</button>
             )}
             {activeFolder === null && (
               <button onClick={() => setFolderModal({ mode: "create" })} className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--border)] bg-[var(--bg-card)] text-[var(--fg)] text-xs font-sans font-medium hover:border-[var(--fg-muted)] transition-colors rounded-lg">
-                <FolderIcon /> New folder
+                <FolderIcon /> {t("galleryPage.newFolder")}
               </button>
             )}
             <button onClick={() => fileRef.current?.click()} disabled={uploading}
               className="btn-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-sans font-semibold disabled:opacity-50">
-              <UploadIcon /> {uploading ? `Uploading ${progress.done}/${progress.total}…` : "Upload"}
+              <UploadIcon /> {uploading ? t("galleryPage.uploadingBtn", { done: progress.done, total: progress.total }) : t("galleryPage.upload")}
             </button>
           </div>
         </div>
@@ -271,7 +274,7 @@ export default function GalleryPage() {
             <button onClick={() => { setActiveFolder(null); clearSel(); }}
               className="relative aspect-square bg-[var(--bg-subtle)] flex flex-col items-center justify-center gap-1.5 group hover:bg-[var(--bg-card)] transition-colors">
               <span className="text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors"><BackIcon /></span>
-              <span className="font-mono text-[9px] text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors">All photos</span>
+              <span className="font-mono text-[9px] text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors">{t("galleryPage.allPhotos")}</span>
             </button>
           )}
 
@@ -287,7 +290,7 @@ export default function GalleryPage() {
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 px-2 text-center">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="white" opacity="0.7"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
                 <span className="font-sans font-bold text-white text-xs truncate max-w-full">{f.name}</span>
-                <span className="font-mono text-[9px] text-white/60">{f.count} photo{f.count !== 1 ? "s" : ""}</span>
+                <span className="font-mono text-[9px] text-white/60">{f.count === 1 ? t("galleryPage.photoOne") : t("galleryPage.photos", { n: f.count })}</span>
               </div>
             </button>
           ))}
@@ -322,19 +325,19 @@ export default function GalleryPage() {
               <div className="w-16 h-16 rounded-2xl bg-[var(--bg-subtle)] flex items-center justify-center mb-4 text-[var(--fg-muted)]">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
               </div>
-              <p className="font-sans font-semibold text-[var(--fg)] mb-1">Your gallery is empty</p>
-              <p className="font-serif text-sm text-[var(--fg-muted)] mb-5">Drag photos here, or upload from your device.</p>
+              <p className="font-sans font-semibold text-[var(--fg)] mb-1">{t("galleryPage.emptyTitle")}</p>
+              <p className="font-serif text-sm text-[var(--fg-muted)] mb-5">{t("galleryPage.emptyBody")}</p>
               <button onClick={() => fileRef.current?.click()} disabled={uploading} className="btn-primary px-5 py-2.5 rounded-xl font-sans font-bold text-sm disabled:opacity-50">
-                {uploading ? `Uploading ${progress.done}/${progress.total}…` : "Upload photos"}
+                {uploading ? t("galleryPage.uploadingBtn", { done: progress.done, total: progress.total }) : t("galleryPage.uploadPhotos")}
               </button>
             </div>
           )}
           {photos.length === 0 && activeFolder !== null && (
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-center px-6">
-              <p className="font-sans font-semibold text-[var(--fg)] mb-1">This folder is empty</p>
-              <p className="font-serif text-sm text-[var(--fg-muted)] mb-5">Upload here, or move photos in from your library.</p>
+              <p className="font-sans font-semibold text-[var(--fg)] mb-1">{t("galleryPage.folderEmptyTitle")}</p>
+              <p className="font-serif text-sm text-[var(--fg-muted)] mb-5">{t("galleryPage.folderEmptyBody")}</p>
               <button onClick={() => fileRef.current?.click()} disabled={uploading} className="btn-primary px-5 py-2.5 rounded-xl font-sans font-bold text-sm disabled:opacity-50">
-                {uploading ? `Uploading ${progress.done}/${progress.total}…` : "Upload photos"}
+                {uploading ? t("galleryPage.uploadingBtn", { done: progress.done, total: progress.total }) : t("galleryPage.uploadPhotos")}
               </button>
             </div>
           )}
@@ -347,34 +350,34 @@ export default function GalleryPage() {
           <motion.div initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
             transition={{ type: "spring", stiffness: 400, damping: 32 }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] shadow-2xl">
-            <span className="font-mono text-[11px] text-[var(--fg-muted)]">{selected.size} selected</span>
+            <span className="font-mono text-[11px] text-[var(--fg-muted)]">{t("galleryPage.selected", { n: selected.size })}</span>
 
             <div className="relative">
               <button onClick={() => setMoveMenu((v) => !v)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg)] font-sans text-xs font-medium hover:border-[var(--fg-muted)] transition-colors">
-                <MoveIcon /> Move to
+                <MoveIcon /> {t("galleryPage.moveTo")}
               </button>
               {moveMenu && (
                 <div className="absolute bottom-full mb-2 left-0 w-48 max-h-60 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl py-1">
-                  <button onClick={() => { setMoveMenu(false); setFolderModal({ mode: "create", moveAfter: true }); }} className="w-full text-left px-3 py-2 font-sans text-xs text-yellow hover:bg-[var(--bg-subtle)] transition-colors">+ New folder…</button>
+                  <button onClick={() => { setMoveMenu(false); setFolderModal({ mode: "create", moveAfter: true }); }} className="w-full text-left px-3 py-2 font-sans text-xs text-yellow hover:bg-[var(--bg-subtle)] transition-colors">{t("galleryPage.newFolderItem")}</button>
                   {activeFolder !== null && (
-                    <button onClick={() => moveSelected(null)} className="w-full text-left px-3 py-2 font-sans text-xs text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">Remove from folder</button>
+                    <button onClick={() => moveSelected(null)} className="w-full text-left px-3 py-2 font-sans text-xs text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">{t("galleryPage.removeFromFolder")}</button>
                   )}
                   {folders.filter((f) => f.id !== activeFolder).map((f) => (
                     <button key={f.id} onClick={() => moveSelected(f.id)} className="w-full text-left px-3 py-2 font-sans text-xs text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors flex items-center gap-2">
                       <span className="text-[var(--fg-muted)]"><FolderIcon /></span>{f.name}
                     </button>
                   ))}
-                  {folders.length === 0 && <p className="px-3 py-2 font-sans text-[11px] text-[var(--fg-muted)]">No folders yet</p>}
+                  {folders.length === 0 && <p className="px-3 py-2 font-sans text-[11px] text-[var(--fg-muted)]">{t("galleryPage.noFolders")}</p>}
                 </div>
               )}
             </div>
 
             <button onClick={deleteSelected} disabled={deleting}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/40 text-red-400 font-sans text-xs font-bold hover:bg-red-500/10 disabled:opacity-50 transition-colors">
-              <TrashIcon /> {deleting ? "Deleting…" : "Delete"}
+              <TrashIcon /> {deleting ? t("galleryPage.deleting") : t("galleryPage.delete")}
             </button>
-            <button onClick={clearSel} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 transition-colors">Clear</button>
+            <button onClick={clearSel} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 transition-colors">{t("galleryPage.clear")}</button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -386,7 +389,7 @@ export default function GalleryPage() {
             className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--bg)]/80 backdrop-blur-sm pointer-events-none">
             <div className="flex flex-col items-center gap-3 px-10 py-8 rounded-2xl border-2 border-dashed border-yellow">
               <span className="text-yellow"><UploadIcon /></span>
-              <p className="font-sans font-bold text-[var(--fg)]">Drop to upload{activeFolderObj ? ` to ${activeFolderObj.name}` : ""}</p>
+              <p className="font-sans font-bold text-[var(--fg)]">{activeFolderObj ? t("galleryPage.dropToUploadFolder", { name: activeFolderObj.name }) : t("galleryPage.dropToUpload")}</p>
             </div>
           </motion.div>
         )}

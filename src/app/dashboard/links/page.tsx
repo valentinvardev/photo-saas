@@ -14,16 +14,6 @@ function LinksIcon() {
 
 export default function LinksComingSoonPage() {
   return (
-    <ComingSoon
-      icon={<LinksIcon />}
-      title="Link builder"
-      tagline="A single link-in-bio page that ties everything together — your portfolio, galleries, socials and contact, all on one branded page for Instagram and TikTok."
-      features={[
-        { title: "One link for everything", desc: "Point your bio at one page that links to your portfolio, galleries and shop." },
-        { title: "Social & contact buttons", desc: "Instagram, WhatsApp, email and more, with the icons your clients expect." },
-        { title: "Drag-and-drop ordering", desc: "Arrange your links and dividers exactly how you want them, no code." },
-        { title: "Themes that match you", desc: "Pick a style that matches your brand and stays consistent with your portfolio." },
-      ]}
-    />
+    <ComingSoon icon={<LinksIcon />} ns="links" />
   );
 }

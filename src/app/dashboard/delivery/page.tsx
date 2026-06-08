@@ -13,16 +13,6 @@ function DeliveryIcon() {
 
 export default function DeliveryComingSoonPage() {
   return (
-    <ComingSoon
-      icon={<DeliveryIcon />}
-      title="Client delivery"
-      tagline="Hand finished galleries to your clients on private, branded download pages — no more WeTransfer links or zip files buried in email."
-      features={[
-        { title: "Private client galleries", desc: "Each client gets their own password-protected page to view and download their photos." },
-        { title: "High-res downloads", desc: "Deliver full-resolution originals and web-ready exports, one by one or as a zip." },
-        { title: "Favorites & selection", desc: "Let clients star their picks so you know exactly which shots to retouch." },
-        { title: "Branded, expiring links", desc: "Your logo, your colors, and optional expiry dates on every delivery." },
-      ]}
-    />
+    <ComingSoon icon={<DeliveryIcon />} ns="delivery" />
   );
 }
