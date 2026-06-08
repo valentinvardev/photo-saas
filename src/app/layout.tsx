@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 import { JetBrains_Mono, Lora, Plus_Jakarta_Sans } from "next/font/google";
 
 import { ThemeProvider } from "~/components/providers/ThemeProvider";
+import { LangProvider } from "~/components/providers/LangProvider";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
@@ -43,7 +44,9 @@ export default function RootLayout({
     >
       <body>
         <TRPCReactProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <LangProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </LangProvider>
         </TRPCReactProvider>
       </body>
     </html>

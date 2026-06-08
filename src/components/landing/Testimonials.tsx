@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useT } from "~/components/providers/LangProvider";
 
 function QuoteIcon() {
   return (
@@ -71,6 +72,7 @@ const testimonials = [
 ];
 
 export function Testimonials() {
+  const { t } = useT();
   return (
     <section className="py-32 bg-[var(--bg-subtle)] overflow-hidden">
       <div className="mx-auto max-w-7xl px-6">
@@ -85,7 +87,7 @@ export function Testimonials() {
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="h-px w-8 bg-yellow" />
             <span className="font-mono text-xs text-[var(--fg-muted)] tracking-[0.2em] uppercase">
-              From photographers
+              {t("landing.testimonials.eyebrow")}
             </span>
             <div className="h-px w-8 bg-yellow" />
           </div>
@@ -93,15 +95,15 @@ export function Testimonials() {
             className="font-sans font-black text-[var(--fg)] leading-tight"
             style={{ fontSize: "clamp(2.2rem, 5vw, 4rem)" }}
           >
-            Trusted by
+            {t("landing.testimonials.title1")}
             <br />
-            <span className="title-yellow font-serif">12,000+ photographers.</span>
+            <span className="title-yellow font-serif">{t("landing.testimonials.title2")}</span>
           </h2>
         </motion.div>
 
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
+          {testimonials.map((item, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 30 }}
@@ -121,16 +123,16 @@ export function Testimonials() {
 
               {/* Quote */}
               <p className="font-serif text-[var(--fg-secondary)] text-base leading-relaxed flex-1 mb-6">
-                {t.quote}
+                {t(`landing.testimonials.items.${i}.quote`)}
               </p>
 
               {/* Stat highlight */}
               <div className="mb-5 flex items-center gap-3">
                 <div className="text-2xl font-black title-yellow font-serif">
-                  {t.stat}
+                  {item.stat}
                 </div>
                 <div className="font-mono text-[11px] text-[var(--fg-muted)] tracking-wide">
-                  {t.statLabel}
+                  {t(`landing.testimonials.items.${i}.statLabel`)}
                 </div>
               </div>
 
@@ -140,17 +142,17 @@ export function Testimonials() {
                 <div
                   className="w-9 h-9 rounded-full flex items-center justify-center font-sans font-black text-sm text-white"
                   style={{
-                    background: `linear-gradient(135deg, #${Math.abs(t.name.charCodeAt(0) * 99).toString(16).slice(0, 2)}2a2a, #111)`,
+                    background: `linear-gradient(135deg, #${Math.abs(item.name.charCodeAt(0) * 99).toString(16).slice(0, 2)}2a2a, #111)`,
                   }}
                 >
-                  {t.name.charAt(0)}
+                  {item.name.charAt(0)}
                 </div>
                 <div>
                   <div className="font-sans font-semibold text-sm text-[var(--fg)]">
-                    {t.name}
+                    {item.name}
                   </div>
                   <div className="font-mono text-[10px] text-[var(--fg-muted)] tracking-wide">
-                    {t.role} · {t.location}
+                    {t(`landing.testimonials.items.${i}.role`)} · {item.location}
                   </div>
                 </div>
               </div>

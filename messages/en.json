@@ -406,5 +406,109 @@
     "tiff": "TIFF",
     "jpeg": "JPEG",
     "other": "Other"
+  },
+
+  "landing": {
+    "language": "Language",
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "login": "Log in",
+      "startFree": "Start free"
+    },
+    "hero": {
+      "tag": "// For photographers",
+      "build": "Build.",
+      "sell": "Sell.",
+      "deliver": "Deliver.",
+      "subtext": "The all-in-one platform built for serious photographers. Portfolio, e-commerce, cloud storage, and client galleries — all in one place.",
+      "stats": [
+        { "value": "12k+", "label": "photographers" },
+        { "value": "$2.4M", "label": "earned on platform" },
+        { "value": "99.9%", "label": "uptime" }
+      ],
+      "ctaPrimary": "Start for free",
+      "ctaSecondary": "See how it works",
+      "trust": "No credit card required · Cancel anytime · 14-day free trial",
+      "scroll": "Scroll"
+    },
+    "marquee": ["Portfolio Builder", "Photo Sales", "Cloud Storage", "Client Delivery", "RAW Support", "Custom Domains", "Analytics", "Print Fulfillment", "Watermarking", "Team Access"],
+    "features": {
+      "eyebrow": "Everything you need",
+      "title1": "One platform.",
+      "title2": "Every tool.",
+      "items": [
+        { "tag": "01 · Portfolio", "title": "Craft your\nvisual identity.", "body": "Build stunning portfolio websites with zero code. Choose from layouts designed specifically for photographers — galleries, masonry, editorial, and more.", "bullets": ["Custom domains", "SEO optimized", "Mobile perfect", "Dark & light themes"] },
+        { "tag": "02 · E-Commerce", "title": "Turn every\nshot into income.", "body": "Sell prints, digital files, and commercial licenses directly from your portfolio. Zero commission. Set your prices, keep everything.", "bullets": ["Print fulfillment", "Digital delivery", "License templates", "Stripe integration"] },
+        { "tag": "03 · Storage", "title": "Your archive,\nalways protected.", "body": "Store your entire library in the cloud — RAW, TIFF, JPEG, DNG. Organize with smart folders, tags, and metadata. Access anywhere.", "bullets": ["RAW + TIFF support", "Smart organization", "Version history", "Unlimited upload"] },
+        { "tag": "04 · Delivery", "title": "Client galleries\nthey'll love.", "body": "Send interactive galleries with selection tools, download links, and approval workflows. Make the delivery experience as premium as your work.", "bullets": ["Password protection", "Selection workflow", "Download control", "Watermark on proof"] }
+      ]
+    },
+    "how": {
+      "eyebrow": "Simple by design",
+      "title1": "Up and running",
+      "title2": "in three steps.",
+      "steps": [
+        { "title": "Upload your work", "body": "Drag and drop your photos. RAW, TIFF, JPEG, DNG — every format supported. Your files are encrypted and backed up automatically." },
+        { "title": "Build your portfolio", "body": "Choose a layout, add your logo, set your custom domain. Your portfolio goes live in minutes. No code, no designer needed." },
+        { "title": "Grow your business", "body": "Sell prints and licenses, deliver client galleries, track analytics. Your portfolio is your storefront — open 24/7." }
+      ],
+      "cta": "Get started today"
+    },
+    "pricing": {
+      "eyebrow": "Pricing",
+      "title1": "Simple, transparent",
+      "title2": "pricing.",
+      "subtitle": "14-day free trial on all plans. No credit card required.",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "perMonth": "/ mo",
+      "mostPopular": "Most popular",
+      "note": "All plans include SSL, CDN delivery, and 99.9% uptime SLA.\nAnnual billing saves up to 20%. Switch plans anytime.",
+      "plans": [
+        { "name": "Starter", "description": "Everything you need to start building your photography business online.", "features": ["1 portfolio site", "100 GB cloud storage", "Photo sales (5% fee)", "Custom domain", "5 client galleries / mo", "Basic analytics", "Email support"], "cta": "Start free trial" },
+        { "name": "Pro", "description": "For professional photographers who are serious about growing their income.", "features": ["5 portfolio sites", "1 TB cloud storage", "Photo sales (0% fee)", "Custom domains", "Unlimited client galleries", "Advanced analytics", "Print fulfillment", "Watermarking", "Priority support"], "cta": "Start free trial" },
+        { "name": "Studio", "description": "For studios and agencies managing multiple photographers and clients.", "features": ["Unlimited portfolio sites", "5 TB cloud storage", "Photo sales (0% fee)", "Team access (5 seats)", "Unlimited client galleries", "White-label galleries", "API access", "Dedicated support"], "cta": "Contact sales" }
+      ]
+    },
+    "testimonials": {
+      "eyebrow": "From photographers",
+      "title1": "Trusted by",
+      "title2": "12,000+ photographers.",
+      "items": [
+        { "quote": "Portapic turned my portfolio into a business. In my first month selling prints I made $3,200. The platform just gets out of the way.", "role": "Portrait Photographer", "statLabel": "first month" },
+        { "quote": "The client delivery galleries are a game-changer. My couples can browse, select, and approve — no back-and-forth emails. It's professional on every level.", "role": "Wedding Photographer", "statLabel": "galleries delivered" },
+        { "quote": "I've tried every platform out there. Portapic is the only one that understands the RAW workflow. The storage management is seamless.", "role": "Commercial Photographer", "statLabel": "archive migrated" },
+        { "quote": "Zero commission on sales is unreal. I was losing hundreds every month on other platforms. Portapic changed my numbers completely.", "role": "Fine Art Photographer", "statLabel": "commission" },
+        { "quote": "My portfolio loads faster than anything I've had before. Clients constantly mention how beautiful and smooth it feels. It reflects directly on my work.", "role": "Editorial Photographer", "statLabel": "uptime" },
+        { "quote": "The analytics show me exactly which photos convert. I can see what my clients love and price accordingly. Data-driven creativity.", "role": "Architectural Photographer", "statLabel": "conversion lift" }
+      ]
+    },
+    "ctaBanner": {
+      "tag": "14-day free trial",
+      "title1": "Your images deserve",
+      "title2": "a better home.",
+      "subtext": "Join 12,000+ photographers already building their business on Portapic. No credit card required.",
+      "primary": "Start building for free",
+      "secondary": "Explore features",
+      "stats": [
+        { "value": "12k+", "label": "photographers" },
+        { "value": "$2.4M", "label": "earned on platform" },
+        { "value": "99.9%", "label": "uptime" },
+        { "value": "0%", "label": "sales commission" }
+      ]
+    },
+    "footer": {
+      "tagline": "The all-in-one platform built for professional photographers.",
+      "groups": [
+        { "title": "Product", "items": ["Portfolio Builder", "Photo Sales", "Cloud Storage", "Client Delivery", "Analytics", "Custom Domains"] },
+        { "title": "Company", "items": ["About", "Blog", "Careers", "Press"] },
+        { "title": "Legal", "items": ["Privacy Policy", "Terms of Service", "Cookie Policy"] },
+        { "title": "Support", "items": ["Documentation", "Help Center", "Status", "Contact"] }
+      ],
+      "rights": "All rights reserved.",
+      "operational": "All systems operational"
+    }
   }
 }

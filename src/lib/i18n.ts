@@ -16,14 +16,19 @@ const MESSAGES: Record<Locale, Record<string, unknown>> = {
   pt: pt as Record<string, unknown>,
 };
 
-function resolve(obj: Record<string, unknown>, path: string): string {
+function lookup(obj: Record<string, unknown>, path: string): string | undefined {
   const parts = path.split(".");
   let cur: unknown = obj;
   for (const part of parts) {
-    if (cur == null || typeof cur !== "object") return path;
+    if (cur == null || typeof cur !== "object") return undefined;
     cur = (cur as Record<string, unknown>)[part];
   }
-  return typeof cur === "string" ? cur : path;
+  return typeof cur === "string" ? cur : undefined;
+}
+
+/** Resolve a key in the locale, falling back to English, then the key itself. */
+function resolve(obj: Record<string, unknown>, path: string): string {
+  return lookup(obj, path) ?? lookup(en as Record<string, unknown>, path) ?? path;
 }
 
 function interpolate(str: string, vars?: Record<string, string | number>): string {

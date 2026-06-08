@@ -2,6 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { useT } from "~/components/providers/LangProvider";
 
 const steps = [
   {
@@ -43,6 +44,7 @@ const steps = [
 export function HowItWorks() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
+  const { t } = useT();
 
   return (
     <section
@@ -64,7 +66,7 @@ export function HowItWorks() {
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="h-px w-8 bg-yellow" />
             <span className="font-mono text-xs text-[var(--fg-muted)] tracking-[0.2em] uppercase">
-              Simple by design
+              {t("landing.how.eyebrow")}
             </span>
             <div className="h-px w-8 bg-yellow" />
           </div>
@@ -72,9 +74,9 @@ export function HowItWorks() {
             className="font-sans font-black text-[var(--fg)] leading-tight"
             style={{ fontSize: "clamp(2.2rem, 5vw, 4rem)" }}
           >
-            Up and running
+            {t("landing.how.title1")}
             <br />
-            <span className="title-yellow font-serif">in three steps.</span>
+            <span className="title-yellow font-serif">{t("landing.how.title2")}</span>
           </h2>
         </motion.div>
 
@@ -158,11 +160,11 @@ export function HowItWorks() {
                 </div>
 
                 <h3 className="font-sans font-black text-[var(--fg)] text-2xl mb-3">
-                  {step.title}
+                  {t(`landing.how.steps.${i}.title`)}
                 </h3>
 
                 <p className="font-serif text-[var(--fg-secondary)] text-base leading-relaxed">
-                  {step.body}
+                  {t(`landing.how.steps.${i}.body`)}
                 </p>
               </motion.div>
             ))}
@@ -181,7 +183,7 @@ export function HowItWorks() {
             href="#pricing"
             className="btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-xl font-sans font-bold"
           >
-            Get started today
+            {t("landing.how.cta")}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>

@@ -406,5 +406,109 @@
     "tiff": "TIFF",
     "jpeg": "JPEG",
     "other": "Otro"
+  },
+
+  "landing": {
+    "language": "Idioma",
+    "nav": {
+      "features": "Funciones",
+      "howItWorks": "Cómo funciona",
+      "pricing": "Precios",
+      "login": "Iniciar sesión",
+      "startFree": "Empezar gratis"
+    },
+    "hero": {
+      "tag": "// Para fotógrafos",
+      "build": "Crea.",
+      "sell": "Vende.",
+      "deliver": "Entrega.",
+      "subtext": "La plataforma todo-en-uno hecha para fotógrafos profesionales. Portafolio, e-commerce, almacenamiento en la nube y galerías para clientes — todo en un solo lugar.",
+      "stats": [
+        { "value": "12k+", "label": "fotógrafos" },
+        { "value": "$2.4M", "label": "ganados en la plataforma" },
+        { "value": "99.9%", "label": "tiempo activo" }
+      ],
+      "ctaPrimary": "Empezar gratis",
+      "ctaSecondary": "Ver cómo funciona",
+      "trust": "Sin tarjeta de crédito · Cancela cuando quieras · 14 días de prueba gratis",
+      "scroll": "Desplázate"
+    },
+    "marquee": ["Creador de portafolio", "Venta de fotos", "Almacenamiento en la nube", "Entrega a clientes", "Soporte RAW", "Dominios personalizados", "Analíticas", "Impresión de copias", "Marca de agua", "Acceso de equipo"],
+    "features": {
+      "eyebrow": "Todo lo que necesitas",
+      "title1": "Una plataforma.",
+      "title2": "Todas las herramientas.",
+      "items": [
+        { "tag": "01 · Portafolio", "title": "Crea tu\nidentidad visual.", "body": "Crea sitios de portafolio impresionantes sin escribir código. Elige entre diseños pensados para fotógrafos — galerías, mosaico, editorial y más.", "bullets": ["Dominios personalizados", "Optimizado para SEO", "Perfecto en móvil", "Temas claro y oscuro"] },
+        { "tag": "02 · E-Commerce", "title": "Convierte cada\ntoma en ingresos.", "body": "Vende copias, archivos digitales y licencias comerciales directamente desde tu portafolio. Cero comisión. Pon tus precios y quédate con todo.", "bullets": ["Impresión de copias", "Entrega digital", "Plantillas de licencia", "Integración con Stripe"] },
+        { "tag": "03 · Almacenamiento", "title": "Tu archivo,\nsiempre protegido.", "body": "Guarda toda tu biblioteca en la nube — RAW, TIFF, JPEG, DNG. Organiza con carpetas inteligentes, etiquetas y metadatos. Accede desde cualquier lugar.", "bullets": ["Soporte RAW + TIFF", "Organización inteligente", "Historial de versiones", "Subida ilimitada"] },
+        { "tag": "04 · Entrega", "title": "Galerías que tus\nclientes amarán.", "body": "Envía galerías interactivas con herramientas de selección, enlaces de descarga y flujos de aprobación. Haz que la entrega sea tan premium como tu trabajo.", "bullets": ["Protección con contraseña", "Flujo de selección", "Control de descargas", "Marca de agua en pruebas"] }
+      ]
+    },
+    "how": {
+      "eyebrow": "Simple por diseño",
+      "title1": "Listo y funcionando",
+      "title2": "en tres pasos.",
+      "steps": [
+        { "title": "Sube tu trabajo", "body": "Arrastra y suelta tus fotos. RAW, TIFF, JPEG, DNG — todos los formatos. Tus archivos se cifran y respaldan automáticamente." },
+        { "title": "Crea tu portafolio", "body": "Elige un diseño, agrega tu logo, configura tu dominio. Tu portafolio sale en vivo en minutos. Sin código, sin diseñador." },
+        { "title": "Haz crecer tu negocio", "body": "Vende copias y licencias, entrega galerías a clientes, mira tus analíticas. Tu portafolio es tu tienda — abierta 24/7." }
+      ],
+      "cta": "Empezar hoy"
+    },
+    "pricing": {
+      "eyebrow": "Precios",
+      "title1": "Precios simples",
+      "title2": "y transparentes.",
+      "subtitle": "14 días de prueba gratis en todos los planes. Sin tarjeta de crédito.",
+      "monthly": "Mensual",
+      "annual": "Anual",
+      "perMonth": "/ mes",
+      "mostPopular": "Más popular",
+      "note": "Todos los planes incluyen SSL, entrega por CDN y 99.9% de tiempo activo garantizado.\nLa facturación anual ahorra hasta 20%. Cambia de plan cuando quieras.",
+      "plans": [
+        { "name": "Starter", "description": "Todo lo que necesitas para empezar a construir tu negocio de fotografía en línea.", "features": ["1 sitio de portafolio", "100 GB de almacenamiento", "Venta de fotos (5% de comisión)", "Dominio personalizado", "5 galerías de cliente / mes", "Analíticas básicas", "Soporte por correo"], "cta": "Empezar prueba gratis" },
+        { "name": "Pro", "description": "Para fotógrafos profesionales que se toman en serio hacer crecer sus ingresos.", "features": ["5 sitios de portafolio", "1 TB de almacenamiento", "Venta de fotos (0% de comisión)", "Dominios personalizados", "Galerías de cliente ilimitadas", "Analíticas avanzadas", "Impresión de copias", "Marca de agua", "Soporte prioritario"], "cta": "Empezar prueba gratis" },
+        { "name": "Studio", "description": "Para estudios y agencias que gestionan varios fotógrafos y clientes.", "features": ["Sitios de portafolio ilimitados", "5 TB de almacenamiento", "Venta de fotos (0% de comisión)", "Acceso de equipo (5 puestos)", "Galerías de cliente ilimitadas", "Galerías white-label", "Acceso a API", "Soporte dedicado"], "cta": "Contactar a ventas" }
+      ]
+    },
+    "testimonials": {
+      "eyebrow": "De fotógrafos",
+      "title1": "La eligen",
+      "title2": "más de 12.000 fotógrafos.",
+      "items": [
+        { "quote": "Portapic convirtió mi portafolio en un negocio. En mi primer mes vendiendo copias gané $3,200. La plataforma simplemente no estorba.", "role": "Fotógrafa de retrato", "statLabel": "primer mes" },
+        { "quote": "Las galerías de entrega a clientes son un antes y un después. Mis parejas pueden navegar, seleccionar y aprobar — sin idas y vueltas por correo. Es profesional en todo sentido.", "role": "Fotógrafo de bodas", "statLabel": "galerías entregadas" },
+        { "quote": "Probé todas las plataformas que existen. Portapic es la única que entiende el flujo de trabajo RAW. La gestión del almacenamiento es impecable.", "role": "Fotógrafa comercial", "statLabel": "archivo migrado" },
+        { "quote": "Cero comisión en las ventas es increíble. Estaba perdiendo cientos cada mes en otras plataformas. Portapic cambió mis números por completo.", "role": "Fotógrafo de bellas artes", "statLabel": "comisión" },
+        { "quote": "Mi portafolio carga más rápido que cualquier cosa que tuve antes. Los clientes siempre mencionan lo hermoso y fluido que se siente. Se refleja directo en mi trabajo.", "role": "Fotógrafa editorial", "statLabel": "tiempo activo" },
+        { "quote": "Las analíticas me muestran exactamente qué fotos convierten. Veo qué aman mis clientes y pongo precios en consecuencia. Creatividad basada en datos.", "role": "Fotógrafo de arquitectura", "statLabel": "aumento de conversión" }
+      ]
+    },
+    "ctaBanner": {
+      "tag": "14 días de prueba gratis",
+      "title1": "Tus imágenes merecen",
+      "title2": "un mejor hogar.",
+      "subtext": "Únete a más de 12.000 fotógrafos que ya construyen su negocio en Portapic. Sin tarjeta de crédito.",
+      "primary": "Empieza gratis",
+      "secondary": "Explorar funciones",
+      "stats": [
+        { "value": "12k+", "label": "fotógrafos" },
+        { "value": "$2.4M", "label": "ganados en la plataforma" },
+        { "value": "99.9%", "label": "tiempo activo" },
+        { "value": "0%", "label": "comisión de ventas" }
+      ]
+    },
+    "footer": {
+      "tagline": "La plataforma todo-en-uno hecha para fotógrafos profesionales.",
+      "groups": [
+        { "title": "Producto", "items": ["Creador de portafolio", "Venta de fotos", "Almacenamiento en la nube", "Entrega a clientes", "Analíticas", "Dominios personalizados"] },
+        { "title": "Empresa", "items": ["Nosotros", "Blog", "Empleo", "Prensa"] },
+        { "title": "Legal", "items": ["Política de privacidad", "Términos del servicio", "Política de cookies"] },
+        { "title": "Soporte", "items": ["Documentación", "Centro de ayuda", "Estado", "Contacto"] }
+      ],
+      "rights": "Todos los derechos reservados.",
+      "operational": "Todos los sistemas operativos"
+    }
   }
 }

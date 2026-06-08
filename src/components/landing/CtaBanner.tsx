@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useT } from "~/components/providers/LangProvider";
 
 export function CtaBanner() {
+  const { t } = useT();
   return (
     <section className="py-8 bg-[var(--bg)]">
       <div className="mx-auto max-w-7xl px-6">
@@ -29,7 +31,7 @@ export function CtaBanner() {
             >
               <span className="w-1.5 h-1.5 rounded-full bg-yellow animate-pulse" />
               <span className="font-mono text-[11px] text-[var(--fg-muted)] tracking-wider uppercase">
-                14-day free trial
+                {t("landing.ctaBanner.tag")}
               </span>
             </motion.div>
 
@@ -41,9 +43,9 @@ export function CtaBanner() {
               className="font-sans font-black text-[var(--fg)] leading-tight mb-6"
               style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)" }}
             >
-              Your images deserve
+              {t("landing.ctaBanner.title1")}
               <br />
-              <span className="title-yellow font-serif">a better home.</span>
+              <span className="title-yellow font-serif">{t("landing.ctaBanner.title2")}</span>
             </motion.h2>
 
             <motion.p
@@ -53,8 +55,7 @@ export function CtaBanner() {
               transition={{ delay: 0.25, duration: 0.6 }}
               className="font-serif text-[var(--fg-secondary)] text-xl max-w-lg mx-auto mb-12 leading-relaxed"
             >
-              Join 12,000+ photographers already building their business on Frame.
-              No credit card required.
+              {t("landing.ctaBanner.subtext")}
             </motion.p>
 
             <motion.div
@@ -68,7 +69,7 @@ export function CtaBanner() {
                 href="#pricing"
                 className="btn-primary inline-flex items-center gap-2 rounded-xl px-8 py-4 font-sans font-bold text-base"
               >
-                Start building for free
+                {t("landing.ctaBanner.primary")}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
@@ -77,7 +78,7 @@ export function CtaBanner() {
                 href="#features"
                 className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-8 py-4 font-sans font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors duration-200 text-base"
               >
-                Explore features
+                {t("landing.ctaBanner.secondary")}
               </a>
             </motion.div>
 
@@ -89,18 +90,13 @@ export function CtaBanner() {
               transition={{ delay: 0.5 }}
               className="mt-12 flex flex-wrap items-center justify-center gap-8"
             >
-              {[
-                { value: "12k+", label: "photographers" },
-                { value: "$2.4M", label: "earned on platform" },
-                { value: "99.9%", label: "uptime" },
-                { value: "0%", label: "sales commission" },
-              ].map((s) => (
-                <div key={s.label} className="text-center">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="text-center">
                   <div className="font-sans font-black text-[var(--fg)] text-xl">
-                    {s.value}
+                    {t(`landing.ctaBanner.stats.${i}.value`)}
                   </div>
                   <div className="font-mono text-[10px] text-[var(--fg-muted)] tracking-wide mt-0.5">
-                    {s.label}
+                    {t(`landing.ctaBanner.stats.${i}.label`)}
                   </div>
                 </div>
               ))}

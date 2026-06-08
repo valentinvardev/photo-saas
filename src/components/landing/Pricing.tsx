@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useT } from "~/components/providers/LangProvider";
 
 const plans = [
   {
@@ -76,6 +77,7 @@ function CheckIcon() {
 
 export function Pricing() {
   const [annual, setAnnual] = useState(true);
+  const { t } = useT();
 
   return (
     <section id="pricing" className="py-32 bg-[var(--bg)]">
@@ -91,7 +93,7 @@ export function Pricing() {
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="h-px w-8 bg-yellow" />
             <span className="font-mono text-xs text-[var(--fg-muted)] tracking-[0.2em] uppercase">
-              Pricing
+              {t("landing.pricing.eyebrow")}
             </span>
             <div className="h-px w-8 bg-yellow" />
           </div>
@@ -99,12 +101,12 @@ export function Pricing() {
             className="font-sans font-black text-[var(--fg)] leading-tight mb-6"
             style={{ fontSize: "clamp(2.2rem, 5vw, 4rem)" }}
           >
-            Simple, transparent
+            {t("landing.pricing.title1")}
             <br />
-            <span className="title-yellow font-serif">pricing.</span>
+            <span className="title-yellow font-serif">{t("landing.pricing.title2")}</span>
           </h2>
           <p className="font-serif text-[var(--fg-muted)] text-lg max-w-md mx-auto">
-            14-day free trial on all plans. No credit card required.
+            {t("landing.pricing.subtitle")}
           </p>
 
           {/* Billing toggle */}
@@ -117,7 +119,7 @@ export function Pricing() {
                   : "text-[var(--fg-muted)]"
               }`}
             >
-              Monthly
+              {t("landing.pricing.monthly")}
             </button>
             <button
               onClick={() => setAnnual(true)}
@@ -127,7 +129,7 @@ export function Pricing() {
                   : "text-[var(--fg-muted)]"
               }`}
             >
-              Annual
+              {t("landing.pricing.annual")}
               <span className="bg-yellow text-[#111] font-mono text-[10px] font-black px-1.5 py-0.5 rounded">
                 -20%
               </span>
@@ -158,7 +160,7 @@ export function Pricing() {
               {plan.tag && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                   <div className="bg-yellow text-[#111] font-mono font-black text-[10px] tracking-wider uppercase px-3 py-1 rounded-full">
-                    {plan.tag}
+                    {t("landing.pricing.mostPopular")}
                   </div>
                 </div>
               )}
@@ -184,7 +186,7 @@ export function Pricing() {
                       plan.highlight ? "text-[var(--bg)]/60" : "text-[var(--fg-muted)]"
                     }`}
                   >
-                    / mo
+                    {t("landing.pricing.perMonth")}
                   </span>
                 </div>
                 <p
@@ -192,7 +194,7 @@ export function Pricing() {
                     plan.highlight ? "text-[var(--bg)]/70" : "text-[var(--fg-muted)]"
                   }`}
                 >
-                  {plan.description}
+                  {t(`landing.pricing.plans.${i}.description`)}
                 </p>
               </div>
 
@@ -204,7 +206,7 @@ export function Pricing() {
 
               {/* Features */}
               <ul className="space-y-3 mb-8 flex-1">
-                {plan.features.map((f) => (
+                {plan.features.map((f, j) => (
                   <li key={f} className="flex items-start gap-3">
                     <div
                       className={`mt-0.5 shrink-0 ${
@@ -220,7 +222,7 @@ export function Pricing() {
                           : "text-[var(--fg-secondary)]"
                       }`}
                     >
-                      {f}
+                      {t(`landing.pricing.plans.${i}.features.${j}`)}
                     </span>
                   </li>
                 ))}
@@ -234,7 +236,7 @@ export function Pricing() {
                     : "border border-[var(--border)] text-[var(--fg)] hover:border-[var(--fg-muted)] bg-[var(--bg)]"
                 }`}
               >
-                {plan.cta}
+                {t(`landing.pricing.plans.${i}.cta`)}
               </a>
             </motion.div>
           ))}
@@ -246,11 +248,9 @@ export function Pricing() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4 }}
-          className="text-center font-mono text-xs text-[var(--fg-muted)] mt-10"
+          className="text-center font-mono text-xs text-[var(--fg-muted)] mt-10 whitespace-pre-line"
         >
-          All plans include SSL, CDN delivery, and 99.9% uptime SLA.
-          <br />
-          Annual billing saves up to 20%. Switch plans anytime.
+          {t("landing.pricing.note")}
         </motion.p>
       </div>
     </section>

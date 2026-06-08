@@ -1,23 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-
-const items = [
-  { label: "Portfolio Builder" },
-  { label: "Photo Sales" },
-  { label: "Cloud Storage" },
-  { label: "Client Delivery" },
-  { label: "RAW Support" },
-  { label: "Custom Domains" },
-  { label: "Analytics" },
-  { label: "Print Fulfillment" },
-  { label: "Watermarking" },
-  { label: "Team Access" },
-];
-
-const doubled = [...items, ...items];
+import { useT } from "~/components/providers/LangProvider";
 
 export function Marquee() {
+  const { t } = useT();
+  const items = Array.from({ length: 10 }, (_, i) => t(`landing.marquee.${i}`));
+  const doubled = [...items, ...items];
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -34,7 +23,7 @@ export function Marquee() {
           >
             <span className="text-yellow text-xs font-mono">✦</span>
             <span className="font-sans font-medium text-sm text-[var(--fg-muted)] tracking-wide uppercase">
-              {item.label}
+              {item}
             </span>
           </div>
         ))}

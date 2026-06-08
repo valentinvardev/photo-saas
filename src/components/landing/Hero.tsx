@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useTheme } from "~/components/providers/ThemeProvider";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ── Browser mockup — animated portfolio preview ── */
 const photoSlots = [
@@ -202,9 +203,9 @@ function BrowserMockup() {
         }}
       >
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs"
+          <div className="w-6 h-6 rounded-full flex items-center justify-center text-yellow"
             style={{ background: "var(--mockup-surface)" }}>
-            📦
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>
           </div>
           <div>
             <div
@@ -241,6 +242,7 @@ const fadeUp = {
 };
 
 export function Hero() {
+  const { t } = useT();
   return (
     <section className="relative min-h-screen flex items-center grain overflow-hidden bg-[var(--bg-section)]">
       {/* Radial glow */}
@@ -260,7 +262,7 @@ export function Hero() {
           >
             <span className="w-1.5 h-1.5 rounded-full bg-yellow animate-pulse" />
             <span className="font-mono text-[11px] text-[var(--fg-muted)] tracking-wider uppercase">
-              // For photographers
+              {t("landing.hero.tag")}
             </span>
           </motion.div>
 
@@ -278,7 +280,7 @@ export function Hero() {
               className="block"
               style={{ position: "relative", zIndex: 2, color: "var(--fg)" }}
             >
-              Build.
+              {t("landing.hero.build")}
             </span>
 
             {/* "Sell." — z-index 1, hosts the yellow highlight background */}
@@ -315,7 +317,7 @@ export function Hero() {
                 />
                 {/* "Sell." text — above its own highlight */}
                 <span className="font-serif" style={{ position: "relative", zIndex: 1, color: "#111111" }}>
-                  Sell.
+                  {t("landing.hero.sell")}
                 </span>
               </span>
             </span>
@@ -325,7 +327,7 @@ export function Hero() {
               className="block"
               style={{ position: "relative", zIndex: 2, color: "var(--fg)" }}
             >
-              Deliver.
+              {t("landing.hero.deliver")}
             </span>
           </motion.h1>
 
@@ -337,9 +339,7 @@ export function Hero() {
             animate="visible"
             className="mt-8 font-serif text-lg text-[var(--fg-secondary)] leading-relaxed max-w-lg"
           >
-            The all-in-one platform built for serious photographers.
-            Portfolio, e-commerce, cloud storage, and client galleries —
-            all in one place.
+            {t("landing.hero.subtext")}
           </motion.p>
 
           {/* Stats row */}
@@ -350,17 +350,13 @@ export function Hero() {
             animate="visible"
             className="mt-10 flex gap-8"
           >
-            {[
-              { value: "12k+", label: "photographers" },
-              { value: "$2.4M", label: "earned on platform" },
-              { value: "99.9%", label: "uptime" },
-            ].map((s) => (
-              <div key={s.label}>
+            {[0, 1, 2].map((i) => (
+              <div key={i}>
                 <div className="font-sans font-black text-[var(--fg)] text-2xl">
-                  {s.value}
+                  {t(`landing.hero.stats.${i}.value`)}
                 </div>
                 <div className="font-mono text-[11px] text-[var(--fg-muted)] tracking-wide mt-0.5">
-                  {s.label}
+                  {t(`landing.hero.stats.${i}.label`)}
                 </div>
               </div>
             ))}
@@ -378,7 +374,7 @@ export function Hero() {
               href="#pricing"
               className="btn-primary inline-flex items-center gap-2 rounded-xl px-6 py-3.5 font-sans font-bold text-sm"
             >
-              Start for free
+              {t("landing.hero.ctaPrimary")}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
@@ -391,7 +387,7 @@ export function Hero() {
                 <circle cx="12" cy="12" r="10" />
                 <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
               </svg>
-              See how it works
+              {t("landing.hero.ctaSecondary")}
             </Link>
           </motion.div>
 
@@ -403,7 +399,7 @@ export function Hero() {
             animate="visible"
             className="mt-6 font-mono text-xs text-[var(--fg-muted)] tracking-wide"
           >
-            No credit card required · Cancel anytime · 14-day free trial
+            {t("landing.hero.trust")}
           </motion.p>
         </div>
 
@@ -424,7 +420,7 @@ export function Hero() {
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
         <span className="font-mono text-[10px] text-[var(--fg-muted)] tracking-[0.2em] uppercase">
-          Scroll
+          {t("landing.hero.scroll")}
         </span>
         <motion.div
           animate={{ y: [0, 6, 0] }}

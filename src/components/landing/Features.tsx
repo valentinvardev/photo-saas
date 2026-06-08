@@ -2,6 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ─────────────────────────────────────────────
    MOCKUP 1 — Portfolio Builder
@@ -622,32 +623,8 @@ function DeliveryMockup({ inView }: { inView: boolean }) {
 /* ─────────────────────────────────────────────
    Feature rows config
 ───────────────────────────────────────────── */
-const features = [
-  {
-    tag: "01 · Portfolio",
-    title: "Craft your\nvisual identity.",
-    body: "Build stunning portfolio websites with zero code. Choose from layouts designed specifically for photographers — galleries, masonry, editorial, and more.",
-    bullets: ["Custom domains", "SEO optimized", "Mobile perfect", "Dark & light themes"],
-  },
-  {
-    tag: "02 · E-Commerce",
-    title: "Turn every\nshot into income.",
-    body: "Sell prints, digital files, and commercial licenses directly from your portfolio. Zero commission. Set your prices, keep everything.",
-    bullets: ["Print fulfillment", "Digital delivery", "License templates", "Stripe integration"],
-  },
-  {
-    tag: "03 · Storage",
-    title: "Your archive,\nalways protected.",
-    body: "Store your entire library in the cloud — RAW, TIFF, JPEG, DNG. Organize with smart folders, tags, and metadata. Access anywhere.",
-    bullets: ["RAW + TIFF support", "Smart organization", "Version history", "Unlimited upload"],
-  },
-  {
-    tag: "04 · Delivery",
-    title: "Client galleries\nthey'll love.",
-    body: "Send interactive galleries with selection tools, download links, and approval workflows. Make the delivery experience as premium as your work.",
-    bullets: ["Password protection", "Selection workflow", "Download control", "Watermark on proof"],
-  },
-];
+const FEATURE_COUNT = 4;
+const FEATURE_BULLETS = 4;
 
 const Mockups = [PortfolioMockup, SalesMockup, StorageMockup, DeliveryMockup];
 
@@ -655,6 +632,7 @@ const Mockups = [PortfolioMockup, SalesMockup, StorageMockup, DeliveryMockup];
    Section
 ───────────────────────────────────────────── */
 export function Features() {
+  const { t } = useT();
   return (
     <section id="features" className="py-32 bg-[var(--bg)]">
       <div className="mx-auto max-w-7xl px-6">
@@ -669,7 +647,7 @@ export function Features() {
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="h-px w-8 bg-yellow" />
             <span className="font-mono text-xs text-[var(--fg-muted)] tracking-[0.2em] uppercase">
-              Everything you need
+              {t("landing.features.eyebrow")}
             </span>
             <div className="h-px w-8 bg-yellow" />
           </div>
@@ -677,21 +655,21 @@ export function Features() {
             className="font-sans font-black text-[var(--fg)] leading-tight"
             style={{ fontSize: "clamp(2.2rem, 5vw, 4rem)" }}
           >
-            One platform.
+            {t("landing.features.title1")}
             <br />
-            <span className="title-yellow font-serif">Every tool.</span>
+            <span className="title-yellow font-serif">{t("landing.features.title2")}</span>
           </h2>
         </motion.div>
 
         {/* Feature rows */}
         <div className="space-y-32">
-          {features.map((feat, i) => {
+          {Array.from({ length: FEATURE_COUNT }).map((_, i) => {
             const isEven = i % 2 === 0;
             const MockupComponent = Mockups[i]!;
             return (
               <FeatureRow
                 key={i}
-                feat={feat}
+                index={i}
                 isEven={isEven}
                 MockupComponent={MockupComponent}
               />
@@ -704,16 +682,17 @@ export function Features() {
 }
 
 function FeatureRow({
-  feat,
+  index,
   isEven,
   MockupComponent,
 }: {
-  feat: (typeof features)[0];
+  index: number;
   isEven: boolean;
   MockupComponent: (p: { inView: boolean }) => React.ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: false, margin: "-100px" });
+  const { t } = useT();
 
   return (
     <div
@@ -730,24 +709,24 @@ function FeatureRow({
         className="flex-1 max-w-lg"
       >
         <div className="font-mono text-xs tracking-[0.2em] uppercase mb-4">
-          <span className="yellow-label">{feat.tag}</span>
+          <span className="yellow-label">{t(`landing.features.items.${index}.tag`)}</span>
         </div>
         <h3
           className="font-sans font-black text-[var(--fg)] leading-tight mb-6 whitespace-pre-line"
           style={{ fontSize: "clamp(1.8rem, 4vw, 3rem)" }}
         >
-          {feat.title}
+          {t(`landing.features.items.${index}.title`)}
         </h3>
         <p className="font-serif text-[var(--fg-secondary)] text-lg leading-relaxed mb-8">
-          {feat.body}
+          {t(`landing.features.items.${index}.body`)}
         </p>
         <ul className="space-y-2">
-          {feat.bullets.map((b) => (
-            <li key={b} className="flex items-center gap-3">
+          {Array.from({ length: FEATURE_BULLETS }).map((_, j) => (
+            <li key={j} className="flex items-center gap-3">
               <div className="w-5 h-5 rounded-full border border-yellow/40 flex items-center justify-center shrink-0">
                 <div className="w-1.5 h-1.5 rounded-full bg-yellow" />
               </div>
-              <span className="font-sans text-sm text-[var(--fg-secondary)]">{b}</span>
+              <span className="font-sans text-sm text-[var(--fg-secondary)]">{t(`landing.features.items.${index}.bullets.${j}`)}</span>
             </li>
           ))}
         </ul>

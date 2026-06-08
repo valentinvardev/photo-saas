@@ -3,15 +3,13 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Logo } from "~/components/ui/Logo";
+import { useT } from "~/components/providers/LangProvider";
 
-const links = {
-  Product: ["Portfolio Builder", "Photo Sales", "Cloud Storage", "Client Delivery", "Analytics", "Custom Domains"],
-  Company: ["About", "Blog", "Careers", "Press"],
-  Legal: ["Privacy Policy", "Terms of Service", "Cookie Policy"],
-  Support: ["Documentation", "Help Center", "Status", "Contact"],
-};
+/* item counts per footer group (titles + items come from translations) */
+const FOOTER_GROUPS = [6, 4, 3, 4];
 
 export function Footer() {
+  const { t } = useT();
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--bg)]">
       <div className="mx-auto max-w-7xl px-6 py-16">
@@ -28,7 +26,7 @@ export function Footer() {
               <Logo />
             </div>
             <p className="font-serif text-sm text-[var(--fg-muted)] leading-relaxed mb-6 max-w-xs">
-              The all-in-one platform built for professional photographers.
+              {t("landing.footer.tagline")}
             </p>
             {/* Social links */}
             <div className="flex gap-3">
@@ -51,19 +49,19 @@ export function Footer() {
           </div>
 
           {/* Link groups */}
-          {Object.entries(links).map(([group, items]) => (
-            <div key={group} className="col-span-1">
+          {FOOTER_GROUPS.map((count, gi) => (
+            <div key={gi} className="col-span-1">
               <div className="font-mono text-xs text-[var(--fg-muted)] tracking-[0.15em] uppercase mb-4">
-                {group}
+                {t(`landing.footer.groups.${gi}.title`)}
               </div>
               <ul className="space-y-2.5">
-                {items.map((item) => (
-                  <li key={item}>
+                {Array.from({ length: count }).map((_, j) => (
+                  <li key={j}>
                     <Link
                       href="#"
                       className="font-sans text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors duration-150"
                     >
-                      {item}
+                      {t(`landing.footer.groups.${gi}.items.${j}`)}
                     </Link>
                   </li>
                 ))}
@@ -75,12 +73,12 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-16 pt-6 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="font-mono text-[11px] text-[var(--fg-muted)] tracking-wide">
-            © {new Date().getFullYear()} Frame, Inc. All rights reserved.
+            © {new Date().getFullYear()} Portapic. {t("landing.footer.rights")}
           </p>
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
             <span className="font-mono text-[11px] text-[var(--fg-muted)]">
-              All systems operational
+              {t("landing.footer.operational")}
             </span>
           </div>
         </div>
