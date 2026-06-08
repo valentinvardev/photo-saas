@@ -979,5 +979,44 @@
       "continue": "Continuar →"
     },
     "previewSubtitle": "plantilla {template}"
+  },
+
+  "onb": {
+    "close": "Cerrar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "finish": "Crear mi estudio",
+    "welcome": {
+      "title": "Bienvenido a Portapic",
+      "body": "Configuremos tu estudio en menos de un minuto — tus datos, tus colores y fuentes, y tu primer portafolio, todo con tu marca y listo para editar.",
+      "langDetected": "Idioma: {lang}",
+      "start": "Empezar"
+    },
+    "identity": {
+      "title": "Contanos sobre vos",
+      "body": "Esto aparece en la portada de tu portafolio. Podés cambiarlo cuando quieras.",
+      "first": "Nombre", "firstPh": "Sofía",
+      "last": "Apellido", "lastPh": "Chen",
+      "location": "Ubicación", "locationPh": "Buenos Aires, AR",
+      "bio": "Biografía corta", "bioPh": "Una línea sobre vos y tu trabajo."
+    },
+    "color": { "title": "Elegí tu color", "body": "Tu color de marca — define el tono de todo tu sitio." },
+    "fonts": { "title": "Elegí tu tipografía", "body": "Un par de fuentes (título y cuerpo) para tu portafolio." },
+    "template": {
+      "title": "Elegí una plantilla inicial",
+      "body": "Las dos se adaptan a tu marca. Podés cambiarla después.",
+      "minimalName": "Minimal", "minimalDesc": "Limpia, alineada a la izquierda, centrada en la galería.",
+      "atelierName": "Atelier", "atelierDesc": "Centrada, editorial, con mucho espacio en blanco."
+    },
+    "done": {
+      "title": "Tu estudio está listo",
+      "body": "{name} quedó configurado con tu marca. Entrá al editor para agregar fotos y publicarlo.",
+      "creating": "Creando…",
+      "openEditor": "Abrir editor →",
+      "goDashboard": "Ir al panel",
+      "error": "No se pudo terminar la configuración. Inténtalo de nuevo."
+    },
+    "palettes": { "noir": "Noir", "sand": "Arena", "slate": "Pizarra", "forest": "Bosque", "plum": "Ciruela", "midnight": "Medianoche" },
+    "pairings": { "editorial": "Editorial", "modern": "Moderna", "warm": "Cálida", "clean": "Limpia", "bold": "Audaz" }
   }
 }

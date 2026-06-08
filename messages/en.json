@@ -979,5 +979,44 @@
       "continue": "Continue →"
     },
     "previewSubtitle": "{template} template"
+  },
+
+  "onb": {
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Create my studio",
+    "welcome": {
+      "title": "Welcome to Portapic",
+      "body": "Let's set up your studio in under a minute — your details, your colours and fonts, and your first portfolio, all branded and ready to edit.",
+      "langDetected": "Language: {lang}",
+      "start": "Get started"
+    },
+    "identity": {
+      "title": "Tell us about you",
+      "body": "This appears on your portfolio's home page. You can change it any time.",
+      "first": "First name", "firstPh": "Sofia",
+      "last": "Last name", "lastPh": "Chen",
+      "location": "Location", "locationPh": "Buenos Aires, AR",
+      "bio": "Short bio", "bioPh": "A line about you and your work."
+    },
+    "color": { "title": "Pick your colour", "body": "Your brand accent — it sets the tone across your whole site." },
+    "fonts": { "title": "Choose your type", "body": "A heading and body pairing for your portfolio." },
+    "template": {
+      "title": "Pick a starting template",
+      "body": "Both adapt to your brand. You can switch later.",
+      "minimalName": "Minimal", "minimalDesc": "Clean, left-aligned, gallery-forward.",
+      "atelierName": "Atelier", "atelierDesc": "Centred, editorial, lots of whitespace."
+    },
+    "done": {
+      "title": "Your studio is ready",
+      "body": "{name} is set up with your branding. Jump into the editor to add photos and go live.",
+      "creating": "Creating…",
+      "openEditor": "Open editor →",
+      "goDashboard": "Go to dashboard",
+      "error": "Couldn't finish setup. Please try again."
+    },
+    "palettes": { "noir": "Noir", "sand": "Sand", "slate": "Slate", "forest": "Forest", "plum": "Plum", "midnight": "Midnight" },
+    "pairings": { "editorial": "Editorial", "modern": "Modern", "warm": "Warm", "clean": "Clean", "bold": "Bold" }
   }
 }

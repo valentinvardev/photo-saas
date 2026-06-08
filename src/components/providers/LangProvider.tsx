@@ -19,8 +19,14 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");
 
   useEffect(() => {
+    // A previously chosen language always wins.
     const stored = localStorage.getItem("lang") as Locale | null;
-    if (stored && ["en", "es", "pt"].includes(stored)) setLocaleState(stored);
+    if (stored && ["en", "es", "pt"].includes(stored)) { setLocaleState(stored); return; }
+    // Otherwise auto-detect from the browser's language (the most reliable
+    // signal for which language a person reads — more so than IP geolocation).
+    const nav = (navigator.language || "en").toLowerCase();
+    const detected: Locale = nav.startsWith("es") ? "es" : nav.startsWith("pt") ? "pt" : "en";
+    setLocaleState(detected);
   }, []);
 
   const setLocale = useCallback((l: Locale) => {

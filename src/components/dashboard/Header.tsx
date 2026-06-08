@@ -12,6 +12,7 @@ import { LOCALES, type Locale } from "~/lib/i18n";
 import { useCart } from "~/lib/cart";
 import { CartPanel } from "~/components/dashboard/CartPanel";
 import { DevicePreviewModal } from "~/components/dashboard/DevicePreviewModal";
+import { OnboardingFlow } from "~/components/onboarding/OnboardingFlow";
 
 /* ── Language tester ────────────────────────────────────── */
 function LangTester() {
@@ -478,6 +479,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
   const [searchQuery,   setSearchQuery]   = useState("");
   const [searchOpen,    setSearchOpen]    = useState(false);
   const [profileOpen,   setProfileOpen]   = useState(false);
+  const [onbOpen,       setOnbOpen]       = useState(false);
 
   const searchRef  = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -944,8 +946,22 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
         )}
       </AnimatePresence>
 
+      {/* Onboarding flow (launched from the Setup test button) */}
+      <OnboardingFlow open={onbOpen} onClose={() => setOnbOpen(false)} />
+
       {/* Spacer */}
       <div className="flex-1" />
+
+      {/* Onboarding — test button */}
+      <button
+        onClick={() => setOnbOpen(true)}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors shrink-0"
+        aria-label="Onboarding"
+        title="Onboarding"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z"/></svg>
+        <span className="hidden sm:block font-sans text-xs font-medium">Setup</span>
+      </button>
 
       {/* Language */}
       <LangTester />
