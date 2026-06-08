@@ -106,14 +106,16 @@ function EditableText({ id, style }: { id: string; style?: React.CSSProperties }
 
   // Headings auto-shrink: if a single word is wider than the column it would
   // otherwise overflow (we never break mid-word), so reduce the font until it
-  // fits. Multi-word text just wraps at spaces and never triggers this. We
-  // observe the PARENT width (stable, set by the grid) so resizing the font
-  // doesn't feed back into the observer.
+  // fits. Multi-word text just wraps at spaces and never triggers this.
+  // NB: we deliberately do NOT use a ResizeObserver — shrinking the font
+  // changes the node's height, which would re-trigger the observer and loop.
+  // The column width only changes on viewport toggle (a dep) or window resize.
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el || !isHeading || editing) return;
     const fit = () => {
       el.style.fontSize = "";
+      if (el.clientWidth <= 0) return;
       let guard = 0;
       while (el.scrollWidth > el.clientWidth + 1 && guard < 14) {
         const cur  = parseFloat(getComputedStyle(el).fontSize) || 16;
@@ -124,11 +126,9 @@ function EditableText({ id, style }: { id: string; style?: React.CSSProperties }
       }
     };
     fit();
-    const parent = el.parentElement;
-    const ro = new ResizeObserver(fit);
-    if (parent) ro.observe(parent);
-    return () => ro.disconnect();
-  }, [content, viewport, isHeading, editing]);
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [content, viewport, isHeading, editing, node?.fontSize]);
 
   if (editing) {
     return (
