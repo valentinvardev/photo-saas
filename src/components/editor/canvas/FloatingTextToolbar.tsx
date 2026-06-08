@@ -4,6 +4,12 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useEditorStore } from "~/lib/editor/store";
 import type { EditorNode } from "~/lib/editor/types";
+import { FontPickerModal } from "./FontPickerModal";
+
+/** Plain-text sample from a node's HTML content (fallback preview text). */
+function sampleFromContent(html?: string): string {
+  return (html ?? "").replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").trim();
+}
 
 /* Quick-pick sizes offered in the datalist next to the numeric px field. */
 const SIZE_STEPS = [10, 12, 14, 16, 20, 24, 32, 48, 72];
@@ -50,7 +56,7 @@ const numStyle: React.CSSProperties = {
   borderRadius: 5,
   outline: "none",
   height: 26,
-  width: 42,
+  width: 56,
   textAlign: "left",
 };
 
@@ -77,6 +83,7 @@ export function FloatingTextToolbar() {
   const barRef = useRef<HTMLDivElement>(null);
   const colorRef = useRef<HTMLInputElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+  const [fontModalOpen, setFontModalOpen] = useState(false);
 
   // Re-measure the selected element's position whenever it (or anything that
   // changes its box) updates, and on scroll/resize. The canvas frame isn't
@@ -128,9 +135,9 @@ export function FloatingTextToolbar() {
       window.removeEventListener("scroll", onScrollResize, true);
       window.removeEventListener("resize", onScrollResize);
     };
-  }, [isText, selectedId, viewport, node?.fontSize, node?.fontWeight, node?.fontStyle, node?.textAlign, node?.content, node?.hidden]);
+  }, [isText, selectedId, viewport, node?.fontSize, node?.fontWeight, node?.fontStyle, node?.textAlign, node?.fontFamily, node?.content, node?.hidden]);
 
-  if (!isText || !node || !pos) return null;
+  if (!isText || !node) return null;
 
   const update = (patch: Partial<EditorNode>) => updateNode(selectedId!, patch);
   const isItalic = node.fontStyle === "italic";
@@ -144,7 +151,9 @@ export function FloatingTextToolbar() {
     right:  <svg width="12" height="10" viewBox="0 0 12 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M0 1h12M4 5h8M2 9h10"/></svg>,
   };
 
-  return createPortal(
+  return (
+    <>
+    {pos && createPortal(
     <div
       ref={barRef}
       style={{
@@ -158,6 +167,18 @@ export function FloatingTextToolbar() {
         fontFamily: "system-ui, sans-serif",
       }}
     >
+      {/* Font family — opens the typography modal */}
+      <button
+        onClick={() => setFontModalOpen(true)}
+        title="Font family"
+        style={{ display: "flex", alignItems: "center", gap: 5, height: 26, padding: "0 8px", background: "var(--ec-raised)", border: "1px solid var(--ec-lift)", borderRadius: 5, cursor: "pointer", color: "var(--ec-label)", flexShrink: 0 }}
+      >
+        <span style={{ fontFamily: node.fontFamily || "inherit", fontSize: 13, fontWeight: 600, lineHeight: 1 }}>Aa</span>
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+
+      <Divider />
+
       {/* Size — exact px (datalist offers common presets) */}
       <input
         type="number"
@@ -240,5 +261,16 @@ export function FloatingTextToolbar() {
       </button>
     </div>,
     document.body,
+    )}
+
+    {fontModalOpen && (
+      <FontPickerModal
+        value={node.fontFamily}
+        fallbackSample={sampleFromContent(node.content)}
+        onSelect={(stack) => update({ fontFamily: stack })}
+        onClose={() => setFontModalOpen(false)}
+      />
+    )}
+    </>
   );
 }

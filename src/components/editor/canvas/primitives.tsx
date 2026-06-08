@@ -76,6 +76,7 @@ export function EditableNode({
   if (node?.fontStyle)  overrides.fontStyle  = node.fontStyle;
   if (node?.textAlign)  overrides.textAlign  = node.textAlign;
   if (node?.color)      overrides.color      = node.color;
+  if (node?.fontFamily) overrides.fontFamily = node.fontFamily;
 
   const El = Tag as "div";
   return (

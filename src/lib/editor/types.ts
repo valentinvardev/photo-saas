@@ -21,6 +21,7 @@ export interface EditorNode {
   fontStyle?: "normal" | "italic";
   textAlign?: "left" | "center" | "right";
   color?: string;
+  fontFamily?: string;
   /* Image style overrides */
   objectFit?: "cover" | "contain" | "fill" | "none";
   objectPosition?: string;
