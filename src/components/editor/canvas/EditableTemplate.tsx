@@ -577,12 +577,14 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
 /* ═══════════════════════════════════════════
    SECTION LABEL  (identical to source)
 ═══════════════════════════════════════════ */
-function Label({ index, text }: { index: string; text: string }) {
+function Label({ index, nodeId }: { index: string; nodeId: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2.5rem" }}>
       <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", fontWeight: 700, color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.2em", textTransform: "uppercase" as const }}>{index}</span>
       <div style={{ flex: 1, height: "1px", background: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }} />
-      <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.15em", textTransform: "uppercase" as const }}>{text}</span>
+      <EditableNode id={nodeId} tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.15em", textTransform: "uppercase" as const }}>
+        <EditableText id={nodeId} />
+      </EditableNode>
     </div>
   );
 }
@@ -592,7 +594,10 @@ function Label({ index, text }: { index: string; text: string }) {
 ═══════════════════════════════════════════ */
 export function EditableTemplate({ viewport }: { viewport: Viewport }) {
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const { selectNode, grid } = useEditorStore();
+  const { selectNode, grid, readOnly } = useEditorStore();
+  // In the editor a button click selects it (for editing); only the live site
+  // fires the action. So gallery buttons open the modal only when readOnly.
+  const openGallery = () => { if (readOnly) setGalleryOpen(true); };
 
   /* Derive breakpoint flags from the editor viewport prop
      instead of reading window.innerWidth */
@@ -616,11 +621,14 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
   /* Footer link to the full gallery — shared by mosaic + non-paginated grid */
   const allProjectsLink = (
     <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "flex-end" }}>
-      <button onClick={() => setGalleryOpen(true)}
+      <button onClick={openGallery}
         style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", borderBottom: "1px solid var(--ed-fg, #0a0a0a)", paddingBottom: "2px" }}
         onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.45"; }}
         onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}>
-        All projects ({allWorks.length})
+        <span style={{ display: "inline-flex", alignItems: "baseline", gap: 5 }}>
+          <EditableNode id="work-all-label" tag="span"><EditableText id="work-all-label" /></EditableNode>
+          <span>({allWorks.length})</span>
+        </span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
     </div>
@@ -652,7 +660,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       {/* SECTION IDS: used by the sidebar Pages tree to scroll-to and highlight sections.
           nav-section, hero-section, work (existing), section-quote,
           about (existing), press (existing), contact (existing), footer-section */}
-      <Nav onOpenGallery={() => setGalleryOpen(true)} isMobile={isMobile} />
+      <Nav onOpenGallery={openGallery} isMobile={isMobile} />
 
       {/* ════ HERO ════ */}
       <section
@@ -683,7 +691,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           </EditableNode>
 
           <div style={{ display: "flex", gap: "0.75rem", marginTop: "2.5rem", flexWrap: "wrap" }}>
-            <button onClick={() => setGalleryOpen(true)}
+            <button onClick={openGallery}
               style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", padding: "12px 24px", border: "1px solid var(--ed-btn-bg, #0a0a0a)", borderRadius: "var(--ed-btn-radius, 0)", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
               onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; e.currentTarget.style.color = "var(--ed-btn-fg, var(--ed-bg, #fafafa))"; }}>
@@ -725,34 +733,34 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
       {/* ════ WORK ════ */}
       <section id="work" style={{ padding: `5rem ${px}` }}>
-        <Label index="01" text="Selected Work" />
+        <Label index="01" nodeId="label-work" />
 
         {grid.layout === "mosaic" ? (
           /* ── Mosaic — editorial layout with art-directed cell sizes ── */
           <>
             {!isMobile && (!isTablet && featured.length >= 8 ? (
               <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "280px 280px 360px 320px", gap }}>
-                <div style={{ gridRow: "1/3", gridColumn: "1" }}>   <Cell w={featured[0]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "1",   gridColumn: "2" }}>   <Cell w={featured[1]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "1",   gridColumn: "3" }}>   <Cell w={featured[2]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "2",   gridColumn: "2" }}>   <Cell w={featured[3]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "2",   gridColumn: "3" }}>   <Cell w={featured[4]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "3",   gridColumn: "1/3" }}> <Cell w={featured[5]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "3",   gridColumn: "3" }}>   <Cell w={featured[6]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "4",   gridColumn: "1" }}>   <Cell w={featured[7]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "4",   gridColumn: "2/4" }}> <Cell w={featured[0]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "1/3", gridColumn: "1" }}>   <Cell w={featured[0]} fit={grid.fit} onClick={openGallery} /></div>
+                <div style={{ gridRow: "1",   gridColumn: "2" }}>   <Cell w={featured[1]} fit={grid.fit} onClick={openGallery} /></div>
+                <div style={{ gridRow: "1",   gridColumn: "3" }}>   <Cell w={featured[2]} fit={grid.fit} onClick={openGallery} /></div>
+                <div style={{ gridRow: "2",   gridColumn: "2" }}>   <Cell w={featured[3]} fit={grid.fit} onClick={openGallery} /></div>
+                <div style={{ gridRow: "2",   gridColumn: "3" }}>   <Cell w={featured[4]} fit={grid.fit} onClick={openGallery} /></div>
+                <div style={{ gridRow: "3",   gridColumn: "1/3" }}> <Cell w={featured[5]} fit={grid.fit} onClick={openGallery} /></div>
+                <div style={{ gridRow: "3",   gridColumn: "3" }}>   <Cell w={featured[6]} fit={grid.fit} onClick={openGallery} /></div>
+                <div style={{ gridRow: "4",   gridColumn: "1" }}>   <Cell w={featured[7]} fit={grid.fit} onClick={openGallery} /></div>
+                <div style={{ gridRow: "4",   gridColumn: "2/4" }}> <Cell w={featured[0]} fit={grid.fit} onClick={openGallery} /></div>
               </div>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: isTablet ? "1fr 1fr" : "1fr 1fr 1fr", gap }}>
                 {featured.map((w) => (
-                  <div key={w.id} style={{ aspectRatio: "4/5" }}><Cell w={w} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                  <div key={w.id} style={{ aspectRatio: "4/5" }}><Cell w={w} fit={grid.fit} onClick={openGallery} /></div>
                 ))}
               </div>
             ))}
             {isMobile && (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap }}>
                 {featured.map((w) => (
-                  <div key={w.id} style={{ aspectRatio: "1/1" }}><Cell w={w} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                  <div key={w.id} style={{ aspectRatio: "1/1" }}><Cell w={w} fit={grid.fit} onClick={openGallery} /></div>
                 ))}
               </div>
             )}
@@ -764,7 +772,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
             <div style={{ columnCount: uniformCols, columnGap: gap }}>
               {uniformWorks.map((w, i) => (
                 <div key={`${w.id}-${i}`} style={{ breakInside: "avoid", marginBottom: gap }}>
-                  <MasonryCell w={w} onClick={() => setGalleryOpen(true)} />
+                  <MasonryCell w={w} onClick={openGallery} />
                 </div>
               ))}
             </div>
@@ -776,7 +784,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
             <div style={{ display: "grid", gridTemplateColumns: `repeat(${uniformCols}, 1fr)`, gap }}>
               {uniformWorks.map((w, i) => (
                 <div key={`${w.id}-${i}`} style={{ aspectRatio: isMobile ? "1/1" : "4/5" }}>
-                  <Cell w={w} fit={grid.fit} onClick={() => setGalleryOpen(true)} />
+                  <Cell w={w} fit={grid.fit} onClick={openGallery} />
                 </div>
               ))}
             </div>
@@ -801,7 +809,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       {/* ════ ABOUT ════ */}
       <section id="about" style={{ padding: `${isMobile ? "4rem" : "7rem"} ${px}`, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "3rem" : "6rem", alignItems: "center" }}>
         <div>
-          <Label index="02" text="About" />
+          <Label index="02" nodeId="label-about" />
           <EditableNode id="about-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 400, fontSize: isMobile ? "clamp(32px,10vw,48px)" : "clamp(36px,4vw,56px)", lineHeight: 1.1, color: "var(--ed-fg, #0a0a0a)", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
             <EditableText id="about-heading" />
           </EditableNode>
@@ -844,7 +852,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
       {/* ════ PRESS ════ */}
       <section id="press" style={{ padding: `${isMobile ? "3.5rem" : "5rem"} ${px}`, background: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 4%, var(--ed-bg, #fafafa))", borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
-        <Label index="03" text="Press &amp; Features" />
+        <Label index="03" nodeId="label-press" />
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : isTablet ? "repeat(3,1fr)" : "repeat(5,1fr)", gap: "1px", background: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
           {(["press-1","press-2","press-3","press-4","press-5"] as const).map((id, i) => {
             if (isMobile && i >= 4) return null;
@@ -865,7 +873,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       {/* ════ CONTACT ════ */}
       <section id="contact" style={{ padding: `${isMobile ? "4rem" : "8rem"} ${px}`, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "3rem" : "6rem", alignItems: "start" }}>
         <div>
-          <Label index="04" text="Contact" />
+          <Label index="04" nodeId="label-contact" />
           <EditableNode id="contact-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "clamp(36px,11vw,56px)" : "clamp(40px,5vw,72px)", lineHeight: 1.05, color: "var(--ed-fg, #0a0a0a)", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
             <EditableText id="contact-heading" />
           </EditableNode>
@@ -874,13 +882,17 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           </EditableNode>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
             {[
-              { label: "General",  value: "hello@jameshollis.com" },
-              { label: "Bookings", value: "bookings@jameshollis.com" },
-              { label: "Agent",    value: "+1 (212) 555 0184" },
+              { l: "contact-d1-label", v: "contact-d1-value" },
+              { l: "contact-d2-label", v: "contact-d2-value" },
+              { l: "contact-d3-label", v: "contact-d3-value" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", gap: "1.25rem", alignItems: "baseline" }}>
-                <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.2em", textTransform: "uppercase", minWidth: "52px" }}>{row.label}</span>
-                <span style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", color: "var(--ed-fg, #0a0a0a)" }}>{row.value}</span>
+              <div key={row.l} style={{ display: "flex", gap: "1.25rem", alignItems: "baseline" }}>
+                <EditableNode id={row.l} tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "var(--ed-muted, #9ca3af)", letterSpacing: "0.2em", textTransform: "uppercase", minWidth: "52px" }}>
+                  <EditableText id={row.l} />
+                </EditableNode>
+                <EditableNode id={row.v} tag="span" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", color: "var(--ed-fg, #0a0a0a)" }}>
+                  <EditableText id={row.v} />
+                </EditableNode>
               </div>
             ))}
           </div>

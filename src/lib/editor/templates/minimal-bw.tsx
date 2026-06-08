@@ -59,6 +59,23 @@ export const MINIMAL_BW_NODES: Record<string, EditorNode> = {
   "contact-heading":  { id: "contact-heading",  type: "heading",   content: "Let’s create<br/><em>something.</em>" },
   "contact-body":     { id: "contact-body",     type: "paragraph", content: "For editorial commissions, exhibition inquiries, and long-form project proposals." },
 
+  /* Section labels (the eyebrow text next to the rule) */
+  "label-work":       { id: "label-work",       type: "paragraph", content: "Selected Work" },
+  "label-about":      { id: "label-about",      type: "paragraph", content: "About" },
+  "label-press":      { id: "label-press",      type: "paragraph", content: "Press & Features" },
+  "label-contact":    { id: "label-contact",    type: "paragraph", content: "Contact" },
+
+  /* Work "view all" button label */
+  "work-all-label":   { id: "work-all-label",   type: "paragraph", content: "All projects" },
+
+  /* Contact details */
+  "contact-d1-label": { id: "contact-d1-label", type: "paragraph", content: "General" },
+  "contact-d1-value": { id: "contact-d1-value", type: "paragraph", content: "hello@jameshollis.com" },
+  "contact-d2-label": { id: "contact-d2-label", type: "paragraph", content: "Bookings" },
+  "contact-d2-value": { id: "contact-d2-value", type: "paragraph", content: "bookings@jameshollis.com" },
+  "contact-d3-label": { id: "contact-d3-label", type: "paragraph", content: "Agent" },
+  "contact-d3-value": { id: "contact-d3-value", type: "paragraph", content: "+1 (212) 555 0184" },
+
   "footer-copyright": { id: "footer-copyright", type: "paragraph", content: "© 2025 James Hollis Photography" },
 };
 
@@ -82,7 +99,11 @@ export const MINIMAL_BW_SECTIONS: SectionDef[] = [
       { nodeId: "hero-image-1",  label: "Main image",    type: "image" },
       { nodeId: "hero-image-2",  label: "Second image",  type: "image" },
     ] },
-  { id: "work", label: "Work", icon: <GridIcon />, locked: false, elements: [] },
+  { id: "work", label: "Work", icon: <GridIcon />, locked: false,
+    elements: [
+      { nodeId: "label-work",     label: "Section label",    type: "text" },
+      { nodeId: "work-all-label", label: "View-all button",  type: "text" },
+    ] },
   { id: "section-quote", label: "Quote", icon: <QuoteIcon />, locked: false,
     elements: [
       { nodeId: "quote-eyebrow", label: "Eyebrow", type: "text" },
@@ -91,6 +112,7 @@ export const MINIMAL_BW_SECTIONS: SectionDef[] = [
     ] },
   { id: "about", label: "About", icon: <UserIcon />, locked: false,
     elements: [
+      { nodeId: "label-about",    label: "Section label", type: "text" },
       { nodeId: "about-heading",  label: "Heading",     type: "text"  },
       { nodeId: "about-body-1",   label: "Paragraph 1", type: "text"  },
       { nodeId: "about-body-2",   label: "Paragraph 2", type: "text"  },
@@ -105,6 +127,7 @@ export const MINIMAL_BW_SECTIONS: SectionDef[] = [
     ] },
   { id: "press", label: "Press", icon: <PaperIcon />, locked: false,
     elements: [
+      { nodeId: "label-press",  label: "Section label", type: "text" },
       { nodeId: "press-1",      label: "Publication 1", type: "text" },
       { nodeId: "press-1-year", label: "Year 1",        type: "text" },
       { nodeId: "press-2",      label: "Publication 2", type: "text" },
@@ -118,8 +141,15 @@ export const MINIMAL_BW_SECTIONS: SectionDef[] = [
     ] },
   { id: "contact", label: "Contact", icon: <MailIcon />, locked: false,
     elements: [
-      { nodeId: "contact-heading", label: "Heading", type: "text" },
-      { nodeId: "contact-body",    label: "Body",    type: "text" },
+      { nodeId: "label-contact",   label: "Section label",  type: "text" },
+      { nodeId: "contact-heading", label: "Heading",        type: "text" },
+      { nodeId: "contact-body",    label: "Body",           type: "text" },
+      { nodeId: "contact-d1-label", label: "Detail 1 — lbl", type: "text" },
+      { nodeId: "contact-d1-value", label: "Detail 1 — val", type: "text" },
+      { nodeId: "contact-d2-label", label: "Detail 2 — lbl", type: "text" },
+      { nodeId: "contact-d2-value", label: "Detail 2 — val", type: "text" },
+      { nodeId: "contact-d3-label", label: "Detail 3 — lbl", type: "text" },
+      { nodeId: "contact-d3-value", label: "Detail 3 — val", type: "text" },
     ] },
   { id: "section-footer", label: "Footer", icon: <FooterIcon />, locked: true,
     elements: [
