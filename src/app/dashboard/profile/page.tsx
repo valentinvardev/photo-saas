@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { api, type RouterOutputs } from "~/trpc/react";
 import { PhotoPickerModal } from "~/components/portfolio/PhotoPickerModal";
+import { useT } from "~/components/providers/LangProvider";
 
 type Me = RouterOutputs["user"]["me"];
 
@@ -74,6 +75,7 @@ const SOCIALS = [
 ] as const;
 
 export default function ProfilePage() {
+  const { t } = useT();
   const utils = api.useUtils();
   const { data: me, isLoading } = api.user.me.useQuery();
   const { data: portfolios }    = api.portfolio.list.useQuery();
@@ -121,8 +123,8 @@ export default function ProfilePage() {
       {/* ── Page header ── */}
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="font-sans font-black text-[var(--fg)] text-xl">Profile</h1>
-          <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">Your public identity on Portapic</p>
+          <h1 className="font-sans font-black text-[var(--fg)] text-xl">{t("profilePage.title")}</h1>
+          <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">{t("profilePage.subtitle")}</p>
         </div>
         {published && (
           <Link
@@ -131,7 +133,7 @@ export default function ProfilePage() {
             className="flex items-center gap-1.5 font-sans text-xs font-medium text-[var(--fg-muted)] border border-[var(--border)] px-3 py-2 rounded-lg hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors shrink-0"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            View live portfolio
+            {t("profilePage.viewLive")}
           </Link>
         )}
       </div>
@@ -146,13 +148,13 @@ export default function ProfilePage() {
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={form.coverUrl} alt="" className="w-full h-full object-cover" />
           ) : (
-            <span className="absolute inset-0 flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)]">No cover photo</span>
+            <span className="absolute inset-0 flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)]">{t("profilePage.noCover")}</span>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <span className="flex items-center gap-2 font-sans text-xs font-semibold text-white bg-black/50 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-lg">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              {form.coverUrl ? "Change cover" : "Add cover"}
+              {form.coverUrl ? t("profilePage.changeCover") : t("profilePage.addCover")}
             </span>
           </span>
         </button>
@@ -177,36 +179,36 @@ export default function ProfilePage() {
       </div>
 
       {/* ── Identity ── */}
-      <Section title="Public profile">
-        <Field label="Display name" hint="This is what clients see on your public portfolio.">
-          <input className={inputCls} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Your name" />
+      <Section title={t("profilePage.publicProfile")}>
+        <Field label={t("profilePage.displayName")} hint={t("profilePage.displayNameHint")}>
+          <input className={inputCls} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={t("profilePage.namePlaceholder")} />
         </Field>
 
-        <Field label="Bio" hint="Max 300 characters.">
+        <Field label={t("profilePage.bio")} hint={t("profilePage.bioHint")}>
           <textarea
             className={`${inputCls} resize-none`}
             rows={3}
             maxLength={300}
             value={form.bio}
             onChange={(e) => set("bio", e.target.value)}
-            placeholder="A short line about you and your work."
+            placeholder={t("profilePage.bioPlaceholder")}
           />
         </Field>
 
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Location">
-            <input className={inputCls} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="City, Country" />
+          <Field label={t("profilePage.location")}>
+            <input className={inputCls} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder={t("profilePage.locationPlaceholder")} />
           </Field>
-          <Field label="Specialty">
-            <input className={inputCls} value={form.specialty} onChange={(e) => set("specialty", e.target.value)} placeholder="e.g. Wedding, Portrait…" />
+          <Field label={t("profilePage.specialty")}>
+            <input className={inputCls} value={form.specialty} onChange={(e) => set("specialty", e.target.value)} placeholder={t("profilePage.specialtyPlaceholder")} />
           </Field>
         </div>
       </Section>
 
       {/* ── Social links ── */}
-      <Section title="Social links">
+      <Section title={t("profilePage.socialLinks")}>
         {SOCIALS.map((s) => (
-          <Field key={s.key} label={s.label}>
+          <Field key={s.key} label={s.key === "website" ? t("profilePage.website") : s.label}>
             <input
               className={inputCls}
               value={form[s.key]}
@@ -218,12 +220,12 @@ export default function ProfilePage() {
       </Section>
 
       {/* ── Account ── */}
-      <Section title="Account">
-        <Field label="Email" hint="Used to sign in. Contact support to change it.">
+      <Section title={t("profilePage.account")}>
+        <Field label={t("profilePage.email")} hint={t("profilePage.emailHint")}>
           <input className={`${inputCls} opacity-60 cursor-not-allowed`} value={me.email} disabled />
         </Field>
         <div className="font-sans text-xs text-[var(--fg-muted)]">
-          Member since {new Date(me.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long" })}
+          {t("profilePage.memberSince", { date: new Date(me.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long" }) })}
         </div>
       </Section>
 
@@ -234,7 +236,7 @@ export default function ProfilePage() {
           disabled={!dirty || updateMut.isPending}
           className="font-sans text-sm text-[var(--fg-muted)] border border-[var(--border)] px-4 py-2 rounded-lg hover:text-[var(--fg)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          Discard
+          {t("profilePage.discard")}
         </button>
         <AnimatePresence mode="wait">
           <motion.button
@@ -249,7 +251,7 @@ export default function ProfilePage() {
               saved ? "bg-green-500 text-white" : "bg-yellow text-[#111] hover:bg-yellow/90"
             }`}
           >
-            {saved ? "Saved" : updateMut.isPending ? "Saving…" : "Save changes"}
+            {saved ? t("profilePage.saved") : updateMut.isPending ? t("profilePage.saving") : t("profilePage.saveChanges")}
           </motion.button>
         </AnimatePresence>
       </div>

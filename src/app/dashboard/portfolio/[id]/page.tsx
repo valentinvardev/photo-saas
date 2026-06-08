@@ -12,6 +12,7 @@ import { dbToView } from "~/lib/portfolio/adapt";
 import { portfolioPublicUrl, portfolioPublicLabel } from "~/lib/portfolio/url";
 import { usePortfolioContentSync } from "~/lib/portfolio/useContentSync";
 import { api, type RouterOutputs } from "~/trpc/react";
+import { useT } from "~/components/providers/LangProvider";
 
 type DbPortfolio = NonNullable<RouterOutputs["portfolio"]["get"]>;
 type SaveFn = (patch: Partial<{
@@ -22,17 +23,18 @@ type SaveFn = (patch: Partial<{
 
 type Tab = "content" | "template" | "domain" | "seo" | "analytics" | "settings";
 
-const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: "content",   label: "Content",   icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg> },
-  { id: "template",  label: "Template",  icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> },
-  { id: "domain",    label: "Domain",    icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> },
-  { id: "seo",       label: "SEO",       icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
-  { id: "analytics", label: "Analytics", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
-  { id: "settings",  label: "Settings",  icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
+const TABS: { id: Tab; icon: React.ReactNode }[] = [
+  { id: "content",   icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg> },
+  { id: "template",  icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> },
+  { id: "domain",    icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> },
+  { id: "seo",       icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
+  { id: "analytics", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
+  { id: "settings",  icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
 ];
 
 /* Clickable public URL + a copy-to-clipboard button. */
 function CopyLink({ href, label, copyText }: { href: string; label: string; copyText: string }) {
+  const { t } = useT();
   const [copied, setCopied] = useState(false);
   async function copy() {
     try { await navigator.clipboard.writeText(copyText); } catch { /* ignore */ }
@@ -46,13 +48,13 @@ function CopyLink({ href, label, copyText }: { href: string; label: string; copy
         target="_blank"
         rel="noopener noreferrer"
         className="font-mono text-[11px] text-[var(--fg-muted)] hover:text-[var(--fg)] truncate transition-colors"
-        title="Open public page"
+        title={t("pm.openPublic")}
       >
         {label}
       </a>
       <button
         onClick={copy}
-        title="Copy link"
+        title={t("pm.copyLink")}
         aria-live="polite"
         className={`shrink-0 inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest transition-colors ${
           copied ? "text-green-400" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"
@@ -61,12 +63,12 @@ function CopyLink({ href, label, copyText }: { href: string; label: string; copy
         {copied ? (
           <>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-            Copied
+            {t("pm.copied")}
           </>
         ) : (
           <>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>
-            Copy
+            {t("pm.copy")}
           </>
         )}
       </button>
@@ -77,6 +79,7 @@ function CopyLink({ href, label, copyText }: { href: string; label: string; copy
 export default function PortfolioManagePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const { t } = useT();
 
   const { data: dbP, isLoading } = api.portfolio.get.useQuery({ id });
   const portfolio = dbP ? dbToView(dbP) : undefined;
@@ -107,9 +110,9 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
   if (!portfolio) {
     return (
       <div className="p-12 text-center">
-        <p className="font-sans text-sm text-[var(--fg-muted)]">Portfolio not found.</p>
+        <p className="font-sans text-sm text-[var(--fg-muted)]">{t("pm.notFound")}</p>
         <Link href="/dashboard/portfolio" className="font-mono text-[10px] text-yellow uppercase tracking-widest mt-4 inline-block hover:underline">
-          ← Back to all portfolios
+          {t("pm.backAll")}
         </Link>
       </div>
     );
@@ -140,19 +143,19 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
             published ? "bg-green-500/10 text-green-400" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)]"
           }`}>
             <span className={`w-1.5 h-1.5 rounded-full ${published ? "bg-green-400" : "bg-[var(--fg-muted)]"}`} />
-            {published ? "Published" : "Draft"}
+            {published ? t("pm.published") : t("pm.draft")}
           </span>
 
           <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">
             {saving ? (
               <>
                 <span className="w-1.5 h-1.5 rounded-full bg-yellow animate-pulse" />
-                Saving…
+                {t("pm.saving")}
               </>
             ) : (
               <>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                Saved
+                {t("pm.saved")}
               </>
             )}
           </span>
@@ -168,7 +171,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors font-sans text-xs font-medium"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              View live
+              {t("pm.viewLive")}
             </a>
           )}
           <button
@@ -177,14 +180,14 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] disabled:opacity-40 transition-colors font-sans text-xs font-medium"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            Preview
+            {t("pm.preview")}
           </button>
           <Link
             href={`/editor/${id}`}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors font-sans text-xs font-medium"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Edit website
+            {t("pm.editWebsite")}
           </Link>
           <button
             onClick={() => {
@@ -199,7 +202,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
                 : "bg-yellow text-[#111] hover:bg-yellow/90"
             }`}
           >
-            {published ? "Unpublish" : "Publish"}
+            {published ? t("pm.unpublish") : t("pm.publish")}
           </button>
         </div>
 
@@ -225,7 +228,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                 <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-[#111] font-sans text-[11px] font-bold px-3 py-1.5 rounded-md flex items-center gap-1.5">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  Open preview
+                  {t("pm.openPreview")}
                 </span>
               </div>
             </button>
@@ -234,20 +237,20 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
 
         {/* Tabs */}
         <nav className="flex gap-0 px-5 -mb-px border-b border-[var(--border)] overflow-x-auto">
-          {TABS.map((t) => {
-            const active = tab === t.id;
+          {TABS.map((tabItem) => {
+            const active = tab === tabItem.id;
             return (
               <button
-                key={t.id}
-                onClick={() => setTab(t.id)}
+                key={tabItem.id}
+                onClick={() => setTab(tabItem.id)}
                 className={`flex items-center gap-2 px-4 py-3 font-sans text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   active
                     ? "border-yellow text-[var(--fg)]"
                     : "border-transparent text-[var(--fg-muted)] hover:text-[var(--fg)]"
                 }`}
               >
-                <span className={active ? "text-yellow" : "text-[var(--fg-muted)]"}>{t.icon}</span>
-                {t.label}
+                <span className={active ? "text-yellow" : "text-[var(--fg-muted)]"}>{tabItem.icon}</span>
+                {t(`pm.tabs.${tabItem.id}`)}
               </button>
             );
           })}
@@ -317,6 +320,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
 /* ─── Tabs ─────────────────────────────────────────────────── */
 
 function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: SaveFn; saving: boolean }) {
+  const { t } = useT();
   const [selected, setSelected] = useState(portfolio.template);
   /* Keep the local pick in sync if the applied template changes elsewhere. */
   useEffect(() => { setSelected(portfolio.template); }, [portfolio.template]);
@@ -326,21 +330,21 @@ function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: 
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="font-sans font-bold text-[var(--fg)] text-base">Template</h2>
+        <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.template.title")}</h2>
         <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
-          Pick the visual style of your portfolio. You can switch any time.
+          {t("pm.template.subtitle")}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {TEMPLATES.map((t) => {
-          const url     = TEMPLATE_URL[t];
-          const active  = selected === t;            // the user's current pick (highlight)
-          const inUse   = portfolio.template === t;  // what's actually applied
+        {TEMPLATES.map((tpl) => {
+          const url     = TEMPLATE_URL[tpl];
+          const active  = selected === tpl;            // the user's current pick (highlight)
+          const inUse   = portfolio.template === tpl;  // what's actually applied
           return (
             <button
-              key={t}
-              onClick={() => setSelected(t)}
+              key={tpl}
+              onClick={() => setSelected(tpl)}
               className={`text-left rounded-xl overflow-hidden border transition-all ${
                 active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"
               }`}
@@ -349,14 +353,14 @@ function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: 
                 {url && <LivePreviewThumbnail url={url} baseWidth={1280} className="w-full h-full" />}
               </div>
               <div className="p-3 flex items-center justify-between gap-2">
-                <span className="font-sans font-bold text-[var(--fg)] text-sm capitalize">{t}</span>
+                <span className="font-sans font-bold text-[var(--fg)] text-sm capitalize">{tpl}</span>
                 {inUse ? (
                   <span className="font-mono text-[9px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 rounded shrink-0">
-                    In use
+                    {t("pm.template.inUse")}
                   </span>
                 ) : active ? (
                   <span className="font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded shrink-0">
-                    Selected
+                    {t("pm.template.selected")}
                   </span>
                 ) : null}
               </div>
@@ -377,7 +381,7 @@ function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: 
             </svg>
           </div>
           <div className="p-3 flex items-center justify-between">
-            <span className="font-sans font-bold text-[var(--fg-muted)] group-hover:text-[var(--fg)] text-sm transition-colors">Browse all templates</span>
+            <span className="font-sans font-bold text-[var(--fg-muted)] group-hover:text-[var(--fg)] text-sm transition-colors">{t("pm.template.browseAll")}</span>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] group-hover:text-yellow transition-colors">
               <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
             </svg>
@@ -391,13 +395,13 @@ function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: 
           disabled={!dirty || saving}
           className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          {saving ? "Applying…" : dirty ? "Apply template" : "Applied"}
+          {saving ? t("pm.template.applying") : dirty ? t("pm.template.apply") : t("pm.template.applied")}
         </button>
         <Link
           href="/dashboard/templates"
           className="px-4 py-2 rounded-lg border border-[var(--border)] font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
         >
-          Browse all templates →
+          {t("pm.template.browseAllArrow")}
         </Link>
       </div>
     </div>
@@ -405,6 +409,7 @@ function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: 
 }
 
 function DomainTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
+  const { t } = useT();
   const liveUrl = (typeof window !== "undefined" ? window.location.origin : "https://portapic.com") + `/p/${dbP.slug}`;
   const [domain, setDomain]   = useState(dbP.customDomain ?? "");
   const [copied, setCopied]   = useState(false);
@@ -414,51 +419,51 @@ function DomainTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
   return (
     <div className="max-w-2xl space-y-5">
       <div>
-        <h2 className="font-sans font-bold text-[var(--fg)] text-base">Domain</h2>
+        <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.domain.title")}</h2>
         <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
-          The address visitors use to reach this portfolio.
+          {t("pm.domain.subtitle")}
         </p>
       </div>
 
       {/* Live address */}
       <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-        <div className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest mb-2">Live address</div>
+        <div className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest mb-2">{t("pm.domain.liveAddress")}</div>
         <div className="flex items-center gap-2 flex-wrap">
           <code className="font-mono text-sm text-[var(--fg)] bg-[var(--bg-subtle)] px-2 py-1 rounded truncate flex-1 min-w-0">{liveUrl}</code>
           <button
             onClick={() => { navigator.clipboard.writeText(liveUrl).catch(() => {}); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
             className="px-3 py-1.5 rounded-lg border border-[var(--border)] font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors whitespace-nowrap"
-          >{copied ? "Copied" : "Copy"}</button>
-          <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 transition-colors">Open</a>
+          >{copied ? t("pm.copied") : t("pm.copy")}</button>
+          <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 transition-colors">{t("pm.open")}</a>
         </div>
       </div>
 
       {/* Custom domain */}
       <div>
-        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">Custom domain (optional)</label>
+        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.domain.custom")}</label>
         <div className="flex gap-2">
           <input
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
-            placeholder="yourname.com"
+            placeholder={t("pm.domain.placeholder")}
             className="flex-1 rounded-lg px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] focus:outline-none focus:border-yellow transition-colors"
           />
           <button
             disabled={!dirty}
             onClick={() => save({ customDomain: clean || null })}
             className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
-          >Save domain</button>
+          >{t("pm.domain.saveDomain")}</button>
         </div>
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1.5">Leave empty to use the free address above.</p>
+        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1.5">{t("pm.domain.emptyHint")}</p>
       </div>
 
       {/* DNS instructions when a custom domain is set */}
       {dbP.customDomain && (
         <div className="rounded-xl border border-yellow/30 bg-yellow/5 p-4 space-y-2">
-          <p className="font-sans text-sm font-semibold text-[var(--fg)]">Point your DNS</p>
-          <p className="font-sans text-xs text-[var(--fg-muted)]">At your domain registrar, add a CNAME record:</p>
+          <p className="font-sans text-sm font-semibold text-[var(--fg)]">{t("pm.domain.pointDns")}</p>
+          <p className="font-sans text-xs text-[var(--fg-muted)]">{t("pm.domain.cnameHint")}</p>
           <code className="block font-mono text-[11px] bg-[var(--bg-subtle)] px-3 py-2 rounded text-[var(--fg)]">CNAME&nbsp;&nbsp;@&nbsp;→&nbsp;cname.vercel-dns.com</code>
-          <p className="font-mono text-[10px] text-yellow/80">Saved. Domain routing activates once verified — coming soon. For now the portfolio is live at the address above.</p>
+          <p className="font-mono text-[10px] text-yellow/80">{t("pm.domain.dnsNote")}</p>
         </div>
       )}
     </div>
@@ -466,6 +471,7 @@ function DomainTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
 }
 
 function SeoTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
+  const { t } = useT();
   const liveUrl = (typeof window !== "undefined" ? window.location.origin : "https://portapic.com") + `/p/${dbP.slug}`;
   const [title, setTitle] = useState(dbP.seoTitle ?? "");
   const [desc,  setDesc]  = useState(dbP.seoDescription ?? "");
@@ -484,56 +490,56 @@ function SeoTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
   return (
     <div className="max-w-2xl space-y-5">
       <div>
-        <h2 className="font-sans font-bold text-[var(--fg)] text-base">SEO</h2>
+        <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.seo.title")}</h2>
         <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
-          How your portfolio shows up in search results and social shares.
+          {t("pm.seo.subtitle")}
         </p>
       </div>
 
       <div>
-        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">Meta title</label>
+        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.seo.metaTitle")}</label>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={dbP.title}
           className="w-full rounded-lg px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] focus:outline-none focus:border-yellow transition-colors"
         />
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">{title.length}/60 · blank uses the portfolio title</p>
+        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">{t("pm.seo.metaTitleHint", { n: title.length })}</p>
       </div>
 
       <div>
-        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">Meta description</label>
+        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.seo.metaDesc")}</label>
         <textarea
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
           rows={3}
           className="w-full rounded-lg px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] focus:outline-none focus:border-yellow transition-colors resize-none"
         />
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">{desc.length}/160 characters</p>
+        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">{t("pm.seo.metaDescHint", { n: desc.length })}</p>
       </div>
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mb-3 uppercase tracking-widest">Search preview</p>
+        <p className="font-mono text-[10px] text-[var(--fg-muted)] mb-3 uppercase tracking-widest">{t("pm.seo.searchPreview")}</p>
         <div className="font-sans text-base text-blue-400 hover:underline cursor-default truncate">{title || dbP.title}</div>
         <div className="font-mono text-[11px] text-green-600 truncate">{liveUrl}</div>
-        <div className="font-sans text-xs text-[var(--fg-muted)] mt-1 line-clamp-2">{desc || "No description set."}</div>
+        <div className="font-sans text-xs text-[var(--fg-muted)] mt-1 line-clamp-2">{desc || t("pm.seo.noDesc")}</div>
       </div>
 
       <div>
-        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">Social / OG image</label>
+        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.seo.ogImage")}</label>
         {og ? (
           <div className="rounded-lg border border-[var(--border)] overflow-hidden relative group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={og} alt="" className="w-full aspect-[1200/630] object-cover" />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-              <button onClick={() => setPicker(true)} className="px-3 py-1.5 rounded-lg bg-white text-[#111] font-sans text-xs font-bold">Change</button>
-              <button onClick={() => setOg("")} className="px-3 py-1.5 rounded-lg bg-white/90 text-red-500 font-sans text-xs font-bold">Remove</button>
+              <button onClick={() => setPicker(true)} className="px-3 py-1.5 rounded-lg bg-white text-[#111] font-sans text-xs font-bold">{t("pm.seo.change")}</button>
+              <button onClick={() => setOg("")} className="px-3 py-1.5 rounded-lg bg-white/90 text-red-500 font-sans text-xs font-bold">{t("pm.seo.remove")}</button>
             </div>
           </div>
         ) : (
           <button onClick={() => setPicker(true)} className="w-full rounded-lg border-2 border-dashed border-[var(--border)] h-32 flex flex-col items-center justify-center gap-2 text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span className="font-mono text-xs">Choose from your library (1200×630 ideal)</span>
+            <span className="font-mono text-xs">{t("pm.seo.chooseImage")}</span>
           </button>
         )}
       </div>
@@ -543,7 +549,7 @@ function SeoTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
         disabled={!dirty}
         className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
-        Save SEO settings
+        {t("pm.seo.save")}
       </button>
 
       {picker && (
@@ -554,35 +560,36 @@ function SeoTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
 }
 
 function AnalyticsTab({ dbP }: { dbP: DbPortfolio }) {
+  const { t } = useT();
   const published = dbP.status === "published";
   return (
     <div className="space-y-5 max-w-4xl">
       <div>
-        <h2 className="font-sans font-bold text-[var(--fg)] text-base">Analytics</h2>
+        <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.analytics.title")}</h2>
         <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
-          How your published portfolio is performing.
+          {t("pm.analytics.subtitle")}
         </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
-          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">Total views</div>
+          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{t("pm.analytics.totalViews")}</div>
           <div className="font-sans font-black text-2xl text-[var(--fg)]">{dbP.views.toLocaleString()}</div>
         </div>
         <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
-          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">Status</div>
-          <div className={`font-sans font-black text-2xl ${published ? "text-green-400" : "text-[var(--fg-muted)]"}`}>{published ? "Live" : "Draft"}</div>
+          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{t("pm.analytics.status")}</div>
+          <div className={`font-sans font-black text-2xl ${published ? "text-green-400" : "text-[var(--fg-muted)]"}`}>{published ? t("pm.analytics.live") : t("pm.analytics.draft")}</div>
         </div>
         <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
-          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">Last updated</div>
+          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{t("pm.analytics.lastUpdated")}</div>
           <div className="font-sans font-bold text-base text-[var(--fg)]">{new Date(dbP.updatedAt).toLocaleDateString()}</div>
         </div>
       </div>
 
       {!published && (
         <div className="rounded-xl border border-yellow/30 bg-yellow/5 p-4">
-          <p className="font-sans text-sm font-semibold text-[var(--fg)]">Not published yet</p>
-          <p className="font-sans text-xs text-[var(--fg-muted)] mt-1">Publish this portfolio to start counting views.</p>
+          <p className="font-sans text-sm font-semibold text-[var(--fg)]">{t("pm.analytics.notPublished")}</p>
+          <p className="font-sans text-xs text-[var(--fg-muted)] mt-1">{t("pm.analytics.notPublishedBody")}</p>
         </div>
       )}
 
@@ -591,8 +598,8 @@ function AnalyticsTab({ dbP }: { dbP: DbPortfolio }) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         </span>
         <div>
-          <p className="font-sans text-sm font-semibold text-[var(--fg)]">More analytics coming soon</p>
-          <p className="font-sans text-xs text-[var(--fg-muted)] mt-1 leading-relaxed">Total views are tracked in real time. Traffic sources, top content, sessions and per-day trends will land here once event tracking is in place — shown only when there's real data, never placeholders.</p>
+          <p className="font-sans text-sm font-semibold text-[var(--fg)]">{t("pm.analytics.moreSoon")}</p>
+          <p className="font-sans text-xs text-[var(--fg-muted)] mt-1 leading-relaxed">{t("pm.analytics.moreSoonBody")}</p>
         </div>
       </div>
     </div>
@@ -600,6 +607,7 @@ function AnalyticsTab({ dbP }: { dbP: DbPortfolio }) {
 }
 
 function SettingsTab({ dbP, save, onDelete }: { dbP: DbPortfolio; save: SaveFn; onDelete: () => void }) {
+  const { t } = useT();
   const [pwOn, setPwOn] = useState(dbP.passwordEnabled);
   const [pw, setPw]     = useState(dbP.password ?? "");
 
@@ -613,17 +621,17 @@ function SettingsTab({ dbP, save, onDelete }: { dbP: DbPortfolio; save: SaveFn; 
   return (
     <div className="max-w-2xl space-y-5">
       <div>
-        <h2 className="font-sans font-bold text-[var(--fg)] text-base">Settings</h2>
+        <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.settings.title")}</h2>
         <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
-          Privacy and danger zone.
+          {t("pm.settings.subtitle")}
         </p>
       </div>
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="font-sans text-sm font-semibold text-[var(--fg)]">Password protection</div>
-            <div className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">Visitors need a password to view this portfolio.</div>
+            <div className="font-sans text-sm font-semibold text-[var(--fg)]">{t("pm.settings.passwordProtection")}</div>
+            <div className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">{t("pm.settings.passwordHint")}</div>
           </div>
           <button
             onClick={toggle}
@@ -640,31 +648,31 @@ function SettingsTab({ dbP, save, onDelete }: { dbP: DbPortfolio; save: SaveFn; 
               type="text"
               value={pw}
               onChange={(e) => setPw(e.target.value)}
-              placeholder="Set a password"
+              placeholder={t("pm.settings.setPassword")}
               className="flex-1 rounded-lg px-3 py-2 font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] focus:outline-none focus:border-yellow transition-colors"
             />
             <button
               onClick={() => save({ passwordEnabled: true, password: pw.trim() })}
               disabled={!pwDirty}
               className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
-            >Save</button>
+            >{t("pm.settings.save")}</button>
           </div>
         )}
         {pwOn && dbP.passwordEnabled && dbP.password && pw === dbP.password && (
-          <p className="font-mono text-[10px] text-green-400">Password active — visitors must enter it.</p>
+          <p className="font-mono text-[10px] text-green-400">{t("pm.settings.passwordActive")}</p>
         )}
       </div>
 
       <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4">
-        <div className="font-sans text-sm font-semibold text-red-400 mb-1">Danger zone</div>
+        <div className="font-sans text-sm font-semibold text-red-400 mb-1">{t("pm.settings.dangerZone")}</div>
         <p className="font-sans text-xs text-[var(--fg-muted)] mb-3">
-          Deleting "{dbP.title}" can't be undone. All categories, folders, and photos under this portfolio will be permanently removed.
+          {t("pm.settings.dangerBody", { title: dbP.title })}
         </p>
         <button
-          onClick={() => { if (confirm(`Delete "${dbP.title}"? This cannot be undone.`)) onDelete(); }}
+          onClick={() => { if (confirm(t("pm.settings.deleteConfirm", { title: dbP.title }))) onDelete(); }}
           className="px-3 py-2 rounded-lg border border-red-500/40 text-red-400 font-sans text-xs font-bold hover:bg-red-500/10 transition-colors"
         >
-          Delete portfolio
+          {t("pm.settings.deletePortfolio")}
         </button>
       </div>
     </div>

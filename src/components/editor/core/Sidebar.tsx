@@ -48,6 +48,11 @@ function scrollToSection(sectionId: string) {
 function PagesTab() {
   const { templateId, selectedSection, setSelectedSection, setHoveredSection, selectNode, selectedId, hiddenSections, hideSection, showSection } = useEditorStore();
   const { t } = useT();
+  // Translate known section names; fall back to the template's own label.
+  const secLabel = (s: SectionDef) => {
+    const v = t(`sections.${s.id}`);
+    return v === `sections.${s.id}` ? s.label : v;
+  };
   const SECTIONS: SectionDef[] = TEMPLATES[templateId]!.sections;
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     const first = SECTIONS.find((s) => !s.locked);
@@ -96,7 +101,7 @@ function PagesTab() {
           return (
             <div key={section.id} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 14px 4px 28px", opacity: 0.45 }}>
               <span style={{ color: "var(--ec-dim)", display: "flex" }}>{section.icon}</span>
-              <span style={{ fontSize: 11, color: "var(--ec-dim)", flex: 1, textDecoration: "line-through" }}>{section.label}</span>
+              <span style={{ fontSize: 11, color: "var(--ec-dim)", flex: 1, textDecoration: "line-through" }}>{secLabel(section)}</span>
               <button
                 onClick={() => showSection(section.id)}
                 style={{ background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-sub)", fontSize: 9, padding: "2px 6px", borderRadius: 3, cursor: "pointer", fontFamily: "inherit" }}
@@ -151,7 +156,7 @@ function PagesTab() {
                 <span style={{ color: isSelected ? "#facc15" : "var(--ec-dim)", display: "flex" }}>{section.icon}</span>
 
                 {/* Label */}
-                <span style={{ flex: 1, fontSize: 11, fontWeight: isSelected ? 500 : 400 }}>{section.label}</span>
+                <span style={{ flex: 1, fontSize: 11, fontWeight: isSelected ? 500 : 400 }}>{secLabel(section)}</span>
 
                 {/* Lock or drag handle */}
                 {section.locked ? (
