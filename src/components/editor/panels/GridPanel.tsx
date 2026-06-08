@@ -88,9 +88,17 @@ function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange:
   );
 }
 
+const LAYOUT_DESC: Record<string, string> = {
+  mosaic:  "An editorial layout with mixed, art-directed cell sizes.",
+  uniform: "An even grid of equal cells.",
+  masonry: "Keeps each photo’s aspect ratio — boxes vary in height (VSCO-style).",
+};
+
 export function GridPanel() {
   const { grid, setGrid } = useEditorStore();
-  const uniform = grid.layout === "uniform";
+  const usesColumns = grid.layout !== "mosaic";   // uniform + masonry
+  const fixedCells  = grid.layout !== "masonry";  // mosaic + uniform
+  const canPaginate = grid.layout !== "mosaic";   // uniform + masonry
 
   return (
     <div style={{ padding: "14px 14px 4px", display: "flex", flexDirection: "column", gap: 20 }}>
@@ -99,19 +107,20 @@ export function GridPanel() {
         <label style={labelStyle}>Layout</label>
         <Segmented
           value={grid.layout}
-          onChange={(v) => setGrid({ layout: v as "mosaic" | "uniform" })}
+          onChange={(v) => setGrid({ layout: v as "mosaic" | "uniform" | "masonry" })}
           options={[
             { value: "mosaic",  label: "Mosaic" },
             { value: "uniform", label: "Grid" },
+            { value: "masonry", label: "Masonry" },
           ]}
         />
         <p style={{ margin: "8px 0 0", fontSize: 10.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
-          {uniform ? "An even grid of equal cells." : "An editorial layout with mixed cell sizes."}
+          {LAYOUT_DESC[grid.layout]}
         </p>
       </div>
 
-      {/* Columns — uniform only */}
-      {uniform && (
+      {/* Columns — uniform + masonry */}
+      {usesColumns && (
         <Slider label="Columns" value={grid.columns} min={2} max={5} step={1}
           onChange={(v) => setGrid({ columns: v })} />
       )}
@@ -120,8 +129,26 @@ export function GridPanel() {
       <Slider label="Spacing" value={grid.gap} suffix="px" min={0} max={24} step={1}
         onChange={(v) => setGrid({ gap: v })} />
 
-      {/* Load more — uniform only */}
-      {uniform && (
+      {/* Fit — fixed-cell layouts only (masonry keeps the natural ratio) */}
+      {fixedCells && (
+        <div>
+          <label style={labelStyle}>Photo fit</label>
+          <Segmented
+            value={grid.fit}
+            onChange={(v) => setGrid({ fit: v as "cover" | "contain" })}
+            options={[
+              { value: "cover",   label: "Crop" },
+              { value: "contain", label: "Fit" },
+            ]}
+          />
+          <p style={{ margin: "8px 0 0", fontSize: 10.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
+            {grid.fit === "cover" ? "Photos fill each cell, cropping the edges." : "Whole photo shown, letterboxed inside the cell."}
+          </p>
+        </div>
+      )}
+
+      {/* Load more — uniform + masonry */}
+      {canPaginate && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <Toggle label="Load more" on={grid.loadMore} onChange={(v) => setGrid({ loadMore: v })} />
           {grid.loadMore && (

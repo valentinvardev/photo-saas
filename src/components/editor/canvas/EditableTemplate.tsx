@@ -141,6 +141,10 @@ type Work = { id: number | string; seed?: number; src?: string; title: string; y
 /** Source URL for a work — real photo when present, else the demo picsum seed. */
 const cellSrc  = (w: Work) => w.src ?? `https://picsum.photos/seed/${w.seed}/800/1000?grayscale`;
 const lightSrc = (w: Work) => w.src ?? `https://picsum.photos/seed/${w.seed}/1400/900?grayscale`;
+/** Masonry source — varies the demo image height from the work's aspect ratio so
+ *  the placeholder grid shows different sizes; real photos use their natural src. */
+const masonrySrc = (w: Work) =>
+  w.src ?? `https://picsum.photos/seed/${w.seed}/800/${w.w && w.h ? Math.round(800 * (w.h / w.w)) : 1000}?grayscale`;
 
 /** Hide raw file names so they never surface as a hover caption. A real,
  *  human caption (e.g. "Cover candidate") still shows; "IMG_2043.jpg",
@@ -164,7 +168,7 @@ function useWorks(): Work[] {
 /* ═══════════════════════════════════════════
    PHOTO CELL
 ═══════════════════════════════════════════ */
-function Cell({ w, onClick }: { w?: Work; onClick?: () => void }) {
+function Cell({ w, onClick, fit = "cover" }: { w?: Work; onClick?: () => void; fit?: "cover" | "contain" }) {
   const [hov, setHov] = useState(false);
   if (!w) return <div style={{ width: "100%", height: "100%", background: "#111" }} />;
   return (
@@ -175,9 +179,9 @@ function Cell({ w, onClick }: { w?: Work; onClick?: () => void }) {
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={cellSrc(w)} alt={w.title}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block",
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: fit, display: "block",
           filter: hov ? "brightness(0.5)" : "brightness(0.88)",
-          transform: hov ? "scale(1.05)" : "scale(1)",
+          transform: hov && fit === "cover" ? "scale(1.05)" : "scale(1)",
           transition: "filter 0.5s ease, transform 0.65s ease" }} />
       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "flex-end",
         padding: "1rem", opacity: hov ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: "none" }}>
@@ -192,6 +196,43 @@ function Cell({ w, onClick }: { w?: Work; onClick?: () => void }) {
         </span>
         )}
       </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   MASONRY CELL — natural aspect ratio (VSCO-style); height set by the image
+═══════════════════════════════════════════ */
+function MasonryCell({ w, onClick }: { w?: Work; onClick?: () => void }) {
+  const [hov, setHov] = useState(false);
+  if (!w) return null;
+  return (
+    <div
+      style={{ position: "relative", overflow: "hidden", cursor: "pointer", background: "#111", lineHeight: 0 }}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      onClick={onClick}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={masonrySrc(w)} alt={w.title}
+        style={{ width: "100%", height: "auto", display: "block",
+          filter: hov ? "brightness(0.55)" : "brightness(0.92)",
+          transform: hov ? "scale(1.03)" : "scale(1)",
+          transition: "filter 0.5s ease, transform 0.65s ease" }} />
+      {(w.cat || w.title) && (
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "flex-end",
+          padding: "1rem", opacity: hov ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: "none" }}>
+          {w.cat && (
+            <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em", textTransform: "uppercase" as const, marginBottom: "0.25rem" }}>
+              {w.cat} · {w.year}
+            </span>
+          )}
+          {w.title && (
+            <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "var(--ed-bg, #fafafa)", lineHeight: 1.2 }}>
+              {w.title}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -532,6 +573,24 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
     </div>
   );
 
+  /* Footer for the paginated layouts (uniform + masonry): a Load more button
+     when paginating, otherwise the All projects link. */
+  const paginationFooter = grid.loadMore ? (
+    canLoadMore && (
+      <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "center" }}>
+        <button onClick={() => setVisibleCount((c) => c + grid.pageSize)}
+          style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "1px solid #0a0a0a", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.85rem 1.75rem" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}>
+          Load more
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        </button>
+      </div>
+    )
+  ) : (
+    allProjectsLink
+  );
+
   return (
     <div
       style={{ background: "var(--ed-bg, #fafafa)", color: "var(--ed-fg, #0a0a0a)", minHeight: "100%", fontFamily: "var(--tpl-sans,sans-serif)" }}
@@ -615,62 +674,60 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       <section id="work" style={{ padding: `5rem ${px}` }}>
         <Label index="01" text="Selected Work" />
 
-        {grid.layout === "uniform" ? (
-          /* ── Uniform N-column grid (optionally paginated with Load more) ── */
-          <>
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${uniformCols}, 1fr)`, gap }}>
-              {uniformWorks.map((w, i) => (
-                <div key={`${w.id}-${i}`} style={{ aspectRatio: isMobile ? "1/1" : "4/5" }}>
-                  <Cell w={w} onClick={() => setGalleryOpen(true)} />
-                </div>
-              ))}
-            </div>
-            {grid.loadMore ? (
-              canLoadMore && (
-                <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "center" }}>
-                  <button onClick={() => setVisibleCount((c) => c + grid.pageSize)}
-                    style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "1px solid #0a0a0a", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.85rem 1.75rem" }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--ed-fg, #0a0a0a)"; e.currentTarget.style.color = "var(--ed-bg, #fafafa)"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--ed-fg, #0a0a0a)"; }}>
-                    Load more
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-                  </button>
-                </div>
-              )
-            ) : (
-              allProjectsLink
-            )}
-          </>
-        ) : (
-          /* ── Mosaic (editorial masonry) ── */
+        {grid.layout === "mosaic" ? (
+          /* ── Mosaic — editorial layout with art-directed cell sizes ── */
           <>
             {!isMobile && (!isTablet && featured.length >= 8 ? (
               <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "280px 280px 360px 320px", gap }}>
-                <div style={{ gridRow: "1/3", gridColumn: "1" }}>   <Cell w={featured[0]} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "1",   gridColumn: "2" }}>   <Cell w={featured[1]} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "1",   gridColumn: "3" }}>   <Cell w={featured[2]} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "2",   gridColumn: "2" }}>   <Cell w={featured[3]} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "2",   gridColumn: "3" }}>   <Cell w={featured[4]} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "3",   gridColumn: "1/3" }}> <Cell w={featured[5]} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "3",   gridColumn: "3" }}>   <Cell w={featured[6]} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "4",   gridColumn: "1" }}>   <Cell w={featured[7]} onClick={() => setGalleryOpen(true)} /></div>
-                <div style={{ gridRow: "4",   gridColumn: "2/4" }}> <Cell w={featured[0]} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "1/3", gridColumn: "1" }}>   <Cell w={featured[0]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "1",   gridColumn: "2" }}>   <Cell w={featured[1]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "1",   gridColumn: "3" }}>   <Cell w={featured[2]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "2",   gridColumn: "2" }}>   <Cell w={featured[3]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "2",   gridColumn: "3" }}>   <Cell w={featured[4]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "3",   gridColumn: "1/3" }}> <Cell w={featured[5]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "3",   gridColumn: "3" }}>   <Cell w={featured[6]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "4",   gridColumn: "1" }}>   <Cell w={featured[7]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
+                <div style={{ gridRow: "4",   gridColumn: "2/4" }}> <Cell w={featured[0]} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
               </div>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: isTablet ? "1fr 1fr" : "1fr 1fr 1fr", gap }}>
                 {featured.map((w) => (
-                  <div key={w.id} style={{ aspectRatio: "4/5" }}><Cell w={w} onClick={() => setGalleryOpen(true)} /></div>
+                  <div key={w.id} style={{ aspectRatio: "4/5" }}><Cell w={w} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
                 ))}
               </div>
             ))}
             {isMobile && (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap }}>
                 {featured.map((w) => (
-                  <div key={w.id} style={{ aspectRatio: "1/1" }}><Cell w={w} onClick={() => setGalleryOpen(true)} /></div>
+                  <div key={w.id} style={{ aspectRatio: "1/1" }}><Cell w={w} fit={grid.fit} onClick={() => setGalleryOpen(true)} /></div>
                 ))}
               </div>
             )}
             {allProjectsLink}
+          </>
+        ) : grid.layout === "masonry" ? (
+          /* ── Masonry — keeps each photo's natural ratio (VSCO-style) ── */
+          <>
+            <div style={{ columnCount: uniformCols, columnGap: gap }}>
+              {uniformWorks.map((w, i) => (
+                <div key={`${w.id}-${i}`} style={{ breakInside: "avoid", marginBottom: gap }}>
+                  <MasonryCell w={w} onClick={() => setGalleryOpen(true)} />
+                </div>
+              ))}
+            </div>
+            {paginationFooter}
+          </>
+        ) : (
+          /* ── Uniform — even N-column grid of equal cells ── */
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${uniformCols}, 1fr)`, gap }}>
+              {uniformWorks.map((w, i) => (
+                <div key={`${w.id}-${i}`} style={{ aspectRatio: isMobile ? "1/1" : "4/5" }}>
+                  <Cell w={w} fit={grid.fit} onClick={() => setGalleryOpen(true)} />
+                </div>
+              ))}
+            </div>
+            {paginationFooter}
           </>
         )}
       </section>

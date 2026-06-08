@@ -40,15 +40,19 @@ export interface Typography {
 }
 
 /* Gallery grid for the "Selected work" section.
-   - mosaic  → the editorial masonry layout (current default).
-   - uniform → an even N-column grid; with `loadMore` it paginates every photo
-               behind a "Load more" button instead of the "All projects" link. */
+   - mosaic  → the editorial layout with mixed, art-directed cell sizes.
+   - uniform → an even N-column grid of equal cells.
+   - masonry → a VSCO/Pinterest-style grid that keeps each photo's natural
+               aspect ratio, so boxes have different heights.
+   `loadMore` (uniform + masonry) paginates every photo behind a "Load more"
+   button instead of the "All projects" link. */
 export interface GridSettings {
-  layout:   "mosaic" | "uniform";
-  columns:  number;  // 2..5 — uniform only
-  gap:      number;  // px between cells
-  loadMore: boolean; // uniform only
-  pageSize: number;  // initial + per-batch count when loadMore is on
+  layout:   "mosaic" | "uniform" | "masonry";
+  columns:  number;            // 2..5 — uniform + masonry
+  gap:      number;            // px between cells
+  fit:      "cover" | "contain"; // how photos fill fixed cells (mosaic + uniform)
+  loadMore: boolean;           // uniform + masonry
+  pageSize: number;            // initial + per-batch count when loadMore is on
 }
 
 /* Global button styling. Empty bg/fg means "follow the palette"
@@ -119,6 +123,7 @@ export const DEFAULT_GRID: GridSettings = {
   layout:   "mosaic",
   columns:  3,
   gap:      3,
+  fit:      "cover",
   loadMore: false,
   pageSize: 9,
 };
