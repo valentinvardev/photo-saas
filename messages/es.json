@@ -905,5 +905,79 @@
       "deleteConfirm": "¿Eliminar \"{title}\"? Esto no se puede deshacer.",
       "deletePortfolio": "Eliminar portafolio"
     }
+  },
+
+  "nw": {
+    "steps": { "s0": "Nombre y fotos", "s1": "Estructura", "s2": "Plantilla", "s3": "Dominio", "s4": "Listo" },
+    "topBack": "Portafolio",
+    "back": "Volver",
+    "picker": {
+      "tap": "Toca las fotos para incluirlas",
+      "selected": "{n} seleccionadas",
+      "upload": "Subir",
+      "uploadPhotos": "Subir fotos",
+      "uploading": "Subiendo {done}/{total}…",
+      "emptyTitle": "Tu biblioteca está vacía",
+      "emptyBody": "Sube fotos para incluirlas ahora, o agrégalas después en el editor."
+    },
+    "preview": {
+      "none": "No seleccionaste fotos — puedes agregarlas en el editor luego de crear.",
+      "gallery": "Galería",
+      "photos": "{n} fotos",
+      "photoOne": "1 foto"
+    },
+    "right": {
+      "galleryTitle": "Tu galería",
+      "galleryBody": "Elige fotos de tu biblioteca para incluir — o sube nuevas.",
+      "overviewTitle": "Resumen del contenido",
+      "overviewWith": "Estas fotos se agregarán a tu portafolio.",
+      "overviewNone": "Nada seleccionado aún — no hay problema, agrega fotos después.",
+      "previewTitle": "Vista previa en vivo",
+      "showing": "Mostrando {template}.",
+      "fullPreview": "Vista previa completa",
+      "noPreview": "Sin vista previa disponible",
+      "addressTitle": "Tu dirección",
+      "addressBody": "La URL que usarán los clientes para llegar a tu portafolio.",
+      "ssl": "SSL seguro · Gratis para siempre"
+    },
+    "step0": {
+      "title": "Nombra tu portafolio",
+      "body": "Así aparecerá en tu panel y en la pestaña del navegador.",
+      "placeholder": "Fotografía de Sofía Chen",
+      "selectedArrow": "{n} fotos seleccionadas →",
+      "selectedArrowOne": "1 foto seleccionada →"
+    },
+    "step1": {
+      "title": "Confirmar estructura",
+      "body": "Revisa cómo se organizará tu portafolio. Puedes renombrar carpetas y reorganizar cuando quieras en el editor.",
+      "selected": "{n} fotos seleccionadas",
+      "selectedOne": "1 foto seleccionada"
+    },
+    "step2": { "title": "Elige una plantilla", "body": "Elige la que más se acerque a tu estilo.", "browseAll": "Ver todas las plantillas" },
+    "step3": {
+      "title": "Elige tu dominio",
+      "body": "Empieza gratis, mejora cuando quieras.",
+      "free": "Subdominio gratuito",
+      "custom": "Dominio personalizado",
+      "customPlaceholder": "tudominio.com"
+    },
+    "done": {
+      "title": "¡Listo para empezar!",
+      "body": "{name} está configurado con la plantilla {template}.",
+      "photosSuffix": " · {n} fotos",
+      "photosSuffixOne": " · 1 foto",
+      "goToPortfolio": "Ir al portafolio",
+      "openEditor": "Abrir editor →"
+    },
+    "footer": {
+      "cancel": "Cancelar",
+      "back": "← Volver",
+      "skip": "Omitir por ahora",
+      "creating": "Creando…",
+      "create": "Crear portafolio",
+      "confirm": "Confirmar →",
+      "continue": "Continuar →"
+    },
+    "previewSubtitle": "plantilla {template}"
   }
 }

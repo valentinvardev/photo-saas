@@ -905,5 +905,79 @@
       "deleteConfirm": "Delete \"{title}\"? This cannot be undone.",
       "deletePortfolio": "Delete portfolio"
     }
+  },
+
+  "nw": {
+    "steps": { "s0": "Name & Photos", "s1": "Structure", "s2": "Template", "s3": "Domain", "s4": "Done" },
+    "topBack": "Portfolio",
+    "back": "Back",
+    "picker": {
+      "tap": "Tap photos to include them",
+      "selected": "{n} selected",
+      "upload": "Upload",
+      "uploadPhotos": "Upload photos",
+      "uploading": "Uploading {done}/{total}…",
+      "emptyTitle": "Your library is empty",
+      "emptyBody": "Upload photos to include them now, or add them later in the editor."
+    },
+    "preview": {
+      "none": "No photos selected — you can add them in the editor after creating.",
+      "gallery": "Gallery",
+      "photos": "{n} photos",
+      "photoOne": "1 photo"
+    },
+    "right": {
+      "galleryTitle": "Your gallery",
+      "galleryBody": "Pick photos from your library to include — or upload new ones.",
+      "overviewTitle": "Content overview",
+      "overviewWith": "These photos will be added to your portfolio.",
+      "overviewNone": "Nothing selected yet — that's fine, add photos later.",
+      "previewTitle": "Live preview",
+      "showing": "Showing {template}.",
+      "fullPreview": "Full preview",
+      "noPreview": "No preview available",
+      "addressTitle": "Your address",
+      "addressBody": "The URL clients will use to reach your portfolio.",
+      "ssl": "SSL secured · Free forever"
+    },
+    "step0": {
+      "title": "Name your portfolio",
+      "body": "This is how it'll appear in your dashboard and browser tab.",
+      "placeholder": "Sofia Chen Photography",
+      "selectedArrow": "{n} photos selected →",
+      "selectedArrowOne": "1 photo selected →"
+    },
+    "step1": {
+      "title": "Confirm structure",
+      "body": "Review how your portfolio will be organized. You can rename folders and reorganize anytime in the editor.",
+      "selected": "{n} photos selected",
+      "selectedOne": "1 photo selected"
+    },
+    "step2": { "title": "Pick a template", "body": "Choose what feels closest to your style.", "browseAll": "Browse all templates" },
+    "step3": {
+      "title": "Choose your domain",
+      "body": "Start free, upgrade any time.",
+      "free": "Free subdomain",
+      "custom": "Custom domain",
+      "customPlaceholder": "yourdomain.com"
+    },
+    "done": {
+      "title": "Ready to go!",
+      "body": "{name} is set up with the {template} template.",
+      "photosSuffix": " · {n} photos",
+      "photosSuffixOne": " · 1 photo",
+      "goToPortfolio": "Go to portfolio",
+      "openEditor": "Open editor →"
+    },
+    "footer": {
+      "cancel": "Cancel",
+      "back": "← Back",
+      "skip": "Skip for now",
+      "creating": "Creating…",
+      "create": "Create portfolio",
+      "confirm": "Confirm →",
+      "continue": "Continue →"
+    },
+    "previewSubtitle": "{template} template"
   }
 }
