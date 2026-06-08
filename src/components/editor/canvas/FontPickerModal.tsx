@@ -2,15 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { FONT_OPTIONS } from "~/lib/editor/fonts";
+import { FONT_OPTIONS, type FontOption } from "~/lib/editor/fonts";
 import { api } from "~/trpc/react";
 
-const CATEGORY_LABELS: Record<string, string> = {
-  serif: "Serif",
-  sans:  "Sans serif",
-  mono:  "Monospace",
-};
-const CATEGORY_ORDER = ["serif", "sans", "mono"] as const;
+type Tab = "all" | "serif" | "sans" | "mono";
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "all",   label: "All" },
+  { id: "serif", label: "Serif" },
+  { id: "sans",  label: "Sans" },
+  { id: "mono",  label: "Mono" },
+];
+const CATEGORY_LABELS: Record<string, string> = { serif: "Serif", sans: "Sans serif", mono: "Monospace" };
+const CATEGORY_ORDER: Array<FontOption["category"]> = ["serif", "sans", "mono"];
 
 interface Props {
   value?: string;          // current fontFamily stack (undefined = template default)
@@ -22,6 +26,8 @@ interface Props {
 export function FontPickerModal({ value, fallbackSample, onSelect, onClose }: Props) {
   const { data: me } = api.user.me.useQuery();
   const [hovered, setHovered] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>("all");
+  const [query, setQuery] = useState("");
 
   // Esc closes
   useEffect(() => {
@@ -30,12 +36,34 @@ export function FontPickerModal({ value, fallbackSample, onSelect, onClose }: Pr
     return () => window.removeEventListener("keydown", onKey, { capture: true });
   }, [onClose]);
 
-  const sample =
-    (me?.name?.trim()) ||
-    (fallbackSample?.trim()) ||
-    "Your Name";
-
+  const sample = (me?.name?.trim()) || (fallbackSample?.trim()) || "Your Name";
   const previewStack = hovered ?? value ?? "var(--tpl-serif, serif)";
+
+  const q = query.trim().toLowerCase();
+  const matches = (f: FontOption) =>
+    (tab === "all" || f.category === tab) && (!q || f.label.toLowerCase().includes(q));
+  const filtered = FONT_OPTIONS.filter(matches);
+  const grouped = tab === "all" && !q; // show category headers only on the unfiltered All view
+
+  const fontRow = (f: FontOption) => {
+    const active = value === f.stack;
+    return (
+      <button
+        key={f.value}
+        onClick={() => { onSelect(f.stack); onClose(); }}
+        onMouseEnter={() => setHovered(f.stack)}
+        style={rowStyle(active)}
+      >
+        <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2, minWidth: 0 }}>
+          <span style={{ fontFamily: f.stack, fontSize: 19, color: active ? "#facc15" : "var(--ec-label)", lineHeight: 1.1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 400 }}>
+            {sample}
+          </span>
+          <span style={{ fontSize: 10.5, color: "var(--ec-dim)" }}>{f.label}</span>
+        </span>
+        {active && <Check />}
+      </button>
+    );
+  };
 
   return createPortal(
     <div
@@ -50,7 +78,7 @@ export function FontPickerModal({ value, fallbackSample, onSelect, onClose }: Pr
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: "100%", maxWidth: 480, maxHeight: "82vh",
+          width: "100%", maxWidth: 560, maxHeight: "84vh",
           background: "var(--ec-bg, #111)", border: "1px solid var(--ec-raised, #222)",
           borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column",
           boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
@@ -60,63 +88,93 @@ export function FontPickerModal({ value, fallbackSample, onSelect, onClose }: Pr
         <div style={{ padding: "16px 18px 14px", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
             <h2 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--ec-bright)", letterSpacing: "-0.01em" }}>Typography</h2>
-            <button
-              onClick={onClose}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ec-sub)", padding: 2, display: "flex" }}
-            >
+            <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ec-sub)", padding: 2, display: "flex" }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
           </div>
           {/* Live preview of the sample name in the focused font */}
           <div style={{ background: "var(--ec-raised)", borderRadius: 9, padding: "18px 16px", textAlign: "center", overflow: "hidden" }}>
-            <span style={{ fontFamily: previewStack, fontSize: 34, color: "var(--ec-bright)", lineHeight: 1.1, wordBreak: "break-word" }}>
+            <span style={{ fontFamily: previewStack, fontSize: 36, color: "var(--ec-bright)", lineHeight: 1.1, wordBreak: "break-word" }}>
               {sample}
             </span>
           </div>
         </div>
 
+        {/* Search + tabs */}
+        <div style={{ padding: "12px 16px 10px", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ position: "relative" }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--ec-dim)" strokeWidth="2" strokeLinecap="round" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+            {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
+            <input
+              autoFocus
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search fonts…"
+              style={{
+                width: "100%", boxSizing: "border-box", background: "var(--ec-raised)",
+                border: "1px solid var(--ec-lift)", color: "var(--ec-label)", fontSize: 12,
+                padding: "8px 10px 8px 30px", borderRadius: 7, outline: "none", fontFamily: "inherit",
+              }}
+            />
+            {query && (
+              <button onClick={() => setQuery("")} style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--ec-dim)", padding: 2, display: "flex" }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            )}
+          </div>
+          <div style={{ display: "flex", gap: 4 }}>
+            {TABS.map((t) => {
+              const active = tab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  style={{
+                    flex: 1, background: active ? "rgba(250,204,21,0.14)" : "var(--ec-raised)",
+                    border: `1px solid ${active ? "#facc15" : "var(--ec-lift)"}`,
+                    color: active ? "#facc15" : "var(--ec-sub)", fontSize: 11, fontWeight: active ? 600 : 500,
+                    padding: "6px 4px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit",
+                  }}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Font list */}
         <div style={{ overflowY: "auto", padding: "8px 8px 12px" }}>
-          {/* Default / reset */}
-          <button
-            onClick={() => { onSelect(undefined); onClose(); }}
-            onMouseEnter={() => setHovered("var(--tpl-serif, serif)")}
-            style={rowStyle(value === undefined)}
-          >
-            <span style={{ fontSize: 14, color: value === undefined ? "#facc15" : "var(--ec-label)" }}>Template default</span>
-            {value === undefined && <Check />}
-          </button>
+          {/* Template default / reset — only on the unfiltered view */}
+          {!q && (
+            <button
+              onClick={() => { onSelect(undefined); onClose(); }}
+              onMouseEnter={() => setHovered("var(--tpl-serif, serif)")}
+              style={rowStyle(value === undefined)}
+            >
+              <span style={{ fontSize: 14, color: value === undefined ? "#facc15" : "var(--ec-label)" }}>Template default</span>
+              {value === undefined && <Check />}
+            </button>
+          )}
 
-          {CATEGORY_ORDER.map((cat) => {
-            const fonts = FONT_OPTIONS.filter((f) => f.category === cat);
-            if (fonts.length === 0) return null;
-            return (
-              <div key={cat} style={{ marginTop: 8 }}>
-                <p style={{ margin: "8px 10px 4px", fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--ec-dim)", fontWeight: 600 }}>
-                  {CATEGORY_LABELS[cat]}
-                </p>
-                {fonts.map((f) => {
-                  const active = value === f.stack;
-                  return (
-                    <button
-                      key={f.value}
-                      onClick={() => { onSelect(f.stack); onClose(); }}
-                      onMouseEnter={() => setHovered(f.stack)}
-                      style={rowStyle(active)}
-                    >
-                      <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2, minWidth: 0 }}>
-                        <span style={{ fontFamily: f.stack, fontSize: 18, color: active ? "#facc15" : "var(--ec-label)", lineHeight: 1.1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 320 }}>
-                          {sample}
-                        </span>
-                        <span style={{ fontSize: 10.5, color: "var(--ec-dim)" }}>{f.label}</span>
-                      </span>
-                      {active && <Check />}
-                    </button>
-                  );
-                })}
-              </div>
-            );
-          })}
+          {filtered.length === 0 && (
+            <p style={{ textAlign: "center", color: "var(--ec-dim)", fontSize: 12, padding: "28px 0" }}>No fonts match “{query}”.</p>
+          )}
+
+          {grouped
+            ? CATEGORY_ORDER.map((cat) => {
+                const fonts = filtered.filter((f) => f.category === cat);
+                if (fonts.length === 0) return null;
+                return (
+                  <div key={cat} style={{ marginTop: 8 }}>
+                    <p style={{ margin: "8px 10px 4px", fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--ec-dim)", fontWeight: 600 }}>
+                      {CATEGORY_LABELS[cat]}
+                    </p>
+                    {fonts.map(fontRow)}
+                  </div>
+                );
+              })
+            : filtered.map(fontRow)}
         </div>
       </div>
     </div>,
