@@ -986,6 +986,7 @@
     "back": "Volver",
     "next": "Siguiente",
     "finish": "Crear mi estudio",
+    "livePreview": "Vista previa en vivo",
     "welcome": {
       "title": "Bienvenido a Portapic",
       "body": "Configuremos tu estudio en menos de un minuto — tus datos, tus colores y fuentes, y tu primer portafolio, todo con tu marca y listo para editar.",
@@ -1000,8 +1001,20 @@
       "location": "Ubicación", "locationPh": "Buenos Aires, AR",
       "bio": "Biografía corta", "bioPh": "Una línea sobre vos y tu trabajo."
     },
-    "color": { "title": "Elegí tu color", "body": "Tu color de marca — define el tono de todo tu sitio." },
-    "fonts": { "title": "Elegí tu tipografía", "body": "Un par de fuentes (título y cuerpo) para tu portafolio." },
+    "color": {
+      "title": "Elegí tus colores",
+      "body": "Tu paleta define todo el sitio. Ajustá cada color o partí de una combinación.",
+      "custom": "Ajustá cada color",
+      "presets": "Combinaciones",
+      "varBg": "Fondo", "varFg": "Texto", "varAccent": "Acento", "varMuted": "Tenue"
+    },
+    "fonts": {
+      "title": "Elegí tu tipografía",
+      "body": "Definí una fuente para los títulos y otra para el cuerpo — o partí de un par.",
+      "presets": "Pares",
+      "custom": "O elegí cada una",
+      "lblHeading": "Títulos", "lblBody": "Cuerpo", "lblMono": "Detalles"
+    },
     "template": {
       "title": "Elegí una plantilla inicial",
       "body": "Las dos se adaptan a tu marca. Podés cambiarla después.",

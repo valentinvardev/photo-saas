@@ -986,6 +986,7 @@
     "back": "Back",
     "next": "Next",
     "finish": "Create my studio",
+    "livePreview": "Live preview",
     "welcome": {
       "title": "Welcome to Portapic",
       "body": "Let's set up your studio in under a minute — your details, your colours and fonts, and your first portfolio, all branded and ready to edit.",
@@ -1000,8 +1001,20 @@
       "location": "Location", "locationPh": "Buenos Aires, AR",
       "bio": "Short bio", "bioPh": "A line about you and your work."
     },
-    "color": { "title": "Pick your colour", "body": "Your brand accent — it sets the tone across your whole site." },
-    "fonts": { "title": "Choose your type", "body": "A heading and body pairing for your portfolio." },
+    "color": {
+      "title": "Pick your colours",
+      "body": "Your palette drives the whole site. Fine-tune each one, or start from a preset.",
+      "custom": "Fine-tune",
+      "presets": "Presets",
+      "varBg": "Background", "varFg": "Text", "varAccent": "Accent", "varMuted": "Muted"
+    },
+    "fonts": {
+      "title": "Choose your type",
+      "body": "Set a font for headings and one for body — or start from a pairing.",
+      "presets": "Pairings",
+      "custom": "Or choose each one",
+      "lblHeading": "Headings", "lblBody": "Body", "lblMono": "Details"
+    },
     "template": {
       "title": "Pick a starting template",
       "body": "Both adapt to your brand. You can switch later.",

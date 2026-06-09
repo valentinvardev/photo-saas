@@ -6,16 +6,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useT } from "~/components/providers/LangProvider";
 import { LOCALES } from "~/lib/i18n";
 import { api } from "~/trpc/react";
-import { BrandPreview } from "./BrandPreview";
+import { FONT_OPTIONS } from "~/lib/editor/fonts";
+import type { ColorPalette, Typography } from "~/lib/editor/types";
+import { LiveTemplatePreview } from "./LiveTemplatePreview";
 import {
   PALETTES, PAIRINGS, pairingTypography, TEMPLATE_OPTIONS,
   buildMinimalNodes, fullName, type Identity,
 } from "./brandData";
 
-// Load the @fontsource fonts so the live preview renders the chosen pairings.
+// Load the @fontsource fonts so the live preview + pickers render the real type.
 import "~/lib/editor/fonts";
 
-const TOTAL = 6; // welcome, identity, color, fonts, template, done
+const TOTAL = 6; // welcome, identity, template, color, fonts, done
 
 function slugify(s: string) {
   return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "portfolio";
@@ -23,6 +25,8 @@ function slugify(s: string) {
 
 const inputCls =
   "w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2.5 outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition placeholder:text-[var(--fg-muted)]";
+
+const sameColor = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
 
 export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t, locale } = useT();
@@ -33,9 +37,12 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
   const [last, setLast] = useState("");
   const [location, setLocation] = useState("");
   const [bio, setBio] = useState("");
-  const [paletteIdx, setPaletteIdx] = useState(0);
-  const [pairingIdx, setPairingIdx] = useState(0);
   const [templateIdx, setTemplateIdx] = useState(0);
+  const [palette, setPaletteState] = useState<ColorPalette>(() => {
+    const p = PALETTES[0]!;
+    return { bg: p.bg, fg: p.fg, accent: p.accent, muted: p.muted };
+  });
+  const [typo, setTypo] = useState<Typography>(() => pairingTypography(PAIRINGS[0]!));
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newId, setNewId] = useState<string | null>(null);
@@ -47,13 +54,15 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
 
   if (!open) return null;
 
-  const palette  = PALETTES[paletteIdx]!;
-  const pairing  = PAIRINGS[pairingIdx]!;
-  const typography = pairingTypography(pairing);
   const template = TEMPLATE_OPTIONS[templateIdx]!;
   const identity: Identity = { first, last, location, bio };
   const langLabel = LOCALES.find((l) => l.id === locale)?.native ?? "English";
+  const previewNodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity) : undefined;
+  const slug = slugify(fullName(identity) || "portfolio");
 
+  const setColor = (key: keyof ColorPalette, value: string) => setPaletteState((p) => ({ ...p, [key]: value }));
+
+  // Preview shows from Identity (1) through Fonts (4).
   const showPreview = step >= 1 && step <= 4;
 
   async function finish() {
@@ -69,7 +78,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
       });
       const base = name || "Portfolio";
       const nodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity) : undefined;
-      const editorState = { templateId: template.id, palette: { bg: palette.bg, fg: palette.fg, accent: palette.accent, muted: palette.muted }, typography, nodes };
+      const editorState = { templateId: template.id, palette, typography: typo, nodes };
 
       let made;
       try {
@@ -97,13 +106,13 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-black/70 backdrop-blur-md">
       <motion.div
         initial={{ opacity: 0, scale: 0.98, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-5xl bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
-        style={{ height: "min(88vh, 720px)" }}
+        className="relative w-full max-w-[1320px] bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+        style={{ height: "min(94vh, 900px)" }}
       >
         {/* Header: progress + close */}
         <div className="flex items-center gap-4 px-5 sm:px-7 py-4 border-b border-[var(--border)] shrink-0">
@@ -121,7 +130,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
         {/* Body */}
         <div className="flex-1 min-h-0 flex">
           {/* Left — controls */}
-          <div className={`${showPreview ? "lg:w-[44%] lg:border-r border-[var(--border)]" : "w-full"} w-full flex flex-col min-h-0`}>
+          <div className={`${showPreview ? "lg:w-[40%] lg:max-w-[520px] lg:border-r border-[var(--border)]" : "w-full"} w-full flex flex-col min-h-0`}>
             <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-6">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -133,7 +142,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
                 >
                   {/* 0 — Welcome */}
                   {step === 0 && (
-                    <div className="max-w-md mx-auto text-center py-8">
+                    <div className="max-w-md mx-auto text-center py-10">
                       <div className="w-14 h-14 mx-auto rounded-2xl bg-yellow/10 border border-yellow/30 flex items-center justify-center text-yellow mb-6">
                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z"/></svg>
                       </div>
@@ -167,56 +176,8 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
                     </div>
                   )}
 
-                  {/* 2 — Color */}
+                  {/* 2 — Template (choose the portfolio first) */}
                   {step === 2 && (
-                    <div className="flex flex-col gap-4">
-                      <StepHead title={t("onb.color.title")} body={t("onb.color.body")} />
-                      <div className="grid grid-cols-2 gap-3">
-                        {PALETTES.map((p, i) => {
-                          const active = i === paletteIdx;
-                          return (
-                            <button key={p.id} onClick={() => setPaletteIdx(i)}
-                              className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}>
-                              <span className="w-9 h-9 rounded-lg shrink-0 border border-black/10" style={{ background: p.accent }} />
-                              <div className="min-w-0">
-                                <div className="font-sans text-sm font-semibold text-[var(--fg)] truncate">{t(`onb.palettes.${p.id}`)}</div>
-                                <div className="flex gap-1 mt-1">
-                                  <span className="w-3 h-3 rounded-full border border-black/10" style={{ background: p.bg }} />
-                                  <span className="w-3 h-3 rounded-full border border-black/10" style={{ background: p.fg }} />
-                                  <span className="w-3 h-3 rounded-full border border-black/10" style={{ background: p.muted }} />
-                                </div>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 3 — Typography */}
-                  {step === 3 && (
-                    <div className="flex flex-col gap-4">
-                      <StepHead title={t("onb.fonts.title")} body={t("onb.fonts.body")} />
-                      <div className="flex flex-col gap-2.5">
-                        {PAIRINGS.map((p, i) => {
-                          const active = i === pairingIdx;
-                          return (
-                            <button key={p.id} onClick={() => setPairingIdx(i)}
-                              className={`flex items-center gap-4 p-3.5 rounded-xl border text-left transition-all ${active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}>
-                              <span style={{ fontFamily: p.serif, fontSize: 30, lineHeight: 1, color: "var(--fg)" }}>Ag</span>
-                              <div className="min-w-0">
-                                <div className="font-sans text-sm font-semibold text-[var(--fg)]">{t(`onb.pairings.${p.id}`)}</div>
-                                <div style={{ fontFamily: p.sans, fontSize: 12, color: "var(--fg-muted)", marginTop: 2 }}>Aa Bb Cc · 0123</div>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 4 — Template */}
-                  {step === 4 && (
                     <div className="flex flex-col gap-4">
                       <StepHead title={t("onb.template.title")} body={t("onb.template.body")} />
                       <div className="flex flex-col gap-3">
@@ -239,9 +200,80 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
                     </div>
                   )}
 
+                  {/* 3 — Color (variables first, then presets) */}
+                  {step === 3 && (
+                    <div className="flex flex-col gap-5">
+                      <StepHead title={t("onb.color.title")} body={t("onb.color.body")} />
+
+                      <div>
+                        <SectionLabel>{t("onb.color.custom")}</SectionLabel>
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <ColorVar label={t("onb.color.varBg")} value={palette.bg} onChange={(v) => setColor("bg", v)} />
+                          <ColorVar label={t("onb.color.varFg")} value={palette.fg} onChange={(v) => setColor("fg", v)} />
+                          <ColorVar label={t("onb.color.varAccent")} value={palette.accent} onChange={(v) => setColor("accent", v)} />
+                          <ColorVar label={t("onb.color.varMuted")} value={palette.muted} onChange={(v) => setColor("muted", v)} />
+                        </div>
+                      </div>
+
+                      <div>
+                        <SectionLabel>{t("onb.color.presets")}</SectionLabel>
+                        <div className="grid grid-cols-3 gap-2.5">
+                          {PALETTES.map((p) => {
+                            const active = sameColor(p.bg, palette.bg) && sameColor(p.fg, palette.fg) && sameColor(p.accent, palette.accent) && sameColor(p.muted, palette.muted);
+                            return (
+                              <button key={p.id} onClick={() => setPaletteState({ bg: p.bg, fg: p.fg, accent: p.accent, muted: p.muted })}
+                                title={t(`onb.palettes.${p.id}`)}
+                                className={`group rounded-xl border p-2 transition-all ${active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}>
+                                <div className="h-9 rounded-lg overflow-hidden flex" style={{ background: p.bg }}>
+                                  <span className="flex-1" style={{ background: p.bg }} />
+                                  <span className="flex-1" style={{ background: p.fg }} />
+                                  <span className="flex-1" style={{ background: p.accent }} />
+                                  <span className="flex-1" style={{ background: p.muted }} />
+                                </div>
+                                <div className="font-sans text-[11px] text-[var(--fg-muted)] mt-1.5 text-center truncate">{t(`onb.palettes.${p.id}`)}</div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 4 — Typography (pairings + per-font selection) */}
+                  {step === 4 && (
+                    <div className="flex flex-col gap-5">
+                      <StepHead title={t("onb.fonts.title")} body={t("onb.fonts.body")} />
+
+                      <div>
+                        <SectionLabel>{t("onb.fonts.presets")}</SectionLabel>
+                        <div className="flex flex-wrap gap-2">
+                          {PAIRINGS.map((p) => {
+                            const active = p.serif === typo.serif && p.sans === typo.sans;
+                            return (
+                              <button key={p.id} onClick={() => setTypo((tp) => ({ ...tp, serif: p.serif, sans: p.sans }))}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all ${active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}>
+                                <span style={{ fontFamily: p.serif, fontSize: 20, lineHeight: 1, color: "var(--fg)" }}>Ag</span>
+                                <span className="font-sans text-xs font-medium text-[var(--fg)]">{t(`onb.pairings.${p.id}`)}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div>
+                        <SectionLabel>{t("onb.fonts.custom")}</SectionLabel>
+                        <div className="flex flex-col gap-3">
+                          <FontSelect label={t("onb.fonts.lblHeading")} category="serif" value={typo.serif} onChange={(stack) => setTypo((tp) => ({ ...tp, serif: stack }))} />
+                          <FontSelect label={t("onb.fonts.lblBody")} category="sans" value={typo.sans} onChange={(stack) => setTypo((tp) => ({ ...tp, sans: stack }))} />
+                          <FontSelect label={t("onb.fonts.lblMono")} category="mono" value={typo.mono} onChange={(stack) => setTypo((tp) => ({ ...tp, mono: stack }))} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* 5 — Done */}
                   {step === 5 && (
-                    <div className="max-w-md mx-auto text-center py-8">
+                    <div className="max-w-md mx-auto text-center py-10">
                       <div className="w-16 h-16 mx-auto rounded-full bg-yellow/10 border border-yellow/30 flex items-center justify-center mb-6">
                         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                       </div>
@@ -277,11 +309,15 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
             )}
           </div>
 
-          {/* Right — live preview */}
+          {/* Right — live real-template preview */}
           {showPreview && (
-            <div className="hidden lg:flex flex-1 min-w-0 items-center justify-center p-7 bg-[var(--bg-subtle)]">
-              <div className="w-full max-w-md">
-                <BrandPreview palette={palette} fonts={typography} identity={identity} variant={template.variant} locale={locale} />
+            <div className="hidden lg:flex flex-1 min-w-0 flex-col bg-[var(--bg-subtle)] p-5">
+              <div className="flex items-center gap-2 mb-3 px-1 shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" style={{ boxShadow: "0 0 8px rgba(34,197,94,0.6)" }} />
+                <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)]">{t("onb.livePreview")}</span>
+              </div>
+              <div className="flex-1 min-h-0 rounded-xl overflow-hidden border border-[var(--border)] shadow-lg">
+                <LiveTemplatePreview templateId={template.id} palette={palette} typography={typo} nodes={previewNodes} slug={slug} />
               </div>
             </div>
           )}
@@ -305,6 +341,62 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div>
       <label className="block font-sans text-xs font-semibold text-[var(--fg-muted)] mb-1.5">{label}</label>
       {children}
+    </div>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-2.5">{children}</div>;
+}
+
+/* A single editable colour variable: swatch (opens the native picker) + hex. */
+function ColorVar({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const safe = /^#[0-9a-fA-F]{6}$/.test(value.trim()) ? value.trim() : "#000000";
+  return (
+    <div className="flex items-center gap-2.5 p-2.5 rounded-xl border border-[var(--border)]">
+      <div className="relative w-9 h-9 rounded-lg shrink-0 border border-black/10 overflow-hidden" style={{ background: value }}>
+        <input type="color" value={safe} onChange={(e) => onChange(e.target.value)} className="absolute inset-[-4px] w-[calc(100%+8px)] h-[calc(100%+8px)] opacity-0 cursor-pointer" aria-label={label} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="font-sans text-[10px] font-semibold text-[var(--fg-muted)] uppercase tracking-wide">{label}</div>
+        <input value={value} onChange={(e) => onChange(e.target.value)} spellCheck={false} className="w-full bg-transparent font-mono text-xs text-[var(--fg)] outline-none mt-0.5" />
+      </div>
+    </div>
+  );
+}
+
+/* A compact dropdown to pick one font of a category, rendered in its own face. */
+function FontSelect({ label, category, value, onChange }: { label: string; category: "serif" | "sans" | "mono"; value: string; onChange: (stack: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const opts = FONT_OPTIONS.filter((f) => f.category === category);
+  const current = opts.find((o) => o.stack === value);
+  return (
+    <div className="relative">
+      <label className="block font-sans text-xs font-semibold text-[var(--fg-muted)] mb-1.5">{label}</label>
+      <button type="button" onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors">
+        <span style={{ fontFamily: value }} className="text-[15px] text-[var(--fg)] truncate">{current?.label ?? "Custom"}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={`text-[var(--fg-muted)] shrink-0 transition-transform ${open ? "rotate-180" : ""}`}><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute z-20 mt-1 w-full max-h-56 overflow-y-auto rounded-lg border border-[var(--border)] bg-[var(--bg-card)] shadow-xl py-1">
+            {opts.map((o) => {
+              const active = o.stack === value;
+              return (
+                <button key={o.value} type="button" onClick={() => { onChange(o.stack); setOpen(false); }}
+                  className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-left transition-colors ${active ? "bg-yellow/10" : "hover:bg-[var(--bg-subtle)]"}`}>
+                  <span style={{ fontFamily: o.stack }} className={`text-[15px] truncate ${active ? "text-yellow" : "text-[var(--fg)]"}`}>{o.label}</span>
+                  {active && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }
