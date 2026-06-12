@@ -79,7 +79,7 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 /* Build the per-node overrides that seed a fresh minimal-bw portfolio with the
    user's identity — and, when locale is Spanish, Spanish default copy so the
    template itself reads in Spanish. Merged over the template defaults. */
-export function buildMinimalNodes(locale: string, id: Identity): Record<string, EditorNode> {
+export function buildMinimalNodes(locale: string, id: Identity, logoText?: string): Record<string, EditorNode> {
   const es = locale === "es";
   const name = fullName(id);
   const year = new Date().getFullYear();
@@ -118,6 +118,8 @@ export function buildMinimalNodes(locale: string, id: Identity): Record<string, 
     put(n("hero-heading", "heading", head));
     put(n("footer-copyright", "paragraph", `© ${year} ${esc(name)}`));
   }
+  // Custom logo wordmark overrides the initials.
+  if (logoText && logoText.trim()) put(n("nav-logo", "logo", esc(logoText.trim())));
   const eyebrow = (es ? "Fotografía" : "Photography") + (id.location ? ` · ${esc(id.location)}` : "");
   put(n("hero-eyebrow", "paragraph", eyebrow));
   if (id.bio) {

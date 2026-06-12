@@ -7,9 +7,10 @@ import { useT } from "~/components/providers/LangProvider";
 import { LOCALES } from "~/lib/i18n";
 import { api } from "~/trpc/react";
 import { FONT_OPTIONS } from "~/lib/editor/fonts";
-import { DEFAULT_TYPOGRAPHY, type ColorPalette, type Typography, type LogoSettings } from "~/lib/editor/types";
+import { DEFAULT_TYPOGRAPHY, type ColorPalette, type Typography, type LogoSettings, type ImageCrop } from "~/lib/editor/types";
 import { THEME_VARS } from "~/lib/editor/editorTheme";
 import { FontPickerModal } from "~/components/editor/canvas/FontPickerModal";
+import { ImageCropModal } from "~/components/editor/panels/ImageCropModal";
 import { useUploadPhotos } from "~/lib/photo/upload";
 import { LiveTemplatePreview } from "./LiveTemplatePreview";
 import {
@@ -45,9 +46,14 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
 
   // Logo (optional)
   const [hasLogo, setHasLogo] = useState(false);
+  const [logoMode, setLogoMode] = useState<LogoSettings["mode"]>("image");
+  const [logoText, setLogoText] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [iconUrl, setIconUrl] = useState("");
   const [altLogoUrl, setAltLogoUrl] = useState("");
+  const [logoWidth, setLogoWidth] = useState(40);
+  const [logoCrop, setLogoCrop] = useState<ImageCrop | undefined>(undefined);
+  const [cropOpen, setCropOpen] = useState(false);
 
   const [templateIdx, setTemplateIdx] = useState(0);
   const [palette, setPaletteState] = useState<ColorPalette>(() => {
@@ -80,11 +86,14 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
   const template = TEMPLATE_OPTIONS[templateIdx]!;
   const identity: Identity = { first, last, location, bio };
   const langLabel = LOCALES.find((l) => l.id === locale)?.native ?? "English";
-  const previewNodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity) : undefined;
   const slug = slugify(fullName(identity) || "portfolio");
 
+  // Wordmark shown in the nav when the logo uses text (text or image+text mode).
+  const navLogoText = hasLogo && logoMode !== "image" ? (logoText.trim() || initials(identity)) : undefined;
+  const previewNodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText) : undefined;
+
   const logoSettings: LogoSettings | undefined = hasLogo
-    ? { mode: logoUrl ? "image" : "text", text: initials(identity), imageUrl: logoUrl, altImageUrl: altLogoUrl, faviconUrl: iconUrl, width: 40 }
+    ? { mode: logoMode, text: logoText.trim() || initials(identity), imageUrl: logoUrl, altImageUrl: altLogoUrl, faviconUrl: iconUrl, width: logoWidth, imageCrop: logoCrop }
     : undefined;
 
   // Photos for the preview gallery: loose first, then each folder's photos.
@@ -129,7 +138,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
         bio: bio.trim() || undefined,
       });
       const base = name || "Portfolio";
-      const nodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity) : undefined;
+      const nodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText) : undefined;
       const content = contentPhotos.length > 0 ? buildOnboardingContent(locale, folders, contentPhotos) : undefined;
       const editorState = { templateId: template.id, palette, typography: typo, nodes, logo: logoSettings };
 
@@ -244,9 +253,44 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
                           {hasLogo && (
                             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
                               <div className="flex flex-col gap-3 mt-4">
-                                <AssetUpload label={t("onb.logo.logoLabel")} hint={t("onb.logo.logoHint")} value={logoUrl} onChange={setLogoUrl} />
+                                {/* Display mode */}
+                                <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
+                                  {(["text", "image", "image+text"] as const).map((m) => (
+                                    <button key={m} onClick={() => setLogoMode(m)}
+                                      className={`flex-1 px-2 py-1.5 font-sans text-[11px] font-semibold transition-colors ${logoMode === m ? "bg-yellow/15 text-[var(--fg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"} ${m !== "text" ? "border-l border-[var(--border)]" : ""}`}>
+                                      {m === "text" ? t("onb.logo.modeText") : m === "image" ? t("onb.logo.modeImage") : t("onb.logo.modeBoth")}
+                                    </button>
+                                  ))}
+                                </div>
+
+                                {/* Logo text */}
+                                {(logoMode === "text" || logoMode === "image+text") && (
+                                  <Field label={t("onb.logo.text")}>
+                                    <input className={inputCls} value={logoText} onChange={(e) => setLogoText(e.target.value)} placeholder={initials(identity)} maxLength={40} />
+                                  </Field>
+                                )}
+
+                                {/* Logo image + crop + width + alt */}
+                                {(logoMode === "image" || logoMode === "image+text") && (
+                                  <>
+                                    <AssetUpload label={t("onb.logo.logoLabel")} hint={t("onb.logo.logoHint")} value={logoUrl} onChange={(url) => { setLogoUrl(url); setLogoCrop(undefined); }} />
+                                    {logoUrl && (
+                                      <>
+                                        <button onClick={() => setCropOpen(true)}
+                                          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] text-xs font-sans font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
+                                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/></svg>
+                                          <span className="flex-1 text-left">{logoCrop ? t("onb.logo.adjustCrop") : t("onb.logo.crop")}</span>
+                                          {logoCrop && <span className="font-mono text-[9px] text-yellow border border-yellow/60 bg-yellow/10 px-1.5 py-0.5 rounded">ON</span>}
+                                        </button>
+                                        <LogoWidthSlider label={t("onb.logo.width")} width={logoWidth} onChange={setLogoWidth} />
+                                      </>
+                                    )}
+                                    <AssetUpload label={t("onb.logo.altLabel")} hint={t("onb.logo.altHint")} value={altLogoUrl} onChange={setAltLogoUrl} />
+                                  </>
+                                )}
+
+                                {/* Favicon — always available */}
                                 <AssetUpload label={t("onb.logo.iconLabel")} hint={t("onb.logo.iconHint")} value={iconUrl} onChange={setIconUrl} />
-                                <AssetUpload label={t("onb.logo.altLabel")} hint={t("onb.logo.altHint")} value={altLogoUrl} onChange={setAltLogoUrl} />
                               </div>
                             </motion.div>
                           )}
@@ -473,6 +517,34 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
           onClose={() => setFontModal(null)}
         />
       )}
+
+      {/* Reused editor logo cropper */}
+      {cropOpen && logoUrl && (
+        <ImageCropModal src={logoUrl} value={logoCrop} onChange={(c) => setLogoCrop(c ?? undefined)} onClose={() => setCropOpen(false)} />
+      )}
+    </div>
+  );
+}
+
+/* Logo width slider, styled for the onboarding (light/dark) surface. */
+function LogoWidthSlider({ label, width, onChange }: { label: string; width: number; onChange: (w: number) => void }) {
+  const min = 16, max = 240;
+  const pct = ((width - min) / (max - min)) * 100;
+  return (
+    <div>
+      <div className="flex items-baseline justify-between mb-1.5">
+        <label className="font-sans text-xs font-semibold text-[var(--fg-muted)]">{label}</label>
+        <span className="font-mono text-[11px] text-[var(--fg-muted)]">{width}px</span>
+      </div>
+      <input type="range" min={min} max={max} value={width} onChange={(e) => onChange(Number(e.target.value))}
+        className="onb-range w-full"
+        style={{ background: `linear-gradient(to right, #fad502 0%, #fad502 ${pct}%, var(--border) ${pct}%, var(--border) 100%)` }} />
+      <style>{`
+        .onb-range { appearance: none; -webkit-appearance: none; height: 4px; border-radius: 2px; outline: none; cursor: grab; }
+        .onb-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--bg-card); border: 2px solid #fad502; cursor: grab; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+        .onb-range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--bg-card); border: 2px solid #fad502; cursor: grab; }
+        .onb-range::-moz-range-track { background: transparent; }
+      `}</style>
     </div>
   );
 }

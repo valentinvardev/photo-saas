@@ -1019,6 +1019,9 @@
     "logo": {
       "question": "¿Tenés logo?",
       "yes": "Sí", "no": "No",
+      "modeText": "Texto", "modeImage": "Imagen", "modeBoth": "Ambos",
+      "text": "Texto del logo", "width": "Ancho del logo",
+      "crop": "Recortar logo", "adjustCrop": "Ajustar recorte",
       "logoLabel": "Logo", "logoHint": "PNG o SVG, fondo transparente",
       "iconLabel": "Icono", "iconHint": "Favicon cuadrado para la pestaña",
       "altLabel": "Logo alternativo", "altHint": "Versión clara para fondos oscuros",

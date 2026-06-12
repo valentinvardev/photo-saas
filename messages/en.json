@@ -1019,6 +1019,9 @@
     "logo": {
       "question": "Do you have a logo?",
       "yes": "Yes", "no": "No",
+      "modeText": "Text", "modeImage": "Image", "modeBoth": "Both",
+      "text": "Logo text", "width": "Logo width",
+      "crop": "Crop logo", "adjustCrop": "Adjust crop",
       "logoLabel": "Logo", "logoHint": "PNG or SVG, transparent background",
       "iconLabel": "Icon", "iconHint": "Square favicon for the browser tab",
       "altLabel": "Alt logo", "altHint": "Light version for dark backgrounds",
