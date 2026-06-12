@@ -1,4 +1,5 @@
 import type { ColorPalette, Typography, EditorNode } from "~/lib/editor/types";
+import type { PortfolioContent } from "~/lib/portfolio/data";
 
 /* ── Accent palettes the user picks from (their "brand color") ── */
 export type PaletteOption = { id: string } & ColorPalette;
@@ -47,6 +48,30 @@ export function initials(id: Identity) {
   const a = id.first.trim()[0] ?? "";
   const b = id.last.trim()[0] ?? "";
   return (a + (b ? "·" + b : "")).toUpperCase() || "—";
+}
+
+/* ── Content the user uploads during onboarding (photos + folders) ── */
+export type OnbFolder = { id: string; name: string };
+export type OnbPhoto = { id: string; url: string; filename: string; folderId: string | null };
+
+/* Assemble the uploaded photos/folders into the portfolio content tree the
+   editor + public render expect (one "Work" category holding loose photos and
+   the user's folders). */
+export function buildOnboardingContent(locale: string, folders: OnbFolder[], photos: OnbPhoto[]): PortfolioContent {
+  const catId = "cat-work";
+  const directPhotoIds = photos.filter((p) => !p.folderId).map((p) => p.id);
+  const photosRec: PortfolioContent["photos"] = {};
+  for (const p of photos) photosRec[p.id] = { id: p.id, src: p.url, visibility: "public" };
+  const foldersRec: PortfolioContent["folders"] = {};
+  for (const f of folders) {
+    foldersRec[f.id] = { id: f.id, title: f.name, photoIds: photos.filter((p) => p.folderId === f.id).map((p) => p.id), visibility: "public" };
+  }
+  return {
+    categoryIds: [catId],
+    categories: { [catId]: { id: catId, name: locale === "es" ? "Trabajos" : "Work", slug: "work", folderIds: folders.map((f) => f.id), directPhotoIds, visibility: "public" } },
+    folders: foldersRec,
+    photos: photosRec,
+  };
 }
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

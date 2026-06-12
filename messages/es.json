@@ -990,6 +990,7 @@
     "welcome": {
       "title": "Bienvenido a Portapic",
       "body": "Configuremos tu estudio en menos de un minuto — tus datos, tus colores y fuentes, y tu primer portafolio, todo con tu marca y listo para editar.",
+      "hint": "En los próximos pasos vas a elegir un portafolio y definir toda su estética — colores, tipografías y fotos — con una vista previa en vivo.",
       "langDetected": "Idioma: {lang}",
       "start": "Empezar"
     },
@@ -1014,6 +1015,22 @@
       "presets": "Pares",
       "custom": "O elegí cada una",
       "lblHeading": "Títulos", "lblBody": "Cuerpo", "lblMono": "Detalles"
+    },
+    "logo": {
+      "question": "¿Tenés logo?",
+      "yes": "Sí", "no": "No",
+      "logoLabel": "Logo", "logoHint": "PNG o SVG, fondo transparente",
+      "iconLabel": "Icono", "iconHint": "Favicon cuadrado para la pestaña",
+      "altLabel": "Logo alternativo", "altHint": "Versión clara para fondos oscuros",
+      "upload": "Subir", "change": "Cambiar", "uploading": "Subiendo…", "remove": "Quitar", "set": "Cargado"
+    },
+    "content": {
+      "title": "Agregá tus trabajos",
+      "body": "Subí fotos y agrupalas en carpetas — tu portafolio se actualiza en vivo a la derecha. Siempre podés agregar más después.",
+      "upload": "Subir fotos", "uploading": "Subiendo {done}/{total}…",
+      "newFolder": "Nueva carpeta", "folderName": "Nombre de la carpeta", "add": "Agregar",
+      "all": "Todo", "remove": "Quitar",
+      "empty": "Todavía no hay fotos acá — subí tus primeras tomas."
     },
     "template": {
       "title": "Elegí una plantilla inicial",

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import { TEMPLATES, DEFAULT_TEMPLATE_ID, type TemplateId } from "~/lib/editor/templates/registry";
-import type { ColorPalette, Typography, EditorNode } from "~/lib/editor/types";
+import type { ColorPalette, Typography, EditorNode, LogoSettings } from "~/lib/editor/types";
 
 // Load the builder's @fontsource CSS so the real template renders the chosen fonts.
 import "~/lib/editor/fonts";
@@ -17,22 +17,30 @@ const FRAME_W = 1280;
  * the public site use) with the user's onboarding branding applied live.
  *
  * It hydrates the shared editor store in read-only mode and re-hydrates whenever
- * the chosen palette / fonts / template / identity change, so the onboarding
- * preview is a faithful, scaled view of what the portfolio will actually look
- * like — not a mock.
+ * the chosen palette / fonts / template / identity / photos change, so the
+ * onboarding preview is a faithful, scaled view of the real portfolio.
+ *
+ * `scrollable` lets the person scroll the whole site (used on the content step,
+ * so uploaded photos can be browsed as they come in).
  */
 export function LiveTemplatePreview({
   templateId,
   palette,
   typography,
   nodes,
+  logo,
+  galleryPhotos,
   slug,
+  scrollable = false,
 }: {
   templateId: TemplateId;
   palette: ColorPalette;
   typography: Typography;
   nodes?: Record<string, EditorNode>;
+  logo?: LogoSettings;
+  galleryPhotos?: { src: string; title?: string }[];
   slug: string;
+  scrollable?: boolean;
 }) {
   const hydrateDesign    = useEditorStore((s) => s.hydrateDesign);
   const setGalleryPhotos = useEditorStore((s) => s.setGalleryPhotos);
@@ -41,22 +49,25 @@ export function LiveTemplatePreview({
 
   const [ready, setReady] = useState(false);
 
-  // `nodes` is a fresh object every parent render, so depend on a stable string
-  // key instead — re-hydrate only when the actual design content changes.
-  const designKey = JSON.stringify({ templateId, palette, typography, nodes });
+  // `nodes` / `galleryPhotos` are fresh objects every parent render, so depend on
+  // a stable string key instead — re-hydrate only when the content changes.
+  const designKey = JSON.stringify({ templateId, palette, typography, nodes, logo, galleryPhotos });
   useEffect(() => {
     setReadOnly(true);
-    setGalleryPhotos([]);
-    hydrateDesign({ templateId, palette, typography, nodes });
+    setGalleryPhotos(galleryPhotos ?? []);
+    hydrateDesign({ templateId, palette, typography, nodes, logo });
     setReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [designKey]);
 
   // Scale the fixed-width frame to fit the pane width.
-  const frameRef = useRef<HTMLDivElement>(null);
+  const paneRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.42);
+  const [innerH, setInnerH] = useState(0);
+
   useEffect(() => {
-    const el = frameRef.current;
+    const el = paneRef.current;
     if (!el) return;
     const ro = new ResizeObserver(() => {
       const w = el.clientWidth;
@@ -65,6 +76,17 @@ export function LiveTemplatePreview({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  // Track the rendered template height so the scroll area is sized to the scaled
+  // content (CSS transforms don't shrink the layout box).
+  useEffect(() => {
+    if (!scrollable) return;
+    const el = innerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setInnerH(el.scrollHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [scrollable, ready, designKey]);
 
   const Component = TEMPLATES[storeTemplateId]?.Component ?? TEMPLATES[DEFAULT_TEMPLATE_ID]!.Component;
 
@@ -104,10 +126,12 @@ export function LiveTemplatePreview({
         </div>
       </div>
 
-      {/* Clipped, scaled real template */}
-      <div ref={frameRef} className="relative flex-1 min-h-0 overflow-hidden" style={{ background: palette.bg }}>
-        <div style={frameVars}>
-          {ready && <Component viewport="desktop" />}
+      {/* Scaled real template — clipped or scrollable */}
+      <div ref={paneRef} className="relative flex-1 min-h-0" style={{ overflowY: scrollable ? "auto" : "hidden", overflowX: "hidden", background: palette.bg }}>
+        <div style={{ position: "relative", width: "100%", height: scrollable ? innerH * scale : "100%" }}>
+          <div ref={innerRef} style={frameVars}>
+            {ready && <Component viewport="desktop" />}
+          </div>
         </div>
       </div>
     </div>

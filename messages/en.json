@@ -990,6 +990,7 @@
     "welcome": {
       "title": "Welcome to Portapic",
       "body": "Let's set up your studio in under a minute — your details, your colours and fonts, and your first portfolio, all branded and ready to edit.",
+      "hint": "In the next steps you'll pick a portfolio and shape its whole look — colours, fonts and photos — with a live preview as you go.",
       "langDetected": "Language: {lang}",
       "start": "Get started"
     },
@@ -1014,6 +1015,22 @@
       "presets": "Pairings",
       "custom": "Or choose each one",
       "lblHeading": "Headings", "lblBody": "Body", "lblMono": "Details"
+    },
+    "logo": {
+      "question": "Do you have a logo?",
+      "yes": "Yes", "no": "No",
+      "logoLabel": "Logo", "logoHint": "PNG or SVG, transparent background",
+      "iconLabel": "Icon", "iconHint": "Square favicon for the browser tab",
+      "altLabel": "Alt logo", "altHint": "Light version for dark backgrounds",
+      "upload": "Upload", "change": "Change", "uploading": "Uploading…", "remove": "Remove", "set": "Uploaded"
+    },
+    "content": {
+      "title": "Add your work",
+      "body": "Upload photos and group them into folders — your portfolio updates live on the right. You can always add more later.",
+      "upload": "Upload photos", "uploading": "Uploading {done}/{total}…",
+      "newFolder": "New folder", "folderName": "Folder name", "add": "Add",
+      "all": "All", "remove": "Remove",
+      "empty": "No photos here yet — upload your first shots."
     },
     "template": {
       "title": "Pick a starting template",
