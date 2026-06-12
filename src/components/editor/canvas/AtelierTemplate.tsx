@@ -464,19 +464,19 @@ function Lightbox({ photos, startIndex, onClose }: { photos: typeof PHOTOS; star
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      style={{ position: "fixed", inset: 0, zIndex: 1100, background: "#0a0a0a", display: "flex", flexDirection: "column", userSelect: "none" }}
+      style={{ position: "fixed", inset: 0, zIndex: 1100, background: "var(--ed-bg, #0a0a0a)", display: "flex", flexDirection: "column", userSelect: "none" }}
     >
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", background: "linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)", pointerEvents: "none" }}>
-        <button onClick={onClose} style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.7)", padding: "6px 10px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", background: "linear-gradient(to bottom, color-mix(in srgb, var(--ed-bg, #000) 70%, transparent), transparent)", pointerEvents: "none" }}>
+        <button onClick={onClose} style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "color-mix(in srgb, var(--ed-fg, #fff) 70%, transparent)", padding: "6px 10px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
           Back
         </button>
-        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>
+        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "color-mix(in srgb, var(--ed-fg, #fff) 45%, transparent)" }}>
           {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
         </span>
         <div style={{ pointerEvents: "auto" }}>
           {zoom > 1 && (
-            <button onClick={resetView} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)", cursor: "pointer", padding: "5px 10px", fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+            <button onClick={resetView} style={{ background: "color-mix(in srgb, var(--ed-fg, #fff) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--ed-fg, #fff) 12%, transparent)", color: "color-mix(in srgb, var(--ed-fg, #fff) 65%, transparent)", cursor: "pointer", padding: "5px 10px", fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}>
               {Math.round(zoom * 100)}% · Reset
             </button>
           )}
@@ -504,12 +504,12 @@ function Lightbox({ photos, startIndex, onClose }: { photos: typeof PHOTOS; star
       </div>
 
       {index > 0 && (
-        <button onClick={prev} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", cursor: "pointer", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}>
+        <button onClick={prev} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", background: "color-mix(in srgb, var(--ed-fg, #fff) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--ed-fg, #fff) 12%, transparent)", color: "color-mix(in srgb, var(--ed-fg, #fff) 70%, transparent)", cursor: "pointer", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
       )}
       {index < photos.length - 1 && (
-        <button onClick={next} style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", cursor: "pointer", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}>
+        <button onClick={next} style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", background: "color-mix(in srgb, var(--ed-fg, #fff) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--ed-fg, #fff) 12%, transparent)", color: "color-mix(in srgb, var(--ed-fg, #fff) 70%, transparent)", cursor: "pointer", width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       )}

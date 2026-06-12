@@ -346,14 +346,14 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
 
   return (
     <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
-      style={{ position: "fixed", inset: 0, zIndex: 2000, background: "#000", display: "flex", flexDirection: "column", userSelect: "none" }}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)", pointerEvents: "none" }}>
-        <button style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.6)", padding: "4px 8px", fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", display: "flex", alignItems: "center", gap: "6px" }} onClick={onClose}>
+      style={{ position: "fixed", inset: 0, zIndex: 2000, background: "var(--ed-bg, #000)", display: "flex", flexDirection: "column", userSelect: "none" }}>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "linear-gradient(to bottom, color-mix(in srgb, var(--ed-bg, #000) 75%, transparent), transparent)", pointerEvents: "none" }}>
+        <button style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "color-mix(in srgb, var(--ed-fg, #fff) 65%, transparent)", padding: "4px 8px", fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", display: "flex", alignItems: "center", gap: "6px" }} onClick={onClose}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
         </button>
-        <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>{w.title ? `${w.title} · ` : ""}{index + 1} / {works.length}</span>
+        <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", color: "color-mix(in srgb, var(--ed-fg, #fff) 45%, transparent)" }}>{w.title ? `${w.title} · ` : ""}{index + 1} / {works.length}</span>
         <div style={{ pointerEvents: "auto" }}>
-          {zoom > 1 && <button onClick={resetView} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: "4px 10px", fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", borderRadius: "4px" }}>{Math.round(zoom * 100)}% · Reset</button>}
+          {zoom > 1 && <button onClick={resetView} style={{ background: "color-mix(in srgb, var(--ed-fg, #fff) 10%, transparent)", border: "none", color: "color-mix(in srgb, var(--ed-fg, #fff) 55%, transparent)", cursor: "pointer", padding: "4px 10px", fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", borderRadius: "4px" }}>{Math.round(zoom * 100)}% · Reset</button>}
         </div>
       </div>
       <div ref={containerRef} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "64px 48px", cursor: zoom > 1 ? (dragging ? "grabbing" : "grab") : "default", overflow: "hidden" }}
@@ -364,14 +364,14 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
             transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`, transformOrigin: "center",
             transition: dragging ? "none" : "transform 0.15s ease" }} />
       </div>
-      {index > 0 && <button onClick={() => { setIndex((i) => Math.max(i - 1, 0)); resetView(); }} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)", cursor: "pointer", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>}
-      {index < works.length - 1 && <button onClick={() => { setIndex((i) => Math.min(i + 1, works.length - 1)); resetView(); }} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)", cursor: "pointer", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "12px 20px", background: "linear-gradient(to top, rgba(0,0,0,0.6), transparent)", display: "flex", justifyContent: "space-between", alignItems: "flex-end", pointerEvents: "none" }}>
+      {index > 0 && <button onClick={() => { setIndex((i) => Math.max(i - 1, 0)); resetView(); }} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", background: "color-mix(in srgb, var(--ed-fg, #fff) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--ed-fg, #fff) 12%, transparent)", color: "color-mix(in srgb, var(--ed-fg, #fff) 60%, transparent)", cursor: "pointer", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>}
+      {index < works.length - 1 && <button onClick={() => { setIndex((i) => Math.min(i + 1, works.length - 1)); resetView(); }} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "color-mix(in srgb, var(--ed-fg, #fff) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--ed-fg, #fff) 12%, transparent)", color: "color-mix(in srgb, var(--ed-fg, #fff) 60%, transparent)", cursor: "pointer", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "12px 20px", background: "linear-gradient(to top, color-mix(in srgb, var(--ed-bg, #000) 70%, transparent), transparent)", display: "flex", justifyContent: "space-between", alignItems: "flex-end", pointerEvents: "none" }}>
         <div>
-          <div style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "#fff", marginBottom: "2px" }}>{w.title}</div>
-          {w.cat && <div style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.15em", textTransform: "uppercase" }}>{w.cat} · {w.year}</div>}
+          <div style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "var(--ed-fg, #fff)", marginBottom: "2px" }}>{w.title}</div>
+          {w.cat && <div style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "color-mix(in srgb, var(--ed-fg, #fff) 45%, transparent)", letterSpacing: "0.15em", textTransform: "uppercase" }}>{w.cat} · {w.year}</div>}
         </div>
-        {w.w ? <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "rgba(255,255,255,0.3)" }}>{w.w} × {w.h}px</span> : <span />}
+        {w.w ? <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "color-mix(in srgb, var(--ed-fg, #fff) 35%, transparent)" }}>{w.w} × {w.h}px</span> : <span />}
       </div>
     </div>
   );
