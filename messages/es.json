@@ -1000,7 +1000,10 @@
       "first": "Nombre", "firstPh": "Sofía",
       "last": "Apellido", "lastPh": "Chen",
       "location": "Ubicación", "locationPh": "Buenos Aires, AR",
-      "bio": "Biografía corta", "bioPh": "Una línea sobre vos y tu trabajo."
+      "bio": "Biografía corta", "bioPh": "Una línea sobre vos y tu trabajo.",
+      "email": "Email de contacto", "emailPh": "vos@estudio.com",
+      "phone": "Teléfono", "phonePh": "+54 9 11 1234 5678",
+      "phoneHint": "Lo usamos sobre todo para WhatsApp — se muestra en tu sección de contacto."
     },
     "color": {
       "title": "Elegí tus colores",
@@ -1042,10 +1045,11 @@
       "atelierName": "Atelier", "atelierDesc": "Centrada, editorial, con mucho espacio en blanco."
     },
     "done": {
-      "title": "Tu estudio está listo",
-      "body": "{name} quedó configurado con tu marca. Entrá al editor para agregar fotos y publicarlo.",
+      "title": "Tu estudio está publicado",
+      "body": "{name} quedó publicado con tu marca y tus fotos. Compartilo, o seguí editándolo cuando quieras.",
       "creating": "Creando…",
       "openEditor": "Abrir editor →",
+      "viewSite": "Ver mi sitio",
       "goDashboard": "Ir al panel",
       "error": "No se pudo terminar la configuración. Inténtalo de nuevo."
     },

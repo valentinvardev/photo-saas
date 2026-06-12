@@ -79,7 +79,7 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 /* Build the per-node overrides that seed a fresh minimal-bw portfolio with the
    user's identity — and, when locale is Spanish, Spanish default copy so the
    template itself reads in Spanish. Merged over the template defaults. */
-export function buildMinimalNodes(locale: string, id: Identity, logoText?: string): Record<string, EditorNode> {
+export function buildMinimalNodes(locale: string, id: Identity, logoText?: string, contact?: { email?: string; phone?: string }): Record<string, EditorNode> {
   const es = locale === "es";
   const name = fullName(id);
   const year = new Date().getFullYear();
@@ -127,6 +127,25 @@ export function buildMinimalNodes(locale: string, id: Identity, logoText?: strin
     put(n("about-body-1", "paragraph", esc(id.bio)));
   }
   if (id.location) put(n("about-caption", "paragraph", esc(id.location)));
+
+  // Contact details — seed from the collected email + WhatsApp phone, hiding
+  // any unused slots so the template's demo addresses don't linger.
+  const details: { label: string; value: string }[] = [];
+  if (contact?.email?.trim()) details.push({ label: es ? "Correo" : "Email", value: contact.email.trim() });
+  if (contact?.phone?.trim()) details.push({ label: "WhatsApp", value: contact.phone.trim() });
+  if (details.length > 0) {
+    for (let i = 0; i < 3; i++) {
+      const idx = i + 1;
+      const d = details[i];
+      if (d) {
+        put(n(`contact-d${idx}-label`, "paragraph", esc(d.label)));
+        put(n(`contact-d${idx}-value`, "paragraph", esc(d.value)));
+      } else {
+        out[`contact-d${idx}-label`] = { id: `contact-d${idx}-label`, type: "paragraph", hidden: true };
+        out[`contact-d${idx}-value`] = { id: `contact-d${idx}-value`, type: "paragraph", hidden: true };
+      }
+    }
+  }
 
   return out;
 }

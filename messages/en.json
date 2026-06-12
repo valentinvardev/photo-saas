@@ -1000,7 +1000,10 @@
       "first": "First name", "firstPh": "Sofia",
       "last": "Last name", "lastPh": "Chen",
       "location": "Location", "locationPh": "Buenos Aires, AR",
-      "bio": "Short bio", "bioPh": "A line about you and your work."
+      "bio": "Short bio", "bioPh": "A line about you and your work.",
+      "email": "Contact email", "emailPh": "you@studio.com",
+      "phone": "Phone", "phonePh": "+1 555 123 4567",
+      "phoneHint": "Mainly used for WhatsApp — shown on your contact section."
     },
     "color": {
       "title": "Pick your colours",
@@ -1042,10 +1045,11 @@
       "atelierName": "Atelier", "atelierDesc": "Centred, editorial, lots of whitespace."
     },
     "done": {
-      "title": "Your studio is ready",
-      "body": "{name} is set up with your branding. Jump into the editor to add photos and go live.",
+      "title": "Your studio is live",
+      "body": "{name} is published with your branding and photos. Share it, or keep editing any time.",
       "creating": "Creating…",
       "openEditor": "Open editor →",
+      "viewSite": "View my site",
       "goDashboard": "Go to dashboard",
       "error": "Couldn't finish setup. Please try again."
     },

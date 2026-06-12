@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useT } from "~/components/providers/LangProvider";
@@ -43,6 +43,8 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
   const [last, setLast] = useState("");
   const [location, setLocation] = useState("");
   const [bio, setBio] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
   // Logo (optional)
   const [hasLogo, setHasLogo] = useState(false);
@@ -75,11 +77,20 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newId, setNewId] = useState<string | null>(null);
+  const [newSlug, setNewSlug] = useState<string | null>(null);
 
+  const { data: me } = api.user.me.useQuery();
   const updateProfile = api.user.updateProfile.useMutation();
   const createPortfolio = api.portfolio.create.useMutation();
   const saveDesign = api.portfolio.saveDesign.useMutation();
+  const publishPortfolio = api.portfolio.update.useMutation();
   const utils = api.useUtils();
+
+  // Prefill the contact email with the account email (until the user edits it).
+  const emailTouched = useRef(false);
+  useEffect(() => {
+    if (!emailTouched.current && me?.email && !email) setEmail(me.email);
+  }, [me?.email, email]);
 
   if (!open) return null;
 
@@ -90,7 +101,8 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
 
   // Wordmark shown in the nav when the logo uses text (text or image+text mode).
   const navLogoText = hasLogo && logoMode !== "image" ? (logoText.trim() || initials(identity)) : undefined;
-  const previewNodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText) : undefined;
+  const contact = { email, phone };
+  const previewNodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact) : undefined;
 
   const logoSettings: LogoSettings | undefined = hasLogo
     ? { mode: logoMode, text: logoText.trim() || initials(identity), imageUrl: logoUrl, altImageUrl: altLogoUrl, faviconUrl: iconUrl, width: logoWidth, imageCrop: logoCrop }
@@ -138,7 +150,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
         bio: bio.trim() || undefined,
       });
       const base = name || "Portfolio";
-      const nodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText) : undefined;
+      const nodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact) : undefined;
       const content = contentPhotos.length > 0 ? buildOnboardingContent(locale, folders, contentPhotos) : undefined;
       const editorState = { templateId: template.id, palette, typography: typo, nodes, logo: logoSettings };
 
@@ -152,10 +164,13 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
         } else throw e;
       }
       await saveDesign.mutateAsync({ id: made.id, editorState });
+      // Publish so the portfolio (and its photos) are live immediately.
+      try { await publishPortfolio.mutateAsync({ id: made.id, status: "published" }); } catch { /* stays draft if it fails */ }
       try { localStorage.setItem("portapic_onboarded", "1"); } catch { /* ignore */ }
       void utils.portfolio.list.invalidate();
       void utils.user.me.invalidate();
       setNewId(made.id);
+      setNewSlug(made.slug);
       setStep(6);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("onb.done.error"));
@@ -239,6 +254,20 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
                       <Field label={t("onb.identity.bio")}>
                         <textarea className={`${inputCls} resize-none`} rows={3} maxLength={160} value={bio} onChange={(e) => setBio(e.target.value)} placeholder={t("onb.identity.bioPh")} />
                       </Field>
+
+                      {/* Contact */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <Field label={t("onb.identity.email")}>
+                          <input type="email" className={inputCls} value={email} onChange={(e) => { emailTouched.current = true; setEmail(e.target.value); }} placeholder={t("onb.identity.emailPh")} />
+                        </Field>
+                        <Field label={t("onb.identity.phone")}>
+                          <input type="tel" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("onb.identity.phonePh")} />
+                        </Field>
+                      </div>
+                      <div className="flex items-center gap-1.5 -mt-1.5 text-[var(--fg-muted)]">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1012 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.6-4.1-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2.1.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.7 1.8c.1.2.1.4 0 .5l-.3.5c-.1.2-.3.3-.1.6.1.3.6 1 1.3 1.6.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.6-.7c.2-.2.3-.2.6-.1l1.6.8c.3.1.5.2.5.4.1.1.1.6-.1 1z"/></svg>
+                        <span className="font-sans text-[11px]">{t("onb.identity.phoneHint")}</span>
+                      </div>
 
                       {/* Logo */}
                       <div className="pt-2 border-t border-[var(--border)]">
@@ -462,14 +491,23 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
                       </div>
                       <h1 className="font-sans font-black text-[var(--fg)] text-2xl sm:text-3xl tracking-tight">{t("onb.done.title")}</h1>
                       <p className="font-sans text-sm text-[var(--fg-muted)] mt-3 leading-relaxed">{t("onb.done.body", { name: fullName(identity) || (locale === "es" ? "tu portafolio" : "your portfolio") })}</p>
+                      {newSlug && (
+                        <a href={`/p/${newSlug}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 mt-5 font-mono text-xs text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/></svg>
+                          portapic.com/p/{newSlug}
+                        </a>
+                      )}
                       <div className="flex items-center justify-center gap-3 mt-8">
-                        <button onClick={() => { onClose(); router.push("/dashboard/portfolio"); }} className="px-5 py-2.5 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
-                          {t("onb.done.goDashboard")}
-                        </button>
+                        <a href={newSlug ? `/p/${newSlug}` : "#"} target="_blank" rel="noreferrer" className="px-5 py-2.5 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
+                          {t("onb.done.viewSite")}
+                        </a>
                         <button onClick={() => { onClose(); router.push(newId ? `/editor/${newId}` : "/dashboard/portfolio"); }} className="px-6 py-2.5 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 transition-colors">
                           {t("onb.done.openEditor")}
                         </button>
                       </div>
+                      <button onClick={() => { onClose(); router.push("/dashboard/portfolio"); }} className="mt-4 font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
+                        {t("onb.done.goDashboard")}
+                      </button>
                     </div>
                   )}
                 </motion.div>
