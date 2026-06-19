@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
-import { TEMPLATE_URL, type Portfolio } from "~/lib/portfolio/mock";
+import { type Portfolio } from "~/lib/portfolio/mock";
 import { dbToView } from "~/lib/portfolio/adapt";
 import { portfolioPublicLabel } from "~/lib/portfolio/url";
 import { api } from "~/trpc/react";
@@ -87,7 +87,8 @@ function weekTrend(views: number[]): "up" | "down" | "flat" | "none" {
 /* ── Portfolio card — clicking it navigates to the manage page ── */
 function PortfolioCard({ p }: { p: Portfolio }) {
   const { t } = useT();
-  const previewUrl = TEMPLATE_URL[p.template];
+  // Live render of the portfolio's own saved design (not the stock template).
+  const previewUrl = `/editor/${p.id}/preview`;
 
   return (
     <Link

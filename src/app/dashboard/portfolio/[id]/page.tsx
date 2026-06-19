@@ -121,7 +121,8 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
   const publicUrl  = portfolioPublicUrl(portfolio.slug);
   const displayUrl = portfolio.customDomain ?? portfolioPublicLabel(portfolio.slug);
   const copyUrl    = portfolio.customDomain ? `https://${portfolio.customDomain}` : publicUrl;
-  const previewUrl = TEMPLATE_URL[portfolio.template];
+  // Live render of the portfolio's own saved design (not the stock template).
+  const previewUrl = `/editor/${portfolio.id}/preview`;
 
   return (
     <div className="min-h-full">
