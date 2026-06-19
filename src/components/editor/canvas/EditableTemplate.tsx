@@ -536,10 +536,9 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
               </button>
             </div>
             <nav style={{ flex: 1, padding: "2rem 1.5rem", display: "flex", flexDirection: "column" }}>
-              {navItems.map((item, i) => (
+              {navItems.map((item) => (
                 <button key={item.id} onClick={() => { if (readOnly) { setMenuOpen(false); item.fn(); } }}
-                  style={{ ...sans, textAlign: "left", background: "none", border: "none", borderBottom: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", padding: "1.25rem 0", fontSize: "22px", fontWeight: 300, color: "var(--ed-fg, #0a0a0a)", cursor: "pointer",
-                    fontFamily: i === 0 ? "var(--tpl-serif,serif)" : "var(--tpl-sans,sans-serif)", fontStyle: i === 0 ? "italic" : "normal" }}>
+                  style={{ ...sans, textAlign: "left", background: "none", border: "none", borderBottom: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", padding: "1.25rem 0", fontSize: "22px", fontWeight: 300, color: "var(--ed-fg, #0a0a0a)", cursor: "pointer", fontStyle: "normal" }}>
                   <EditableNode id={item.id} tag="span"><EditableText id={item.id} /></EditableNode>
                 </button>
               ))}
@@ -766,7 +765,10 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           </div>
         )}
         {isMobile && (
-          <EditableNode id="hero-image-1" style={{ overflow: "hidden", height: "50vw", minHeight: "220px" }}>
+          /* Width-relative aspect ratio (not 50vw) — vw resolves against the real
+             window in the builder's phone frame, which blew the image up huge.
+             aspectRatio keys off the frame/phone width so it matches everywhere. */
+          <EditableNode id="hero-image-1" style={{ overflow: "hidden", width: "100%", aspectRatio: "16 / 9" }}>
             <EditableImage id="hero-image-1" imgStyle={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.88)" }} />
           </EditableNode>
         )}
