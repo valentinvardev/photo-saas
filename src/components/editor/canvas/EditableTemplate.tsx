@@ -401,19 +401,19 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "var(--ed-fg, #0a0a0a)", display: "flex", flexDirection: "column" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2.5rem", height: "60px", borderBottom: "1px solid rgba(255,255,255,0.08)", flexShrink: 0, gap: "1rem" }}>
+      <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "var(--ed-bg, #fafafa)", display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2.5rem", height: "60px", borderBottom: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", flexShrink: 0, gap: "1rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexShrink: 0 }}>
-            <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.45)", display: "flex", alignItems: "center", padding: 0 }}>
+            <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 55%, transparent)", display: "flex", alignItems: "center", padding: 0 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
-            <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "#fff" }}>All Work</span>
-            <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "rgba(255,255,255,0.3)", letterSpacing: "0.1em" }}>{visible.length}</span>
+            <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "var(--ed-fg, #0a0a0a)" }}>All Work</span>
+            <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 40%, transparent)", letterSpacing: "0.1em" }}>{visible.length}</span>
           </div>
           <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "2px" }}>
             {cats.map((cat) => (
               <button key={cat} onClick={() => setFilter(cat)}
-                style={{ background: filter === cat ? "#fff" : "rgba(255,255,255,0.06)", border: "1px solid", borderColor: filter === cat ? "#fff" : "rgba(255,255,255,0.1)", color: filter === cat ? "var(--ed-fg, #0a0a0a)" : "rgba(255,255,255,0.5)", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "5px 12px", cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap", flexShrink: 0 }}>
+                style={{ background: filter === cat ? "var(--ed-fg, #0a0a0a)" : "color-mix(in srgb, var(--ed-fg, #0a0a0a) 6%, transparent)", border: "1px solid", borderColor: filter === cat ? "var(--ed-fg, #0a0a0a)" : "color-mix(in srgb, var(--ed-fg, #0a0a0a) 14%, transparent)", color: filter === cat ? "var(--ed-bg, #fafafa)" : "color-mix(in srgb, var(--ed-fg, #0a0a0a) 55%, transparent)", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "5px 12px", cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap", flexShrink: 0 }}>
                 {cat}
               </button>
             ))}
