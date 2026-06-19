@@ -125,7 +125,7 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
       {compact ? (
         /* Phone + tablet: two full-width panes (editor / preview) swiped between. */
         <div style={{ display: "flex", flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
-          <div style={{ display: "flex", width: "200%", height: "100%", transform: `translateX(${mobilePane === 0 ? "0%" : "-50%"})`, transition: "transform 0.32s cubic-bezier(0.22,1,0.36,1)" }}>
+          <div style={{ display: "flex", width: "200%", height: "100%", flexShrink: 0, transform: `translateX(${mobilePane === 0 ? "0%" : "-50%"})`, transition: "transform 0.32s cubic-bezier(0.22,1,0.36,1)" }}>
             <div style={{ width: "50%", height: "100%", display: "flex", flexShrink: 0, minWidth: 0 }}>
               <Sidebar tab={tab} setTab={changeTab} />
             </div>
