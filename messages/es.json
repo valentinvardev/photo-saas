@@ -763,6 +763,8 @@
     "uploadingInline": "subiendo {done}/{total}…",
     "done": "Listo",
     "select": "Seleccionar",
+    "selectPhoto": "Seleccionar foto",
+    "deselect": "Quitar selección",
     "upload": "Subir",
     "uploadingBtn": "Subiendo {done}/{total}…",
     "renameFolderTitle": "Renombrar carpeta",

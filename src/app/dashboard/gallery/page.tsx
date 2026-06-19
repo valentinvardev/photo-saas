@@ -318,19 +318,23 @@ export default function GalleryPage() {
               <div key={photo.id}
                 className="relative aspect-square overflow-hidden cursor-pointer group bg-[var(--bg-subtle)]"
                 style={{ boxShadow: isSel ? "inset 0 0 0 3px #fad502" : "none" }}
-                onClick={() => { if (selectMode) toggle(photo.id); else setLightboxIdx(i); }}>
+                onClick={() => { if (selectMode || selected.size > 0) toggle(photo.id); else setLightboxIdx(i); }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photo.url} alt={photo.filename} loading="lazy" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                 <div className="absolute bottom-0 inset-x-0 px-1.5 py-1 bg-gradient-to-t from-black/70 to-transparent translate-y-full group-hover:translate-y-0 transition-transform">
                   <p className="font-mono text-[9px] text-white truncate">{photo.filename}</p>
                 </div>
-                {(selectMode || isSel) && (
-                  <div onClick={(e) => { e.stopPropagation(); toggle(photo.id); }}
-                    className={`absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center transition-colors ${isSel ? "bg-yellow" : "bg-black/40 border border-white/40"}`}>
-                    {isSel && <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#111" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
-                  </div>
-                )}
+                {/* Selection checkbox — shows on hover (unchecked) so you can pick
+                    photos without first entering select mode; stays once checked. */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggle(photo.id); }}
+                  aria-label={isSel ? t("galleryPage.deselect") : t("galleryPage.selectPhoto")}
+                  className={`absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-150
+                    ${isSel ? "bg-yellow border border-yellow scale-100" : "bg-black/30 border border-white/70 hover:border-white hover:bg-black/50 backdrop-blur-[1px]"}
+                    ${isSel || selectMode ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+                  {isSel && <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#111" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
+                </button>
               </div>
             );
           })}

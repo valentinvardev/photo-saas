@@ -763,6 +763,8 @@
     "uploadingInline": "uploading {done}/{total}…",
     "done": "Done",
     "select": "Select",
+    "selectPhoto": "Select photo",
+    "deselect": "Deselect",
     "upload": "Upload",
     "uploadingBtn": "Uploading {done}/{total}…",
     "renameFolderTitle": "Rename folder",
