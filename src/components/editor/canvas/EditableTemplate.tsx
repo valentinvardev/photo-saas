@@ -348,7 +348,7 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
   };
 
   return (
-    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} className="gm-modal"
       style={{ position: "fixed", inset: 0, zIndex: 2000, background: "var(--ed-bg, #000)", display: "flex", flexDirection: "column", userSelect: "none" }}>
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "linear-gradient(to bottom, color-mix(in srgb, var(--ed-bg, #000) 75%, transparent), transparent)", pointerEvents: "none" }}>
         <button style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "color-mix(in srgb, var(--ed-fg, #fff) 65%, transparent)", padding: "4px 8px", fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", display: "flex", alignItems: "center", gap: "6px" }} onClick={onClose}>
@@ -404,8 +404,15 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "var(--ed-bg, #fafafa)", display: "flex", flexDirection: "column" }}>
-        <style>{`.gm-filters::-webkit-scrollbar{display:none}`}</style>
+      <div className="gm-modal" style={{ position: "fixed", inset: 0, zIndex: 1000, background: "var(--ed-bg, #fafafa)", display: "flex", flexDirection: "column" }}>
+        <style>{`
+          .gm-filters::-webkit-scrollbar{display:none}
+          @keyframes gm-modal-in{from{opacity:0}to{opacity:1}}
+          @keyframes gm-cell-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+          .gm-modal{animation:gm-modal-in .28s ease both}
+          .gm-cell{animation:gm-cell-in .5s cubic-bezier(.22,1,.36,1) both}
+          @media (prefers-reduced-motion: reduce){.gm-modal,.gm-cell{animation:none !important}}
+        `}</style>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2.5rem", height: "60px", borderBottom: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", flexShrink: 0, gap: "1rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexShrink: 0 }}>
             <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 55%, transparent)", display: "flex", alignItems: "center", padding: 0 }}>
@@ -428,7 +435,7 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
         <div style={{ flex: 1, overflowY: "auto", padding: "2rem 2.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "3px" }}>
             {visible.map((w, i) => (
-              <div key={w.id} style={{ aspectRatio: "4/5", cursor: "pointer" }} onClick={() => setLightboxIndex(i)}>
+              <div key={w.id} className="gm-cell" style={{ aspectRatio: "4/5", cursor: "pointer", animationDelay: `${Math.min(i * 25, 350)}ms` }} onClick={() => setLightboxIndex(i)}>
                 <Cell w={w} captionPalette />
               </div>
             ))}
@@ -601,6 +608,7 @@ function Label({ index, nodeId }: { index: string; nodeId: string }) {
 export function EditableTemplate({ viewport }: { viewport: Viewport }) {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const { selectNode, grid, readOnly } = useEditorStore();
+  const rootRef = useRef<HTMLDivElement>(null);
   // In the editor a button click selects it (for editing); only the live site
   // fires the action. So gallery buttons open the modal only when readOnly.
   const openGallery = () => { if (readOnly) setGalleryOpen(true); };
@@ -621,6 +629,25 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
   /* "Load more" pagination — reset when the relevant settings change */
   const [visibleCount, setVisibleCount] = useState(grid.pageSize);
   useEffect(() => { setVisibleCount(grid.pageSize); }, [grid.pageSize, grid.loadMore, grid.layout, allWorks.length]);
+
+  /* Reveal sections on scroll — only on the public/preview render (readOnly),
+     never while editing in the canvas (where hiding sections would get in the
+     way). Sections start hidden via the .tpl-anim CSS and get `is-in` here. */
+  useEffect(() => {
+    if (!readOnly) return;
+    const root = rootRef.current;
+    if (!root) return;
+    const els = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
+    if (els.length === 0) return;
+    if (typeof IntersectionObserver === "undefined") { els.forEach((el) => el.classList.add("is-in")); return; }
+    const obs = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) { e.target.classList.add("is-in"); obs.unobserve(e.target); }
+      }
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.08 });
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [readOnly, viewport]);
   const uniformWorks = grid.loadMore ? allWorks.slice(0, visibleCount) : featured;
   const canLoadMore  = grid.loadMore && visibleCount < allWorks.length;
 
@@ -660,9 +687,16 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
   return (
     <div
+      ref={rootRef}
+      className={readOnly ? "tpl-anim" : undefined}
       style={{ background: "var(--ed-bg, #fafafa)", color: "var(--ed-fg, #0a0a0a)", minHeight: "100%", fontFamily: "var(--tpl-sans,sans-serif)" }}
       onClick={() => selectNode(null)}
     >
+      <style>{`
+        .tpl-anim [data-reveal]{opacity:0;transform:translateY(26px);transition:opacity .7s ease, transform .8s cubic-bezier(.22,1,.36,1);}
+        .tpl-anim [data-reveal].is-in{opacity:1;transform:none;}
+        @media (prefers-reduced-motion: reduce){.tpl-anim [data-reveal]{opacity:1 !important;transform:none !important;transition:none !important;}}
+      `}</style>
       {/* SECTION IDS: used by the sidebar Pages tree to scroll-to and highlight sections.
           nav-section, hero-section, work (existing), section-quote,
           about (existing), press (existing), contact (existing), footer-section */}
@@ -671,6 +705,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       {/* ════ HERO ════ */}
       <section
         id="section-hero"
+        data-reveal
         style={{
           minHeight: "92vh",
           display: "grid",
@@ -738,7 +773,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ════ WORK ════ */}
-      <section id="work" style={{ padding: `5rem ${px}` }}>
+      <section id="work" data-reveal style={{ padding: `5rem ${px}` }}>
         <Label index="01" nodeId="label-work" />
 
         {grid.layout === "mosaic" ? (
@@ -800,7 +835,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ════ PULL QUOTE ════ */}
-      <section id="section-quote" style={{ padding: `${isMobile ? "4rem" : "6rem"} ${px}`, background: "var(--ed-fg, #0a0a0a)", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
+      <section id="section-quote" data-reveal style={{ padding: `${isMobile ? "4rem" : "6rem"} ${px}`, background: "var(--ed-fg, #0a0a0a)", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
         <EditableNode id="quote-eyebrow" tag="span" style={{ display: "block", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "color-mix(in srgb, var(--ed-bg, #fafafa) 45%, transparent)" }}>
           <EditableText id="quote-eyebrow" />
         </EditableNode>
@@ -813,7 +848,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ════ ABOUT ════ */}
-      <section id="about" style={{ padding: `${isMobile ? "4rem" : "7rem"} ${px}`, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "3rem" : "6rem", alignItems: "center" }}>
+      <section id="about" data-reveal style={{ padding: `${isMobile ? "4rem" : "7rem"} ${px}`, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "3rem" : "6rem", alignItems: "center" }}>
         <div>
           <Label index="02" nodeId="label-about" />
           <EditableNode id="about-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 400, fontSize: isMobile ? "clamp(32px,10vw,48px)" : "clamp(36px,4vw,56px)", lineHeight: 1.1, color: "var(--ed-fg, #0a0a0a)", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
@@ -857,7 +892,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ════ PRESS ════ */}
-      <section id="press" style={{ padding: `${isMobile ? "3.5rem" : "5rem"} ${px}`, background: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 4%, var(--ed-bg, #fafafa))", borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
+      <section id="press" data-reveal style={{ padding: `${isMobile ? "3.5rem" : "5rem"} ${px}`, background: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 4%, var(--ed-bg, #fafafa))", borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
         <Label index="03" nodeId="label-press" />
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : isTablet ? "repeat(3,1fr)" : "repeat(5,1fr)", gap: "1px", background: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
           {(["press-1","press-2","press-3","press-4","press-5"] as const).map((id, i) => {
@@ -877,7 +912,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ════ CONTACT ════ */}
-      <section id="contact" style={{ padding: `${isMobile ? "4rem" : "8rem"} ${px}`, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "3rem" : "6rem", alignItems: "start" }}>
+      <section id="contact" data-reveal style={{ padding: `${isMobile ? "4rem" : "8rem"} ${px}`, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "3rem" : "6rem", alignItems: "start" }}>
         <div>
           <Label index="04" nodeId="label-contact" />
           <EditableNode id="contact-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "clamp(36px,11vw,56px)" : "clamp(40px,5vw,72px)", lineHeight: 1.05, color: "var(--ed-fg, #0a0a0a)", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
@@ -931,7 +966,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ════ FOOTER ════ */}
-      <footer id="section-footer" style={{ padding: `2rem ${px}`, borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? "1.25rem" : "2rem", justifyContent: "space-between" }}>
+      <footer id="section-footer" data-reveal style={{ padding: `2rem ${px}`, borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? "1.25rem" : "2rem", justifyContent: "space-between" }}>
         <EditableNode id="nav-logo" tag="span" style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--ed-fg, #0a0a0a)", textTransform: "uppercase" }}>
           <EditableText id="nav-logo" />
         </EditableNode>
