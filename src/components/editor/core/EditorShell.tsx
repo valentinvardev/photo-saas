@@ -10,6 +10,8 @@ import { Canvas } from "./Canvas";
 import { Sidebar, type SidebarTab } from "./Sidebar";
 import { InspectorPanel } from "~/components/editor/panels/InspectorPanel";
 import { FloatingTextToolbar } from "~/components/editor/canvas/FloatingTextToolbar";
+import { MobileBuilderChrome } from "./MobileBuilderChrome";
+import { useIsMobile } from "~/lib/useIsMobile";
 import type { TemplateId } from "~/lib/editor/templates/registry";
 
 // Side-effect: load all @fontsource CSS
@@ -26,10 +28,15 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
   const {
     setTemplate, updateNode, setPalette, setTypography, setLogo,
     hydrateDesign, setGalleryPhotos, setReadOnly,
-    setSelectedSection, setHoveredSection,
+    setSelectedSection, setHoveredSection, setViewport,
     palette, typography, buttons, grid, selectedSection, hoveredSection, hiddenSections,
     nodes, logo, contact,
   } = useEditorStore();
+
+  // Phone: full-width editor/preview panes you swipe between. Desktop is unchanged.
+  const isMobile = useIsMobile();
+  const [mobilePane, setMobilePane] = useState<0 | 1>(0);
+  useEffect(() => { if (isMobile) setViewport("mobile"); }, [isMobile, setViewport]);
 
   // One left panel, three modes. Design (the global system) is shown first.
   const [tab, setTab] = useState<SidebarTab>("design");
@@ -110,13 +117,29 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
         saving={saveDesign.isPending}
       />
 
-      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-        <Sidebar tab={tab} setTab={changeTab} />
-        {/* Canvas editing is available in every tab: the image inspector and the
-            floating text toolbar self-hide until an element is selected. */}
-        <InspectorPanel />
-        <Canvas />
-      </div>
+      {isMobile ? (
+        /* Phone: two full-width panes (editor / preview) swiped between. */
+        <div style={{ display: "flex", flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
+          <div style={{ display: "flex", width: "200%", height: "100%", transform: `translateX(${mobilePane === 0 ? "0%" : "-50%"})`, transition: "transform 0.32s cubic-bezier(0.22,1,0.36,1)" }}>
+            <div style={{ width: "50%", height: "100%", display: "flex", flexShrink: 0, minWidth: 0 }}>
+              <Sidebar tab={tab} setTab={changeTab} />
+            </div>
+            <div style={{ width: "50%", height: "100%", display: "flex", flexDirection: "column", flexShrink: 0, minWidth: 0 }}>
+              <InspectorPanel />
+              <Canvas />
+            </div>
+          </div>
+          <MobileBuilderChrome pane={mobilePane} setPane={setMobilePane} />
+        </div>
+      ) : (
+        <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+          <Sidebar tab={tab} setTab={changeTab} />
+          {/* Canvas editing is available in every tab: the image inspector and the
+              floating text toolbar self-hide until an element is selected. */}
+          <InspectorPanel />
+          <Canvas />
+        </div>
+      )}
 
       {/* Floating formatting toolbar — appears above the selected text node */}
       <FloatingTextToolbar />

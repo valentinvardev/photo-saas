@@ -9,6 +9,7 @@ import { useEditorTheme } from "~/lib/editor/editorTheme";
 import type { Viewport } from "~/lib/editor/types";
 import { api } from "~/trpc/react";
 import { useT } from "~/components/providers/LangProvider";
+import { useIsMobile } from "~/lib/useIsMobile";
 
 const VIEWPORT_PX: Record<Viewport, number> = { desktop: 1280, tablet: 768, mobile: 375 };
 
@@ -93,6 +94,8 @@ export function TopBar({ portfolioId, saving }: {
   const { theme, toggle } = useEditorTheme();
   const router = useRouter();
   const [showExitModal, setShowExitModal] = useState(false);
+  const isMobile = useIsMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const canUndo = pastStates.length > 0;
   const canRedo = futureStates.length > 0;
@@ -128,6 +131,74 @@ export function TopBar({ portfolioId, saving }: {
   }
 
   const divider = <div style={{ width: 1, height: 18, background: "var(--ec-border)", margin: "0 2px" }} />;
+
+  /* ── Phone: compact bar (back · undo · redo · theme · ⋯ menu) ── */
+  if (isMobile) {
+    const iconBtn = (enabled = true): React.CSSProperties => ({
+      background: "none", border: "none", cursor: enabled ? "pointer" : "not-allowed",
+      color: enabled ? "var(--ec-label)" : "var(--ec-ghost)", padding: "6px 7px", borderRadius: 4,
+      display: "flex", alignItems: "center",
+    });
+    const menuItem: React.CSSProperties = {
+      display: "flex", alignItems: "center", gap: 9, width: "100%", textAlign: "left",
+      padding: "10px 12px", background: "none", border: "none", cursor: "pointer",
+      fontSize: 12.5, color: "var(--ec-label)", fontFamily: "inherit", textDecoration: "none", borderRadius: 7,
+    };
+    return (
+      <>
+        <header style={{ height: "var(--ed-topbar-h)", background: "var(--ec-bg)", borderBottom: "1px solid var(--ec-line)", display: "flex", alignItems: "center", padding: "0 8px", gap: 2, flexShrink: 0, zIndex: 50 }}>
+          <button onClick={handleBack} title={t("editor.backToDashboard")} style={iconBtn()}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <button onClick={() => undo()} disabled={!canUndo} style={iconBtn(canUndo)}><UndoIcon /></button>
+          <button onClick={() => redo()} disabled={!canRedo} style={iconBtn(canRedo)}><RedoIcon /></button>
+          <button onClick={toggle} style={iconBtn()}>{theme === "dark" ? <SunIcon /> : <MoonIcon />}</button>
+
+          <div style={{ flex: 1 }} />
+
+          {portfolioId && (
+            <span style={{ display: "flex", alignItems: "center", marginRight: 2 }} title={saving ? t("editor.saving") : t("editor.saved")}>
+              {saving
+                ? <span style={{ width: 11, height: 11, borderRadius: "50%", border: "1.5px solid var(--ec-border)", borderTopColor: "#facc15", display: "inline-block", animation: "ed-spin 0.7s linear infinite" }} />
+                : <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />}
+              <style>{`@keyframes ed-spin { to { transform: rotate(360deg); } }`}</style>
+            </span>
+          )}
+
+          <div style={{ position: "relative" }}>
+            <button onClick={() => setMenuOpen((o) => !o)} style={iconBtn()} title="More">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+            </button>
+            {menuOpen && (
+              <>
+                <div style={{ position: "fixed", inset: 0, zIndex: 55 }} onClick={() => setMenuOpen(false)} />
+                <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, minWidth: 188, background: "var(--ec-bg)", border: "1px solid var(--ec-border)", borderRadius: 10, boxShadow: "0 12px 32px rgba(0,0,0,0.45)", padding: 4, zIndex: 60 }}>
+                  <a href={portfolioId ? `/editor/${portfolioId}/preview` : "/templates/minimal-bw"} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} style={menuItem}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    {t("editor.preview")}
+                  </a>
+                  {portfolioId && (
+                    <button onClick={() => { togglePublish(); setMenuOpen(false); }} disabled={updateStatus.isPending} style={{ ...menuItem, color: isPublished ? "#22c55e" : "var(--ec-label)" }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                      {isPublished ? t("editor.published") : t("editor.publish")}
+                    </button>
+                  )}
+                  <div style={{ height: 1, background: "var(--ec-line)", margin: "4px 0" }} />
+                  <button onClick={() => { setMenuOpen(false); if (confirm(t("editor.resetConfirm"))) reset(); }} style={{ ...menuItem, color: "#f87171" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
+                    {t("editor.reset")}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </header>
+        {showExitModal && (
+          <ExitModal onSaveExit={handleSaveAndExit} onDiscard={handleDiscard} onCancel={() => setShowExitModal(false)} />
+        )}
+      </>
+    );
+  }
 
   return (
     <>
@@ -296,79 +367,41 @@ export function TopBar({ portfolioId, saving }: {
       )}
     </header>
 
-      {/* Exit confirmation modal */}
       {showExitModal && (
-        <div
-          style={{
-            position: "fixed", inset: 0, zIndex: 9999,
-            background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)",
-            display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
-          }}
-          onClick={() => setShowExitModal(false)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "var(--ec-bg)",
-              border: "1px solid var(--ec-border)",
-              borderRadius: 14,
-              width: "100%", maxWidth: 360,
-              boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
-              overflow: "hidden",
-            }}
-          >
-            {/* Header */}
-            <div style={{ padding: "20px 22px 16px", borderBottom: "1px solid var(--ec-line)" }}>
-              <p style={{ fontSize: 14, fontWeight: 700, color: "var(--ec-text)", margin: 0 }}>
-                {t("editor.exit.title")}
-              </p>
-              <p style={{ fontSize: 12, color: "var(--ec-muted)", marginTop: 4, lineHeight: 1.5 }}>
-                {t("editor.exit.body")}
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div style={{ padding: "14px 22px 18px", display: "flex", flexDirection: "column", gap: 8 }}>
-              {/* Save & exit — primary */}
-              <button
-                onClick={handleSaveAndExit}
-                style={{
-                  width: "100%", padding: "9px 16px", borderRadius: 8,
-                  background: "#facc15", border: "none", cursor: "pointer",
-                  fontSize: 13, fontWeight: 700, color: "#111",
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-                }}
-              >
-                <SaveIcon /> {t("editor.exit.saveAndExit")}
-              </button>
-
-              {/* Don't save */}
-              <button
-                onClick={handleDiscard}
-                style={{
-                  width: "100%", padding: "9px 16px", borderRadius: 8,
-                  background: "none", border: "1px solid var(--ec-border)", cursor: "pointer",
-                  fontSize: 13, fontWeight: 500, color: "var(--ec-label)",
-                }}
-              >
-                {t("editor.exit.dontSave")}
-              </button>
-
-              {/* Cancel */}
-              <button
-                onClick={() => setShowExitModal(false)}
-                style={{
-                  width: "100%", padding: "7px 16px", borderRadius: 8,
-                  background: "none", border: "none", cursor: "pointer",
-                  fontSize: 12, color: "var(--ec-dim)",
-                }}
-              >
-                {t("editor.exit.cancel")}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ExitModal onSaveExit={handleSaveAndExit} onDiscard={handleDiscard} onCancel={() => setShowExitModal(false)} />
       )}
     </>
+  );
+}
+
+/* Exit confirmation modal — shared by the desktop + mobile top bars. */
+function ExitModal({ onSaveExit, onDiscard, onCancel }: { onSaveExit: () => void; onDiscard: () => void; onCancel: () => void }) {
+  const { t } = useT();
+  return (
+    <div
+      style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+      onClick={onCancel}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ background: "var(--ec-bg)", border: "1px solid var(--ec-border)", borderRadius: 14, width: "100%", maxWidth: 360, boxShadow: "0 24px 64px rgba(0,0,0,0.4)", overflow: "hidden" }}
+      >
+        <div style={{ padding: "20px 22px 16px", borderBottom: "1px solid var(--ec-line)" }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: "var(--ec-text)", margin: 0 }}>{t("editor.exit.title")}</p>
+          <p style={{ fontSize: 12, color: "var(--ec-muted)", marginTop: 4, lineHeight: 1.5 }}>{t("editor.exit.body")}</p>
+        </div>
+        <div style={{ padding: "14px 22px 18px", display: "flex", flexDirection: "column", gap: 8 }}>
+          <button onClick={onSaveExit} style={{ width: "100%", padding: "9px 16px", borderRadius: 8, background: "#facc15", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#111", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            <SaveIcon /> {t("editor.exit.saveAndExit")}
+          </button>
+          <button onClick={onDiscard} style={{ width: "100%", padding: "9px 16px", borderRadius: 8, background: "none", border: "1px solid var(--ec-border)", cursor: "pointer", fontSize: 13, fontWeight: 500, color: "var(--ec-label)" }}>
+            {t("editor.exit.dontSave")}
+          </button>
+          <button onClick={onCancel} style={{ width: "100%", padding: "7px 16px", borderRadius: 8, background: "none", border: "none", cursor: "pointer", fontSize: 12, color: "var(--ec-dim)" }}>
+            {t("editor.exit.cancel")}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

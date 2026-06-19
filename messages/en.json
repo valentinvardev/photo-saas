@@ -352,6 +352,13 @@
   "editor": {
     "backToDashboard": "Back to dashboard",
     "builder": "Website builder",
+    "mobile": {
+      "edit": "Edit",
+      "preview": "Preview",
+      "introTitle": "Edit and preview",
+      "introBody": "Swipe from the edges — or use the toggle at the bottom — to move between editing and the live preview.",
+      "gotIt": "Got it"
+    },
     "back": "Back",
     "save": "Save",
     "saving": "Saving",

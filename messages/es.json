@@ -352,6 +352,13 @@
   "editor": {
     "backToDashboard": "Volver al panel",
     "builder": "Editor web",
+    "mobile": {
+      "edit": "Editar",
+      "preview": "Vista previa",
+      "introTitle": "Editar y previsualizar",
+      "introBody": "Deslizá desde los bordes — o usá el botón de abajo — para moverte entre la edición y la vista previa en vivo.",
+      "gotIt": "Entendido"
+    },
     "back": "Volver",
     "save": "Guardar",
     "saving": "Guardando",
