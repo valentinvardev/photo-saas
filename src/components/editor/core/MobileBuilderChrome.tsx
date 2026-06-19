@@ -5,11 +5,15 @@ import { useT } from "~/components/providers/LangProvider";
 
 const INTRO_KEY = "frame-mobile-builder-intro";
 
-/* A draggable edge handle — tap or swipe inward to switch panes. */
-function EdgeHandle({ side, onActivate }: { side: "left" | "right"; onActivate: () => void }) {
+/* A labelled vertical strip on the edge — tap or swipe inward to switch panes. */
+function EdgeHandle({ side, label, onActivate }: { side: "left" | "right"; label: string; onActivate: () => void }) {
   const startX = useRef(0);
   const done = useRef(false);
-
+  const chevron = (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      {side === "right" ? <polyline points="9 18 15 12 9 6" /> : <polyline points="15 18 9 12 15 6" />}
+    </svg>
+  );
   return (
     <div
       onPointerDown={(e) => { startX.current = e.clientX; done.current = false; }}
@@ -24,17 +28,25 @@ function EdgeHandle({ side, onActivate }: { side: "left" | "right"; onActivate: 
       }}
       style={{
         position: "fixed", top: "50%", transform: "translateY(-50%)",
-        [side]: 0, width: 22, height: 84, zIndex: 60,
-        display: "flex", alignItems: "center", justifyContent: side === "left" ? "flex-start" : "flex-end",
-        touchAction: "none", cursor: "pointer",
+        [side]: 0, zIndex: 60, touchAction: "none", cursor: "pointer",
+        display: "flex", alignItems: "center",
       }}
-      aria-hidden
     >
       <div style={{
-        width: 5, height: 56, background: "#facc15", opacity: 0.85,
-        borderRadius: side === "left" ? "0 4px 4px 0" : "4px 0 0 4px",
-        boxShadow: "0 1px 6px rgba(0,0,0,0.4)",
-      }} />
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 7,
+        padding: "13px 5px",
+        background: "var(--ec-bg)",
+        border: "1px solid var(--ec-border)",
+        color: "#facc15",
+        boxShadow: "0 6px 22px rgba(0,0,0,0.45)",
+        ...(side === "right"
+          ? { borderRight: "none", borderRadius: "12px 0 0 12px", borderLeft: "2px solid #facc15" }
+          : { borderLeft: "none", borderRadius: "0 12px 12px 0", borderRight: "2px solid #facc15" }),
+      }}>
+        {chevron}
+        <span style={{ writingMode: "vertical-rl", fontSize: 9.5, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--ec-label)" }}>{label}</span>
+        {chevron}
+      </div>
     </div>
   );
 }
@@ -76,8 +88,8 @@ export function MobileBuilderChrome({ pane, setPane }: { pane: 0 | 1; setPane: (
     <>
       {/* Edge handle (only on the side that switches) */}
       {pane === 0
-        ? <EdgeHandle side="right" onActivate={() => setPane(1)} />
-        : <EdgeHandle side="left" onActivate={() => setPane(0)} />}
+        ? <EdgeHandle side="right" label={t("editor.mobile.preview")} onActivate={() => setPane(1)} />
+        : <EdgeHandle side="left" label={t("editor.mobile.edit")} onActivate={() => setPane(0)} />}
 
       {/* Bottom Edit / Preview toggle */}
       <div style={{

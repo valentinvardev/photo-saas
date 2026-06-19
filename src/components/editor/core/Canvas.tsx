@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import { deviceContentRef } from "~/lib/editor/deviceRef";
 import { TEMPLATES } from "~/lib/editor/templates/registry";
+import { useIsMobile } from "~/lib/useIsMobile";
 import type { Viewport } from "~/lib/editor/types";
 
 /* Resolves the active template's component from the editor store */
@@ -245,12 +246,35 @@ function DesktopFrame({ contentRef }: { contentRef: React.RefObject<HTMLDivEleme
 export function Canvas() {
   const { selectNode, viewport } = useEditorStore();
   const contentRef = useRef<HTMLDivElement>(null);
+  // On a real phone there's no point simulating a device — render the site
+  // full-bleed at the actual phone size (more accurate, and uses the space).
+  const isPhone = useIsMobile(768);
 
   // Keep the module-level ref in sync with the current content div
   useEffect(() => {
     deviceContentRef.current = contentRef.current;
     return () => { deviceContentRef.current = null; };
-  }, [viewport]); // rebind whenever viewport switches (new DOM node)
+  }, [viewport, isPhone]); // rebind whenever the content div changes
+
+  if (isPhone) {
+    return (
+      <div
+        className="editor-canvas-viewport"
+        style={{ flex: 1, minHeight: 0, overflow: "hidden", background: "#fafafa", display: "flex", flexDirection: "column" }}
+        onClick={(e) => { if (e.target === e.currentTarget) selectNode(null); }}
+      >
+        <div
+          ref={contentRef}
+          className="editor-canvas-scroll"
+          style={{ flex: 1, width: "100%", overflowY: "auto", overflowX: "hidden", background: "#fafafa" }}
+        >
+          <div className="canvas-frame" style={{ minHeight: "100%" }}>
+            <ActiveTemplate viewport="mobile" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
