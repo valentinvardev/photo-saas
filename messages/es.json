@@ -783,6 +783,7 @@
     "clear": "Limpiar",
     "dropToUpload": "Suelta para subir",
     "dropToUploadFolder": "Suelta para subir a {name}",
+    "deletePhotosTitle": "Eliminar fotos",
     "deleteConfirmOne": "¿Eliminar 1 foto? No se puede deshacer.",
     "deleteConfirmMany": "¿Eliminar {n} fotos? No se puede deshacer.",
     "deleteFolderConfirm": "¿Eliminar la carpeta \"{name}\"? Las fotos de adentro volverán a tu biblioteca (no se eliminan)."
@@ -1081,7 +1082,8 @@
     "markRead": "Marcar como leído",
     "markUnread": "Marcar como no leído",
     "delete": "Eliminar",
-    "deleteConfirm": "¿Eliminar este mensaje?",
+    "deleteConfirm": "¿Eliminar este mensaje? No se puede deshacer.",
+    "cancel": "Cancelar",
     "reply": "Responder",
     "replySubject": "Re: tu mensaje"
   }

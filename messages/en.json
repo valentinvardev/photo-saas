@@ -783,6 +783,7 @@
     "clear": "Clear",
     "dropToUpload": "Drop to upload",
     "dropToUploadFolder": "Drop to upload to {name}",
+    "deletePhotosTitle": "Delete photos",
     "deleteConfirmOne": "Delete 1 photo? This can't be undone.",
     "deleteConfirmMany": "Delete {n} photos? This can't be undone.",
     "deleteFolderConfirm": "Delete folder \"{name}\"? The photos inside will be moved back to your library (not deleted)."
@@ -1081,7 +1082,8 @@
     "markRead": "Mark as read",
     "markUnread": "Mark as unread",
     "delete": "Delete",
-    "deleteConfirm": "Delete this message?",
+    "deleteConfirm": "Delete this message? This can't be undone.",
+    "cancel": "Cancel",
     "reply": "Reply",
     "replySubject": "Re: your message"
   }

@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { api } from "~/trpc/react";
 import { useT } from "~/components/providers/LangProvider";
+import { ConfirmModal } from "~/components/ui/ConfirmModal";
 
 function fmtDate(d: Date | string) {
   const date = new Date(d);
@@ -16,15 +19,17 @@ export default function InboxPage() {
   const del = api.contact.delete.useMutation();
   const msgs = data ?? [];
   const unread = msgs.filter((m) => !m.read).length;
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
   async function refresh() {
     await Promise.all([utils.contact.list.invalidate(), utils.contact.unreadCount.invalidate()]);
   }
   async function toggleRead(id: string, read: boolean) { await markRead.mutateAsync({ id, read }); await refresh(); }
-  async function remove(id: string) {
-    if (!confirm(t("inbox.deleteConfirm"))) return;
-    await del.mutateAsync({ id });
+  async function confirmDelete() {
+    if (!pendingDelete) return;
+    await del.mutateAsync({ id: pendingDelete });
     await refresh();
+    setPendingDelete(null);
   }
 
   return (
@@ -74,7 +79,7 @@ export default function InboxPage() {
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     )}
                   </button>
-                  <button onClick={() => remove(m.id)} title={t("inbox.delete")}
+                  <button onClick={() => setPendingDelete(m.id)} title={t("inbox.delete")}
                     className="p-1.5 rounded-lg text-[var(--fg-muted)] hover:text-red-400 hover:bg-[var(--bg-subtle)] transition-colors">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
                   </button>
@@ -94,6 +99,20 @@ export default function InboxPage() {
           ))}
         </div>
       )}
+
+      <AnimatePresence>
+        {pendingDelete && (
+          <ConfirmModal
+            title={t("inbox.delete")}
+            body={t("inbox.deleteConfirm")}
+            confirmLabel={t("inbox.delete")}
+            cancelLabel={t("inbox.cancel")}
+            busy={del.isPending}
+            onConfirm={confirmDelete}
+            onClose={() => setPendingDelete(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

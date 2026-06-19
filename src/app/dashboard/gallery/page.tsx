@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { api } from "~/trpc/react";
 import { useUploadPhotos } from "~/lib/photo/upload";
 import { useT } from "~/components/providers/LangProvider";
+import { ConfirmModal } from "~/components/ui/ConfirmModal";
 
 /* ── Icons ── */
 const UploadIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;
@@ -145,6 +146,7 @@ export default function GalleryPage() {
   const [moveMenu, setMoveMenu] = useState(false);
   const [folderModal, setFolderModal] = useState<FolderModalState>(null);
   const [folderBusy, setFolderBusy] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{ title: string; body: string; confirmLabel: string; onConfirm: () => void } | null>(null);
 
   const activeFolderObj = folders.find((f) => f.id === activeFolder) ?? null;
 
@@ -162,12 +164,18 @@ export default function GalleryPage() {
     await doUpload(files);
   }
 
-  async function deleteSelected() {
+  function deleteSelected() {
     if (selected.size === 0) return;
-    if (!confirm(selected.size === 1 ? t("galleryPage.deleteConfirmOne") : t("galleryPage.deleteConfirmMany", { n: selected.size }))) return;
-    setDeleting(true);
-    try { await Promise.all([...selected].map((id) => deleteMut.mutateAsync({ id }))); await refresh(); clearSel(); }
-    finally { setDeleting(false); }
+    setConfirmDialog({
+      title: t("galleryPage.deletePhotosTitle"),
+      body: selected.size === 1 ? t("galleryPage.deleteConfirmOne") : t("galleryPage.deleteConfirmMany", { n: selected.size }),
+      confirmLabel: t("galleryPage.delete"),
+      onConfirm: async () => {
+        setDeleting(true);
+        try { await Promise.all([...selected].map((id) => deleteMut.mutateAsync({ id }))); await refresh(); clearSel(); }
+        finally { setDeleting(false); setConfirmDialog(null); }
+      },
+    });
   }
 
   async function moveSelected(folderId: string | null) {
@@ -195,12 +203,20 @@ export default function GalleryPage() {
     } finally { setFolderBusy(false); }
   }
 
-  async function deleteActiveFolder() {
+  function deleteActiveFolder() {
     if (!activeFolderObj) return;
-    if (!confirm(t("galleryPage.deleteFolderConfirm", { name: activeFolderObj.name }))) return;
-    await deleteFolderMut.mutateAsync({ id: activeFolderObj.id });
-    setActiveFolder(null);
-    await refresh();
+    const folder = activeFolderObj;
+    setConfirmDialog({
+      title: t("galleryPage.deleteFolderTitle"),
+      body: t("galleryPage.deleteFolderConfirm", { name: folder.name }),
+      confirmLabel: t("galleryPage.delete"),
+      onConfirm: async () => {
+        await deleteFolderMut.mutateAsync({ id: folder.id });
+        setActiveFolder(null);
+        await refresh();
+        setConfirmDialog(null);
+      },
+    });
   }
 
   function onDrop(e: React.DragEvent) {
@@ -412,6 +428,21 @@ export default function GalleryPage() {
       <AnimatePresence>
         {lightboxIdx !== null && photos[lightboxIdx] && (
           <Lightbox photos={photos} index={lightboxIdx} onIndex={setLightboxIdx} onClose={() => setLightboxIdx(null)} />
+        )}
+      </AnimatePresence>
+
+      {/* Delete confirmation */}
+      <AnimatePresence>
+        {confirmDialog && (
+          <ConfirmModal
+            title={confirmDialog.title}
+            body={confirmDialog.body}
+            confirmLabel={confirmDialog.confirmLabel}
+            cancelLabel={t("galleryPage.cancel")}
+            busy={deleting || deleteFolderMut.isPending}
+            onConfirm={confirmDialog.onConfirm}
+            onClose={() => setConfirmDialog(null)}
+          />
         )}
       </AnimatePresence>
     </div>
