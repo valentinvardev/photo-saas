@@ -86,6 +86,15 @@ export interface LogoSettings {
   imageCrop?: ImageCrop;
 }
 
+/* Where the contact form sends submissions.
+   - inbox    → stored in our app; the owner reads them in the dashboard Inbox.
+   - whatsapp → opens WhatsApp to `whatsapp` with the filled `waTemplate`. */
+export interface ContactSettings {
+  mode: "inbox" | "whatsapp";
+  whatsapp: string;    // recipient number (digits; may include +/spaces)
+  waTemplate: string;  // default WhatsApp message — supports {name} {email} {message}
+}
+
 export interface EditorState {
   nodes: Record<string, EditorNode>;
   palette: ColorPalette;
@@ -93,6 +102,7 @@ export interface EditorState {
   buttons: ButtonStyle;
   grid: GridSettings;
   logo: LogoSettings;
+  contact: ContactSettings;
   selectedId: string | null;
   editingId: string | null;
   viewport: Viewport;
@@ -136,4 +146,10 @@ export const DEFAULT_LOGO: LogoSettings = {
   altImageUrl: "",
   faviconUrl:  "",
   width:       32,
+};
+
+export const DEFAULT_CONTACT: ContactSettings = {
+  mode:       "inbox",
+  whatsapp:   "",
+  waTemplate: "Hi! I saw your portfolio and I'd love to get in touch.",
 };

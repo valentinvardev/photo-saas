@@ -22,6 +22,7 @@
 
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { useEditorStore } from "~/lib/editor/store";
+import { api } from "~/trpc/react";
 import { TiptapEditor } from "~/components/editor/toolbars/TiptapEditor";
 import { LogoImage } from "./primitives";
 import type { Viewport } from "~/lib/editor/types";
@@ -602,6 +603,83 @@ function Label({ index, nodeId }: { index: string; nodeId: string }) {
 }
 
 /* ═══════════════════════════════════════════
+   CONTACT FORM — routes to WhatsApp or our inbox per the contact settings
+═══════════════════════════════════════════ */
+function fillWaTemplate(tpl: string, v: { name: string; email: string; message: string }) {
+  let t = (tpl || "").replace(/\{name\}/gi, v.name).replace(/\{email\}/gi, v.email).replace(/\{message\}/gi, v.message);
+  if (v.message && !/\{message\}/i.test(tpl)) t = `${t}\n\n${v.message}`.trim();
+  return t || v.message;
+}
+
+function ContactForm() {
+  const contact  = useEditorStore((s) => s.contact);
+  const siteSlug = useEditorStore((s) => s.siteSlug);
+  const readOnly = useEditorStore((s) => s.readOnly);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const submit = api.contact.submit.useMutation();
+
+  const fieldStyle: React.CSSProperties = { fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" };
+  const focus = (e: React.FocusEvent<HTMLElement>) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; };
+  const blur  = (e: React.FocusEvent<HTMLElement>) => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)"; };
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!readOnly) return; // editing the canvas — don't submit
+    const fd = new FormData(e.currentTarget);
+    const name    = `${fd.get("first") ?? ""} ${fd.get("last") ?? ""}`.trim();
+    const email   = String(fd.get("email") ?? "").trim();
+    const message = String(fd.get("message") ?? "").trim();
+
+    if (contact.mode === "whatsapp") {
+      const digits = contact.whatsapp.replace(/[^\d]/g, "");
+      const text   = fillWaTemplate(contact.waTemplate, { name, email, message });
+      const url    = digits ? `https://wa.me/${digits}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(url, "_blank", "noopener");
+      setStatus("sent");
+      return;
+    }
+    // inbox mode — store the message in our app
+    if (!siteSlug) { setStatus("sent"); return; } // preview/editor: no real submit
+    try {
+      setStatus("sending");
+      await submit.mutateAsync({ slug: siteSlug, name: name || "—", email: email || "hello@example.com", message: message || "—" });
+      setStatus("sent");
+    } catch { setStatus("error"); }
+  }
+
+  if (status === "sent") {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", alignItems: "flex-start", padding: "1.5rem 0" }}>
+        <div style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 25%, transparent)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ed-fg, #0a0a0a)" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "20px", color: "var(--ed-fg, #0a0a0a)" }}>
+          {contact.mode === "whatsapp" ? "Opening WhatsApp…" : "Message sent — thank you."}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+        <input name="first" placeholder="First name" style={fieldStyle} onFocus={focus} onBlur={blur} />
+        <input name="last" placeholder="Last name" style={fieldStyle} onFocus={focus} onBlur={blur} />
+      </div>
+      <input name="email" type="email" placeholder="Email address" style={fieldStyle} onFocus={focus} onBlur={blur} />
+      <textarea name="message" placeholder="Tell me about your project..." rows={5} style={{ ...fieldStyle, resize: "vertical" }} onFocus={focus} onBlur={blur} />
+      {status === "error" && <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: 11, color: "#ef4444" }}>Couldn&apos;t send — please try again.</span>}
+      <button type="submit" disabled={status === "sending"}
+        style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", border: "1px solid var(--ed-btn-bg, #0a0a0a)", borderRadius: "var(--ed-btn-radius, 0)", padding: "13px", cursor: "pointer", transition: "background 0.2s, color 0.2s", opacity: status === "sending" ? 0.6 : 1 }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; e.currentTarget.style.color = "var(--ed-btn-fg, var(--ed-bg, #fafafa))"; }}>
+        {contact.mode === "whatsapp" ? "Send via WhatsApp" : status === "sending" ? "Sending…" : "Send message"}
+      </button>
+    </form>
+  );
+}
+
+/* ═══════════════════════════════════════════
    MAIN EDITABLE TEMPLATE
 ═══════════════════════════════════════════ */
 export function EditableTemplate({ viewport }: { viewport: Viewport }) {
@@ -941,30 +1019,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           </div>
         </div>
 
-        <form style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            {["First name", "Last name"].map((ph) => (
-              <input key={ph} placeholder={ph}
-                style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
-                onBlur={(e)  => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)"; }} />
-            ))}
-          </div>
-          <input type="email" placeholder="Email address"
-            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
-            onBlur={(e)  => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)"; }} />
-          <textarea placeholder="Tell me about your project..." rows={5}
-            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", background: "transparent", color: "var(--ed-fg, #0a0a0a)", outline: "none", resize: "vertical", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
-            onBlur={(e)  => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)"; }} />
-          <button type="submit"
-            style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", border: "1px solid var(--ed-btn-bg, #0a0a0a)", borderRadius: "var(--ed-btn-radius, 0)", padding: "13px", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; e.currentTarget.style.color = "var(--ed-btn-fg, var(--ed-bg, #fafafa))"; }}>
-            Send message
-          </button>
-        </form>
+        <ContactForm />
       </section>
 
       {/* ════ FOOTER ════ */}

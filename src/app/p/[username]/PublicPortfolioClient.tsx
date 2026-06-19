@@ -205,7 +205,7 @@ export function PublicPortfolioClient({ slug }: { slug: string }) {
 
   // If the portfolio was built in the website builder, render that design.
   if (data && isDesign(data.editorState)) {
-    return <PortfolioSiteRender design={data.editorState} galleryPhotos={flattenContentPhotos(data.content)} />;
+    return <PortfolioSiteRender design={data.editorState} galleryPhotos={flattenContentPhotos(data.content)} slug={slug} />;
   }
 
   const content = data && isContent(data.content) ? data.content : null;

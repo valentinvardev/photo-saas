@@ -131,7 +131,27 @@ model Portfolio {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    contactMessages ContactMessage[]
+
     @@index([userId])
+}
+
+// ── Contact inbox ─────────────────────────────────────────────────────────────
+// Submissions from a portfolio's contact form when the owner routes the form to
+// our inbox (instead of WhatsApp). Shown in the dashboard Inbox.
+model ContactMessage {
+    id          String    @id @default(cuid())
+    portfolioId String
+    portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+    userId      String    // denormalized owner for cheap inbox queries
+    name        String
+    email       String
+    message     String
+    read        Boolean   @default(false)
+    createdAt   DateTime  @default(now())
+
+    @@index([userId, createdAt])
+    @@index([portfolioId])
 }
 
 // ── Links pages ───────────────────────────────────────────────────────────────

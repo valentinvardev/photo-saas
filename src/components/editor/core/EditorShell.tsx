@@ -28,7 +28,7 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
     hydrateDesign, setGalleryPhotos, setReadOnly,
     setSelectedSection, setHoveredSection,
     palette, typography, buttons, grid, selectedSection, hoveredSection, hiddenSections,
-    nodes, logo,
+    nodes, logo, contact,
   } = useEditorStore();
 
   // One left panel, three modes. Design (the global system) is shown first.
@@ -67,7 +67,7 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
     if (!portfolioId || !hydrated.current) return;
     const design: PortfolioDesign = {
       templateId: useEditorStore.getState().templateId,
-      nodes, palette, typography, buttons, grid, logo, hiddenSections,
+      nodes, palette, typography, buttons, grid, logo, contact, hiddenSections,
     };
     const json = JSON.stringify(design);
     if (json === lastSaved.current) return;
@@ -77,7 +77,7 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
     }, 1000);
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes, palette, typography, buttons, grid, logo, hiddenSections, portfolioId]);
+  }, [nodes, palette, typography, buttons, grid, logo, contact, hiddenSections, portfolioId]);
 
   /* ── Legacy localStorage editor (/editor/minimal-bw) ── */
   useEffect(() => {

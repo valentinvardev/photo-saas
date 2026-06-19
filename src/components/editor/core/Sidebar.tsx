@@ -482,7 +482,7 @@ function LogoCropButton({
 }
 
 function SettingsTab() {
-  const { logo, setLogo, templateId, updateNode } = useEditorStore();
+  const { logo, setLogo, contact, setContact, templateId, updateNode } = useEditorStore();
   const { t } = useT();
 
   function updateLogoText(value: string) {
@@ -560,6 +560,36 @@ function SettingsTab() {
             <ImagePickerButton value={logo.faviconUrl} onChange={(url) => setLogo({ faviconUrl: url })} />
           </div>
         </div>
+      </div>
+
+      {/* Contact form routing */}
+      <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
+        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.contact")}</p>
+
+        <label style={labelStyle}>{t("editor.settings.contactMode")}</label>
+        <div style={{ display: "flex", gap: 2, marginBottom: 12 }}>
+          {(["inbox", "whatsapp"] as const).map((m) => (
+            <button key={m} style={modeStyle(contact.mode === m)} onClick={() => setContact({ mode: m })}>
+              {m === "inbox" ? t("editor.settings.contactInbox") : "WhatsApp"}
+            </button>
+          ))}
+        </div>
+
+        {contact.mode === "inbox" ? (
+          <p style={{ color: "var(--ec-dim)", fontSize: 10, lineHeight: 1.6, margin: 0 }}>{t("editor.settings.contactInboxHint")}</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div>
+              <label style={labelStyle}>{t("editor.settings.contactNumber")}</label>
+              <input value={contact.whatsapp} onChange={(e) => setContact({ whatsapp: e.target.value })} placeholder="+54 9 11 1234 5678" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>{t("editor.settings.contactTemplate")}</label>
+              <textarea value={contact.waTemplate} onChange={(e) => setContact({ waTemplate: e.target.value })} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+              <p style={{ color: "var(--ec-dim)", fontSize: 9.5, marginTop: 5, lineHeight: 1.5 }}>{t("editor.settings.contactTemplateHint")}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Site info */}

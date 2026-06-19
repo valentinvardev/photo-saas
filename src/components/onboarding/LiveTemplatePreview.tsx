@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditorStore } from "~/lib/editor/store";
 import { TEMPLATES, DEFAULT_TEMPLATE_ID, type TemplateId } from "~/lib/editor/templates/registry";
-import type { ColorPalette, Typography, EditorNode, LogoSettings } from "~/lib/editor/types";
+import type { ColorPalette, Typography, EditorNode, LogoSettings, ContactSettings } from "~/lib/editor/types";
 
 // Load the builder's @fontsource CSS so the real template renders the chosen fonts.
 import "~/lib/editor/fonts";
@@ -29,6 +29,7 @@ export function LiveTemplatePreview({
   typography,
   nodes,
   logo,
+  contact,
   galleryPhotos,
   slug,
   scrollable = false,
@@ -38,6 +39,7 @@ export function LiveTemplatePreview({
   typography: Typography;
   nodes?: Record<string, EditorNode>;
   logo?: LogoSettings;
+  contact?: ContactSettings;
   galleryPhotos?: { src: string; title?: string }[];
   slug: string;
   scrollable?: boolean;
@@ -51,11 +53,11 @@ export function LiveTemplatePreview({
 
   // `nodes` / `galleryPhotos` are fresh objects every parent render, so depend on
   // a stable string key instead — re-hydrate only when the content changes.
-  const designKey = JSON.stringify({ templateId, palette, typography, nodes, logo, galleryPhotos });
+  const designKey = JSON.stringify({ templateId, palette, typography, nodes, logo, contact, galleryPhotos });
   useEffect(() => {
     setReadOnly(true);
     setGalleryPhotos(galleryPhotos ?? []);
-    hydrateDesign({ templateId, palette, typography, nodes, logo });
+    hydrateDesign({ templateId, palette, typography, nodes, logo, contact });
     setReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [designKey]);

@@ -7,7 +7,7 @@ import { useT } from "~/components/providers/LangProvider";
 import { LOCALES } from "~/lib/i18n";
 import { api } from "~/trpc/react";
 import { FONT_OPTIONS } from "~/lib/editor/fonts";
-import { DEFAULT_TYPOGRAPHY, type ColorPalette, type Typography, type LogoSettings, type ImageCrop } from "~/lib/editor/types";
+import { DEFAULT_TYPOGRAPHY, DEFAULT_CONTACT, type ColorPalette, type Typography, type LogoSettings, type ImageCrop, type ContactSettings } from "~/lib/editor/types";
 import { THEME_VARS } from "~/lib/editor/editorTheme";
 import { FontPickerModal } from "~/components/editor/canvas/FontPickerModal";
 import { ImageCropModal } from "~/components/editor/panels/ImageCropModal";
@@ -45,6 +45,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
   const [bio, setBio] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [contactMode, setContactMode] = useState<ContactSettings["mode"]>("whatsapp");
 
   // Logo (optional)
   const [hasLogo, setHasLogo] = useState(false);
@@ -108,6 +109,13 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
     ? { mode: logoMode, text: logoText.trim() || initials(identity), imageUrl: logoUrl, altImageUrl: altLogoUrl, faviconUrl: iconUrl, width: logoWidth, imageCrop: logoCrop }
     : undefined;
 
+  // Where the contact form routes — WhatsApp (with the entered phone) or our inbox.
+  const contactSettings: ContactSettings = {
+    mode: contactMode,
+    whatsapp: phone.trim(),
+    waTemplate: locale === "es" ? "¡Hola! Vi tu portafolio y me gustaría ponerme en contacto." : DEFAULT_CONTACT.waTemplate,
+  };
+
   // Photos for the preview gallery: loose first, then each folder's photos
   // (tagged with the folder name so the gallery modal can navigate by folder).
   const previewGallery = [
@@ -153,7 +161,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
       const base = name || "Portfolio";
       const nodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact) : undefined;
       const content = contentPhotos.length > 0 ? buildOnboardingContent(locale, folders, contentPhotos) : undefined;
-      const editorState = { templateId: template.id, palette, typography: typo, nodes, logo: logoSettings };
+      const editorState = { templateId: template.id, palette, typography: typo, nodes, logo: logoSettings, contact: contactSettings };
 
       let made;
       try {
@@ -269,6 +277,15 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1012 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.6-4.1-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2.1.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.7 1.8c.1.2.1.4 0 .5l-.3.5c-.1.2-.3.3-.1.6.1.3.6 1 1.3 1.6.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.6-.7c.2-.2.3-.2.6-.1l1.6.8c.3.1.5.2.5.4.1.1.1.6-.1 1z"/></svg>
                         <span className="font-sans text-[11px]">{t("onb.identity.phoneHint")}</span>
                       </div>
+
+                      {/* Where the contact form sends people */}
+                      <Field label={t("onb.contact.label")}>
+                        <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
+                          <button onClick={() => setContactMode("whatsapp")} className={`flex-1 px-3 py-2 font-sans text-xs font-semibold transition-colors ${contactMode === "whatsapp" ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.contact.whatsapp")}</button>
+                          <button onClick={() => setContactMode("inbox")} className={`flex-1 px-3 py-2 font-sans text-xs font-semibold transition-colors border-l border-[var(--border)] ${contactMode === "inbox" ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.contact.inbox")}</button>
+                        </div>
+                        <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1.5">{contactMode === "whatsapp" ? t("onb.contact.whatsappHint") : t("onb.contact.inboxHint")}</p>
+                      </Field>
 
                       {/* Logo */}
                       <div className="pt-2 border-t border-[var(--border)]">
@@ -539,7 +556,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
                 <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)]">{t("onb.livePreview")}</span>
               </div>
               <div className="flex-1 min-h-0 rounded-xl overflow-hidden border border-[var(--border)] shadow-lg">
-                <LiveTemplatePreview templateId={template.id} palette={palette} typography={typo} nodes={previewNodes} logo={logoSettings} galleryPhotos={previewGallery} slug={slug} scrollable={step === 5} />
+                <LiveTemplatePreview templateId={template.id} palette={palette} typography={typo} nodes={previewNodes} logo={logoSettings} contact={contactSettings} galleryPhotos={previewGallery} slug={slug} scrollable={step === 5} />
               </div>
             </div>
           )}

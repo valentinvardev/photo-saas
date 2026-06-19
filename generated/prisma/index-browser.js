@@ -188,6 +188,17 @@ exports.Prisma.PortfolioScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ContactMessageScalarFieldEnum = {
+  id: 'id',
+  portfolioId: 'portfolioId',
+  userId: 'userId',
+  name: 'name',
+  email: 'email',
+  message: 'message',
+  read: 'read',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.LinksPageScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -331,6 +342,7 @@ exports.Prisma.ModelName = {
   Photo: 'Photo',
   PhotoFolder: 'PhotoFolder',
   Portfolio: 'Portfolio',
+  ContactMessage: 'ContactMessage',
   LinksPage: 'LinksPage',
   LinkItem: 'LinkItem',
   Delivery: 'Delivery',

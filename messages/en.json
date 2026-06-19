@@ -47,6 +47,7 @@
     "dashboard": "Dashboard",
     "gallery": "Gallery",
     "portfolio": "Portfolio",
+    "inbox": "Inbox",
     "delivery": "Delivery",
     "links": "Links",
     "templates": "Templates",
@@ -454,6 +455,13 @@
       "altLogo": "Alt logo (dark bg)",
       "logoWidth": "Logo width",
       "favicon": "Favicon",
+      "contact": "Contact form",
+      "contactMode": "Where submissions go",
+      "contactInbox": "Inbox",
+      "contactInboxHint": "Submissions are saved to your dashboard Inbox.",
+      "contactNumber": "WhatsApp number",
+      "contactTemplate": "Default message",
+      "contactTemplateHint": "Pre-filled WhatsApp message. Use {name}, {email}, {message} to insert what the visitor typed.",
       "site": "Site",
       "title": "Title",
       "description": "Description",
@@ -1054,6 +1062,27 @@
       "error": "Couldn't finish setup. Please try again."
     },
     "palettes": { "noir": "Noir", "sand": "Sand", "slate": "Slate", "forest": "Forest", "plum": "Plum", "midnight": "Midnight" },
-    "pairings": { "editorial": "Editorial", "modern": "Modern", "warm": "Warm", "clean": "Clean", "bold": "Bold" }
+    "pairings": { "editorial": "Editorial", "modern": "Modern", "warm": "Warm", "clean": "Clean", "bold": "Bold" },
+    "contact": {
+      "label": "Contact form sends to",
+      "whatsapp": "WhatsApp",
+      "inbox": "My inbox",
+      "whatsappHint": "Visitors who submit the form open WhatsApp to message you directly.",
+      "inboxHint": "Submissions land in your dashboard Inbox."
+    }
+  },
+  "inbox": {
+    "title": "Inbox",
+    "loading": "Loading…",
+    "unread": "{n} unread",
+    "allRead": "All caught up",
+    "emptyTitle": "No messages yet",
+    "emptyBody": "Contact-form submissions from your portfolios show up here.",
+    "markRead": "Mark as read",
+    "markUnread": "Mark as unread",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this message?",
+    "reply": "Reply",
+    "replySubject": "Re: your message"
   }
 }

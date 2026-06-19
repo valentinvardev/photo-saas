@@ -26,13 +26,15 @@ function useViewport(): Viewport {
  * Hydrates the editor store with the saved design + the portfolio's real photos,
  * flips it to read-only, then renders the template full-bleed.
  */
-export function PortfolioSiteRender({ design, galleryPhotos }: {
+export function PortfolioSiteRender({ design, galleryPhotos, slug }: {
   design: PortfolioDesign;
   galleryPhotos: { src: string; title?: string }[];
+  slug?: string;
 }) {
   const hydrateDesign    = useEditorStore((s) => s.hydrateDesign);
   const setGalleryPhotos = useEditorStore((s) => s.setGalleryPhotos);
   const setReadOnly      = useEditorStore((s) => s.setReadOnly);
+  const setSiteSlug      = useEditorStore((s) => s.setSiteSlug);
   const palette          = useEditorStore((s) => s.palette);
   const typography       = useEditorStore((s) => s.typography);
   const buttons          = useEditorStore((s) => s.buttons);
@@ -44,10 +46,11 @@ export function PortfolioSiteRender({ design, galleryPhotos }: {
 
   useEffect(() => {
     setReadOnly(true);
+    setSiteSlug(slug ?? null);
     hydrateDesign(design);
     setGalleryPhotos(galleryPhotos);
     setReady(true);
-  }, [design, galleryPhotos, setReadOnly, hydrateDesign, setGalleryPhotos]);
+  }, [design, galleryPhotos, slug, setReadOnly, setSiteSlug, hydrateDesign, setGalleryPhotos]);
 
   if (!ready) return <div style={{ minHeight: "100vh", background: design.palette?.bg ?? "#fafafa" }} />;
 

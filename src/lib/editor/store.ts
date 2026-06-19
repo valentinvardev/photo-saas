@@ -2,8 +2,8 @@
 
 import { create } from "zustand";
 import { temporal } from "zundo";
-import type { EditorNode, EditorState, ColorPalette, Typography, ButtonStyle, GridSettings, Viewport, LogoSettings } from "./types";
-import { DEFAULT_PALETTE, DEFAULT_TYPOGRAPHY, DEFAULT_BUTTONS, DEFAULT_GRID, DEFAULT_LOGO } from "./types";
+import type { EditorNode, EditorState, ColorPalette, Typography, ButtonStyle, GridSettings, Viewport, LogoSettings, ContactSettings } from "./types";
+import { DEFAULT_PALETTE, DEFAULT_TYPOGRAPHY, DEFAULT_BUTTONS, DEFAULT_GRID, DEFAULT_LOGO, DEFAULT_CONTACT } from "./types";
 import { TEMPLATES, DEFAULT_TEMPLATE_ID, type TemplateId } from "./templates/registry";
 
 /** Serializable design saved per-portfolio (Portfolio.editorState). */
@@ -15,6 +15,7 @@ export interface PortfolioDesign {
   buttons?:        ButtonStyle;
   grid?:           GridSettings;
   logo?:           LogoSettings;
+  contact?:        ContactSettings;
   hiddenSections?: string[];
 }
 
@@ -22,7 +23,9 @@ interface EditorStore extends EditorState {
   templateId:         TemplateId;
   readOnly:           boolean;
   galleryPhotos:      { src: string; title?: string; group?: string }[];
+  siteSlug:           string | null;
   setReadOnly:        (v: boolean) => void;
+  setSiteSlug:        (slug: string | null) => void;
   setGalleryPhotos:   (p: { src: string; title?: string; group?: string }[]) => void;
   hydrateDesign:      (design: PortfolioDesign) => void;
   setTemplate:        (id: TemplateId) => void;
@@ -37,6 +40,7 @@ interface EditorStore extends EditorState {
   setButtons:         (patch: Partial<ButtonStyle>) => void;
   setGrid:            (patch: Partial<GridSettings>) => void;
   setLogo:            (patch: Partial<LogoSettings>) => void;
+  setContact:         (patch: Partial<ContactSettings>) => void;
   hideSection:        (id: string) => void;
   showSection:        (id: string) => void;
   reset:              () => void;
@@ -48,12 +52,14 @@ export const useEditorStore = create<EditorStore>()(
       templateId:      DEFAULT_TEMPLATE_ID,
       readOnly:        false,
       galleryPhotos:   [],
+      siteSlug:        null,
       nodes:           TEMPLATES[DEFAULT_TEMPLATE_ID]!.initialNodes,
       palette:         DEFAULT_PALETTE,
       typography:      DEFAULT_TYPOGRAPHY,
       buttons:         DEFAULT_BUTTONS,
       grid:            DEFAULT_GRID,
       logo:            DEFAULT_LOGO,
+      contact:         DEFAULT_CONTACT,
       selectedId:      null,
       editingId:       null,
       viewport:        "desktop",
@@ -62,6 +68,7 @@ export const useEditorStore = create<EditorStore>()(
       hiddenSections:  [],
 
       setReadOnly: (v) => set({ readOnly: v }),
+      setSiteSlug: (slug) => set({ siteSlug: slug }),
       setGalleryPhotos: (p) => set({ galleryPhotos: p }),
 
       /** Load a saved design into the store (used by the editor + public render). */
@@ -79,6 +86,7 @@ export const useEditorStore = create<EditorStore>()(
           buttons:         d.buttons ? { ...DEFAULT_BUTTONS, ...d.buttons } : DEFAULT_BUTTONS,
           grid:            d.grid ? { ...DEFAULT_GRID, ...d.grid } : DEFAULT_GRID,
           logo:            d.logo ?? DEFAULT_LOGO,
+          contact:         d.contact ? { ...DEFAULT_CONTACT, ...d.contact } : DEFAULT_CONTACT,
           hiddenSections:  d.hiddenSections ?? [],
           selectedId:      null,
           editingId:       null,
@@ -120,6 +128,9 @@ export const useEditorStore = create<EditorStore>()(
       setLogo: (patch) =>
         set((s) => ({ logo: { ...s.logo, ...patch } })),
 
+      setContact: (patch) =>
+        set((s) => ({ contact: { ...s.contact, ...patch } })),
+
       hideSection: (id) =>
         set((s) => ({ hiddenSections: [...s.hiddenSections.filter((x) => x !== id), id] })),
 
@@ -130,14 +141,14 @@ export const useEditorStore = create<EditorStore>()(
         set((s) => ({
           nodes: TEMPLATES[s.templateId]!.initialNodes,
           palette: DEFAULT_PALETTE, typography: DEFAULT_TYPOGRAPHY, buttons: DEFAULT_BUTTONS,
-          grid: DEFAULT_GRID, logo: DEFAULT_LOGO, selectedId: null, editingId: null,
+          grid: DEFAULT_GRID, logo: DEFAULT_LOGO, contact: DEFAULT_CONTACT, selectedId: null, editingId: null,
           viewport: "desktop", selectedSection: null, hiddenSections: [],
         })),
     }),
     {
       partialize: (s) => ({
         nodes: s.nodes, palette: s.palette, typography: s.typography,
-        buttons: s.buttons, grid: s.grid, logo: s.logo, hiddenSections: s.hiddenSections,
+        buttons: s.buttons, grid: s.grid, logo: s.logo, contact: s.contact, hiddenSections: s.hiddenSections,
       }),
     }
   )

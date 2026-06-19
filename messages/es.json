@@ -47,6 +47,7 @@
     "dashboard": "Inicio",
     "gallery": "Galería",
     "portfolio": "Portafolio",
+    "inbox": "Mensajes",
     "delivery": "Entrega",
     "links": "Enlaces",
     "templates": "Plantillas",
@@ -454,6 +455,13 @@
       "altLogo": "Logo alternativo (fondo oscuro)",
       "logoWidth": "Ancho del logo",
       "favicon": "Favicon",
+      "contact": "Formulario de contacto",
+      "contactMode": "A dónde llegan los mensajes",
+      "contactInbox": "Bandeja",
+      "contactInboxHint": "Los mensajes se guardan en la bandeja de tu panel.",
+      "contactNumber": "Número de WhatsApp",
+      "contactTemplate": "Mensaje predeterminado",
+      "contactTemplateHint": "Mensaje de WhatsApp prellenado. Usá {name}, {email}, {message} para insertar lo que escribió la persona.",
       "site": "Sitio",
       "title": "Título",
       "description": "Descripción",
@@ -1054,6 +1062,27 @@
       "error": "No se pudo terminar la configuración. Inténtalo de nuevo."
     },
     "palettes": { "noir": "Noir", "sand": "Arena", "slate": "Pizarra", "forest": "Bosque", "plum": "Ciruela", "midnight": "Medianoche" },
-    "pairings": { "editorial": "Editorial", "modern": "Moderna", "warm": "Cálida", "clean": "Limpia", "bold": "Audaz" }
+    "pairings": { "editorial": "Editorial", "modern": "Moderna", "warm": "Cálida", "clean": "Limpia", "bold": "Audaz" },
+    "contact": {
+      "label": "El formulario de contacto envía a",
+      "whatsapp": "WhatsApp",
+      "inbox": "Mi bandeja",
+      "whatsappHint": "Quien complete el formulario abre WhatsApp para escribirte directo.",
+      "inboxHint": "Los mensajes llegan a la bandeja de tu panel."
+    }
+  },
+  "inbox": {
+    "title": "Mensajes",
+    "loading": "Cargando…",
+    "unread": "{n} sin leer",
+    "allRead": "Estás al día",
+    "emptyTitle": "Todavía no hay mensajes",
+    "emptyBody": "Los mensajes del formulario de contacto de tus portafolios aparecen acá.",
+    "markRead": "Marcar como leído",
+    "markUnread": "Marcar como no leído",
+    "delete": "Eliminar",
+    "deleteConfirm": "¿Eliminar este mensaje?",
+    "reply": "Responder",
+    "replySubject": "Re: tu mensaje"
   }
 }

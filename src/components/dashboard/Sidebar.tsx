@@ -127,6 +127,15 @@ function HomeIcon() {
   );
 }
 
+function InboxIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 12h-6l-2 3h-4l-2-3H2" />
+      <path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" />
+    </svg>
+  );
+}
+
 // MVP scope: portfolio + gallery only. Templates, Links, Delivery, Domain and
 // the "soon" items are built but hidden — see next.config.js redirects. To
 // restore a feature, add its entry back here and remove its redirect.
@@ -134,6 +143,7 @@ const navMain = [
   { labelKey: "nav.dashboard", label: "Home",      href: "/dashboard",           icon: HomeIcon, exact: true },
   { labelKey: "nav.gallery",   label: "Gallery",   href: "/dashboard/gallery",   icon: GalleryIcon },
   { labelKey: "nav.portfolio", label: "Portfolio", href: "/dashboard/portfolio", icon: PortfolioIcon },
+  { labelKey: "nav.inbox",     label: "Inbox",     href: "/dashboard/inbox",     icon: InboxIcon },
   { label: "Client delivery",  href: "/dashboard/delivery", icon: DeliveryIcon, soon: true },
   { label: "Link builder",     href: "/dashboard/links",    icon: LinksIcon,    soon: true },
 ];
@@ -146,7 +156,7 @@ function ProfileIcon() {
   );
 }
 
-function NavItem({ labelKey, label, href, icon: Icon, soon, exact }: { labelKey?: string; label: string; href: string; icon: () => React.ReactNode; soon?: boolean; exact?: boolean }) {
+function NavItem({ labelKey, label, href, icon: Icon, soon, exact, badge }: { labelKey?: string; label: string; href: string; icon: () => React.ReactNode; soon?: boolean; exact?: boolean; badge?: number }) {
   const pathname = usePathname();
   const { t } = useT();
   const active = exact ? pathname === href : pathname.startsWith(href);
@@ -182,7 +192,8 @@ function NavItem({ labelKey, label, href, icon: Icon, soon, exact }: { labelKey?
       <span className={active ? "text-yellow" : "text-[var(--fg-muted)] group-hover:text-[var(--fg)]"}>
         <Icon />
       </span>
-      <span className="font-sans text-sm font-medium">{displayLabel}</span>
+      <span className="font-sans text-sm font-medium flex-1">{displayLabel}</span>
+      {badge ? <span className="font-mono text-[9px] font-bold bg-yellow text-[#111] px-1.5 py-0.5 rounded-full min-w-[18px] text-center">{badge > 99 ? "99+" : badge}</span> : null}
     </Link>
   );
 }
@@ -192,6 +203,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   const router = useRouter();
   /* DB profile — keeps name/avatar in sync with the /profile page. */
   const { data: me } = api.user.me.useQuery(undefined, { staleTime: 60_000 });
+  const { data: unread } = api.contact.unreadCount.useQuery(undefined, { staleTime: 30_000 });
   const user = me
     ? { name: me.name?.trim() || me.email.split("@")[0] || "Account", email: me.email, avatarUrl: me.avatarUrl ?? null }
     : null;
@@ -224,7 +236,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       {/* Nav */}
       <nav className="flex-1 px-2 py-4 space-y-0.5 overflow-y-auto">
         {navMain.map((item) => (
-          <NavItem key={item.href} {...item} />
+          <NavItem key={item.href} {...item} badge={item.href === "/dashboard/inbox" ? (unread ?? 0) : undefined} />
         ))}
       </nav>
 
