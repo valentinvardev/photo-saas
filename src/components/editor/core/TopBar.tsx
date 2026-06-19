@@ -94,7 +94,9 @@ export function TopBar({ portfolioId, saving }: {
   const { theme, toggle } = useEditorTheme();
   const router = useRouter();
   const [showExitModal, setShowExitModal] = useState(false);
-  const isMobile = useIsMobile();
+  const compact  = useIsMobile(1024);
+  const isPhone  = useIsMobile(768);
+  const isTablet = compact && !isPhone;
   const [menuOpen, setMenuOpen] = useState(false);
 
   const canUndo = pastStates.length > 0;
@@ -132,8 +134,8 @@ export function TopBar({ portfolioId, saving }: {
 
   const divider = <div style={{ width: 1, height: 18, background: "var(--ec-border)", margin: "0 2px" }} />;
 
-  /* ── Phone: compact bar (back · undo · redo · theme · ⋯ menu) ── */
-  if (isMobile) {
+  /* ── Phone + tablet: compact bar (back · undo · redo · theme · ⋯ menu) ── */
+  if (compact) {
     const iconBtn = (enabled = true): React.CSSProperties => ({
       background: "none", border: "none", cursor: enabled ? "pointer" : "not-allowed",
       color: enabled ? "var(--ec-label)" : "var(--ec-ghost)", padding: "6px 7px", borderRadius: 4,
@@ -153,6 +155,18 @@ export function TopBar({ portfolioId, saving }: {
           <button onClick={() => undo()} disabled={!canUndo} style={iconBtn(canUndo)}><UndoIcon /></button>
           <button onClick={() => redo()} disabled={!canRedo} style={iconBtn(canRedo)}><RedoIcon /></button>
           <button onClick={toggle} style={iconBtn()}>{theme === "dark" ? <SunIcon /> : <MoonIcon />}</button>
+
+          {/* Tablet: choose tablet or mobile preview (no desktop). Phone is locked to mobile. */}
+          {isTablet && (
+            <div style={{ display: "flex", alignItems: "center", gap: 1, background: "var(--ec-raised)", border: "1px solid var(--ec-border)", borderRadius: 5, padding: "2px 3px", marginLeft: 4 }}>
+              {(["tablet", "mobile"] as Viewport[]).map((v) => (
+                <button key={v} onClick={() => setViewport(v)} title={vpLabel(v)}
+                  style={{ background: viewport === v ? "var(--ec-border)" : "none", border: "none", cursor: "pointer", color: viewport === v ? "var(--ec-bright)" : "var(--ec-sub)", padding: "4px 7px", borderRadius: 3, display: "flex", alignItems: "center" }}>
+                  {VIEWPORT_ICONS[v]}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div style={{ flex: 1 }} />
 

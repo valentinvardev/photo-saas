@@ -33,10 +33,15 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
     nodes, logo, contact,
   } = useEditorStore();
 
-  // Phone: full-width editor/preview panes you swipe between. Desktop is unchanged.
-  const isMobile = useIsMobile();
+  // Phone + tablet: full-width editor/preview panes you swipe between. Desktop
+  // (>1024px) is unchanged. Phone forces the mobile viewport, tablet the tablet one.
+  const compact  = useIsMobile(1024);
+  const isPhone  = useIsMobile(768);
   const [mobilePane, setMobilePane] = useState<0 | 1>(0);
-  useEffect(() => { if (isMobile) setViewport("mobile"); }, [isMobile, setViewport]);
+  useEffect(() => {
+    if (isPhone) setViewport("mobile");
+    else if (compact) setViewport("tablet");
+  }, [isPhone, compact, setViewport]);
 
   // One left panel, three modes. Design (the global system) is shown first.
   const [tab, setTab] = useState<SidebarTab>("design");
@@ -117,18 +122,20 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
         saving={saveDesign.isPending}
       />
 
-      {isMobile ? (
-        /* Phone: two full-width panes (editor / preview) swiped between. */
+      {compact ? (
+        /* Phone + tablet: two full-width panes (editor / preview) swiped between. */
         <div style={{ display: "flex", flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
           <div style={{ display: "flex", width: "200%", height: "100%", transform: `translateX(${mobilePane === 0 ? "0%" : "-50%"})`, transition: "transform 0.32s cubic-bezier(0.22,1,0.36,1)" }}>
             <div style={{ width: "50%", height: "100%", display: "flex", flexShrink: 0, minWidth: 0 }}>
               <Sidebar tab={tab} setTab={changeTab} />
             </div>
             <div style={{ width: "50%", height: "100%", display: "flex", flexDirection: "column", flexShrink: 0, minWidth: 0 }}>
-              <InspectorPanel />
               <Canvas />
             </div>
           </div>
+          {/* Rendered outside the transformed track so its fixed bottom-sheet
+              positioning is relative to the viewport. */}
+          <InspectorPanel />
           <MobileBuilderChrome pane={mobilePane} setPane={setMobilePane} />
         </div>
       ) : (

@@ -7,9 +7,9 @@
   --ed-selection: #2563eb;
 }
 
-/* ── Phone only: full-width editor/preview panes + tighter chrome.
-   Desktop (>768px) is completely unaffected. ── */
-@media (max-width: 768px) {
+/* ── Phone + tablet: full-width editor/preview panes + tighter chrome.
+   Desktop (>1024px) is completely unaffected. ── */
+@media (max-width: 1024px) {
   .editor-root { --ed-sidebar-w: 100%; --ed-topbar-h: 52px; }
   .editor-canvas-viewport { padding: 14px 6px 56px !important; }
 }

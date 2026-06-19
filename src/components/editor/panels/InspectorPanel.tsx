@@ -5,6 +5,7 @@ import { useEditorStore } from "~/lib/editor/store";
 import type { EditorNode } from "~/lib/editor/types";
 import { ImageGalleryModal } from "./ImageGalleryModal";
 import { useT } from "~/components/providers/LangProvider";
+import { useIsMobile } from "~/lib/useIsMobile";
 
 /* ─────────────────────────────────────────────────────────────────
    Shared primitives
@@ -173,6 +174,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
 export function InspectorPanel() {
   const { selectedId, nodes, updateNode, selectNode } = useEditorStore();
   const { t } = useT();
+  const isMobile = useIsMobile(1024);
 
   if (!selectedId) return null;
   const node = nodes[selectedId];
@@ -182,9 +184,20 @@ export function InspectorPanel() {
     updateNode(selectedId!, patch);
   }
 
-  return (
-    <aside
-      style={{
+  /* Phone / tablet: a bottom sheet that slides up over the preview.
+     Desktop: the original 220px side panel. */
+  const wrapperStyle: React.CSSProperties = isMobile
+    ? {
+        position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 70,
+        maxHeight: "62vh",
+        background: "var(--ec-bg)",
+        borderTop: "1px solid var(--ec-raised)",
+        borderTopLeftRadius: 16, borderTopRightRadius: 16,
+        display: "flex", flexDirection: "column", overflowY: "auto",
+        boxShadow: "0 -14px 40px rgba(0,0,0,0.45)",
+        animation: "ip-sheet-up 0.26s cubic-bezier(0.22,1,0.36,1)",
+      }
+    : {
         width: 220,
         background: "var(--ec-bg)",
         borderRight: "1px solid var(--ec-raised)",
@@ -192,8 +205,11 @@ export function InspectorPanel() {
         flexDirection: "column",
         overflow: "hidden",
         flexShrink: 0,
-      }}
-    >
+      };
+
+  return (
+    <aside style={wrapperStyle}>
+      {isMobile && <style>{`@keyframes ip-sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>}
       {/* Header */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
