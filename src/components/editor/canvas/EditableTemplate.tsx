@@ -606,9 +606,15 @@ function Label({ index, nodeId }: { index: string; nodeId: string }) {
    CONTACT FORM — routes to WhatsApp or our inbox per the contact settings
 ═══════════════════════════════════════════ */
 function fillWaTemplate(tpl: string, v: { name: string; email: string; message: string }) {
+  const hasVars = /\{(name|email|message)\}/i.test(tpl);
   let t = (tpl || "").replace(/\{name\}/gi, v.name).replace(/\{email\}/gi, v.email).replace(/\{message\}/gi, v.message);
-  if (v.message && !/\{message\}/i.test(tpl)) t = `${t}\n\n${v.message}`.trim();
-  return t || v.message;
+  if (!hasVars) {
+    // The template has no placeholders — append the submitted details so the
+    // owner still receives who wrote and what they said.
+    const who = [v.name, v.email].filter(Boolean).join(" · ");
+    t = [t.trim(), who, v.message].filter(Boolean).join("\n\n");
+  }
+  return t.trim() || v.message;
 }
 
 function ContactForm() {

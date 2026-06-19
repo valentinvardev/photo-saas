@@ -113,7 +113,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
   const contactSettings: ContactSettings = {
     mode: contactMode,
     whatsapp: phone.trim(),
-    waTemplate: locale === "es" ? "¡Hola! Vi tu portafolio y me gustaría ponerme en contacto." : DEFAULT_CONTACT.waTemplate,
+    waTemplate: locale === "es" ? "¡Hola! Soy {name} ({email}) — vi tu portafolio.\n\n{message}" : DEFAULT_CONTACT.waTemplate,
   };
 
   // Photos for the preview gallery: loose first, then each folder's photos

@@ -151,5 +151,5 @@ export const DEFAULT_LOGO: LogoSettings = {
 export const DEFAULT_CONTACT: ContactSettings = {
   mode:       "inbox",
   whatsapp:   "",
-  waTemplate: "Hi! I saw your portfolio and I'd love to get in touch.",
+  waTemplate: "Hi! I'm {name} ({email}) — I saw your portfolio.\n\n{message}",
 };
