@@ -36,7 +36,7 @@ export async function updateSession(request: NextRequest) {
 
   // Guard the dashboard + website builder — send anonymous visitors to login,
   // remembering where they were headed so we can bounce them back after sign-in.
-  const guarded = request.nextUrl.pathname.startsWith("/dashboard") || request.nextUrl.pathname.startsWith("/editor");
+  const guarded = request.nextUrl.pathname.startsWith("/dashboard") || request.nextUrl.pathname.startsWith("/editor") || request.nextUrl.pathname.startsWith("/onboarding");
   if (!user && guarded) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";

@@ -1005,6 +1005,7 @@
     "next": "Siguiente",
     "finish": "Crear mi estudio",
     "livePreview": "Vista previa en vivo",
+    "stepOf": "Paso {n} de {total}",
     "welcome": {
       "title": "Bienvenido a Portapic",
       "body": "Configuremos tu estudio en menos de un minuto — tus datos, tus colores y fuentes, y tu primer portafolio, todo con tu marca y listo para editar.",

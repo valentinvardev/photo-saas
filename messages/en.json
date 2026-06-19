@@ -1005,6 +1005,7 @@
     "next": "Next",
     "finish": "Create my studio",
     "livePreview": "Live preview",
+    "stepOf": "Step {n} of {total}",
     "welcome": {
       "title": "Welcome to Portapic",
       "body": "Let's set up your studio in under a minute — your details, your colours and fonts, and your first portfolio, all branded and ready to edit.",

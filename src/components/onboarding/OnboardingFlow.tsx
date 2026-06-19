@@ -34,9 +34,11 @@ const inputCls =
 const sameColor = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
 const fontLabel = (stack: string) => FONT_OPTIONS.find((f) => f.stack === stack)?.label ?? "Custom";
 
-export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function OnboardingFlow() {
   const { t, locale } = useT();
   const router = useRouter();
+  const exit = () => router.push("/dashboard/portfolio");
+  const [previewOpen, setPreviewOpen] = useState(false); // mobile preview sheet
 
   const [step, setStep] = useState(0);
   const [first, setFirst] = useState("");
@@ -92,8 +94,6 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
   useEffect(() => {
     if (!emailTouched.current && me?.email && !email) setEmail(me.email);
   }, [me?.email, email]);
-
-  if (!open) return null;
 
   const template = TEMPLATE_OPTIONS[templateIdx]!;
   const identity: Identity = { first, last, location, bio };
@@ -192,29 +192,29 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-black/70 backdrop-blur-md">
+    <div className="fixed inset-0 z-[60] flex flex-col bg-[var(--bg)] overflow-hidden">
       {/* Editor-chrome theme vars so the reused FontPickerModal renders correctly. */}
       <style>{`:root{${(Object.entries(THEME_VARS.dark) as [string, string][]).map(([k, v]) => `${k}:${v};`).join("")}}`}</style>
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.98, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-[1320px] bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
-        style={{ height: "min(94vh, 900px)" }}
-      >
-        {/* Header: progress + close */}
-        <div className="flex items-center gap-4 px-5 sm:px-7 py-4 border-b border-[var(--border)] shrink-0">
-          <div className="flex items-center gap-1.5">
-            {Array.from({ length: TOTAL }).map((_, i) => (
-              <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === step ? "w-6 bg-yellow" : i < step ? "w-2.5 bg-yellow/50" : "w-2.5 bg-[var(--border)]"}`} />
-            ))}
-          </div>
-          <div className="flex-1" />
-          <button onClick={onClose} aria-label={t("onb.close")} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-          </button>
+      {/* Header: step indicator + (mobile) preview + exit */}
+      <div className="flex items-center gap-4 px-5 sm:px-8 py-4 border-b border-[var(--border)] shrink-0">
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: TOTAL }).map((_, i) => (
+            <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === step ? "w-6 bg-yellow" : i < step ? "w-2.5 bg-yellow/50" : "w-2.5 bg-[var(--border)]"}`} />
+          ))}
         </div>
+        <span className="font-mono text-[10px] text-[var(--fg-muted)] hidden sm:inline">{t("onb.stepOf", { n: Math.min(step + 1, TOTAL), total: TOTAL })}</span>
+        <div className="flex-1" />
+        {showPreview && (
+          <button onClick={() => setPreviewOpen(true)} className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg)] font-sans text-xs font-medium hover:border-[var(--fg-muted)] transition-colors">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            {t("onb.livePreview")}
+          </button>
+        )}
+        <button onClick={exit} aria-label={t("onb.close")} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
 
         {/* Body */}
         <div className="flex-1 min-h-0 flex">
@@ -519,11 +519,11 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
                         <a href={newSlug ? `/p/${newSlug}` : "#"} target="_blank" rel="noreferrer" className="px-5 py-2.5 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
                           {t("onb.done.viewSite")}
                         </a>
-                        <button onClick={() => { onClose(); router.push(newId ? `/editor/${newId}` : "/dashboard/portfolio"); }} className="px-6 py-2.5 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 transition-colors">
+                        <button onClick={() => router.push(newId ? `/editor/${newId}` : "/dashboard/portfolio")} className="px-6 py-2.5 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 transition-colors">
                           {t("onb.done.openEditor")}
                         </button>
                       </div>
-                      <button onClick={() => { onClose(); router.push("/dashboard/portfolio"); }} className="mt-4 font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
+                      <button onClick={() => router.push("/dashboard/portfolio")} className="mt-4 font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
                         {t("onb.done.goDashboard")}
                       </button>
                     </div>
@@ -535,7 +535,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
             {/* Footer nav (hidden on done) */}
             {step < 6 && (
               <div className="shrink-0 px-5 sm:px-8 py-4 border-t border-[var(--border)] flex items-center justify-between gap-3">
-                <button onClick={step === 0 ? onClose : back} className="px-4 py-2 rounded-lg font-sans text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
+                <button onClick={step === 0 ? exit : back} className="px-4 py-2 rounded-lg font-sans text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
                   {step === 0 ? t("onb.close") : t("onb.back")}
                 </button>
                 <div className="flex items-center gap-3">
@@ -548,7 +548,7 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
             )}
           </div>
 
-          {/* Right — live real-template preview */}
+          {/* Right — live real-template preview (desktop) */}
           {showPreview && (
             <div className="hidden lg:flex flex-1 min-w-0 flex-col bg-[var(--bg-subtle)] p-5">
               <div className="flex items-center gap-2 mb-3 px-1 shrink-0">
@@ -561,7 +561,31 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
             </div>
           )}
         </div>
-      </motion.div>
+
+      {/* Mobile — live preview bottom sheet */}
+      <AnimatePresence>
+        {showPreview && previewOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="lg:hidden fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm" onClick={() => setPreviewOpen(false)}>
+            <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 34 }}
+              className="absolute bottom-0 inset-x-0 h-[88vh] bg-[var(--bg-card)] rounded-t-2xl flex flex-col overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-center pt-2.5 pb-1 shrink-0"><div className="w-10 h-1 rounded-full bg-[var(--border)]" /></div>
+              <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border)] shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" style={{ boxShadow: "0 0 8px rgba(34,197,94,0.6)" }} />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)]">{t("onb.livePreview")}</span>
+                </div>
+                <button onClick={() => setPreviewOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
+              <div className="flex-1 min-h-0">
+                <LiveTemplatePreview templateId={template.id} palette={palette} typography={typo} nodes={previewNodes} logo={logoSettings} contact={contactSettings} galleryPhotos={previewGallery} slug={slug} scrollable />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Reused editor font picker */}
       {fontModal && (
