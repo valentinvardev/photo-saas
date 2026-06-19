@@ -215,13 +215,15 @@ function captionFromTitle(t?: string): string {
 function useWorks(): Work[] {
   const galleryPhotos = useEditorStore((s) => s.galleryPhotos);
   if (galleryPhotos.length === 0) return WORKS;
-  return galleryPhotos.map((p, i) => ({ id: `g${i}`, src: p.src, title: captionFromTitle(p.title) }));
+  // `group` is the photo's folder name — surfaced as `cat` so the gallery can
+  // filter/navigate by folder.
+  return galleryPhotos.map((p, i) => ({ id: `g${i}`, src: p.src, title: captionFromTitle(p.title), cat: p.group }));
 }
 
 /* ═══════════════════════════════════════════
    PHOTO CELL
 ═══════════════════════════════════════════ */
-function Cell({ w, onClick, fit = "cover" }: { w?: Work; onClick?: () => void; fit?: "cover" | "contain" }) {
+function Cell({ w, onClick, fit = "cover", captionPalette = false }: { w?: Work; onClick?: () => void; fit?: "cover" | "contain"; captionPalette?: boolean }) {
   const [hov, setHov] = useState(false);
   if (!w) return <div style={{ width: "100%", height: "100%", background: "#111" }} />;
   return (
@@ -233,18 +235,19 @@ function Cell({ w, onClick, fit = "cover" }: { w?: Work; onClick?: () => void; f
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={cellSrc(w)} alt={w.title}
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: fit, display: "block",
-          filter: hov ? "brightness(0.5)" : "brightness(0.88)",
+          filter: captionPalette ? (hov ? "brightness(0.97)" : "brightness(1)") : (hov ? "brightness(0.5)" : "brightness(0.88)"),
           transform: hov && fit === "cover" ? "scale(1.05)" : "scale(1)",
           transition: "filter 0.5s ease, transform 0.65s ease" }} />
       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "flex-end",
-        padding: "1rem", opacity: hov ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: "none" }}>
+        padding: "1rem", opacity: hov ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: "none",
+        background: captionPalette ? "linear-gradient(to top, color-mix(in srgb, var(--ed-bg, #fafafa) 92%, transparent), transparent 55%)" : undefined }}>
         {w.cat && (
-        <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em", textTransform: "uppercase" as const, marginBottom: "0.25rem" }}>
-          {w.cat} · {w.year}
+        <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: captionPalette ? "color-mix(in srgb, var(--ed-fg, #0a0a0a) 55%, transparent)" : "rgba(255,255,255,0.55)", letterSpacing: "0.2em", textTransform: "uppercase" as const, marginBottom: "0.25rem" }}>
+          {w.cat}{w.year ? ` · ${w.year}` : ""}
         </span>
         )}
         {w.title && (
-        <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "var(--ed-bg, #fafafa)", lineHeight: 1.2 }}>
+        <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: captionPalette ? "var(--ed-fg, #0a0a0a)" : "var(--ed-bg, #fafafa)", lineHeight: 1.2 }}>
           {w.title}
         </span>
         )}
@@ -402,6 +405,7 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
   return (
     <>
       <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "var(--ed-bg, #fafafa)", display: "flex", flexDirection: "column" }}>
+        <style>{`.gm-filters::-webkit-scrollbar{display:none}`}</style>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2.5rem", height: "60px", borderBottom: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)", flexShrink: 0, gap: "1rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexShrink: 0 }}>
             <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 55%, transparent)", display: "flex", alignItems: "center", padding: 0 }}>
@@ -410,20 +414,22 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
             <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "var(--ed-fg, #0a0a0a)" }}>All Work</span>
             <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 40%, transparent)", letterSpacing: "0.1em" }}>{visible.length}</span>
           </div>
-          <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "2px" }}>
-            {cats.map((cat) => (
-              <button key={cat} onClick={() => setFilter(cat)}
-                style={{ background: filter === cat ? "var(--ed-fg, #0a0a0a)" : "color-mix(in srgb, var(--ed-fg, #0a0a0a) 6%, transparent)", border: "1px solid", borderColor: filter === cat ? "var(--ed-fg, #0a0a0a)" : "color-mix(in srgb, var(--ed-fg, #0a0a0a) 14%, transparent)", color: filter === cat ? "var(--ed-bg, #fafafa)" : "color-mix(in srgb, var(--ed-fg, #0a0a0a) 55%, transparent)", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "5px 12px", cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap", flexShrink: 0 }}>
-                {cat}
-              </button>
-            ))}
-          </div>
+          {cats.length > 1 && (
+            <div className="gm-filters" style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "2px", flex: "1 1 auto", minWidth: 0, justifyContent: "flex-end", scrollbarWidth: "none" }}>
+              {cats.map((cat) => (
+                <button key={cat} onClick={() => setFilter(cat)}
+                  style={{ background: filter === cat ? "var(--ed-fg, #0a0a0a)" : "color-mix(in srgb, var(--ed-fg, #0a0a0a) 6%, transparent)", border: "1px solid", borderColor: filter === cat ? "var(--ed-fg, #0a0a0a)" : "color-mix(in srgb, var(--ed-fg, #0a0a0a) 14%, transparent)", color: filter === cat ? "var(--ed-bg, #fafafa)" : "color-mix(in srgb, var(--ed-fg, #0a0a0a) 55%, transparent)", fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "5px 12px", cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap", flexShrink: 0 }}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "2rem 2.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "3px" }}>
             {visible.map((w, i) => (
               <div key={w.id} style={{ aspectRatio: "4/5", cursor: "pointer" }} onClick={() => setLightboxIndex(i)}>
-                <Cell w={w} />
+                <Cell w={w} captionPalette />
               </div>
             ))}
           </div>

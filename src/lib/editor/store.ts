@@ -21,9 +21,9 @@ export interface PortfolioDesign {
 interface EditorStore extends EditorState {
   templateId:         TemplateId;
   readOnly:           boolean;
-  galleryPhotos:      { src: string; title?: string }[];
+  galleryPhotos:      { src: string; title?: string; group?: string }[];
   setReadOnly:        (v: boolean) => void;
-  setGalleryPhotos:   (p: { src: string; title?: string }[]) => void;
+  setGalleryPhotos:   (p: { src: string; title?: string; group?: string }[]) => void;
   hydrateDesign:      (design: PortfolioDesign) => void;
   setTemplate:        (id: TemplateId) => void;
   selectNode:         (id: string | null) => void;

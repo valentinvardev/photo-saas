@@ -11,9 +11,9 @@ function isContent(c: unknown): c is PortfolioContent {
  * (categories → direct photos → folders → folder photos). Used to feed the
  * website-builder gallery and the public render.
  */
-export function flattenContentPhotos(content: unknown): { src: string; title?: string }[] {
+export function flattenContentPhotos(content: unknown): { src: string; title?: string; group?: string }[] {
   if (!isContent(content)) return [];
-  const out: { src: string; title?: string }[] = [];
+  const out: { src: string; title?: string; group?: string }[] = [];
   for (const catId of content.categoryIds) {
     const cat = content.categories[catId];
     if (!cat || cat.visibility === "hidden") continue;
@@ -24,9 +24,10 @@ export function flattenContentPhotos(content: unknown): { src: string; title?: s
     for (const fid of cat.folderIds) {
       const fol = content.folders[fid];
       if (!fol || fol.visibility === "hidden") continue;
+      // Tag each folder photo with its folder name so the gallery can group by it.
       for (const pid of fol.photoIds) {
         const p = content.photos[pid];
-        if (p && p.visibility !== "hidden") out.push({ src: p.src, title: p.title });
+        if (p && p.visibility !== "hidden") out.push({ src: p.src, title: p.title, group: fol.title });
       }
     }
   }

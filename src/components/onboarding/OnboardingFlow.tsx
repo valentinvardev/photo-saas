@@ -108,11 +108,12 @@ export function OnboardingFlow({ open, onClose }: { open: boolean; onClose: () =
     ? { mode: logoMode, text: logoText.trim() || initials(identity), imageUrl: logoUrl, altImageUrl: altLogoUrl, faviconUrl: iconUrl, width: logoWidth, imageCrop: logoCrop }
     : undefined;
 
-  // Photos for the preview gallery: loose first, then each folder's photos.
+  // Photos for the preview gallery: loose first, then each folder's photos
+  // (tagged with the folder name so the gallery modal can navigate by folder).
   const previewGallery = [
-    ...contentPhotos.filter((p) => !p.folderId),
-    ...folders.flatMap((f) => contentPhotos.filter((p) => p.folderId === f.id)),
-  ].map((p) => ({ src: p.url, title: p.filename }));
+    ...contentPhotos.filter((p) => !p.folderId).map((p) => ({ src: p.url, title: p.filename })),
+    ...folders.flatMap((f) => contentPhotos.filter((p) => p.folderId === f.id).map((p) => ({ src: p.url, title: p.filename, group: f.name }))),
+  ];
 
   const setColor = (key: keyof ColorPalette, value: string) => setPaletteState((p) => ({ ...p, [key]: value }));
 
