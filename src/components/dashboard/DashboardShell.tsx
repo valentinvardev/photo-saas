@@ -6,6 +6,7 @@ import { DashboardHeader } from "./Header";
 import { ChatPanel } from "./ChatPanel";
 import { ChatErrorBoundary } from "./ChatErrorBoundary";
 import { CartPanel } from "./CartPanel";
+import { NewMessageChime } from "./NewMessageChime";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -90,6 +91,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <CartPanel />
+      <NewMessageChime />
     </div>
     </>
   );
