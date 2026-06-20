@@ -394,6 +394,7 @@ function useCurrentUser() {
 /* ── Profile dropdown ───────────────────────────────────── */
 function ProfileDropdown({ onClose }: { onClose: () => void }) {
   const { theme, toggle } = useTheme();
+  const { locale, setLocale } = useT();
   const router = useRouter();
   const user = useCurrentUser();
 
@@ -431,6 +432,14 @@ function ProfileDropdown({ onClose }: { onClose: () => void }) {
           <SettingsIcon />
           <span className="font-sans">Settings</span>
         </Link>
+        <Link
+          href="/onboarding"
+          onClick={onClose}
+          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z"/></svg>
+          <span className="font-sans">Studio setup</span>
+        </Link>
         <button
           onClick={toggle}
           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors"
@@ -442,6 +451,21 @@ function ProfileDropdown({ onClose }: { onClose: () => void }) {
         <div className="flex items-center gap-2.5 px-4 py-2 text-sm text-[var(--fg-muted)]">
           <ThemeTester />
           <span className="font-sans">Theme colors</span>
+        </div>
+        {/* Language (moved from the top bar) */}
+        <div className="px-4 py-2.5">
+          <div className="flex items-center gap-2.5 text-sm text-[var(--fg-muted)] mb-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+            <span className="font-sans">Language</span>
+          </div>
+          <div className="flex gap-1">
+            {(["en", "es", "pt"] as const).map((l) => (
+              <button key={l} onClick={() => setLocale(l)}
+                className={`flex-1 py-1.5 rounded-md font-mono text-[10px] font-bold uppercase tracking-widest transition-colors ${locale === l ? "bg-yellow text-[#111]" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>
+                {l}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -562,7 +586,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
 
       {/* Universal search */}
       <div ref={searchRef} className={`relative flex-1 min-w-0 max-w-none sm:max-w-xs transition-all duration-200 ${searchFocused ? "sm:max-w-sm" : ""}`}>
-        <span className="absolute left-2 sm:left-2.5 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] pointer-events-none">
+        <span className="absolute left-3 sm:left-2.5 top-1/2 -translate-y-1/2 text-[var(--fg-muted)] pointer-events-none">
           <SearchIcon />
         </span>
         <input
@@ -573,7 +597,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
           onFocus={() => { setSearchFocused(true); openSearch(); }}
           onBlur={() => setSearchFocused(false)}
           onChange={(e) => { setSearchQuery(e.target.value); if (!searchOpen) openSearch(); }}
-          className="w-full pl-7 sm:pl-8 pr-2 sm:pr-3 py-1.5 text-xs font-sans bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg text-[var(--fg)] placeholder:text-[var(--fg-muted)] outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition-all"
+          className="w-full pl-9 sm:pl-8 pr-3 py-2.5 sm:py-1.5 text-sm sm:text-xs font-sans bg-[var(--bg-subtle)] border border-[var(--border)] rounded-xl sm:rounded-lg text-[var(--fg)] placeholder:text-[var(--fg-muted)] outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition-all"
         />
         <kbd className="hidden sm:block absolute right-2.5 top-1/2 -translate-y-1/2 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-card)] border border-[var(--border)] px-1 py-0.5 rounded pointer-events-none">
           ⌘K
@@ -946,20 +970,6 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
 
       {/* Spacer */}
       <div className="flex-1" />
-
-      {/* Onboarding — opens the full-page setup flow */}
-      <Link
-        href="/onboarding"
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors shrink-0"
-        aria-label="Onboarding"
-        title="Onboarding"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z"/></svg>
-        <span className="hidden sm:block font-sans text-xs font-medium">Setup</span>
-      </Link>
-
-      {/* Language */}
-      <LangTester />
 
       {/* Cart — only visible when there's something in it */}
       {cartItems.length > 0 && (
