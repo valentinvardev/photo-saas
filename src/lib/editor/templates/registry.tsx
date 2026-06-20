@@ -44,14 +44,12 @@ export const TEMPLATES: Record<string, TemplateDef> = {
     Component: HalcyonComponent,
     /* Halcyon is a warm-dark editorial template — it opens with its own dark
        palette + typography rather than the global light defaults. The Design
-       panel can then change any of them. Typography uses fonts already loaded
-       in the editor (Instrument Serif / Geist aren't bundled) that match the
-       warm-editorial character. */
+       panel can then change any of them. */
     defaultPalette: { bg: "#0E0D0B", fg: "#EFEAE0", accent: "#C2410C", muted: "#8A8378" },
     defaultTypography: {
-      serif: "'Fraunces', Georgia, serif",
-      sans:  "'Inter', system-ui, sans-serif",
-      mono:  "'JetBrains Mono', monospace",
+      serif: "'Instrument Serif', Georgia, serif",
+      sans:  "'Geist', system-ui, sans-serif",
+      mono:  "'Geist Mono', monospace",
     },
     defaultLogo: { ...DEFAULT_LOGO, text: "Halcyon" },
   },

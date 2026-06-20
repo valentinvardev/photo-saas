@@ -32,12 +32,12 @@ type Lightbox = { photos: (HlPhoto & { projectTitle?: string })[]; index: number
    variable, so palette + typography changes apply live. raised/line are derived
    from fg/bg with color-mix so they track the palette too. */
 const t = {
-  accent: "var(--ed-accent)",
-  bg:     "var(--ed-bg)",
-  raised: "color-mix(in srgb, var(--ed-fg) 8%, var(--ed-bg))",
-  fg:     "var(--ed-fg)",
-  muted:  "var(--ed-muted)",
-  line:   "color-mix(in srgb, var(--ed-fg) 16%, transparent)",
+  accent: "var(--ed-accent, #C2410C)",
+  bg:     "var(--ed-bg, #0E0D0B)",
+  raised: "color-mix(in srgb, var(--ed-fg, #EFEAE0) 8%, var(--ed-bg, #0E0D0B))",
+  fg:     "var(--ed-fg, #EFEAE0)",
+  muted:  "var(--ed-muted, #8A8378)",
+  line:   "color-mix(in srgb, var(--ed-fg, #EFEAE0) 16%, transparent)",
 };
 const HL_FONTS = {
   serif: "var(--tpl-serif), Georgia, serif",

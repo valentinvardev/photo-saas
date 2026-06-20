@@ -7,6 +7,7 @@ import { useT } from "~/components/providers/LangProvider";
 import { LOCALES } from "~/lib/i18n";
 import { api } from "~/trpc/react";
 import { FONT_OPTIONS } from "~/lib/editor/fonts";
+import { TEMPLATES } from "~/lib/editor/templates/registry";
 import { DEFAULT_TYPOGRAPHY, DEFAULT_CONTACT, type ColorPalette, type Typography, type LogoSettings, type ImageCrop, type ContactSettings } from "~/lib/editor/types";
 import { THEME_VARS } from "~/lib/editor/editorTheme";
 import { FontPickerModal } from "~/components/editor/canvas/FontPickerModal";
@@ -134,6 +135,20 @@ export function OnboardingFlow() {
   const stepKey: StepKey = STEPS[step] ?? "welcome";
   // Preview appears once a template is chosen, through Content.
   const showPreview = stepKey === "template" || stepKey === "color" || stepKey === "fonts" || stepKey === "content";
+
+  /* Picking a template applies its design defaults: dark/branded templates
+     (Halcyon) bring their own palette + typography; the others fall back to the
+     light base. Template choice precedes the colour step, so this never clobbers
+     a customisation the user has already made. */
+  function selectTemplate(i: number) {
+    if (i === templateIdx) return;
+    setTemplateIdx(i);
+    const tpl  = TEMPLATES[TEMPLATE_OPTIONS[i]!.id];
+    const base = PALETTES[0]!;
+    setPaletteState(tpl?.defaultPalette ?? { bg: base.bg, fg: base.fg, accent: base.accent, muted: base.muted });
+    setTypo(tpl?.defaultTypography ?? pairingTypography(PAIRINGS[0]!));
+  }
+
   const visibleContent = contentPhotos.filter((p) => (activeFolder === null ? !p.folderId : p.folderId === activeFolder));
 
   async function onContentFiles(files: File[]) {
@@ -382,15 +397,16 @@ export function OnboardingFlow() {
                       <div className="flex flex-col gap-3">
                         {TEMPLATE_OPTIONS.map((opt, i) => {
                           const active = i === templateIdx;
+                          const key = opt.id === "minimal-bw" ? "minimal" : opt.id; // i18n key prefix
                           return (
-                            <button key={opt.id} onClick={() => setTemplateIdx(i)}
+                            <button key={opt.id} onClick={() => selectTemplate(i)}
                               className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}>
                               <div className={`mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${active ? "border-yellow" : "border-[var(--fg-muted)]"}`}>
                                 {active && <div className="w-2 h-2 rounded-full bg-yellow" />}
                               </div>
                               <div>
-                                <div className="font-sans text-sm font-semibold text-[var(--fg)]">{t(`onb.template.${opt.id === "minimal-bw" ? "minimalName" : "atelierName"}`)}</div>
-                                <div className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">{t(`onb.template.${opt.id === "minimal-bw" ? "minimalDesc" : "atelierDesc"}`)}</div>
+                                <div className="font-sans text-sm font-semibold text-[var(--fg)]">{t(`onb.template.${key}Name`)}</div>
+                                <div className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">{t(`onb.template.${key}Desc`)}</div>
                               </div>
                             </button>
                           );

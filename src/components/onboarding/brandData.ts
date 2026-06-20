@@ -31,11 +31,12 @@ export function pairingTypography(p: PairingOption): Typography {
 }
 
 /* ── Template options (real editor templates that render with branding) ── */
-export type TemplateOption = { id: "minimal-bw" | "atelier"; variant: "minimal" | "atelier" };
+export type TemplateOption = { id: "minimal-bw" | "atelier" | "halcyon"; variant: "minimal" | "atelier" | "halcyon" };
 
 export const TEMPLATE_OPTIONS: TemplateOption[] = [
   { id: "minimal-bw", variant: "minimal" },
   { id: "atelier",    variant: "atelier" },
+  { id: "halcyon",    variant: "halcyon" },
 ];
 
 /* ── Identity collected in onboarding ── */

@@ -31,6 +31,16 @@ import "@fontsource/josefin-sans/600.css";
 import "@fontsource/nunito/400.css";
 import "@fontsource/nunito/600.css";
 
+/* ── Halcyon template fonts ──────────────────────────────────────────── */
+import "@fontsource/instrument-serif/400.css";
+import "@fontsource/instrument-serif/400-italic.css";
+import "@fontsource/geist/300.css";
+import "@fontsource/geist/400.css";
+import "@fontsource/geist/500.css";
+import "@fontsource/geist/600.css";
+import "@fontsource/geist-mono/400.css";
+import "@fontsource/geist-mono/500.css";
+
 /* ── Extended serif library ──────────────────────────────────────────── */
 import "@fontsource/playfair-display/400.css";
 import "@fontsource/playfair-display/700.css";
@@ -78,6 +88,7 @@ export const FONT_OPTIONS: FontOption[] = [
   { label: "Space Mono",         value: "Space Mono",         stack: "'Space Mono', monospace",                 category: "mono",  featured: true },
 
   /* ── Serifs ─── */
+  { label: "Instrument Serif",   value: "Instrument Serif",   stack: "'Instrument Serif', Georgia, serif",       category: "serif", featured: true  },
   { label: "EB Garamond",        value: "EB Garamond",        stack: "'EB Garamond', Georgia, serif",           category: "serif", featured: true  },
   { label: "Playfair Display",   value: "Playfair Display",   stack: "'Playfair Display', Georgia, serif",      category: "serif", featured: true  },
   { label: "Lora",               value: "Lora",               stack: "'Lora', Georgia, serif",                  category: "serif", featured: true  },
@@ -86,6 +97,7 @@ export const FONT_OPTIONS: FontOption[] = [
   { label: "Source Serif 4",     value: "Source Serif 4",     stack: "'Source Serif 4', Georgia, serif",        category: "serif", featured: false },
 
   /* ── Sans-serifs ─── */
+  { label: "Geist",              value: "Geist",              stack: "'Geist', system-ui, sans-serif",          category: "sans",  featured: true  },
   { label: "Inter",              value: "Inter",              stack: "'Inter', system-ui, sans-serif",          category: "sans",  featured: true  },
   { label: "Manrope",            value: "Manrope",            stack: "'Manrope', system-ui, sans-serif",        category: "sans",  featured: true  },
   { label: "Syne",               value: "Syne",               stack: "'Syne', system-ui, sans-serif",           category: "sans",  featured: true  },
@@ -96,6 +108,7 @@ export const FONT_OPTIONS: FontOption[] = [
   { label: "Nunito",             value: "Nunito",             stack: "'Nunito', system-ui, sans-serif",         category: "sans",  featured: false },
 
   /* ── Mono ─── */
+  { label: "Geist Mono",        value: "Geist Mono",        stack: "'Geist Mono', monospace",                  category: "mono",  featured: true  },
   { label: "JetBrains Mono",    value: "JetBrains Mono",    stack: "'JetBrains Mono', monospace",              category: "mono",  featured: true  },
   { label: "IBM Plex Mono",     value: "IBM Plex Mono",     stack: "'IBM Plex Mono', monospace",               category: "mono",  featured: true  },
   { label: "Source Code Pro",   value: "Source Code Pro",   stack: "'Source Code Pro', monospace",             category: "mono",  featured: true  },
