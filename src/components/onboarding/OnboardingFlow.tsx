@@ -22,7 +22,10 @@ import {
 // Load the @fontsource fonts so the live preview + pickers render the real type.
 import "~/lib/editor/fonts";
 
-const TOTAL = 7; // welcome, identity, template, color, fonts, content, done
+/* The personal-info part is asked one question per step. */
+const STEPS = ["welcome", "name", "avatar", "location", "bio", "email", "phone", "contact", "logo", "template", "color", "fonts", "content", "done"] as const;
+type StepKey = (typeof STEPS)[number];
+const TOTAL = STEPS.length;
 
 function slugify(s: string) {
   return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "portfolio";
@@ -128,8 +131,9 @@ export function OnboardingFlow() {
 
   const setColor = (key: keyof ColorPalette, value: string) => setPaletteState((p) => ({ ...p, [key]: value }));
 
-  // Preview appears once a template is chosen (Template = step 2) through Content (5).
-  const showPreview = step >= 2 && step <= 5;
+  const stepKey: StepKey = STEPS[step] ?? "welcome";
+  // Preview appears once a template is chosen, through Content.
+  const showPreview = stepKey === "template" || stepKey === "color" || stepKey === "fonts" || stepKey === "content";
   const visibleContent = contentPhotos.filter((p) => (activeFolder === null ? !p.folderId : p.folderId === activeFolder));
 
   async function onContentFiles(files: File[]) {
@@ -191,7 +195,7 @@ export function OnboardingFlow() {
       void utils.user.me.invalidate();
       setNewId(made.id);
       setNewSlug(made.slug);
-      setStep(6);
+      setStep(STEPS.indexOf("done"));
     } catch (e) {
       setError(e instanceof Error ? e.message : t("onb.done.error"));
     } finally {
@@ -199,7 +203,7 @@ export function OnboardingFlow() {
     }
   }
 
-  const next = () => { if (step === 5) void finish(); else setStep((s) => Math.min(s + 1, 6)); };
+  const next = () => { if (stepKey === "content") void finish(); else setStep((s) => Math.min(s + 1, TOTAL - 1)); };
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   return (
@@ -209,12 +213,10 @@ export function OnboardingFlow() {
 
       {/* Header: step indicator + (mobile) preview + exit */}
       <div className="flex items-center gap-4 px-5 sm:px-8 py-4 border-b border-[var(--border)] shrink-0">
-        <div className="flex items-center gap-1.5">
-          {Array.from({ length: TOTAL }).map((_, i) => (
-            <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === step ? "w-6 bg-yellow" : i < step ? "w-2.5 bg-yellow/50" : "w-2.5 bg-[var(--border)]"}`} />
-          ))}
+        <div className="w-28 sm:w-48 h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
+          <div className="h-full bg-yellow rounded-full transition-all duration-300" style={{ width: `${(step / (TOTAL - 1)) * 100}%` }} />
         </div>
-        <span className="font-mono text-[10px] text-[var(--fg-muted)] hidden sm:inline">{t("onb.stepOf", { n: Math.min(step + 1, TOTAL), total: TOTAL })}</span>
+        <span className="font-mono text-[10px] text-[var(--fg-muted)]">{t("onb.stepOf", { n: Math.min(step + 1, TOTAL), total: TOTAL })}</span>
         <div className="flex-1" />
         {showPreview && (
           <button onClick={() => setPreviewOpen(true)} className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg)] font-sans text-xs font-medium hover:border-[var(--fg-muted)] transition-colors">
@@ -240,8 +242,8 @@ export function OnboardingFlow() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  {/* 0 — Welcome */}
-                  {step === 0 && (
+                  {/* Welcome */}
+                  {stepKey === "welcome" && (
                     <div className="max-w-md mx-auto text-center py-10">
                       <div className="w-14 h-14 mx-auto rounded-2xl bg-yellow/10 border border-yellow/30 flex items-center justify-center text-yellow mb-6">
                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z"/></svg>
@@ -256,21 +258,11 @@ export function OnboardingFlow() {
                     </div>
                   )}
 
-                  {/* 1 — Identity (+ optional logo) */}
-                  {step === 1 && (
-                    <div className="flex flex-col gap-4">
-                      <StepHead title={t("onb.identity.title")} body={t("onb.identity.body")} />
-
-                      {/* Profile photo — also used in the About section */}
-                      <div className="flex items-center gap-3.5">
-                        <AvatarUpload value={avatarUrl} onChange={setAvatarUrl} initials={initials(identity)} />
-                        <div className="min-w-0">
-                          <div className="font-sans text-xs font-semibold text-[var(--fg)]">{t("onb.identity.avatar")}</div>
-                          <div className="font-sans text-[11px] text-[var(--fg-muted)]">{t("onb.identity.avatarHint")}</div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
+                  {/* Name */}
+                  {stepKey === "name" && (
+                    <div className="max-w-md mx-auto">
+                      <StepHead title={t("onb.q.nameTitle")} body={t("onb.q.nameBody")} />
+                      <div className="grid grid-cols-2 gap-3 mt-5">
                         <Field label={t("onb.identity.first")}>
                           <input autoFocus className={inputCls} value={first} onChange={(e) => setFirst(e.target.value)} placeholder={t("onb.identity.firstPh")} />
                         </Field>
@@ -278,100 +270,135 @@ export function OnboardingFlow() {
                           <input className={inputCls} value={last} onChange={(e) => setLast(e.target.value)} placeholder={t("onb.identity.lastPh")} />
                         </Field>
                       </div>
-                      <Field label={t("onb.identity.location")}>
-                        <input className={inputCls} value={location} onChange={(e) => setLocation(e.target.value)} placeholder={t("onb.identity.locationPh")} />
-                      </Field>
-                      <Field label={t("onb.identity.bio")}>
-                        <textarea className={`${inputCls} resize-none`} rows={3} maxLength={160} value={bio} onChange={(e) => setBio(e.target.value)} placeholder={t("onb.identity.bioPh")} />
-                      </Field>
+                    </div>
+                  )}
 
-                      {/* Contact */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <Field label={t("onb.identity.email")}>
-                          <input type="email" className={inputCls} value={email} onChange={(e) => { emailTouched.current = true; setEmail(e.target.value); }} placeholder={t("onb.identity.emailPh")} />
-                        </Field>
-                        <Field label={t("onb.identity.phone")}>
-                          <input type="tel" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("onb.identity.phonePh")} />
-                        </Field>
-                      </div>
-                      <div className="flex items-center gap-1.5 -mt-1.5 text-[var(--fg-muted)]">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1012 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.6-4.1-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2.1.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.7 1.8c.1.2.1.4 0 .5l-.3.5c-.1.2-.3.3-.1.6.1.3.6 1 1.3 1.6.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.6-.7c.2-.2.3-.2.6-.1l1.6.8c.3.1.5.2.5.4.1.1.1.6-.1 1z"/></svg>
-                        <span className="font-sans text-[11px]">{t("onb.identity.phoneHint")}</span>
-                      </div>
+                  {/* Profile photo */}
+                  {stepKey === "avatar" && (
+                    <div className="max-w-md mx-auto text-center">
+                      <StepHead title={t("onb.q.avatarTitle")} body={t("onb.q.avatarBody")} center />
+                      <div className="flex justify-center mt-7"><AvatarUpload value={avatarUrl} onChange={setAvatarUrl} initials={initials(identity)} /></div>
+                    </div>
+                  )}
 
-                      {/* Where the contact form sends people */}
-                      <Field label={t("onb.contact.label")}>
-                        <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
-                          <button onClick={() => setContactMode("whatsapp")} className={`flex-1 px-3 py-2 font-sans text-xs font-semibold transition-colors ${contactMode === "whatsapp" ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.contact.whatsapp")}</button>
-                          <button onClick={() => setContactMode("inbox")} className={`flex-1 px-3 py-2 font-sans text-xs font-semibold transition-colors border-l border-[var(--border)] ${contactMode === "inbox" ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.contact.inbox")}</button>
-                        </div>
-                        <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1.5">{contactMode === "whatsapp" ? t("onb.contact.whatsappHint") : t("onb.contact.inboxHint")}</p>
-                      </Field>
-
-                      {/* Logo */}
-                      <div className="pt-2 border-t border-[var(--border)]">
-                        <div className="flex items-center justify-between gap-3 mt-3">
-                          <span className="font-sans text-sm font-semibold text-[var(--fg)]">{t("onb.logo.question")}</span>
-                          <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
-                            <button onClick={() => setHasLogo(true)} className={`px-3.5 py-1.5 font-sans text-xs font-semibold transition-colors ${hasLogo ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.logo.yes")}</button>
-                            <button onClick={() => setHasLogo(false)} className={`px-3.5 py-1.5 font-sans text-xs font-semibold transition-colors border-l border-[var(--border)] ${!hasLogo ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.logo.no")}</button>
-                          </div>
-                        </div>
-                        {!hasLogo && (
-                          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-2 leading-relaxed">{t("onb.logo.noHint", { name: fullName(identity) || initials(identity) })}</p>
-                        )}
-                        <AnimatePresence>
-                          {hasLogo && (
-                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-                              <div className="flex flex-col gap-3 mt-4">
-                                {/* Display mode */}
-                                <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
-                                  {(["text", "image", "image+text"] as const).map((m) => (
-                                    <button key={m} onClick={() => setLogoMode(m)}
-                                      className={`flex-1 px-2 py-1.5 font-sans text-[11px] font-semibold transition-colors ${logoMode === m ? "bg-yellow/15 text-[var(--fg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"} ${m !== "text" ? "border-l border-[var(--border)]" : ""}`}>
-                                      {m === "text" ? t("onb.logo.modeText") : m === "image" ? t("onb.logo.modeImage") : t("onb.logo.modeBoth")}
-                                    </button>
-                                  ))}
-                                </div>
-
-                                {/* Logo text */}
-                                {(logoMode === "text" || logoMode === "image+text") && (
-                                  <Field label={t("onb.logo.text")}>
-                                    <input className={inputCls} value={logoText} onChange={(e) => setLogoText(e.target.value)} placeholder={initials(identity)} maxLength={40} />
-                                  </Field>
-                                )}
-
-                                {/* Logo image + crop + width + alt */}
-                                {(logoMode === "image" || logoMode === "image+text") && (
-                                  <>
-                                    <AssetUpload label={t("onb.logo.logoLabel")} hint={t("onb.logo.logoHint")} value={logoUrl} onChange={(url) => { setLogoUrl(url); setLogoCrop(undefined); }} />
-                                    {logoUrl && (
-                                      <>
-                                        <button onClick={() => setCropOpen(true)}
-                                          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] text-xs font-sans font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
-                                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/></svg>
-                                          <span className="flex-1 text-left">{logoCrop ? t("onb.logo.adjustCrop") : t("onb.logo.crop")}</span>
-                                          {logoCrop && <span className="font-mono text-[9px] text-yellow border border-yellow/60 bg-yellow/10 px-1.5 py-0.5 rounded">ON</span>}
-                                        </button>
-                                        <LogoWidthSlider label={t("onb.logo.width")} width={logoWidth} onChange={setLogoWidth} />
-                                      </>
-                                    )}
-                                    <AssetUpload label={t("onb.logo.altLabel")} hint={t("onb.logo.altHint")} value={altLogoUrl} onChange={setAltLogoUrl} />
-                                  </>
-                                )}
-
-                                {/* Favicon — always available */}
-                                <AssetUpload label={t("onb.logo.iconLabel")} hint={t("onb.logo.iconHint")} value={iconUrl} onChange={setIconUrl} />
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                  {/* Location */}
+                  {stepKey === "location" && (
+                    <div className="max-w-md mx-auto">
+                      <StepHead title={t("onb.q.locationTitle")} body={t("onb.q.locationBody")} />
+                      <div className="mt-5">
+                        <input autoFocus className={inputCls} value={location} onChange={(e) => setLocation(e.target.value)} placeholder={t("onb.identity.locationPh")} />
                       </div>
                     </div>
                   )}
 
-                  {/* 2 — Template (choose the portfolio first) */}
-                  {step === 2 && (
+                  {/* Bio */}
+                  {stepKey === "bio" && (
+                    <div className="max-w-md mx-auto">
+                      <StepHead title={t("onb.q.bioTitle")} body={t("onb.q.bioBody")} />
+                      <div className="mt-5">
+                        <textarea autoFocus className={`${inputCls} resize-none`} rows={4} maxLength={160} value={bio} onChange={(e) => setBio(e.target.value)} placeholder={t("onb.identity.bioPh")} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Email */}
+                  {stepKey === "email" && (
+                    <div className="max-w-md mx-auto">
+                      <StepHead title={t("onb.q.emailTitle")} body={t("onb.q.emailBody")} />
+                      <div className="mt-5">
+                        <input autoFocus type="email" className={inputCls} value={email} onChange={(e) => { emailTouched.current = true; setEmail(e.target.value); }} placeholder={t("onb.identity.emailPh")} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Phone */}
+                  {stepKey === "phone" && (
+                    <div className="max-w-md mx-auto">
+                      <StepHead title={t("onb.q.phoneTitle")} body={t("onb.q.phoneBody")} />
+                      <div className="mt-5">
+                        <input autoFocus type="tel" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("onb.identity.phonePh")} />
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-2 text-[var(--fg-muted)]">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1012 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.6-4.1-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2.1.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.7 1.8c.1.2.1.4 0 .5l-.3.5c-.1.2-.3.3-.1.6.1.3.6 1 1.3 1.6.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.6-.7c.2-.2.3-.2.6-.1l1.6.8c.3.1.5.2.5.4.1.1.1.6-.1 1z"/></svg>
+                        <span className="font-sans text-[11px]">{t("onb.identity.phoneHint")}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Contact form destination */}
+                  {stepKey === "contact" && (
+                    <div className="max-w-md mx-auto">
+                      <StepHead title={t("onb.q.contactTitle")} body={t("onb.q.contactBody")} />
+                      <div className="flex rounded-lg border border-[var(--border)] overflow-hidden mt-5">
+                        <button onClick={() => setContactMode("whatsapp")} className={`flex-1 px-3 py-2.5 font-sans text-sm font-semibold transition-colors ${contactMode === "whatsapp" ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.contact.whatsapp")}</button>
+                        <button onClick={() => setContactMode("inbox")} className={`flex-1 px-3 py-2.5 font-sans text-sm font-semibold transition-colors border-l border-[var(--border)] ${contactMode === "inbox" ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.contact.inbox")}</button>
+                      </div>
+                      <p className="font-sans text-xs text-[var(--fg-muted)] mt-2.5 leading-relaxed">{contactMode === "whatsapp" ? t("onb.contact.whatsappHint") : t("onb.contact.inboxHint")}</p>
+                    </div>
+                  )}
+
+                  {/* Logo */}
+                  {stepKey === "logo" && (
+                    <div className="max-w-md mx-auto">
+                      <StepHead title={t("onb.q.logoTitle")} body={t("onb.q.logoBody")} />
+                      <div className="flex rounded-lg border border-[var(--border)] overflow-hidden mt-5 w-full">
+                        <button onClick={() => setHasLogo(true)} className={`flex-1 px-3.5 py-2.5 font-sans text-sm font-semibold transition-colors ${hasLogo ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.logo.yes")}</button>
+                        <button onClick={() => setHasLogo(false)} className={`flex-1 px-3.5 py-2.5 font-sans text-sm font-semibold transition-colors border-l border-[var(--border)] ${!hasLogo ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.logo.no")}</button>
+                      </div>
+                      {!hasLogo && (
+                        <p className="font-sans text-xs text-[var(--fg-muted)] mt-3 leading-relaxed">{t("onb.logo.noHint", { name: fullName(identity) || initials(identity) })}</p>
+                      )}
+                      <AnimatePresence>
+                        {hasLogo && (
+                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
+                            <div className="flex flex-col gap-3 mt-4">
+                              {/* Display mode */}
+                              <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
+                                {(["text", "image", "image+text"] as const).map((m) => (
+                                  <button key={m} onClick={() => setLogoMode(m)}
+                                    className={`flex-1 px-2 py-1.5 font-sans text-[11px] font-semibold transition-colors ${logoMode === m ? "bg-yellow/15 text-[var(--fg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"} ${m !== "text" ? "border-l border-[var(--border)]" : ""}`}>
+                                    {m === "text" ? t("onb.logo.modeText") : m === "image" ? t("onb.logo.modeImage") : t("onb.logo.modeBoth")}
+                                  </button>
+                                ))}
+                              </div>
+
+                              {/* Logo text */}
+                              {(logoMode === "text" || logoMode === "image+text") && (
+                                <Field label={t("onb.logo.text")}>
+                                  <input className={inputCls} value={logoText} onChange={(e) => setLogoText(e.target.value)} placeholder={initials(identity)} maxLength={40} />
+                                </Field>
+                              )}
+
+                              {/* Logo image + crop + width + alt */}
+                              {(logoMode === "image" || logoMode === "image+text") && (
+                                <>
+                                  <AssetUpload label={t("onb.logo.logoLabel")} hint={t("onb.logo.logoHint")} value={logoUrl} onChange={(url) => { setLogoUrl(url); setLogoCrop(undefined); }} />
+                                  {logoUrl && (
+                                    <>
+                                      <button onClick={() => setCropOpen(true)}
+                                        className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] text-xs font-sans font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/></svg>
+                                        <span className="flex-1 text-left">{logoCrop ? t("onb.logo.adjustCrop") : t("onb.logo.crop")}</span>
+                                        {logoCrop && <span className="font-mono text-[9px] text-yellow border border-yellow/60 bg-yellow/10 px-1.5 py-0.5 rounded">ON</span>}
+                                      </button>
+                                      <LogoWidthSlider label={t("onb.logo.width")} width={logoWidth} onChange={setLogoWidth} />
+                                    </>
+                                  )}
+                                  <AssetUpload label={t("onb.logo.altLabel")} hint={t("onb.logo.altHint")} value={altLogoUrl} onChange={setAltLogoUrl} />
+                                </>
+                              )}
+
+                              {/* Favicon — always available */}
+                              <AssetUpload label={t("onb.logo.iconLabel")} hint={t("onb.logo.iconHint")} value={iconUrl} onChange={setIconUrl} />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )}
+
+                  {/* Template */}
+                  {stepKey === "template" && (
                     <div className="flex flex-col gap-4">
                       <StepHead title={t("onb.template.title")} body={t("onb.template.body")} />
                       <div className="flex flex-col gap-3">
@@ -394,8 +421,8 @@ export function OnboardingFlow() {
                     </div>
                   )}
 
-                  {/* 3 — Color (variables first, then presets) */}
-                  {step === 3 && (
+                  {/* Color */}
+                  {stepKey === "color" && (
                     <div className="flex flex-col gap-5">
                       <StepHead title={t("onb.color.title")} body={t("onb.color.body")} />
 
@@ -433,8 +460,8 @@ export function OnboardingFlow() {
                     </div>
                   )}
 
-                  {/* 4 — Typography (pairings + per-font modal) */}
-                  {step === 4 && (
+                  {/* Typography */}
+                  {stepKey === "fonts" && (
                     <div className="flex flex-col gap-5">
                       <StepHead title={t("onb.fonts.title")} body={t("onb.fonts.body")} />
 
@@ -465,8 +492,8 @@ export function OnboardingFlow() {
                     </div>
                   )}
 
-                  {/* 5 — Content (upload photos + folders) */}
-                  {step === 5 && (
+                  {/* Content (upload photos + folders) */}
+                  {stepKey === "content" && (
                     <div className="flex flex-col gap-4">
                       <StepHead title={t("onb.content.title")} body={t("onb.content.body")} />
                       <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => { const f = Array.from(e.target.files ?? []); e.target.value = ""; void onContentFiles(f); }} />
@@ -531,7 +558,7 @@ export function OnboardingFlow() {
                   )}
 
                   {/* 6 — Done */}
-                  {step === 6 && (
+                  {stepKey === "done" && (
                     <div className="max-w-md mx-auto text-center py-10">
                       <div className="w-16 h-16 mx-auto rounded-full bg-yellow/10 border border-yellow/30 flex items-center justify-center mb-6">
                         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -562,15 +589,15 @@ export function OnboardingFlow() {
             </div>
 
             {/* Footer nav (hidden on done) */}
-            {step < 6 && (
+            {stepKey !== "done" && (
               <div className="shrink-0 px-5 sm:px-8 py-4 border-t border-[var(--border)] flex items-center justify-between gap-3">
-                <button onClick={step === 0 ? exit : back} className="px-4 py-2 rounded-lg font-sans text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
-                  {step === 0 ? t("onb.close") : t("onb.back")}
+                <button onClick={stepKey === "welcome" ? exit : back} className="px-4 py-2 rounded-lg font-sans text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
+                  {stepKey === "welcome" ? t("onb.close") : t("onb.back")}
                 </button>
                 <div className="flex items-center gap-3">
                   {error && <span className="font-mono text-[10px] text-red-400 max-w-[160px] truncate" title={error}>{error}</span>}
                   <button onClick={next} disabled={creating} className="px-6 py-2.5 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 disabled:opacity-50 transition-colors">
-                    {step === 0 ? t("onb.welcome.start") : step === 5 ? (creating ? t("onb.done.creating") : t("onb.finish")) : t("onb.next")}
+                    {stepKey === "welcome" ? t("onb.welcome.start") : stepKey === "content" ? (creating ? t("onb.done.creating") : t("onb.finish")) : t("onb.next")}
                   </button>
                 </div>
               </div>
@@ -585,7 +612,7 @@ export function OnboardingFlow() {
                 <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)]">{t("onb.livePreview")}</span>
               </div>
               <div className="flex-1 min-h-0 rounded-xl overflow-hidden border border-[var(--border)] shadow-lg">
-                <LiveTemplatePreview templateId={template.id} palette={palette} typography={typo} nodes={previewNodes} logo={logoSettings} contact={contactSettings} galleryPhotos={previewGallery} slug={slug} scrollable={step === 5} />
+                <LiveTemplatePreview templateId={template.id} palette={palette} typography={typo} nodes={previewNodes} logo={logoSettings} contact={contactSettings} galleryPhotos={previewGallery} slug={slug} scrollable={stepKey === "content"} />
               </div>
             </div>
           )}
@@ -658,11 +685,11 @@ function LogoWidthSlider({ label, width, onChange }: { label: string; width: num
   );
 }
 
-function StepHead({ title, body }: { title: string; body: string }) {
+function StepHead({ title, body, center }: { title: string; body?: string; center?: boolean }) {
   return (
-    <div>
+    <div className={center ? "text-center" : undefined}>
       <h1 className="font-sans font-black text-[var(--fg)] text-xl sm:text-2xl tracking-tight">{title}</h1>
-      <p className="font-sans text-sm text-[var(--fg-muted)] mt-1.5 leading-relaxed">{body}</p>
+      {body && <p className="font-sans text-sm text-[var(--fg-muted)] mt-1.5 leading-relaxed">{body}</p>}
     </div>
   );
 }
