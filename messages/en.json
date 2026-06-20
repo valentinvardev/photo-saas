@@ -710,6 +710,7 @@
     "storageFree": "Free plan · 2 GB included",
     "storageUsed": "{used} of {total} used",
     "storagePhotos": "{n} photos",
+    "upgradePlan": "Upgrade plan",
     "recentActivity": "Recent activity",
     "recentActivityHint": "What's happened across your account.",
     "act1": "47 photos uploaded to 'Coastal'", "act1Time": "2h ago",
@@ -1122,7 +1123,17 @@
     "chatPhotos": "Shared {n} photos",
     "chatFolder": "Shared a folder",
     "chatPortfolio": "Shared a portfolio",
-    "view": "View"
+    "view": "View",
+    "tabPhotos": "Photos",
+    "tabFolders": "Folders",
+    "tabPortfolios": "Portfolios",
+    "emptyPhotos": "No photos yet.",
+    "emptyFolders": "No folders yet.",
+    "emptyPortfolios": "No portfolios yet.",
+    "photoOne": "photo",
+    "photoN": "photos",
+    "draftOnly": "Draft — publish to share",
+    "sharePhotosN": "Share {n}"
   },
   "inbox": {
     "title": "Inbox",

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
 import { api } from "~/trpc/react";
 import { useT } from "~/components/providers/LangProvider";
+import { ChatSharePicker } from "./ChatSharePicker";
 
 /* Detect a Portapic share/portfolio link in a message and show a card for it. */
 function extractShare(body: string): { kind: "v" | "p"; id: string; url: string } | null {
@@ -127,7 +129,9 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
   const sendMut = api.chat.send.useMutation();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const { t } = useT();
   const [draft, setDraft]       = useState("");
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [meId, setMeId]         = useState<string | null>(null);
   const [meName, setMeName]     = useState("You");
   const [meReady, setMeReady]   = useState(false);
@@ -204,11 +208,8 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-  async function send() {
-    const body = draft.trim();
+  async function sendBody(body: string) {
     if (!body) return;
-    setDraft("");
-
     // Optimistic: show it immediately as if sent.
     const tempId = "temp-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6);
     setMessages((prev) => [...prev, {
@@ -224,6 +225,13 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
       // Mark the optimistic message as failed instead of dropping it.
       setMessages((prev) => prev.map((m) => m.id === tempId ? { ...m, pending: false, failed: true } : m));
     }
+  }
+
+  function send() {
+    const body = draft.trim();
+    if (!body) return;
+    setDraft("");
+    void sendBody(body);
   }
 
   return (
@@ -301,6 +309,13 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
       {/* Input */}
       <div className="shrink-0 px-3 py-3 border-t border-[var(--border)]">
         <div className="flex items-center gap-2 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-xl px-3 py-2 focus-within:border-yellow/50 transition-colors">
+          <button
+            onClick={() => setPickerOpen(true)}
+            className="shrink-0 w-7 h-7 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-card)] flex items-center justify-center transition-colors"
+            aria-label={t("share.title")} title={t("share.title")}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+          </button>
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -318,6 +333,15 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
           </button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {pickerOpen && (
+          <ChatSharePicker
+            onClose={() => setPickerOpen(false)}
+            onShared={(url, title) => void sendBody(title ? `${title} — ${url}` : url)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -30,14 +30,13 @@ function EditorShellInner({ templateId, portfolioId, initialDesign, galleryPhoto
     hydrateDesign, setGalleryPhotos, setReadOnly,
     setSelectedSection, setHoveredSection, setViewport,
     palette, typography, buttons, grid, selectedSection, hoveredSection, hiddenSections,
-    nodes, logo, contact,
+    nodes, logo, contact, mobilePane, setMobilePane,
   } = useEditorStore();
 
   // Phone + tablet: full-width editor/preview panes you swipe between. Desktop
   // (>1024px) is unchanged. Phone forces the mobile viewport, tablet the tablet one.
   const compact  = useIsMobile(1024);
   const isPhone  = useIsMobile(768);
-  const [mobilePane, setMobilePane] = useState<0 | 1>(0);
   useEffect(() => {
     if (isPhone) setViewport("mobile");
     else if (compact) setViewport("tablet");

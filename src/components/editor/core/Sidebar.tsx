@@ -46,7 +46,7 @@ function scrollToSection(sectionId: string) {
    PAGES TAB
 ═══════════════════════════════════════════════════════════════════════ */
 function PagesTab() {
-  const { templateId, selectedSection, setSelectedSection, setHoveredSection, selectNode, selectedId, hiddenSections, hideSection, showSection } = useEditorStore();
+  const { templateId, selectedSection, setSelectedSection, setHoveredSection, selectNode, selectedId, hiddenSections, hideSection, showSection, setMobilePane } = useEditorStore();
   const { t } = useT();
   // Translate known section names; fall back to the template's own label.
   const secLabel = (s: SectionDef) => {
@@ -122,6 +122,7 @@ function PagesTab() {
             >
               <button
                 onClick={() => handleSectionClick(section)}
+                onDoubleClick={() => { handleSectionClick(section); setMobilePane(1); }}
                 style={{
                   display:     "flex",
                   alignItems:  "center",
@@ -187,6 +188,7 @@ function PagesTab() {
                     <button
                       key={el.nodeId}
                       onClick={(e) => { e.stopPropagation(); selectNode(el.nodeId); scrollToSection(section.id); }}
+                      onDoubleClick={(e) => { e.stopPropagation(); selectNode(el.nodeId); scrollToSection(section.id); setMobilePane(1); }}
                       style={{
                         display:    "flex",
                         alignItems: "center",

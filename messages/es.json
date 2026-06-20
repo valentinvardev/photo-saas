@@ -710,6 +710,7 @@
     "storageFree": "Plan gratuito · 2 GB incluidos",
     "storageUsed": "{used} de {total} usados",
     "storagePhotos": "{n} fotos",
+    "upgradePlan": "Mejorar plan",
     "recentActivity": "Actividad reciente",
     "recentActivityHint": "Lo que pasó en tu cuenta.",
     "act1": "47 fotos subidas a 'Coastal'", "act1Time": "hace 2 h",
@@ -1122,7 +1123,17 @@
     "chatPhotos": "Compartió {n} fotos",
     "chatFolder": "Compartió una carpeta",
     "chatPortfolio": "Compartió un portafolio",
-    "view": "Ver"
+    "view": "Ver",
+    "tabPhotos": "Fotos",
+    "tabFolders": "Carpetas",
+    "tabPortfolios": "Portafolios",
+    "emptyPhotos": "Aún no hay fotos.",
+    "emptyFolders": "Aún no hay carpetas.",
+    "emptyPortfolios": "Aún no hay portafolios.",
+    "photoOne": "foto",
+    "photoN": "fotos",
+    "draftOnly": "Borrador — publicá para compartir",
+    "sharePhotosN": "Compartir {n}"
   },
   "inbox": {
     "title": "Mensajes",

@@ -24,8 +24,10 @@ interface EditorStore extends EditorState {
   readOnly:           boolean;
   galleryPhotos:      { src: string; title?: string; group?: string }[];
   siteSlug:           string | null;
+  mobilePane:         0 | 1;
   setReadOnly:        (v: boolean) => void;
   setSiteSlug:        (slug: string | null) => void;
+  setMobilePane:      (p: 0 | 1) => void;
   setGalleryPhotos:   (p: { src: string; title?: string; group?: string }[]) => void;
   hydrateDesign:      (design: PortfolioDesign) => void;
   setTemplate:        (id: TemplateId) => void;
@@ -53,6 +55,7 @@ export const useEditorStore = create<EditorStore>()(
       readOnly:        false,
       galleryPhotos:   [],
       siteSlug:        null,
+      mobilePane:      0,
       nodes:           TEMPLATES[DEFAULT_TEMPLATE_ID]!.initialNodes,
       palette:         DEFAULT_PALETTE,
       typography:      DEFAULT_TYPOGRAPHY,
@@ -69,6 +72,7 @@ export const useEditorStore = create<EditorStore>()(
 
       setReadOnly: (v) => set({ readOnly: v }),
       setSiteSlug: (slug) => set({ siteSlug: slug }),
+      setMobilePane: (p) => set({ mobilePane: p }),
       setGalleryPhotos: (p) => set({ galleryPhotos: p }),
 
       /** Load a saved design into the store (used by the editor + public render). */

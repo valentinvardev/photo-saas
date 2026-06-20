@@ -136,25 +136,27 @@ function StorageCard() {
     : b >= 1024 ** 2 ? `${(b / 1024 ** 2).toFixed(1)} MB`
     : `${Math.max(0, Math.round(b / 1024))} KB`;
   return (
-    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-5 flex flex-col justify-center">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2.5">
-          <span className="w-9 h-9 rounded-lg bg-[var(--bg-subtle)] flex items-center justify-center text-[var(--fg-muted)]">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0018 0V5"/><path d="M3 12a9 3 0 0018 0"/></svg>
-          </span>
-          <div>
-            <div className="font-sans text-sm font-semibold text-[var(--fg)]">{t("home.storageTitle")}</div>
-            <div className="font-mono text-[10px] text-[var(--fg-muted)]">{t("home.storageFree")}</div>
-          </div>
+    <div className="group flex flex-col gap-4 p-5 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl hover:border-[var(--fg-muted)] transition-all duration-200">
+      <div className="flex items-start justify-between gap-3">
+        <div className="w-10 h-10 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center text-[var(--fg)]">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0018 0V5"/><path d="M3 12a9 3 0 0018 0"/></svg>
         </div>
-        <Link href="/dashboard/gallery" className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors shrink-0">
+        <Link href="/dashboard/gallery" className="inline-flex items-center font-mono text-[10px] uppercase tracking-wider text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors shrink-0">
           {t("home.storagePhotos", { n: data?.count ?? 0 })}
         </Link>
       </div>
-      <div className="h-2 rounded-full bg-[var(--bg-subtle)] overflow-hidden">
-        <div className={`h-full rounded-full transition-all duration-500 ${near ? "bg-red-500" : "bg-yellow"}`} style={{ width: `${pct}%` }} />
+      <div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--fg-muted)] mb-1.5">{t("home.storageFree")}</div>
+        <div className="font-sans text-base font-semibold text-[var(--fg)]">{t("home.storageTitle")}</div>
+        <div className="h-2 rounded-full bg-[var(--bg-subtle)] overflow-hidden mt-3">
+          <div className={`h-full rounded-full transition-all duration-500 ${near ? "bg-red-500" : "bg-yellow"}`} style={{ width: `${pct}%` }} />
+        </div>
+        <p className="font-mono text-[11px] text-[var(--fg-muted)] mt-2">{t("home.storageUsed", { used: fmt(used), total: "2 GB" })}</p>
       </div>
-      <div className="font-mono text-[11px] text-[var(--fg-muted)] mt-2">{t("home.storageUsed", { used: fmt(used), total: "2 GB" })}</div>
+      <Link href="/dashboard/settings" className="mt-auto inline-flex items-center gap-2 font-sans text-xs font-semibold text-[var(--fg)] group-hover:gap-3 transition-all">
+        {t("home.upgradePlan")}
+        <span className="text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors">{I.arrow}</span>
+      </Link>
     </div>
   );
 }
