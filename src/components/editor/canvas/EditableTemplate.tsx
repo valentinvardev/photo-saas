@@ -819,13 +819,13 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
               style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", padding: "12px 24px", border: "1px solid var(--ed-btn-bg, #0a0a0a)", borderRadius: "var(--ed-btn-radius, 0)", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
               onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; e.currentTarget.style.color = "var(--ed-btn-fg, var(--ed-bg, #fafafa))"; }}>
-              View work
+              <EditableNode id="hero-cta-1" tag="span"><EditableText id="hero-cta-1" /></EditableNode>
             </button>
-            <a href="#about"
+            <a href="#about" onClick={(e) => { if (!readOnly) e.preventDefault(); }}
               style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", padding: "12px 24px", border: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 25%, transparent)", borderRadius: "var(--ed-btn-radius, 0)", textDecoration: "none", transition: "border-color 0.2s", display: "inline-block" }}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--ed-fg, #0a0a0a)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = "color-mix(in srgb, var(--ed-fg, #0a0a0a) 25%, transparent)"; }}>
-              About
+              <EditableNode id="hero-cta-2" tag="span"><EditableText id="hero-cta-2" /></EditableNode>
             </a>
           </div>
 

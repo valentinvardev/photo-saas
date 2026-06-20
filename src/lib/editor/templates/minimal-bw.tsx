@@ -26,6 +26,8 @@ export const MINIMAL_BW_NODES: Record<string, EditorNode> = {
   "hero-heading":     { id: "hero-heading",     type: "heading",   content: "James<br/><em>Hollis</em>" },
   "hero-sub":         { id: "hero-sub",         type: "paragraph", content: "Documenting the quiet tension between presence and absence. Work exhibited across North America and Europe." },
   "hero-avail":       { id: "hero-avail",       type: "paragraph", content: "Available for commissions — Q4 2025" },
+  "hero-cta-1":       { id: "hero-cta-1",       type: "paragraph", content: "View work" },
+  "hero-cta-2":       { id: "hero-cta-2",       type: "paragraph", content: "About" },
   "hero-image-1":     { id: "hero-image-1",     type: "image",     src: "https://picsum.photos/seed/201/900/1100?grayscale", alt: "" },
   "hero-image-2":     { id: "hero-image-2",     type: "image",     src: "https://picsum.photos/seed/202/900/700?grayscale",  alt: "" },
 
@@ -95,6 +97,8 @@ export const MINIMAL_BW_SECTIONS: SectionDef[] = [
       { nodeId: "hero-eyebrow",  label: "Eyebrow",       type: "text"  },
       { nodeId: "hero-heading",  label: "Heading",       type: "text"  },
       { nodeId: "hero-sub",      label: "Subtitle",      type: "text"  },
+      { nodeId: "hero-cta-1",    label: "Button 1",      type: "text"  },
+      { nodeId: "hero-cta-2",    label: "Button 2",      type: "text"  },
       { nodeId: "hero-avail",    label: "Availability",  type: "text"  },
       { nodeId: "hero-image-1",  label: "Main image",    type: "image" },
       { nodeId: "hero-image-2",  label: "Second image",  type: "image" },
