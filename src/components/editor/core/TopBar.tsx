@@ -149,9 +149,11 @@ export function TopBar({ portfolioId, saving }: {
     return (
       <>
         <header style={{ height: "var(--ed-topbar-h)", background: "var(--ec-bg)", borderBottom: "1px solid var(--ec-line)", display: "flex", alignItems: "center", padding: "0 8px", gap: 2, flexShrink: 0, zIndex: 50 }}>
-          <button onClick={handleBack} title={t("editor.backToDashboard")} style={iconBtn()}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          <button onClick={handleBack} title={t("editor.backToDashboard")} style={{ ...iconBtn(), gap: 5, border: "1px solid var(--ec-border)", padding: "5px 9px", fontSize: 12 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            {t("editor.back")}
           </button>
+          <div style={{ width: 1, height: 18, background: "var(--ec-border)", margin: "0 5px" }} />
           <button onClick={() => undo()} disabled={!canUndo} style={iconBtn(canUndo)}><UndoIcon /></button>
           <button onClick={() => redo()} disabled={!canRedo} style={iconBtn(canRedo)}><RedoIcon /></button>
           <button onClick={toggle} style={iconBtn()}>{theme === "dark" ? <SunIcon /> : <MoonIcon />}</button>
@@ -233,10 +235,13 @@ export function TopBar({ portfolioId, saving }: {
       <button
         onClick={handleBack}
         title={t("editor.backToDashboard")}
-        style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 4, background: "none", border: "none", cursor: "pointer", color: "var(--ec-sub)", padding: "4px 5px", borderRadius: 3 }}
+        style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 2, background: "none", border: "1px solid var(--ec-border)", cursor: "pointer", color: "var(--ec-label)", padding: "4px 10px 4px 8px", borderRadius: 5, fontSize: 12 }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        {t("editor.back")}
       </button>
+
+      {divider}
 
       {/* Logo */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 6 }}>
