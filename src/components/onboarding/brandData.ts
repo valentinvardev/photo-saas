@@ -79,7 +79,7 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 /* Build the per-node overrides that seed a fresh minimal-bw portfolio with the
    user's identity — and, when locale is Spanish, Spanish default copy so the
    template itself reads in Spanish. Merged over the template defaults. */
-export function buildMinimalNodes(locale: string, id: Identity, logoText?: string, contact?: { email?: string; phone?: string }): Record<string, EditorNode> {
+export function buildMinimalNodes(locale: string, id: Identity, logoText?: string, contact?: { email?: string; phone?: string }, avatarUrl?: string): Record<string, EditorNode> {
   const es = locale === "es";
   const name = fullName(id);
   const year = new Date().getFullYear();
@@ -127,6 +127,8 @@ export function buildMinimalNodes(locale: string, id: Identity, logoText?: strin
     put(n("about-body-1", "paragraph", esc(id.bio)));
   }
   if (id.location) put(n("about-caption", "paragraph", esc(id.location)));
+  // Profile photo → the About portrait.
+  if (avatarUrl) out["about-image"] = { id: "about-image", type: "image", src: avatarUrl };
 
   // Contact details — seed from the collected email + WhatsApp phone, hiding
   // any unused slots so the template's demo addresses don't linger.

@@ -35,11 +35,17 @@ export default function InboxPage() {
   return (
     <div className="p-6 max-w-3xl">
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-4">
         <h1 className="font-sans font-black text-[var(--fg)] text-xl">{t("inbox.title")}</h1>
         <p className="font-mono text-xs text-[var(--fg-muted)] mt-0.5">
           {isLoading ? t("inbox.loading") : unread > 0 ? t("inbox.unread", { n: unread }) : t("inbox.allRead")}
         </p>
+      </div>
+
+      {/* What this is */}
+      <div className="mb-6 flex items-start gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <p className="font-sans text-xs text-[var(--fg-muted)] leading-relaxed">{t("inbox.about")}</p>
       </div>
 
       {isLoading ? (

@@ -1022,7 +1022,9 @@
       "bio": "Short bio", "bioPh": "A line about you and your work.",
       "email": "Contact email", "emailPh": "you@studio.com",
       "phone": "Phone", "phonePh": "+1 555 123 4567",
-      "phoneHint": "Mainly used for WhatsApp — shown on your contact section."
+      "phoneHint": "Mainly used for WhatsApp — shown on your contact section.",
+      "avatar": "Profile photo",
+      "avatarHint": "Used in your About section and profile."
     },
     "color": {
       "title": "Pick your colours",
@@ -1040,6 +1042,7 @@
     },
     "logo": {
       "question": "Do you have a logo?",
+      "noHint": "No problem — we'll use \"{name}\" as a typographic wordmark, in your chosen font.",
       "yes": "Yes", "no": "No",
       "modeText": "Text", "modeImage": "Image", "modeBoth": "Both",
       "text": "Logo text", "width": "Logo width",
@@ -1052,7 +1055,7 @@
     "content": {
       "title": "Add your work",
       "body": "Upload photos and group them into folders — your portfolio updates live on the right. You can always add more later.",
-      "upload": "Upload photos", "uploading": "Uploading {done}/{total}…",
+      "upload": "Upload photos", "uploading": "Uploading {done}/{total}…", "uploadingN": "Uploading {n}…",
       "newFolder": "New folder", "folderName": "Folder name", "add": "Add",
       "all": "All", "remove": "Remove",
       "empty": "No photos here yet — upload your first shots."
@@ -1087,6 +1090,7 @@
     "loading": "Loading…",
     "unread": "{n} unread",
     "allRead": "All caught up",
+    "about": "Messages people send through your portfolio's contact form (when it's set to Inbox) arrive here.",
     "emptyTitle": "No messages yet",
     "emptyBody": "Contact-form submissions from your portfolios show up here.",
     "markRead": "Mark as read",

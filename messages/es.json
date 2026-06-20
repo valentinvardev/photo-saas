@@ -1022,7 +1022,9 @@
       "bio": "Biografía corta", "bioPh": "Una línea sobre vos y tu trabajo.",
       "email": "Email de contacto", "emailPh": "vos@estudio.com",
       "phone": "Teléfono", "phonePh": "+54 9 11 1234 5678",
-      "phoneHint": "Lo usamos sobre todo para WhatsApp — se muestra en tu sección de contacto."
+      "phoneHint": "Lo usamos sobre todo para WhatsApp — se muestra en tu sección de contacto.",
+      "avatar": "Foto de perfil",
+      "avatarHint": "Aparece en tu sección Sobre mí y tu perfil."
     },
     "color": {
       "title": "Elegí tus colores",
@@ -1040,6 +1042,7 @@
     },
     "logo": {
       "question": "¿Tenés logo?",
+      "noHint": "Sin problema — usaremos \"{name}\" como logotipo tipográfico, con la fuente que elijas.",
       "yes": "Sí", "no": "No",
       "modeText": "Texto", "modeImage": "Imagen", "modeBoth": "Ambos",
       "text": "Texto del logo", "width": "Ancho del logo",
@@ -1052,7 +1055,7 @@
     "content": {
       "title": "Agregá tus trabajos",
       "body": "Subí fotos y agrupalas en carpetas — tu portafolio se actualiza en vivo a la derecha. Siempre podés agregar más después.",
-      "upload": "Subir fotos", "uploading": "Subiendo {done}/{total}…",
+      "upload": "Subir fotos", "uploading": "Subiendo {done}/{total}…", "uploadingN": "Subiendo {n}…",
       "newFolder": "Nueva carpeta", "folderName": "Nombre de la carpeta", "add": "Agregar",
       "all": "Todo", "remove": "Quitar",
       "empty": "Todavía no hay fotos acá — subí tus primeras tomas."
@@ -1087,6 +1090,7 @@
     "loading": "Cargando…",
     "unread": "{n} sin leer",
     "allRead": "Estás al día",
+    "about": "Acá llegan los mensajes que la gente envía desde el formulario de contacto de tu portafolio (cuando está en modo Bandeja).",
     "emptyTitle": "Todavía no hay mensajes",
     "emptyBody": "Los mensajes del formulario de contacto de tus portafolios aparecen acá.",
     "markRead": "Marcar como leído",

@@ -49,6 +49,8 @@ export function OnboardingFlow() {
   const [phone, setPhone] = useState("");
   const [contactMode, setContactMode] = useState<ContactSettings["mode"]>("whatsapp");
 
+  const [avatarUrl, setAvatarUrl] = useState("");
+
   // Logo (optional)
   const [hasLogo, setHasLogo] = useState(false);
   const [logoMode, setLogoMode] = useState<LogoSettings["mode"]>("image");
@@ -71,6 +73,7 @@ export function OnboardingFlow() {
   // Content (photos + folders)
   const [folders, setFolders] = useState<OnbFolder[]>([]);
   const [contentPhotos, setContentPhotos] = useState<OnbPhoto[]>([]);
+  const [uploadingCount, setUploadingCount] = useState(0);
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
   const [folderDraft, setFolderDraft] = useState("");
   const [addingFolder, setAddingFolder] = useState(false);
@@ -103,7 +106,7 @@ export function OnboardingFlow() {
   // Wordmark shown in the nav when the logo uses text (text or image+text mode).
   const navLogoText = hasLogo && logoMode !== "image" ? (logoText.trim() || initials(identity)) : undefined;
   const contact = { email, phone };
-  const previewNodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact) : undefined;
+  const previewNodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact, avatarUrl) : undefined;
 
   const logoSettings: LogoSettings | undefined = hasLogo
     ? { mode: logoMode, text: logoText.trim() || initials(identity), imageUrl: logoUrl, altImageUrl: altLogoUrl, faviconUrl: iconUrl, width: logoWidth, imageCrop: logoCrop }
@@ -125,17 +128,24 @@ export function OnboardingFlow() {
 
   const setColor = (key: keyof ColorPalette, value: string) => setPaletteState((p) => ({ ...p, [key]: value }));
 
-  // Preview shows from Identity (1) through Content (5). Content is scrollable.
-  const showPreview = step >= 1 && step <= 5;
+  // Preview appears once a template is chosen (Template = step 2) through Content (5).
+  const showPreview = step >= 2 && step <= 5;
   const visibleContent = contentPhotos.filter((p) => (activeFolder === null ? !p.folderId : p.folderId === activeFolder));
 
   async function onContentFiles(files: File[]) {
     const images = files.filter((f) => f.type.startsWith("image/"));
     if (images.length === 0) return;
-    try {
-      const made = await contentUpload.upload(images, { folderId: null });
-      setContentPhotos((prev) => [...prev, ...made.map((m) => ({ id: m.id, url: m.url, filename: m.filename, folderId: activeFolder }))]);
-    } catch { /* hook surfaces error */ }
+    const folderId = activeFolder;
+    // Upload one at a time so each photo appears (and its placeholder clears)
+    // as soon as it finishes — clear "uploading" feedback.
+    setUploadingCount((c) => c + images.length);
+    for (const img of images) {
+      try {
+        const made = await contentUpload.upload([img], { folderId: null });
+        if (made[0]) setContentPhotos((prev) => [...prev, { id: made[0]!.id, url: made[0]!.url, filename: made[0]!.filename, folderId }]);
+      } catch { /* hook surfaces error */ }
+      setUploadingCount((c) => Math.max(0, c - 1));
+    }
   }
   function addFolder() {
     const name = folderDraft.trim();
@@ -157,9 +167,10 @@ export function OnboardingFlow() {
         name: name || undefined,
         location: location.trim() || undefined,
         bio: bio.trim() || undefined,
+        avatarUrl: avatarUrl || undefined,
       });
       const base = name || "Portfolio";
-      const nodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact) : undefined;
+      const nodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact, avatarUrl) : undefined;
       const content = contentPhotos.length > 0 ? buildOnboardingContent(locale, folders, contentPhotos) : undefined;
       const editorState = { templateId: template.id, palette, typography: typo, nodes, logo: logoSettings, contact: contactSettings };
 
@@ -249,6 +260,16 @@ export function OnboardingFlow() {
                   {step === 1 && (
                     <div className="flex flex-col gap-4">
                       <StepHead title={t("onb.identity.title")} body={t("onb.identity.body")} />
+
+                      {/* Profile photo — also used in the About section */}
+                      <div className="flex items-center gap-3.5">
+                        <AvatarUpload value={avatarUrl} onChange={setAvatarUrl} initials={initials(identity)} />
+                        <div className="min-w-0">
+                          <div className="font-sans text-xs font-semibold text-[var(--fg)]">{t("onb.identity.avatar")}</div>
+                          <div className="font-sans text-[11px] text-[var(--fg-muted)]">{t("onb.identity.avatarHint")}</div>
+                        </div>
+                      </div>
+
                       <div className="grid grid-cols-2 gap-3">
                         <Field label={t("onb.identity.first")}>
                           <input autoFocus className={inputCls} value={first} onChange={(e) => setFirst(e.target.value)} placeholder={t("onb.identity.firstPh")} />
@@ -296,6 +317,9 @@ export function OnboardingFlow() {
                             <button onClick={() => setHasLogo(false)} className={`px-3.5 py-1.5 font-sans text-xs font-semibold transition-colors border-l border-[var(--border)] ${!hasLogo ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.logo.no")}</button>
                           </div>
                         </div>
+                        {!hasLogo && (
+                          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-2 leading-relaxed">{t("onb.logo.noHint", { name: fullName(identity) || initials(identity) })}</p>
+                        )}
                         <AnimatePresence>
                           {hasLogo && (
                             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
@@ -474,15 +498,15 @@ export function OnboardingFlow() {
                       </div>
 
                       {/* Upload button */}
-                      <button onClick={() => fileRef.current?.click()} disabled={contentUpload.uploading}
+                      <button onClick={() => fileRef.current?.click()} disabled={uploadingCount > 0}
                         className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border-2 border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:border-yellow hover:text-[var(--fg)] disabled:opacity-50 transition-colors">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        <span className="font-sans text-sm font-semibold">{contentUpload.uploading ? t("onb.content.uploading", { done: contentUpload.progress.done, total: contentUpload.progress.total }) : t("onb.content.upload")}</span>
+                        <span className="font-sans text-sm font-semibold">{uploadingCount > 0 ? t("onb.content.uploadingN", { n: uploadingCount }) : t("onb.content.upload")}</span>
                       </button>
                       {contentUpload.error && <p className="font-mono text-[10px] text-red-400">{contentUpload.error}</p>}
 
-                      {/* Thumbnails */}
-                      {visibleContent.length > 0 ? (
+                      {/* Thumbnails (+ loading placeholders for in-flight uploads) */}
+                      {visibleContent.length > 0 || uploadingCount > 0 ? (
                         <div className="grid grid-cols-4 gap-1.5">
                           {visibleContent.map((p) => (
                             <div key={p.id} className="relative aspect-square rounded-lg overflow-hidden group bg-[var(--bg-subtle)]">
@@ -492,6 +516,11 @@ export function OnboardingFlow() {
                                 className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
                               </button>
+                            </div>
+                          ))}
+                          {Array.from({ length: uploadingCount }).map((_, i) => (
+                            <div key={`u${i}`} className="relative aspect-square rounded-lg overflow-hidden bg-[var(--bg-subtle)] animate-pulse flex items-center justify-center">
+                              <span className="w-5 h-5 rounded-full border-2 border-[var(--border)] border-t-yellow animate-spin" />
                             </div>
                           ))}
                         </div>
@@ -677,6 +706,38 @@ function FontField({ label, value, onOpen }: { label: string; value: string; onO
         <span style={{ fontFamily: value }} className="text-[15px] text-[var(--fg)] truncate">{fontLabel(value)}</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)] shrink-0"><path d="M4 7h16M4 12h10M4 17h7"/></svg>
       </button>
+    </div>
+  );
+}
+
+/* Circular profile-photo uploader. */
+function AvatarUpload({ value, onChange, initials }: { value: string; onChange: (url: string) => void; initials: string }) {
+  const { upload, uploading } = useUploadPhotos();
+  const ref = useRef<HTMLInputElement>(null);
+  const init = initials.replace(/·/g, "");
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (!files[0]) return;
+    try { const made = await upload([files[0]]); if (made[0]) onChange(made[0].url); } catch { /* hook surfaces error */ }
+  }
+  return (
+    <div className="relative shrink-0">
+      <button type="button" onClick={() => ref.current?.click()} disabled={uploading}
+        className="relative w-16 h-16 rounded-full overflow-hidden border border-[var(--border)] bg-[var(--bg-subtle)] flex items-center justify-center group">
+        {value ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={value} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <span className="font-sans font-black text-[var(--fg-muted)] text-base">{init !== "—" ? init : ""}</span>
+        )}
+        <span className="absolute inset-0 flex items-center justify-center bg-black/35 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+          {uploading
+            ? <span className="w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+            : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>}
+        </span>
+      </button>
+      <input ref={ref} type="file" accept="image/*" className="hidden" onChange={onFile} />
     </div>
   );
 }

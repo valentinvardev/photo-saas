@@ -454,3 +454,13 @@ body {
     transparent
   );
 }
+
+/* ── iOS: stop Safari auto-zooming when focusing an input.
+   Mobile Safari zooms in whenever a focused field's font-size is < 16px. */
+@media (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
