@@ -265,7 +265,7 @@ export function OnboardingFlow() {
                     <div className="max-w-xl mx-auto">
                       <StepHead title={t("onb.q.profileTitle")} body={t("onb.q.profileBody")} />
                       <div className="flex items-center gap-4 mt-6">
-                        <AvatarUpload value={avatarUrl} onChange={setAvatarUrl} initials={initials(identity)} />
+                        <AvatarUpload value={avatarUrl} onChange={setAvatarUrl} />
                         <div className="flex-1 min-w-0 grid grid-cols-2 gap-3">
                           <Field label={t("onb.identity.first")}>
                             <input autoFocus className={inputCls} value={first} onChange={(e) => setFirst(e.target.value)} placeholder={t("onb.identity.firstPh")} />
@@ -716,10 +716,9 @@ function FontField({ label, value, onOpen }: { label: string; value: string; onO
 }
 
 /* Circular profile-photo uploader. */
-function AvatarUpload({ value, onChange, initials }: { value: string; onChange: (url: string) => void; initials: string }) {
+function AvatarUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
   const { upload, uploading } = useUploadPhotos();
   const ref = useRef<HTMLInputElement>(null);
-  const init = initials.replace(/·/g, "");
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     e.target.value = "";
@@ -729,19 +728,29 @@ function AvatarUpload({ value, onChange, initials }: { value: string; onChange: 
   return (
     <div className="relative shrink-0">
       <button type="button" onClick={() => ref.current?.click()} disabled={uploading}
-        className="relative w-16 h-16 rounded-full overflow-hidden border border-[var(--border)] bg-[var(--bg-subtle)] flex items-center justify-center group">
+        className={`relative w-16 h-16 rounded-full overflow-hidden bg-[var(--bg-subtle)] flex items-center justify-center group ${value ? "border border-[var(--border)]" : "border-2 border-dashed border-yellow/60"}`}>
         {value ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={value} alt="" className="w-full h-full object-cover" />
         ) : (
-          <span className="font-sans font-black text-[var(--fg-muted)] text-base">{init !== "—" ? init : ""}</span>
+          /* Empty: a clear upload prompt (always visible — no hover on touch). */
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--fg-muted)]"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         )}
-        <span className="absolute inset-0 flex items-center justify-center bg-black/35 text-white opacity-0 group-hover:opacity-100 transition-opacity">
-          {uploading
-            ? <span className="w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-            : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>}
-        </span>
+        {/* Hover/upload overlay (filled state, or while uploading) */}
+        {(value || uploading) && (
+          <span className={`absolute inset-0 flex items-center justify-center bg-black/35 text-white transition-opacity ${uploading ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+            {uploading
+              ? <span className="w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+              : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>}
+          </span>
+        )}
       </button>
+      {/* "+" badge to signal you can add a photo */}
+      {!value && !uploading && (
+        <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-yellow text-[#111] flex items-center justify-center shadow border-2 border-[var(--bg-card)]">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </span>
+      )}
       <input ref={ref} type="file" accept="image/*" className="hidden" onChange={onFile} />
     </div>
   );

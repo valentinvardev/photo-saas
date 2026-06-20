@@ -17,8 +17,6 @@ export function ImageGalleryModal({
   onClose: () => void;
 }) {
   const [selected, setSelected] = useState(value);
-  const [tab, setTab] = useState<"gallery" | "url">("gallery");
-  const [urlDraft, setUrlDraft] = useState(value);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const utils = api.useUtils();
@@ -36,14 +34,6 @@ export function ImageGalleryModal({
       if (made[0]) setSelected(made[0].url);
     } catch { /* hook surfaces error */ }
   }
-
-  const tabStyle = (active: boolean): React.CSSProperties => ({
-    flex: 1, background: "none", border: "none",
-    borderBottom: `2px solid ${active ? "#facc15" : "transparent"}`,
-    color: active ? "#facc15" : "var(--ec-dim)",
-    fontSize: 11, padding: "7px 0", cursor: "pointer",
-    fontFamily: "inherit",
-  });
 
   return createPortal(
     <div
@@ -66,13 +56,11 @@ export function ImageGalleryModal({
         <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
           {/* Left: gallery */}
           <div style={{ width: 360, borderRight: "1px solid var(--ec-raised)", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
-              <button style={tabStyle(tab === "gallery")} onClick={() => setTab("gallery")}>Library</button>
-              <button style={tabStyle(tab === "url")}     onClick={() => setTab("url")}>URL</button>
+            <div style={{ display: "flex", alignItems: "center", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0, padding: "8px 12px" }}>
+              <span style={{ color: "var(--ec-muted)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em" }}>Library</span>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: 10 }}>
-              {tab === "gallery" ? (
-                <>
+              <>
                   <input ref={fileRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleFileChange} />
                   <button
                     onClick={() => fileRef.current?.click()}
@@ -122,27 +110,6 @@ export function ImageGalleryModal({
                     </div>
                   )}
                 </>
-              ) : (
-                <div>
-                  <input
-                    value={urlDraft}
-                    onChange={(e) => setUrlDraft(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter" && urlDraft.trim()) setSelected(urlDraft.trim()); }}
-                    placeholder="https://..."
-                    style={{
-                      width: "100%", background: "var(--ec-bg)", border: "1px solid var(--ec-border)",
-                      color: "var(--ec-bright)", fontSize: 12, padding: "7px 8px", borderRadius: 4,
-                      outline: "none", boxSizing: "border-box", fontFamily: "monospace",
-                    }}
-                  />
-                  <button
-                    onClick={() => { if (urlDraft.trim()) setSelected(urlDraft.trim()); }}
-                    style={{ marginTop: 8, width: "100%", background: "rgba(250,204,21,0.12)", border: "1px solid #facc15", color: "#facc15", fontSize: 11, padding: "7px", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}
-                  >
-                    Use URL
-                  </button>
-                </div>
-              )}
             </div>
           </div>
 

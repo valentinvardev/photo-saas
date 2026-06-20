@@ -77,7 +77,8 @@ function ChatSkeleton() {
 
 /* ── Panel ── */
 export function ChatPanel({ onClose }: { onClose: () => void }) {
-  const { data: history, isLoading } = api.chat.list.useQuery({ limit: 50 });
+  // Poll as a fallback so messages still arrive if Realtime isn't available.
+  const { data: history, isLoading } = api.chat.list.useQuery({ limit: 50 }, { refetchInterval: 20000 });
   const sendMut = api.chat.send.useMutation();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -86,6 +87,7 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
   const [meName, setMeName]     = useState("You");
   const [meReady, setMeReady]   = useState(false);
   const [connected, setConnected] = useState(false);
+  const [gaveUp, setGaveUp]       = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const seen = useRef<Set<string>>(new Set());
 
@@ -147,6 +149,14 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
     return () => cleanup();
   }, [addMessage]);
 
+  /* Stop showing "Connecting…" forever — after a grace period the chat just
+     works via the polling fallback above. */
+  useEffect(() => {
+    if (connected) { setGaveUp(false); return; }
+    const to = setTimeout(() => setGaveUp(true), 7000);
+    return () => clearTimeout(to);
+  }, [connected]);
+
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
   async function send() {
@@ -177,10 +187,12 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
       <div className="shrink-0 flex items-center gap-2 px-3 py-3 border-b border-[var(--border)]">
         <div className="flex-1 flex flex-col">
           <span className="font-sans text-sm font-semibold text-[var(--fg)]">Community</span>
-          <span className="font-mono text-[10px] text-[var(--fg-muted)] flex items-center gap-1.5">
-            <span className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-500" : "bg-[var(--fg-muted)]"}`} />
-            {connected ? "Live" : "Connecting…"}
-          </span>
+          {(connected || !gaveUp) && (
+            <span className="font-mono text-[10px] text-[var(--fg-muted)] flex items-center gap-1.5">
+              <span className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-500" : "bg-[var(--fg-muted)]"}`} />
+              {connected ? "Live" : "Connecting…"}
+            </span>
+          )}
         </div>
         <button onClick={onClose} className="p-1.5 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors" aria-label="Close chat">
           <CloseIcon />

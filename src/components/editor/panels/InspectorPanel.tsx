@@ -48,12 +48,6 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
   const fit = node.objectFit ?? "cover";
   const pos = node.objectPosition ?? "center center";
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const [urlDraft, setUrlDraft] = useState(node.src ?? "");
-
-  function applyUrl() {
-    const v = urlDraft.trim();
-    if (v) update({ src: v });
-  }
 
   return (
     <div>
@@ -65,49 +59,24 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
           <img src={node.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         </div>
       )}
-      <input
-        value={urlDraft}
-        onChange={(e) => setUrlDraft(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter") applyUrl(); }}
-        placeholder="https://..."
+      <button
+        onClick={() => setGalleryOpen(true)}
         style={{
-          width: "100%", background: "var(--ec-bg)", border: "1px solid var(--ec-line)",
-          color: "var(--ec-label)", fontSize: 11, padding: "6px 8px", borderRadius: 4,
-          outline: "none", boxSizing: "border-box", fontFamily: "monospace",
-          marginBottom: 6,
+          width: "100%", background: "rgba(250,204,21,0.12)", border: "1px solid #facc15",
+          color: "#facc15", fontSize: 11, padding: "7px", borderRadius: 4,
+          cursor: "pointer", fontFamily: "inherit",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
         }}
-      />
-      <div style={{ display: "flex", gap: 4 }}>
-        <button
-          onClick={applyUrl}
-          disabled={!urlDraft.trim() || urlDraft.trim() === node.src}
-          style={{
-            flex: 1, background: "var(--ec-raised)", border: "1px solid var(--ec-lift)",
-            color: "var(--ec-muted)", fontSize: 10, padding: "6px", borderRadius: 4,
-            cursor: "pointer", fontFamily: "inherit",
-          }}
-        >
-          {t("editor.inspector.applyUrl")}
-        </button>
-        <button
-          onClick={() => setGalleryOpen(true)}
-          style={{
-            flex: 1, background: "rgba(250,204,21,0.12)", border: "1px solid #facc15",
-            color: "#facc15", fontSize: 10, padding: "6px", borderRadius: 4,
-            cursor: "pointer", fontFamily: "inherit",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
-          }}
-        >
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          {t("editor.inspector.gallery")}
-        </button>
-      </div>
+      >
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        {node.src ? t("editor.inspector.gallery") : t("editor.inspector.selectImage")}
+      </button>
 
       {galleryOpen && (
         <ImageGalleryModal
           value={node.src ?? ""}
           title={t("editor.inspector.selectImage")}
-          onChange={(url) => { update({ src: url }); setUrlDraft(url); }}
+          onChange={(url) => update({ src: url })}
           onClose={() => setGalleryOpen(false)}
         />
       )}
