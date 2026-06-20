@@ -2,6 +2,51 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { api } from "~/trpc/react";
+import { useT } from "~/components/providers/LangProvider";
+
+/* Detect a Portapic share/portfolio link in a message and show a card for it. */
+function extractShare(body: string): { kind: "v" | "p"; id: string; url: string } | null {
+  const m = /(https?:\/\/[^\s]+\/(v|p)\/([A-Za-z0-9_-]+))/.exec(body);
+  return m ? { url: m[1]!, kind: m[2] as "v" | "p", id: m[3]! } : null;
+}
+
+function ChatShareCard({ body }: { body: string }) {
+  const { t } = useT();
+  const share = extractShare(body);
+  const { data } = api.share.get.useQuery({ id: share?.id ?? "" }, { enabled: !!share && share.kind === "v" });
+  if (!share) return null;
+
+  if (share.kind === "p") {
+    return (
+      <a href={share.url} target="_blank" rel="noreferrer" className="flex items-center gap-2.5 p-2 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] max-w-[260px] transition-colors">
+        <span className="w-10 h-10 rounded-lg bg-[var(--bg-subtle)] flex items-center justify-center text-[var(--fg-muted)] shrink-0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{t("share.chatPortfolio")}</div>
+          <div className="font-mono text-[10px] text-yellow">{t("share.view")} →</div>
+        </div>
+      </a>
+    );
+  }
+
+  const thumb = data?.photos?.[0]?.src;
+  const count = data?.photos?.length ?? 0;
+  const title = data?.title || (data?.kind === "folder" ? t("share.chatFolder") : t("share.chatPhotos", { n: count }));
+  return (
+    <a href={share.url} target="_blank" rel="noreferrer" className="flex items-center gap-2.5 p-2 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] max-w-[260px] transition-colors">
+      <span className="w-12 h-12 rounded-lg overflow-hidden bg-[var(--bg-subtle)] shrink-0 flex items-center justify-center">
+        {thumb
+          ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={thumb} alt="" className="w-full h-full object-cover" />
+          : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fg-muted)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{title}</div>
+        <div className="font-mono text-[10px] text-yellow">{t("share.view")} →</div>
+      </div>
+    </a>
+  );
+}
 import { createClient } from "~/lib/supabase/client";
 
 /* ── Types ── */
@@ -229,9 +274,20 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
                     {own ? timeOf(msg.createdAt) : `${msg.authorName} · ${timeOf(msg.createdAt)}`}
                   </span>
                 )}
-                <p className={`font-sans text-[13px] leading-relaxed px-3 py-2 rounded-2xl break-words max-w-[260px] transition-opacity ${msg.pending ? "opacity-60" : ""} ${own ? "bg-yellow text-[#111] rounded-tr-sm" : "bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg)] rounded-tl-sm"}`}>
-                  {msg.body}
-                </p>
+                {(() => {
+                  const share = extractShare(msg.body);
+                  const text = share ? msg.body.replace(share.url, "").replace(/[—-]\s*$/, "").trim() : msg.body;
+                  return (
+                    <>
+                      {text && (
+                        <p className={`font-sans text-[13px] leading-relaxed px-3 py-2 rounded-2xl break-words max-w-[260px] transition-opacity ${msg.pending ? "opacity-60" : ""} ${own ? "bg-yellow text-[#111] rounded-tr-sm" : "bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--fg)] rounded-tl-sm"}`}>
+                          {text}
+                        </p>
+                      )}
+                      {share && <ChatShareCard body={msg.body} />}
+                    </>
+                  );
+                })()}
                 {msg.failed && (
                   <span className="font-mono text-[9px] text-red-400 mr-1">Not sent</span>
                 )}

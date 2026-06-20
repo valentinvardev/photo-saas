@@ -36,6 +36,23 @@ model User {
     linksPages   LinksPage[]
     deliveries   Delivery[]
     messages     Message[]
+    shares       Share[]
+}
+
+// ── Shareable links ───────────────────────────────────────────────────────────
+// A public /s/{id} link to photos, a folder snapshot, or a portfolio. Used for
+// sharing anywhere and for the "share to chat" cards.
+model Share {
+    id        String   @id @default(cuid())   // also the public token
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    kind      String   // photos | folder | portfolio
+    title     String   @default("")
+    photoIds  String[] @default([])            // snapshot of photo ids (photos/folder)
+    slug      String   @default("")            // portfolio slug (portfolio kind)
+    createdAt DateTime @default(now())
+
+    @@index([userId, createdAt])
 }
 
 // ── Community chat ────────────────────────────────────────────────────────────

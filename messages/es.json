@@ -1109,6 +1109,21 @@
       "inboxHint": "Los mensajes llegan a la bandeja de tu panel."
     }
   },
+  "share": {
+    "title": "Compartir",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "close": "Cerrar",
+    "sendToChat": "Enviar al chat",
+    "sentToChat": "Enviado",
+    "photos": "Compartir",
+    "folder": "Compartir carpeta",
+    "portfolio": "Compartir",
+    "chatPhotos": "Compartió {n} fotos",
+    "chatFolder": "Compartió una carpeta",
+    "chatPortfolio": "Compartió un portafolio",
+    "view": "Ver"
+  },
   "inbox": {
     "title": "Mensajes",
     "loading": "Cargando…",

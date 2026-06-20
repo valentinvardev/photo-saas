@@ -1109,6 +1109,21 @@
       "inboxHint": "Submissions land in your dashboard Inbox."
     }
   },
+  "share": {
+    "title": "Share",
+    "copy": "Copy",
+    "copied": "Copied",
+    "close": "Close",
+    "sendToChat": "Send to chat",
+    "sentToChat": "Sent",
+    "photos": "Share",
+    "folder": "Share folder",
+    "portfolio": "Share",
+    "chatPhotos": "Shared {n} photos",
+    "chatFolder": "Shared a folder",
+    "chatPortfolio": "Shared a portfolio",
+    "view": "View"
+  },
   "inbox": {
     "title": "Inbox",
     "loading": "Loading…",

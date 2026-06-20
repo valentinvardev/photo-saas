@@ -6,8 +6,10 @@ import { api } from "~/trpc/react";
 import { useUploadPhotos } from "~/lib/photo/upload";
 import { useT } from "~/components/providers/LangProvider";
 import { ConfirmModal } from "~/components/ui/ConfirmModal";
+import { ShareModal } from "~/components/share/ShareModal";
 
 /* ── Icons ── */
+const ShareIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>;
 const UploadIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;
 const TrashIcon  = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>;
 const CloseIcon  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>;
@@ -136,6 +138,7 @@ export default function GalleryPage() {
   const renameFolderMut = api.photo.renameFolder.useMutation();
   const deleteFolderMut = api.photo.deleteFolder.useMutation();
   const moveMut         = api.photo.moveToFolder.useMutation();
+  const createShare     = api.share.create.useMutation();
 
   const fileRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -147,6 +150,22 @@ export default function GalleryPage() {
   const [folderModal, setFolderModal] = useState<FolderModalState>(null);
   const [folderBusy, setFolderBusy] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{ title: string; body: string; confirmLabel: string; onConfirm: () => void } | null>(null);
+  const [shareTarget, setShareTarget] = useState<{ url: string; title?: string } | null>(null);
+
+  async function shareSelected() {
+    if (selected.size === 0) return;
+    try {
+      const r = await createShare.mutateAsync({ kind: "photos", photoIds: [...selected] });
+      setShareTarget({ url: `${window.location.origin}/v/${r.id}` });
+    } catch { /* ignore */ }
+  }
+  async function shareActiveFolder() {
+    if (!activeFolderObj) return;
+    try {
+      const r = await createShare.mutateAsync({ kind: "folder", folderId: activeFolderObj.id });
+      setShareTarget({ url: `${window.location.origin}/v/${r.id}`, title: activeFolderObj.name });
+    } catch { /* ignore */ }
+  }
 
   const activeFolderObj = folders.find((f) => f.id === activeFolder) ?? null;
 
@@ -246,6 +265,7 @@ export default function GalleryPage() {
                 <h1 className="font-sans font-black text-[var(--fg)] text-lg leading-none truncate">{activeFolderObj ? activeFolderObj.name : t("galleryPage.title")}</h1>
                 {activeFolderObj && (
                   <>
+                    <button onClick={shareActiveFolder} disabled={createShare.isPending} className="p-1 rounded text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] disabled:opacity-50 transition-colors" title={t("share.folder")}><ShareIcon /></button>
                     <button onClick={() => setFolderModal({ mode: "rename", id: activeFolderObj.id })} className="p-1 rounded text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors" title={t("galleryPage.renameFolderTitle")}><PencilIcon /></button>
                     <button onClick={deleteActiveFolder} className="p-1 rounded text-[var(--fg-muted)] hover:text-red-400 hover:bg-[var(--bg-subtle)] transition-colors" title={t("galleryPage.deleteFolderTitle")}><TrashIcon /></button>
                   </>
@@ -372,6 +392,11 @@ export default function GalleryPage() {
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] shadow-2xl">
             <span className="font-mono text-[11px] text-[var(--fg-muted)]">{t("galleryPage.selected", { n: selected.size })}</span>
 
+            <button onClick={shareSelected} disabled={createShare.isPending}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg)] font-sans text-xs font-medium hover:border-[var(--fg-muted)] disabled:opacity-50 transition-colors">
+              <ShareIcon /> {t("share.photos")}
+            </button>
+
             <div className="relative">
               <button onClick={() => setMoveMenu((v) => !v)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg)] font-sans text-xs font-medium hover:border-[var(--fg-muted)] transition-colors">
@@ -447,6 +472,13 @@ export default function GalleryPage() {
             onConfirm={confirmDialog.onConfirm}
             onClose={() => setConfirmDialog(null)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Share link */}
+      <AnimatePresence>
+        {shareTarget && (
+          <ShareModal url={shareTarget.url} title={shareTarget.title} onClose={() => setShareTarget(null)} />
         )}
       </AnimatePresence>
     </div>

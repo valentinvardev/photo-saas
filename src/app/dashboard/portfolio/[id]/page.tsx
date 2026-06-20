@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DevicePreviewModal, LivePreviewThumbnail } from "~/components/dashboard/DevicePreviewModal";
 import { ContentTree } from "~/components/portfolio/ContentTree";
 import { PhotoPickerModal } from "~/components/portfolio/PhotoPickerModal";
+import { ShareModal } from "~/components/share/ShareModal";
 import { TEMPLATE_URL, TEMPLATES, type Portfolio } from "~/lib/portfolio/mock";
 import { dbToView } from "~/lib/portfolio/adapt";
 import { portfolioPublicUrl, portfolioPublicLabel } from "~/lib/portfolio/url";
@@ -86,6 +87,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
 
   const [tab, setTab]                 = useState<Tab>("content");
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [shareOpen, setShareOpen]     = useState(false);
   const [published, setPublished]     = useState(false);
 
   const utils      = api.useUtils();
@@ -213,6 +215,11 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
             <h1 className="font-sans font-black text-[var(--fg)] text-xl truncate">{portfolio.name}</h1>
             <div className="flex items-center gap-2 mt-1 min-w-0">
               <CopyLink href={publicUrl} label={displayUrl} copyText={copyUrl} />
+              <button onClick={() => setShareOpen(true)} title={t("share.title")}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--bg-subtle)] font-mono text-[9px] text-[var(--fg-muted)] hover:text-[var(--fg)] uppercase tracking-widest shrink-0 transition-colors">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+                {t("share.title")}
+              </button>
               <span className="px-1.5 py-0.5 rounded-full bg-[var(--bg-subtle)] font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest shrink-0">
                 {portfolio.template}
               </span>
@@ -312,6 +319,13 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
             subtitle={displayUrl}
             onClose={() => setPreviewOpen(false)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Share */}
+      <AnimatePresence>
+        {shareOpen && (
+          <ShareModal url={copyUrl} title={portfolio.name} onClose={() => setShareOpen(false)} />
         )}
       </AnimatePresence>
     </div>

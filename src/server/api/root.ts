@@ -4,6 +4,7 @@ import { photoRouter }     from "~/server/api/routers/photo";
 import { chatRouter }      from "~/server/api/routers/chat";
 import { userRouter }      from "~/server/api/routers/user";
 import { contactRouter }   from "~/server/api/routers/contact";
+import { shareRouter }     from "~/server/api/routers/share";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 // MVP scope: portfolio + gallery (photo) + community chat. The links & delivery
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   chat:      chatRouter,
   user:      userRouter,
   contact:   contactRouter,
+  share:     shareRouter,
 });
 
 // export type definition of API
