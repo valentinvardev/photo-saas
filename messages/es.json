@@ -1007,6 +1007,8 @@
     "livePreview": "Vista previa en vivo",
     "stepOf": "Paso {n} de {total}",
     "q": {
+      "profileTitle": "Contanos sobre vos",
+      "profileBody": "Tu foto, nombre y una breve bio — completa tu portada y la sección Sobre mí.",
       "nameTitle": "¿Cómo te llamás?",
       "nameBody": "Aparece en todo tu portafolio.",
       "avatarTitle": "Agregá una foto de perfil",
@@ -1019,8 +1021,8 @@
       "emailBody": "Donde te pueden escribir.",
       "phoneTitle": "Número de teléfono",
       "phoneBody": "Opcional — se usa para WhatsApp.",
-      "contactTitle": "¿A dónde envía tu formulario de contacto?",
-      "contactBody": "Podés cambiarlo después en el editor.",
+      "contactTitle": "¿Cómo te pueden contactar?",
+      "contactBody": "El email y el teléfono se muestran en tu sitio — y elegí a dónde envía tu formulario.",
       "logoTitle": "¿Tenés logo?",
       "logoBody": "Subí uno, o usamos tu nombre."
     },

@@ -1007,6 +1007,8 @@
     "livePreview": "Live preview",
     "stepOf": "Step {n} of {total}",
     "q": {
+      "profileTitle": "Tell us about you",
+      "profileBody": "Your photo, name and a short bio — this fills your home and About sections.",
       "nameTitle": "What's your name?",
       "nameBody": "It appears across your portfolio.",
       "avatarTitle": "Add a profile photo",
@@ -1019,8 +1021,8 @@
       "emailBody": "Where people can reach you.",
       "phoneTitle": "Phone number",
       "phoneBody": "Optional — used for WhatsApp.",
-      "contactTitle": "Where should your contact form send people?",
-      "contactBody": "You can change this later in the editor.",
+      "contactTitle": "How can people reach you?",
+      "contactBody": "Email and phone show on your site — and choose where your contact form sends people.",
       "logoTitle": "Do you have a logo?",
       "logoBody": "Upload one, or we'll use your name."
     },

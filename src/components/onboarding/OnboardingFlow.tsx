@@ -23,7 +23,7 @@ import {
 import "~/lib/editor/fonts";
 
 /* The personal-info part is asked one question per step. */
-const STEPS = ["welcome", "name", "avatar", "location", "bio", "email", "phone", "contact", "logo", "template", "color", "fonts", "content", "done"] as const;
+const STEPS = ["welcome", "profile", "contact", "logo", "template", "color", "fonts", "content", "done"] as const;
 type StepKey = (typeof STEPS)[number];
 const TOTAL = STEPS.length;
 
@@ -233,10 +233,11 @@ export function OnboardingFlow() {
         <div className="flex-1 min-h-0 flex">
           {/* Left — controls */}
           <div className={`${showPreview ? "lg:w-[40%] lg:max-w-[520px] lg:border-r border-[var(--border)]" : "w-full"} w-full flex flex-col min-h-0`}>
-            <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-6">
+            <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-6 flex flex-col">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={step}
+                  className="w-full my-auto"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
@@ -259,87 +260,64 @@ export function OnboardingFlow() {
                   )}
 
                   {/* Name */}
-                  {stepKey === "name" && (
-                    <div className="max-w-md mx-auto">
-                      <StepHead title={t("onb.q.nameTitle")} body={t("onb.q.nameBody")} />
-                      <div className="grid grid-cols-2 gap-3 mt-5">
-                        <Field label={t("onb.identity.first")}>
-                          <input autoFocus className={inputCls} value={first} onChange={(e) => setFirst(e.target.value)} placeholder={t("onb.identity.firstPh")} />
+                  {/* Profile — photo, name, location, bio */}
+                  {stepKey === "profile" && (
+                    <div className="max-w-xl mx-auto">
+                      <StepHead title={t("onb.q.profileTitle")} body={t("onb.q.profileBody")} />
+                      <div className="flex items-center gap-4 mt-6">
+                        <AvatarUpload value={avatarUrl} onChange={setAvatarUrl} initials={initials(identity)} />
+                        <div className="flex-1 min-w-0 grid grid-cols-2 gap-3">
+                          <Field label={t("onb.identity.first")}>
+                            <input autoFocus className={inputCls} value={first} onChange={(e) => setFirst(e.target.value)} placeholder={t("onb.identity.firstPh")} />
+                          </Field>
+                          <Field label={t("onb.identity.last")}>
+                            <input className={inputCls} value={last} onChange={(e) => setLast(e.target.value)} placeholder={t("onb.identity.lastPh")} />
+                          </Field>
+                        </div>
+                      </div>
+                      <div className="mt-3">
+                        <Field label={t("onb.identity.location")}>
+                          <input className={inputCls} value={location} onChange={(e) => setLocation(e.target.value)} placeholder={t("onb.identity.locationPh")} />
                         </Field>
-                        <Field label={t("onb.identity.last")}>
-                          <input className={inputCls} value={last} onChange={(e) => setLast(e.target.value)} placeholder={t("onb.identity.lastPh")} />
+                      </div>
+                      <div className="mt-3">
+                        <Field label={t("onb.identity.bio")}>
+                          <textarea className={`${inputCls} resize-none`} rows={3} maxLength={160} value={bio} onChange={(e) => setBio(e.target.value)} placeholder={t("onb.identity.bioPh")} />
                         </Field>
                       </div>
                     </div>
                   )}
 
-                  {/* Profile photo */}
-                  {stepKey === "avatar" && (
-                    <div className="max-w-md mx-auto text-center">
-                      <StepHead title={t("onb.q.avatarTitle")} body={t("onb.q.avatarBody")} center />
-                      <div className="flex justify-center mt-7"><AvatarUpload value={avatarUrl} onChange={setAvatarUrl} initials={initials(identity)} /></div>
-                    </div>
-                  )}
-
-                  {/* Location */}
-                  {stepKey === "location" && (
-                    <div className="max-w-md mx-auto">
-                      <StepHead title={t("onb.q.locationTitle")} body={t("onb.q.locationBody")} />
-                      <div className="mt-5">
-                        <input autoFocus className={inputCls} value={location} onChange={(e) => setLocation(e.target.value)} placeholder={t("onb.identity.locationPh")} />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Bio */}
-                  {stepKey === "bio" && (
-                    <div className="max-w-md mx-auto">
-                      <StepHead title={t("onb.q.bioTitle")} body={t("onb.q.bioBody")} />
-                      <div className="mt-5">
-                        <textarea autoFocus className={`${inputCls} resize-none`} rows={4} maxLength={160} value={bio} onChange={(e) => setBio(e.target.value)} placeholder={t("onb.identity.bioPh")} />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Email */}
-                  {stepKey === "email" && (
-                    <div className="max-w-md mx-auto">
-                      <StepHead title={t("onb.q.emailTitle")} body={t("onb.q.emailBody")} />
-                      <div className="mt-5">
-                        <input autoFocus type="email" className={inputCls} value={email} onChange={(e) => { emailTouched.current = true; setEmail(e.target.value); }} placeholder={t("onb.identity.emailPh")} />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Phone */}
-                  {stepKey === "phone" && (
-                    <div className="max-w-md mx-auto">
-                      <StepHead title={t("onb.q.phoneTitle")} body={t("onb.q.phoneBody")} />
-                      <div className="mt-5">
-                        <input autoFocus type="tel" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("onb.identity.phonePh")} />
+                  {/* Contact — email, phone, and where the form sends people */}
+                  {stepKey === "contact" && (
+                    <div className="max-w-xl mx-auto">
+                      <StepHead title={t("onb.q.contactTitle")} body={t("onb.q.contactBody")} />
+                      <div className="grid sm:grid-cols-2 gap-3 mt-6">
+                        <Field label={t("onb.identity.email")}>
+                          <input autoFocus type="email" className={inputCls} value={email} onChange={(e) => { emailTouched.current = true; setEmail(e.target.value); }} placeholder={t("onb.identity.emailPh")} />
+                        </Field>
+                        <Field label={t("onb.identity.phone")}>
+                          <input type="tel" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("onb.identity.phonePh")} />
+                        </Field>
                       </div>
                       <div className="flex items-center gap-1.5 mt-2 text-[var(--fg-muted)]">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1012 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.6-4.1-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2.1.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.7 1.8c.1.2.1.4 0 .5l-.3.5c-.1.2-.3.3-.1.6.1.3.6 1 1.3 1.6.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.6-.7c.2-.2.3-.2.6-.1l1.6.8c.3.1.5.2.5.4.1.1.1.6-.1 1z"/></svg>
                         <span className="font-sans text-[11px]">{t("onb.identity.phoneHint")}</span>
                       </div>
-                    </div>
-                  )}
-
-                  {/* Contact form destination */}
-                  {stepKey === "contact" && (
-                    <div className="max-w-md mx-auto">
-                      <StepHead title={t("onb.q.contactTitle")} body={t("onb.q.contactBody")} />
-                      <div className="flex rounded-lg border border-[var(--border)] overflow-hidden mt-5">
-                        <button onClick={() => setContactMode("whatsapp")} className={`flex-1 px-3 py-2.5 font-sans text-sm font-semibold transition-colors ${contactMode === "whatsapp" ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.contact.whatsapp")}</button>
-                        <button onClick={() => setContactMode("inbox")} className={`flex-1 px-3 py-2.5 font-sans text-sm font-semibold transition-colors border-l border-[var(--border)] ${contactMode === "inbox" ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.contact.inbox")}</button>
+                      <div className="mt-5">
+                        <label className="block font-sans text-xs font-semibold text-[var(--fg-muted)] mb-1.5">{t("onb.contact.label")}</label>
+                        <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
+                          <button onClick={() => setContactMode("whatsapp")} className={`flex-1 px-3 py-2.5 font-sans text-sm font-semibold transition-colors ${contactMode === "whatsapp" ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.contact.whatsapp")}</button>
+                          <button onClick={() => setContactMode("inbox")} className={`flex-1 px-3 py-2.5 font-sans text-sm font-semibold transition-colors border-l border-[var(--border)] ${contactMode === "inbox" ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.contact.inbox")}</button>
+                        </div>
+                        <p className="font-sans text-xs text-[var(--fg-muted)] mt-2 leading-relaxed">{contactMode === "whatsapp" ? t("onb.contact.whatsappHint") : t("onb.contact.inboxHint")}</p>
                       </div>
-                      <p className="font-sans text-xs text-[var(--fg-muted)] mt-2.5 leading-relaxed">{contactMode === "whatsapp" ? t("onb.contact.whatsappHint") : t("onb.contact.inboxHint")}</p>
                     </div>
                   )}
 
                   {/* Logo */}
                   {stepKey === "logo" && (
-                    <div className="max-w-md mx-auto">
+                    <div className="max-w-xl mx-auto">
                       <StepHead title={t("onb.q.logoTitle")} body={t("onb.q.logoBody")} />
                       <div className="flex rounded-lg border border-[var(--border)] overflow-hidden mt-5 w-full">
                         <button onClick={() => setHasLogo(true)} className={`flex-1 px-3.5 py-2.5 font-sans text-sm font-semibold transition-colors ${hasLogo ? "bg-yellow text-[#111]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>{t("onb.logo.yes")}</button>
