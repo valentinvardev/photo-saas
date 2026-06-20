@@ -19,6 +19,16 @@ const EXT_BY_MIME: Record<string, string> = {
 };
 
 export const photoRouter = createTRPCRouter({
+  /** Total storage used by the user's photos (bytes) + photo count. */
+  storageUsage: protectedProcedure.query(async ({ ctx }) => {
+    const agg = await ctx.db.photo.aggregate({
+      where: { userId: ctx.userId },
+      _sum:  { size: true },
+      _count: true,
+    });
+    return { bytes: agg._sum.size ?? 0, count: agg._count };
+  }),
+
   /** List the user's photos. Pass folderId to view a folder; omit for the whole library. */
   list: protectedProcedure
     .input(z.object({
