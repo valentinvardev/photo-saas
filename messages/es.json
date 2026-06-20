@@ -713,9 +713,15 @@
     "upgradePlan": "Mejorar plan",
     "recentActivity": "Actividad reciente",
     "recentActivityHint": "Lo que pasó en tu cuenta.",
-    "act1": "47 fotos subidas a 'Coastal'", "act1Time": "hace 2 h",
-    "act2": "Portafolio visto desde Berlín", "act2Time": "Ayer",
-    "act3": "Portada del portafolio actualizada", "act3Time": "hace 2 d"
+    "actPhoto": "Subiste {label}",
+    "actPortfolioPublished": "Publicaste {label}",
+    "actPortfolioUpdated": "Actualizaste {label}",
+    "actMessage": "Nuevo mensaje de {label}",
+    "actEmpty": "Aún no hay actividad — subí una foto o publicá un portafolio.",
+    "timeNow": "recién",
+    "timeMin": "hace {n}m",
+    "timeHour": "hace {n}h",
+    "timeDay": "hace {n}d"
   },
 
   "cs": {

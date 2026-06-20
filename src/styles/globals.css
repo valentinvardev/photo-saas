@@ -442,6 +442,17 @@ body {
   background-color: #e5e5e5;
 }
 
+/* ── Light theme: yellow-filled buttons read low-contrast on white ──────────
+   Deepen the fill to the darker gold for actual interactive elements only
+   (buttons / links / toggles), leaving progress bars, status dots, badges and
+   the brand logo on the vibrant yellow. Dark theme is unchanged. */
+:root:not(.dark) :is(button, a, label, [role="button"]).bg-yellow {
+  background-color: var(--color-yellow-dark);
+}
+:root:not(.dark) :is(button, a, label, [role="button"]).bg-yellow:hover {
+  background-color: color-mix(in srgb, var(--color-yellow-dark) 88%, #000);
+}
+
 /* ── Horizontal rule ── */
 .hr-gradient {
   border: none;

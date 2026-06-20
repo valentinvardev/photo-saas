@@ -161,6 +161,60 @@ function StorageCard() {
   );
 }
 
+function timeAgo(iso: string, t: ReturnType<typeof useT>["t"]) {
+  const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 1) return t("home.timeNow");
+  if (m < 60) return t("home.timeMin", { n: m });
+  const h = Math.floor(m / 60);
+  if (h < 24) return t("home.timeHour", { n: h });
+  return t("home.timeDay", { n: Math.floor(h / 24) });
+}
+
+const ACT_ICON: Record<string, React.ReactNode> = {
+  photo: I.upload, portfolioPublished: I.portfolio, portfolioUpdated: I.portfolio, message: I.chat,
+};
+const ACT_KEY: Record<string, string> = {
+  photo: "home.actPhoto", portfolioPublished: "home.actPortfolioPublished", portfolioUpdated: "home.actPortfolioUpdated", message: "home.actMessage",
+};
+
+function RecentActivity() {
+  const { t } = useT();
+  const { data, isLoading } = api.activity.recent.useQuery();
+
+  if (isLoading) {
+    return (
+      <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl divide-y divide-[var(--border-subtle)]">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex items-center gap-4 px-5 py-3.5">
+            <span className="w-8 h-8 rounded-lg bg-[var(--bg-subtle)] animate-pulse shrink-0" />
+            <div className="flex-1 h-3 rounded bg-[var(--bg-subtle)] animate-pulse" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-5 py-8 text-center font-sans text-sm text-[var(--fg-muted)]">
+        {t("home.actEmpty")}
+      </div>
+    );
+  }
+  return (
+    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl divide-y divide-[var(--border-subtle)]">
+      {data.map((row, i) => (
+        <div key={i} className="flex items-center gap-4 px-5 py-3.5">
+          <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[var(--bg-subtle)] text-[var(--fg-muted)]">
+            {ACT_ICON[row.kind]}
+          </span>
+          <div className="flex-1 min-w-0 font-sans text-sm text-[var(--fg)] truncate">{t(ACT_KEY[row.kind]!, { label: row.label })}</div>
+          <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--fg-muted)] shrink-0">{timeAgo(row.at, t)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function DashboardHomePage() {
   const { t } = useT();
   const [firstName, setFirstName] = useState<string>("");
@@ -230,21 +284,7 @@ export default function DashboardHomePage() {
           title={t("home.recentActivity")}
           hint={t("home.recentActivityHint")}
         />
-        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl divide-y divide-[var(--border-subtle)]">
-          {[
-            { icon: I.upload,    title: t("home.act1"), time: t("home.act1Time") },
-            { icon: I.portfolio, title: t("home.act2"), time: t("home.act2Time") },
-            { icon: I.portfolio, title: t("home.act3"), time: t("home.act3Time") },
-          ].map((row, i) => (
-            <div key={i} className="flex items-center gap-4 px-5 py-3.5">
-              <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[var(--bg-subtle)] text-[var(--fg-muted)]">
-                {row.icon}
-              </span>
-              <div className="flex-1 min-w-0 font-sans text-sm text-[var(--fg)] truncate">{row.title}</div>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--fg-muted)] shrink-0">{row.time}</span>
-            </div>
-          ))}
-        </div>
+        <RecentActivity />
       </section>
 
     </div>
