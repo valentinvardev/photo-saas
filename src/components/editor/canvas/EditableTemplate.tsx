@@ -82,7 +82,10 @@ function EditableNode({
       // Double-click still works as a shortcut from the unselected state.
       onClick={(e) => {
         e.stopPropagation();
-        if (selected && isTextNode && !editing) setEditing(id);
+        // While editing, a click inside the node (positioning the caret, or a
+        // Space/Enter relayed by a host control) must NOT deselect it.
+        if (editing) return;
+        if (selected && isTextNode) setEditing(id);
         else selectNode(id);
       }}
       onDoubleClick={(e) => { e.stopPropagation(); selectNode(id); setEditing(id); }}
@@ -449,6 +452,35 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
 }
 
 /* ═══════════════════════════════════════════
+   ACTIVATABLE — button on the live site, plain element in the editor
+   ─────────────────────────────────────────
+   Editable text must never live inside a <button>: the button hijacks
+   Space/Enter as activation keys, so the nested inline editor never receives
+   them (typing a space cancels the edit). On the live site we render a real
+   <button> with its navigation/gallery action; in the editor we render a
+   styled <span> with identical look so the inline text stays fully editable.
+═══════════════════════════════════════════ */
+function Activatable({
+  onActivate, style, onMouseEnter, onMouseLeave, children,
+}: {
+  onActivate?: () => void;
+  style?: React.CSSProperties;
+  onMouseEnter?: (e: React.MouseEvent<HTMLElement>) => void;
+  onMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
+  children: React.ReactNode;
+}) {
+  const readOnly = useEditorStore((s) => s.readOnly);
+  if (readOnly) {
+    return (
+      <button onClick={onActivate} style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        {children}
+      </button>
+    );
+  }
+  return <span style={{ ...style, display: "inline-flex", alignItems: "center" }}>{children}</span>;
+}
+
+/* ═══════════════════════════════════════════
    NAV  (adapted: position relative, no scroll effect)
 ═══════════════════════════════════════════ */
 function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile: boolean }) {
@@ -521,10 +553,10 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
           <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
             <LogoMark />
           </div>
-          <button onClick={onOpenGallery}
+          <Activatable onActivate={onOpenGallery}
             style={{ ...sans, marginLeft: "auto", fontSize: "10px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ed-fg, #0a0a0a)", background: "none", border: "1px solid var(--ed-fg, #0a0a0a)", padding: "6px 14px", cursor: "pointer" }}>
-            Work
-          </button>
+            <EditableNode id="nav-item-1" tag="span"><EditableText id="nav-item-1" /></EditableNode>
+          </Activatable>
         </nav>
         {/* Mobile drawer */}
         <div style={{ position: "fixed", inset: 0, zIndex: 1500, pointerEvents: menuOpen ? "auto" : "none" }}>
@@ -568,20 +600,20 @@ function Nav({ onOpenGallery, isMobile }: { onOpenGallery: () => void; isMobile:
             once. The buttons use fontSize:"inherit" so they follow this node. */}
         <EditableNode id="nav-links" tag="div" style={{ display: "flex", gap: "2.5rem", alignItems: "center", fontSize: "12px" }}>
           {navItems.map((item) => (
-            <button key={item.id} onClick={() => { if (readOnly) item.fn(); }}
+            <Activatable key={item.id} onActivate={item.fn}
               style={{ ...sans, background: "none", border: "none", cursor: "pointer", fontSize: "inherit", fontWeight: 400, letterSpacing: "0.06em", color: "var(--ed-fg, #0a0a0a)", opacity: 0.55, transition: "opacity 0.2s", padding: 0 }}
               onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
               onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.55"; }}>
               <EditableNode id={item.id} tag="span"><EditableText id={item.id} /></EditableNode>
-            </button>
+            </Activatable>
           ))}
         </EditableNode>
-        <button onClick={() => { if (readOnly) scrollTo("contact"); }}
+        <Activatable onActivate={() => scrollTo("contact")}
           style={{ ...sans, fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", padding: "7px 18px", border: "1px solid var(--ed-btn-bg, #0a0a0a)", borderRadius: "var(--ed-btn-radius, 0)", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
           onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; e.currentTarget.style.color = "var(--ed-btn-fg, var(--ed-bg, #fafafa))"; }}>
           <EditableNode id="nav-cta" tag="span"><EditableText id="nav-cta" /></EditableNode>
-        </button>
+        </Activatable>
       </div>
     </nav>
   );

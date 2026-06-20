@@ -1,0 +1,588 @@
+"use client";
+
+/**
+ * HalcyonTemplate — adapted fork of src/app/template/halcyon/page.tsx for the
+ * FRAME website builder.  See docs/template-adapter-guide.md.
+ *
+ * Differences from the source template:
+ *  1. Colours + fonts are driven by the editor Design panel: the source's
+ *     hardcoded HL_TOKENS / HL_FONTS are replaced by the editor CSS variables
+ *     (--ed-bg/-fg/-accent/-muted and --tpl-serif/-sans/-mono). Halcyon's dark
+ *     palette + typography ship as the template's design defaults (registry).
+ *  2. The big <style> block is scoped under `.hl-scope` for its reset so it
+ *     can't restyle the editor chrome; the unique hp- / hl- class rules are
+ *     left global.
+ *  3. Nav changed from `position: sticky` → `position: relative` so it stays
+ *     inside the device frame.
+ *  4. Key text is wrapped with EditableNode/EditableText; the project index,
+ *     drawer, detail, gallery and lightbox stay as preview-only interactions
+ *     and only fire on the live site (readOnly).
+ */
+
+import { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEditorStore } from "~/lib/editor/store";
+import type { Viewport } from "~/lib/editor/types";
+import { EditableNode, EditableText, LogoImage } from "./primitives";
+import { HL_PORTFOLIO, HL_PHOTOS, type HlPhoto } from "~/lib/halcyon/data";
+
+type Lightbox = { photos: (HlPhoto & { projectTitle?: string })[]; index: number } | null;
+
+/* Editor-driven design tokens — every colour/font resolves to a Design-panel
+   variable, so palette + typography changes apply live. raised/line are derived
+   from fg/bg with color-mix so they track the palette too. */
+const t = {
+  accent: "var(--ed-accent)",
+  bg:     "var(--ed-bg)",
+  raised: "color-mix(in srgb, var(--ed-fg) 8%, var(--ed-bg))",
+  fg:     "var(--ed-fg)",
+  muted:  "var(--ed-muted)",
+  line:   "color-mix(in srgb, var(--ed-fg) 16%, transparent)",
+};
+const HL_FONTS = {
+  serif: "var(--tpl-serif), Georgia, serif",
+  sans:  "var(--tpl-sans), system-ui, sans-serif",
+  mono:  "var(--tpl-mono), ui-monospace, monospace",
+};
+
+/* Base rules — reset is scoped to .hl-scope so it never touches editor chrome. */
+function hlBaseCss() {
+  return `
+    .hl-scope, .hl-scope *{box-sizing:border-box}
+    .hl-scope h1,.hl-scope h2,.hl-scope h3,.hl-scope h4,.hl-scope p,.hl-scope ul,.hl-scope li,.hl-scope figure,.hl-scope blockquote{margin:0;padding:0}
+    .hl-scope ul{list-style:none}
+    .hl-serif{font-family:${HL_FONTS.serif};font-weight:400;letter-spacing:-0.01em}
+    .hl-italic{font-family:${HL_FONTS.serif};font-style:italic;font-weight:400}
+    .hl-mono{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase}
+    .hl-btn{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:14px 18px;border:1px solid ${t.line};background:transparent;color:${t.fg};cursor:pointer;transition:all .25s ease;display:inline-flex;align-items:center;gap:10px}
+    .hl-btn:hover{border-color:${t.fg};background:${t.fg};color:${t.bg}}
+    .hl-btn-accent{background:${t.accent};border-color:${t.accent};color:${t.fg}}
+    .hl-btn-accent:hover{background:${t.fg};color:${t.bg};border-color:${t.fg}}
+    .hl-link{color:${t.muted};text-decoration:none;transition:color .2s ease}
+    .hl-link:hover{color:${t.fg}}
+    .hl-eyebrow{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted}}
+    .hl-accent{color:${t.accent}}
+  `;
+}
+
+/* On the live site interactive triggers fire; in the editor a click selects the
+   nearest editable node instead (and overlays would block editing). */
+function useGuard() {
+  const readOnly = useEditorStore((s) => s.readOnly);
+  return (fn: () => void) => () => { if (readOnly) fn(); };
+}
+
+export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
+  const { selectNode, logo } = useEditorStore();
+  const guard = useGuard();
+  const data  = HL_PORTFOLIO;
+
+  const [navOpen,       setNavOpen]       = useState(false);
+  const [activeProject, setActiveProject] = useState<string | null>(null);
+  const [galleryOpen,   setGalleryOpen]   = useState(false);
+  const [lightbox,      setLightbox]      = useState<Lightbox>(null);
+  const [hoverIdx,      setHoverIdx]      = useState(-1);
+  const [drawerHoverId, setDrawerHoverId] = useState<string | null>(null);
+  const [showAllWorks,  setShowAllWorks]  = useState(false);
+  const [contactTab,    setContactTab]    = useState<"letter" | "whatsapp">("letter");
+  const [waMsg,         setWaMsg]         = useState("Hola, me gustaría hablar contigo sobre una sesión. Mi proyecto es ");
+
+  const drawerProject  = drawerHoverId ? data.projects.find((p) => p.id === drawerHoverId) : null;
+  const drawerImageSrc = drawerProject ? drawerProject.photos[0]!.src : data.projects[0]!.cover;
+  const indexProject   = hoverIdx >= 0 ? data.projects[hoverIdx] : null;
+  const indexImageSrc  = indexProject ? indexProject.photos[0]!.src : null;
+
+  const VISIBLE_WORKS = 3;
+  const visibleProjects = showAllWorks ? data.projects : data.projects.slice(0, VISIBLE_WORKS);
+  const hiddenCount     = data.projects.length - VISIBLE_WORKS;
+
+  const allPhotos = useMemo(
+    () => data.projects.flatMap((p) => p.photos.map((ph) => ({ ...ph, projectTitle: p.title }))),
+    [data]
+  );
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        if (lightbox)           setLightbox(null);
+        else if (galleryOpen)   setGalleryOpen(false);
+        else if (activeProject) setActiveProject(null);
+        else if (navOpen)       setNavOpen(false);
+      }
+      if (lightbox) {
+        if (e.key === "ArrowRight") setLightbox((l) => l && ({ ...l, index: (l.index + 1) % l.photos.length }));
+        if (e.key === "ArrowLeft")  setLightbox((l) => l && ({ ...l, index: (l.index - 1 + l.photos.length) % l.photos.length }));
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox, galleryOpen, activeProject, navOpen]);
+
+  const project = data.projects.find((p) => p.id === activeProject);
+
+  const Socials = () => (
+    <div className="hp-socials">
+      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" />
+        </svg>
+      </a>
+      <a href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="X">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg>
+      </a>
+      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M13.5 22v-9h3l.5-4h-3.5V6.5c0-1.16.32-1.95 2-1.95H17V1.14C16.66 1.1 15.41 1 13.96 1 10.92 1 8.83 2.86 8.83 6.16V9H6v4h2.83v9h4.67Z"/></svg>
+      </a>
+    </div>
+  );
+
+  /* Wordmark — supports the Settings > Logo image modes like the other templates. */
+  function Brand({ nodeId, className }: { nodeId: string; className?: string }) {
+    const textEl = (
+      <EditableNode id={nodeId} tag="span" className={className}>
+        <EditableText id={nodeId} display="inline" />
+      </EditableNode>
+    );
+    if (logo.mode === "image" && logo.imageUrl) {
+      return <LogoImage src={logo.imageUrl} alt={logo.text} width={logo.width} crop={logo.imageCrop} />;
+    }
+    if (logo.mode === "image+text" && logo.imageUrl) {
+      return (
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <LogoImage src={logo.imageUrl} width={logo.width} crop={logo.imageCrop} />
+          {textEl}
+        </span>
+      );
+    }
+    return textEl;
+  }
+
+  return (
+    <div
+      className="hl-scope hl-root"
+      data-viewport={viewport}
+      onClick={() => selectNode(null)}
+      style={{ minHeight: "100%", position: "relative", overflow: "hidden", background: t.bg, color: t.fg, fontFamily: HL_FONTS.sans }}
+    >
+      <style>{hlBaseCss()}</style>
+      <style>{`
+        .hp-nav{position:relative;top:0;left:0;right:0;z-index:30;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:18px 32px;color:${t.fg};background:${t.accent};border-bottom:1px solid rgba(14,13,11,0.18)}
+        .hp-mark{display:inline-flex;flex-direction:column;align-items:center;gap:2px;color:${t.fg};line-height:1;justify-self:center}
+        .hp-mark .wm{font-family:${HL_FONTS.serif};font-size:26px;letter-spacing:-0.02em;font-weight:400;display:flex;align-items:center;gap:8px}
+        .hp-mark .wm em{font-style:italic;font-weight:400}
+        .hp-mark .wm .glyph{width:6px;height:6px;border-radius:50%;border:1px solid ${t.fg};display:inline-block}
+        .hp-mark .sub{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.32em;text-transform:uppercase;opacity:0.85;margin-top:4px}
+        .hp-burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:transparent;border:0;padding:8px;justify-self:end}
+        .hp-burger span{display:block;width:22px;height:1px;background:${t.fg};transition:transform .3s ease}
+        .hp-burger:hover span:first-child{transform:translateX(-3px)}
+        .hp-burger:hover span:last-child{transform:translateX(3px)}
+
+        .hp-cover{position:relative;height:720px;overflow:hidden}
+        .hp-cover-img{position:absolute;inset:0;background:url('${data.projects[3]!.cover}') center/cover}
+        .hp-cover-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.78) 0%,rgba(14,13,11,0.42) 14%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 50%,rgba(14,13,11,0.55) 75%,rgba(14,13,11,0.95) 100%)}
+        .hp-cover-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;gap:48px;flex-wrap:wrap}
+        .hp-cover-title{font-family:${HL_FONTS.serif};font-size:140px;line-height:0.92;letter-spacing:-0.04em;font-weight:400;color:#EFEAE0}
+        .hp-cover-title em{font-style:italic;font-weight:400}
+        @media(max-width:780px){
+          .hp-cover{height:560px}
+          .hp-cover-title{font-size:72px}
+          .hp-cover-meta{bottom:32px;left:20px;right:20px;gap:20px}
+          .hp-nav{padding:18px 20px}
+        }
+        .hp-scroll-hint{display:flex;flex-direction:column;align-items:center;gap:10px;color:#EFEAE0}
+        .hp-scroll-hint .track{position:relative;width:1px;height:44px;background:rgba(239,234,224,0.22);overflow:hidden}
+        .hp-scroll-hint .track::after{content:"";position:absolute;left:-1.5px;bottom:0;width:4px;height:4px;border-radius:50%;background:#EFEAE0;animation:hpScrollDot 1.8s infinite cubic-bezier(0.22,1,0.36,1)}
+        @keyframes hpScrollDot{0%{transform:translateY(6px);opacity:0}18%{opacity:1}82%{opacity:1}100%{transform:translateY(-46px);opacity:0}}
+
+        .hp-section-label{display:flex;align-items:center;gap:14px;padding:0 32px;margin:96px 0 32px;color:${t.muted}}
+        .hp-section-label hr{flex:1;border:0;border-top:1px solid ${t.line}}
+
+        .hp-index{padding:0 32px;border-top:1px solid ${t.line};position:relative}
+        .hp-index-row{display:grid;grid-template-columns:60px 1fr 200px 120px 32px;gap:24px;align-items:center;padding:28px 0;border-bottom:1px solid ${t.line};cursor:pointer;position:relative;transition:padding .35s cubic-bezier(0.22,1,0.36,1)}
+        .hp-index-row .no{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;color:${t.muted}}
+        .hp-index-row .ti{font-family:${HL_FONTS.serif};font-size:54px;line-height:1;letter-spacing:-0.02em;font-weight:400;transition:transform .22s cubic-bezier(0.22,1,0.36,1),color .15s ease}
+        .hp-index-row .ta{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.1em;color:${t.muted};text-transform:uppercase}
+        .hp-index-row .yr{font-family:${HL_FONTS.mono};font-size:11px;color:${t.muted};text-align:right}
+        .hp-index-row .ar{justify-self:end;color:${t.muted};transition:transform .35s ease,color .35s ease}
+        @media (hover:hover) and (pointer:fine){
+          .hp-index-row:hover{padding-left:18px}
+          .hp-index-row:hover .ti{font-style:italic;transform:translateX(8px)}
+          .hp-index-row:hover .ar{transform:translateX(6px);color:${t.accent}}
+        }
+        @media(max-width:780px){
+          .hp-index-row{grid-template-columns:40px 1fr 24px;gap:12px}
+          .hp-index-row .ti{font-size:30px}
+          .hp-index-row .ta,.hp-index-row .yr{display:none}
+        }
+
+        .hp-thumb-float{position:absolute;width:240px;height:300px;pointer-events:none;z-index:5;opacity:0;transition:opacity .2s ease,transform .25s cubic-bezier(0.22,1,0.36,1);overflow:hidden;background:${t.raised}}
+        .hp-thumb-float.show{opacity:1}
+        @media (hover:none){.hp-thumb-float{display:none}}
+        .hp-thumb-float img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+        .hp-view-all-row{display:flex;justify-content:center;padding:32px 32px 0}
+
+        .hp-allphotos{margin:96px 32px 0;padding:80px 64px;background:${t.accent};color:${t.fg};position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:48px;align-items:end}
+        .hp-allphotos::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 120% at 100% 0%,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0) 55%);pointer-events:none}
+        .hp-allphotos .eyebrow{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:${t.fg};opacity:0.75;margin-bottom:24px}
+        .hp-allphotos h2{font-family:${HL_FONTS.serif};font-size:120px;line-height:0.9;letter-spacing:-0.035em;font-weight:400;color:${t.fg}}
+        .hp-allphotos h2 em{font-style:italic}
+        .hp-allphotos .sub{font-family:${HL_FONTS.sans};font-size:15px;line-height:1.6;color:${t.fg};opacity:0.85;max-width:460px;margin-top:24px}
+        .hp-allphotos .cta{display:inline-flex;align-items:center;gap:16px;padding:22px 32px;background:${t.bg};color:${t.fg};border:0;cursor:pointer;font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.18em;text-transform:uppercase;transition:transform .3s cubic-bezier(0.22,1,0.36,1),background .3s ease}
+        .hp-allphotos .cta:hover{transform:translateY(-3px);background:${t.fg};color:${t.bg}}
+        .hp-allphotos .cta .ico{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:${t.accent};color:${t.fg};font-size:16px;transition:transform .3s ease,background .3s ease}
+        .hp-allphotos .cta:hover .ico{transform:rotate(-12deg);background:${t.bg};color:${t.fg}}
+        @media(max-width:980px){.hp-allphotos{grid-template-columns:1fr;padding:56px 32px;align-items:start}.hp-allphotos h2{font-size:72px}}
+        @media(max-width:640px){.hp-allphotos{margin:64px 16px 0;padding:48px 24px}.hp-allphotos h2{font-size:54px}}
+
+        .hp-about{display:grid;grid-template-columns:320px 1fr;gap:64px;padding:0 32px 96px;align-items:stretch}
+        @media(max-width:780px){.hp-about{grid-template-columns:1fr;gap:32px;padding-bottom:64px}.hp-about-portrait{aspect-ratio:1/1 !important;max-width:280px;min-height:0 !important}}
+        .hp-about-portrait{background:url('${HL_PHOTOS.portraits![2]!.src}') center/cover;background-color:${t.raised};width:100%;min-height:480px}
+        .hp-about h2{font-family:${HL_FONTS.serif};font-size:72px;line-height:0.95;letter-spacing:-0.03em;margin-bottom:24px;font-weight:400}
+        .hp-about h2 em{font-style:italic}
+        .hp-about p{font-size:16px;line-height:1.7;color:${t.fg};max-width:520px}
+        .hp-about-actions{display:flex;align-items:center;gap:24px;margin-top:32px;flex-wrap:wrap}
+
+        .hp-contact{padding:120px 32px;text-align:center;border-top:1px solid ${t.line}}
+        .hp-contact h2{font-family:${HL_FONTS.serif};font-size:96px;line-height:1;letter-spacing:-0.03em;font-weight:400;margin-bottom:24px}
+        @media(max-width:780px){.hp-contact h2{font-size:56px}}
+        .hp-contact h2 em{font-style:italic;color:${t.accent}}
+        .hp-contact .tag{max-width:480px;margin:0 auto 40px;color:${t.muted};line-height:1.6}
+        .hp-contact-form{max-width:520px;margin:0 auto;display:grid;gap:0}
+        .hp-contact-form input,.hp-contact-form textarea{background:transparent;border:0;border-bottom:1px solid ${t.line};color:${t.fg};font-family:${HL_FONTS.sans};font-size:14px;padding:18px 0;outline:none;transition:border-color .2s ease}
+        .hp-contact-form input:focus,.hp-contact-form textarea:focus{border-color:${t.accent}}
+        .hp-contact-form textarea{resize:none;min-height:120px}
+        .hp-contact-actions{display:flex;justify-content:space-between;align-items:center;margin-top:32px;flex-wrap:wrap;gap:12px}
+        .hp-contact-tabs{display:inline-flex;gap:0;margin:0 auto 32px;border:1px solid ${t.line};border-radius:999px;padding:4px;background:${t.raised}}
+        .hp-contact-tab{background:transparent;border:0;cursor:pointer;padding:10px 22px;border-radius:999px;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted};transition:all .25s ease;display:inline-flex;align-items:center;gap:8px}
+        .hp-contact-tab.on{background:${t.fg};color:${t.bg}}
+        .hp-contact-tab:not(.on):hover{color:${t.fg}}
+        .hp-wa{max-width:520px;margin:0 auto;text-align:left;display:grid;gap:18px}
+        .hp-wa textarea{background:transparent;border:1px solid ${t.line};color:${t.fg};font-family:${HL_FONTS.sans};font-size:14px;line-height:1.6;padding:18px;outline:none;resize:vertical;min-height:160px;transition:border-color .2s ease}
+        .hp-wa textarea:focus{border-color:${t.accent}}
+        .hp-wa-actions{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+        .hp-wa-num{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase}
+        .hp-wa-num b{color:${t.fg};font-weight:400;letter-spacing:0.04em}
+        .hp-wa-send{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;background:#25D366;color:#0E0D0B;border:0;cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:transform .25s ease,filter .25s ease;text-decoration:none}
+        .hp-wa-send:hover{transform:translateY(-2px);filter:brightness(1.05)}
+        .hp-wa-send svg{width:16px;height:16px}
+
+        .hp-socials{display:inline-flex;gap:10px}
+        .hp-socials a{width:38px;height:38px;border-radius:50%;border:1px solid ${t.line};color:${t.muted};display:inline-flex;align-items:center;justify-content:center;transition:color .25s ease,border-color .25s ease,background .25s ease}
+        .hp-socials a:hover{color:${t.bg};background:${t.fg};border-color:${t.fg}}
+        .hp-socials a svg{width:15px;height:15px}
+
+        .hp-foot{display:flex;justify-content:space-between;align-items:center;padding:32px;border-top:1px solid ${t.line};color:${t.muted};flex-wrap:wrap;gap:16px}
+        .hp-foot .mark{font-family:${HL_FONTS.serif};font-size:18px;color:${t.fg}}
+        .hp-foot .mark em{font-style:italic}
+
+        .hp-drawer{position:fixed;inset:0;z-index:50;background:${t.bg};display:flex;align-items:center;gap:64px;padding:64px;transform:translateX(-100%);transition:transform .55s cubic-bezier(0.76,0,0.24,1)}
+        .hp-drawer.open{transform:translateX(0)}
+        .hp-drawer .col-l{flex:1;min-width:0;max-width:640px}
+        .hp-drawer .col-r{flex-shrink:0;width:540px;aspect-ratio:3/4;max-height:84vh;position:relative;border:1px solid ${t.line};overflow:hidden;background:${t.raised}}
+        .hp-drawer .col-r img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+        .hp-drawer .col-r .label{position:absolute;left:0;right:0;bottom:0;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${t.fg};padding:14px 18px;background:rgba(14,13,11,0.85);border-top:1px solid rgba(239,234,224,0.08);display:flex;justify-content:space-between;align-items:center;opacity:0;transition:opacity .3s ease}
+        .hp-drawer .col-r.has-hover .label{opacity:1}
+        .hp-drawer .col-r .label em{font-family:${HL_FONTS.serif};font-style:italic;font-size:14px;color:${t.fg};letter-spacing:0;text-transform:none}
+        @media(max-width:780px){.hp-drawer{padding:32px}.hp-drawer .col-l{flex:1;width:100%}.hp-drawer .col-r{display:none}}
+        .hp-drawer li{padding:16px 0;border-bottom:1px solid ${t.line};font-family:${HL_FONTS.serif};font-size:36px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+        .hp-drawer li .n{font-family:${HL_FONTS.mono};font-size:11px;color:${t.muted};font-style:normal}
+        .hp-drawer li .all-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid ${t.line};border-radius:50%;color:${t.fg};transition:all .25s ease}
+        .hp-drawer li:hover .all-icon{border-color:${t.fg};background:${t.fg};color:${t.bg};transform:translateX(4px)}
+        .hp-drawer-close{position:absolute;top:24px;right:32px;background:transparent;border:0;color:${t.fg};cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase}
+
+        .hp-detail{position:fixed;inset:0;z-index:40;background:${t.bg};overflow-y:auto}
+        .hp-detail-hero{position:relative;height:520px;overflow:hidden}
+        .hp-detail-hero img{width:100%;height:100%;object-fit:cover}
+        .hp-detail-hero::before{content:"";position:absolute;inset:0;background:${t.accent};mix-blend-mode:multiply;opacity:0.55;z-index:1;pointer-events:none}
+        .hp-detail-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.35) 0%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 45%,rgba(14,13,11,0.7) 75%,rgba(14,13,11,0.96) 100%);z-index:2}
+        .hp-detail-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;gap:48px;color:#fff;flex-wrap:wrap;z-index:3}
+        .hp-detail-title{font-family:${HL_FONTS.serif};font-size:104px;line-height:0.95;letter-spacing:-0.03em;font-weight:400;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,0.45)}
+        @media(max-width:780px){.hp-detail-title{font-size:56px}}
+        .hp-detail-title em{font-style:italic}
+        .hp-detail-info{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#fff;display:grid;gap:8px;text-align:right;min-width:220px}
+        .hp-detail-info .row{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(255,255,255,0.4);padding-bottom:6px}
+        .hp-detail-grid{padding:48px 32px;column-count:3;column-gap:14px}
+        @media(max-width:1100px){.hp-detail-grid{column-count:2}}
+        @media(max-width:640px){.hp-detail-grid{column-count:1}}
+        .hp-detail-grid .item{break-inside:avoid;margin-bottom:14px;position:relative;cursor:pointer;overflow:hidden;background:${t.raised}}
+        .hp-detail-grid .item img{width:100%;height:auto;display:block}
+        .hp-detail-close{position:fixed;top:24px;right:32px;z-index:41;width:44px;height:44px;border-radius:50%;border:1px solid ${t.line};background:${t.raised};color:${t.fg};cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:${HL_FONTS.mono};font-size:14px;transition:all .25s ease}
+        .hp-detail-close:hover{background:${t.fg};color:${t.bg};border-color:${t.fg};transform:rotate(90deg)}
+
+        .hp-gallery{position:fixed;inset:0;z-index:45;background:${t.bg};overflow-y:auto;padding:32px}
+        .hp-gallery-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;padding-top:48px;flex-wrap:wrap;gap:16px}
+        .hp-gallery-head h2{font-family:${HL_FONTS.serif};font-size:96px;letter-spacing:-0.03em;line-height:0.95;font-weight:400}
+        @media(max-width:780px){.hp-gallery-head h2{font-size:48px}}
+        .hp-gallery-head h2 em{font-style:italic}
+        .hp-mason{column-count:4;column-gap:18px}
+        @media(max-width:1100px){.hp-mason{column-count:3}}
+        @media(max-width:680px){.hp-mason{column-count:2;column-gap:8px}}
+        .hp-mason .cell{break-inside:avoid;margin-bottom:18px;cursor:pointer;overflow:hidden;position:relative}
+        .hp-mason .cell img{width:100%;display:block}
+        .hp-mason .cell .cap{position:absolute;left:12px;bottom:12px;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:${t.fg};background:rgba(14,13,11,0.7);padding:4px 8px;opacity:0;transition:opacity .25s ease}
+        .hp-mason .cell:hover .cap{opacity:1}
+
+        .hp-lb{position:fixed;inset:0;z-index:60;background:rgba(8,8,7,0.96);display:flex;align-items:center;justify-content:center}
+        .hp-lb-img{max-width:78vw;max-height:78vh;object-fit:contain;box-shadow:0 30px 80px rgba(0,0,0,0.6)}
+        .hp-lb-meta{position:fixed;bottom:32px;left:0;right:0;display:flex;justify-content:space-between;padding:0 48px;color:${t.fg};flex-wrap:wrap;gap:8px}
+        .hp-lb-counter{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase}
+        .hp-lb-cap{font-family:${HL_FONTS.serif};font-style:italic;font-size:18px}
+        .hp-lb-arrow{position:fixed;top:50%;transform:translateY(-50%);background:transparent;border:1px solid ${t.line};color:${t.fg};width:48px;height:48px;cursor:pointer;font-family:${HL_FONTS.mono};font-size:14px;transition:all .25s ease}
+        .hp-lb-arrow:hover{background:${t.fg};color:${t.bg}}
+        .hp-lb-arrow.l{left:32px}.hp-lb-arrow.r{right:32px}
+        .hp-lb-x{position:fixed;top:32px;right:32px;background:transparent;border:0;color:${t.fg};cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase}
+      `}</style>
+
+      {/* ── NAV ── */}
+      <div className="hp-nav" id="section-nav">
+        <span aria-hidden />
+        <div className="hp-mark">
+          <div className="wm"><span className="glyph" aria-hidden /><Brand nodeId="hl-mark-name" /></div>
+          <EditableNode id="hl-mark-sub" tag="div" className="sub"><EditableText id="hl-mark-sub" display="inline" /></EditableNode>
+        </div>
+        <button className="hp-burger" onClick={guard(() => setNavOpen(true))} aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+      {/* ── COVER ── */}
+      <section className="hp-cover" id="hl-cover">
+        <div className="hp-cover-img" />
+        <div className="hp-cover-meta">
+          <EditableNode id="hl-cover-title" tag="h1" className="hp-cover-title">
+            <EditableText id="hl-cover-title" />
+          </EditableNode>
+          <div className="hp-scroll-hint">
+            <span className="hl-mono" style={{ color: "#EFEAE0", opacity: 0.75, letterSpacing: "0.18em" }}>Scroll</span>
+            <div className="track" />
+          </div>
+        </div>
+      </section>
+
+      {/* ── SELECTED WORK ── */}
+      <div className="hp-section-label hl-mono">
+        <EditableNode id="hl-work-label" tag="span"><EditableText id="hl-work-label" display="inline" /></EditableNode>
+        <hr />
+        <span>{String(data.projects.length).padStart(2, "0")} Projects</span>
+      </div>
+      <div
+        className="hp-index"
+        id="hl-work"
+        onMouseLeave={() => setHoverIdx(-1)}
+        onMouseMove={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          const el = document.getElementById("hp-thumb-float");
+          if (el) { el.style.left = `${e.clientX - r.left + 24}px`; el.style.top = `${e.clientY - r.top - 150}px`; }
+        }}
+      >
+        <div id="hp-thumb-float" className={`hp-thumb-float ${hoverIdx >= 0 ? "show" : ""}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {indexImageSrc && <img key={indexImageSrc} src={indexImageSrc} alt="" />}
+        </div>
+        {visibleProjects.map((p, i) => (
+          <div key={p.id} className="hp-index-row" onMouseEnter={() => setHoverIdx(i)} onClick={guard(() => setActiveProject(p.id))}>
+            <span className="no">{p.no}</span>
+            <span className="ti">{p.title}</span>
+            <span className="ta">{p.tags.join(" · ")}</span>
+            <span className="yr">{p.year}</span>
+            <span className="ar">→</span>
+          </div>
+        ))}
+      </div>
+
+      {hiddenCount > 0 && !showAllWorks && (
+        <div className="hp-view-all-row">
+          <button className="hl-btn hl-btn-accent" onClick={guard(() => setShowAllWorks(true))}>
+            View all {data.projects.length} works <span>↓</span>
+          </button>
+        </div>
+      )}
+
+      {/* ── ARCHIVE BANNER ── */}
+      <section className="hp-allphotos" id="hl-archive">
+        <div>
+          <EditableNode id="hl-archive-eyebrow" tag="div" className="eyebrow"><EditableText id="hl-archive-eyebrow" display="inline" /></EditableNode>
+          <EditableNode id="hl-archive-title" tag="h2"><EditableText id="hl-archive-title" /></EditableNode>
+          <EditableNode id="hl-archive-sub" tag="p" className="sub"><EditableText id="hl-archive-sub" /></EditableNode>
+        </div>
+        {/* Live: real button opens the archive. Editor: plain element so the
+            inline text editor keeps Space/Enter. */}
+        <ArchiveCta onActivate={() => setGalleryOpen(true)} />
+      </section>
+
+      {/* ── ABOUT ── */}
+      <div className="hp-section-label hl-mono">
+        <EditableNode id="hl-about-label" tag="span"><EditableText id="hl-about-label" display="inline" /></EditableNode>
+        <hr />
+        <span>Lior Avni · b. 1989</span>
+      </div>
+      <section className="hp-about" id="hl-about">
+        <div className="hp-about-portrait" role="img" aria-label="Portrait" />
+        <div>
+          <EditableNode id="hl-about-heading" tag="h2"><EditableText id="hl-about-heading" /></EditableNode>
+          <EditableNode id="hl-about-bio" tag="p"><EditableText id="hl-about-bio" /></EditableNode>
+          <div className="hp-about-actions">
+            <a href="#contact" className="hl-btn hl-btn-accent">Contact <span>↓</span></a>
+            <Socials />
+          </div>
+        </div>
+      </section>
+
+      {/* ── CONTACT ── */}
+      <section id="contact" className="hp-contact">
+        <EditableNode id="hl-contact-eyebrow" tag="div" className="hl-eyebrow" style={{ marginBottom: 24 }}>
+          <EditableText id="hl-contact-eyebrow" display="inline" />
+        </EditableNode>
+        <EditableNode id="hl-contact-heading" tag="h2"><EditableText id="hl-contact-heading" /></EditableNode>
+        <EditableNode id="hl-contact-tag" tag="p" className="tag"><EditableText id="hl-contact-tag" /></EditableNode>
+
+        <div className="hp-contact-tabs" role="tablist">
+          <button role="tab" aria-selected={contactTab === "letter"}   className={`hp-contact-tab ${contactTab === "letter"   ? "on" : ""}`} onClick={() => setContactTab("letter")}>Letter</button>
+          <button role="tab" aria-selected={contactTab === "whatsapp"} className={`hp-contact-tab ${contactTab === "whatsapp" ? "on" : ""}`} onClick={() => setContactTab("whatsapp")}>WhatsApp</button>
+        </div>
+
+        {contactTab === "letter" && (
+          <form className="hp-contact-form" onSubmit={(e) => e.preventDefault()}>
+            <input placeholder="Your name" />
+            <input placeholder="Email" type="email" />
+            <input placeholder="Project · date · place" />
+            <textarea placeholder="A few sentences about what you have in mind." />
+            <div className="hp-contact-actions">
+              <span className="hl-mono" style={{ color: t.muted }}>or write to studio@halcyon.photo</span>
+              <button type="submit" className="hl-btn hl-btn-accent">Send letter →</button>
+            </div>
+          </form>
+        )}
+
+        {contactTab === "whatsapp" && (
+          <div className="hp-wa">
+            <textarea value={waMsg} onChange={(e) => setWaMsg(e.target.value)} />
+            <div className="hp-wa-actions">
+              <span className="hp-wa-num">WhatsApp · <b>+351 912 000 000</b></span>
+              <a className="hp-wa-send" href={`https://wa.me/351912000000?text=${encodeURIComponent(waMsg)}`} target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-18.5A8.5 8.5 0 0 0 4.59 16.32L4 20l3.793-1.057A8.5 8.5 0 1 0 12 3.5z"/></svg>
+                Enviar
+              </a>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="hp-foot" id="section-footer">
+        <Brand nodeId="hl-footer-mark" className="mark" />
+        <EditableNode id="hl-footer-copy" tag="div" className="hl-mono"><EditableText id="hl-footer-copy" display="inline" /></EditableNode>
+        <Socials />
+      </footer>
+
+      {/* ── DRAWER (preview interaction) ── */}
+      <div className={`hp-drawer ${navOpen ? "open" : ""}`} onMouseLeave={() => setDrawerHoverId(null)}>
+        <button className="hp-drawer-close" onClick={() => setNavOpen(false)}>Close ✕</button>
+        <div className="col-l">
+          <div className="hl-eyebrow" style={{ marginBottom: 32 }}>My work</div>
+          <ul>
+            {data.projects.map((p) => (
+              <li key={p.id} onMouseEnter={() => setDrawerHoverId(p.id)} onClick={() => { setActiveProject(p.id); setNavOpen(false); }}>
+                <span>{p.title}</span>
+                <span className="n">{p.no} · {p.year}</span>
+              </li>
+            ))}
+            <li onMouseEnter={() => setDrawerHoverId(null)} onClick={() => { setGalleryOpen(true); setNavOpen(false); }}>
+              <span>All photographs</span>
+              <span className="all-icon" aria-hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg></span>
+            </li>
+          </ul>
+        </div>
+        <div className={`col-r ${drawerHoverId ? "has-hover" : ""}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img key={drawerImageSrc} src={drawerImageSrc} alt="" />
+          {drawerProject && (
+            <div className="label"><em>{drawerProject.title}</em><span>1 / {drawerProject.photos.length}</span></div>
+          )}
+        </div>
+      </div>
+
+      {/* ── DETAIL (preview interaction) ── */}
+      <AnimatePresence>
+        {project && (
+          <motion.div key="hp-detail" className="hp-detail"
+            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 32, transition: { duration: 0.3 } }} transition={{ duration: 0.4 }}>
+            <button className="hp-detail-close" onClick={() => setActiveProject(null)} aria-label="Close project"><span>✕</span></button>
+            <div className="hp-detail-hero">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={project.cover} alt={project.title} />
+              <div className="hp-detail-meta">
+                <h1 className="hp-detail-title">{project.title.split(" ").map((w, i) => i % 2 ? <em key={i}>{w} </em> : <span key={i}>{w} </span>)}</h1>
+                <div className="hp-detail-info">
+                  <div className="row"><span>No.</span><span>{project.no}</span></div>
+                  <div className="row"><span>Year</span><span>{project.year}</span></div>
+                  <div className="row"><span>Tags</span><span>{project.tags.join(" · ")}</span></div>
+                  <div className="row"><span>Frames</span><span>{project.photos.length}</span></div>
+                </div>
+              </div>
+            </div>
+            <div className="hp-detail-grid">
+              {project.photos.map((ph, i) => (
+                <div key={ph.id} className="item" onClick={() => setLightbox({ photos: project.photos, index: i })}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={ph.src} alt={ph.title} loading="lazy" />
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── GALLERY (preview interaction) ── */}
+      <AnimatePresence>
+        {galleryOpen && (
+          <motion.div key="hp-gallery" className="hp-gallery"
+            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 32, transition: { duration: 0.3 } }} transition={{ duration: 0.4 }}>
+            <button className="hp-detail-close" style={{ position: "absolute" }} onClick={() => setGalleryOpen(false)} aria-label="Close gallery"><span>✕</span></button>
+            <div className="hp-gallery-head"><h2>Every <em>photograph,</em><br />in one room.</h2></div>
+            <div className="hp-mason">
+              {allPhotos.map((ph, i) => (
+                <div key={ph.id + i} className="cell" onClick={() => setLightbox({ photos: allPhotos, index: i })}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={ph.src} alt={ph.title} />
+                  <div className="cap">{ph.title} · {ph.projectTitle}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── LIGHTBOX (preview interaction) ── */}
+      {lightbox && lightbox.photos[lightbox.index] && (
+        <div className="hp-lb" onClick={(e) => { if (e.target === e.currentTarget) setLightbox(null); }}>
+          <button className="hp-lb-x" onClick={() => setLightbox(null)}>Close ✕</button>
+          <button className="hp-lb-arrow l" onClick={() => setLightbox((l) => l && ({ ...l, index: (l.index - 1 + l.photos.length) % l.photos.length }))}>←</button>
+          <button className="hp-lb-arrow r" onClick={() => setLightbox((l) => l && ({ ...l, index: (l.index + 1) % l.photos.length }))}>→</button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="hp-lb-img" src={lightbox.photos[lightbox.index]!.src} alt="" />
+          <div className="hp-lb-meta">
+            <div className="hp-lb-counter">{String(lightbox.index + 1).padStart(3, "0")} / {String(lightbox.photos.length).padStart(3, "0")}</div>
+            <div className="hp-lb-cap">{lightbox.photos[lightbox.index]!.title}</div>
+            <div className="hp-lb-counter">{lightbox.photos[lightbox.index]!.date}</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* Archive CTA — button on the live site, plain element in the editor so the
+   nested inline text editor keeps Space/Enter. */
+function ArchiveCta({ onActivate }: { onActivate: () => void }) {
+  const readOnly = useEditorStore((s) => s.readOnly);
+  const inner = (
+    <>
+      <EditableNode id="hl-archive-cta" tag="span"><EditableText id="hl-archive-cta" display="inline" /></EditableNode>
+      <span className="ico" aria-hidden>↗</span>
+    </>
+  );
+  if (readOnly) return <button className="cta" onClick={onActivate}>{inner}</button>;
+  return <div className="cta" style={{ cursor: "default" }}>{inner}</div>;
+}

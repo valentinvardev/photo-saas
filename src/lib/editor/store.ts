@@ -78,18 +78,21 @@ export const useEditorStore = create<EditorStore>()(
       /** Load a saved design into the store (used by the editor + public render). */
       hydrateDesign: (d) => set((s) => {
         const templateId = d.templateId && TEMPLATES[d.templateId] ? d.templateId : s.templateId;
-        const base = TEMPLATES[templateId]!.initialNodes;
+        const tpl  = TEMPLATES[templateId]!;
+        const base = tpl.initialNodes;
         return {
           templateId,
           // Merge saved node edits over the template defaults so designs saved
           // before new nodes existed (e.g. nav links / CTA) still get defaults
           // instead of rendering empty.
           nodes:           d.nodes ? { ...base, ...d.nodes } : base,
-          palette:         d.palette ?? DEFAULT_PALETTE,
-          typography:      d.typography ?? DEFAULT_TYPOGRAPHY,
-          buttons:         d.buttons ? { ...DEFAULT_BUTTONS, ...d.buttons } : DEFAULT_BUTTONS,
+          // Fall back to the template's own defaults (dark/branded templates)
+          // before the global light defaults.
+          palette:         d.palette ?? tpl.defaultPalette ?? DEFAULT_PALETTE,
+          typography:      d.typography ?? tpl.defaultTypography ?? DEFAULT_TYPOGRAPHY,
+          buttons:         d.buttons ? { ...DEFAULT_BUTTONS, ...d.buttons } : (tpl.defaultButtons ?? DEFAULT_BUTTONS),
           grid:            d.grid ? { ...DEFAULT_GRID, ...d.grid } : DEFAULT_GRID,
-          logo:            d.logo ?? DEFAULT_LOGO,
+          logo:            d.logo ?? tpl.defaultLogo ?? DEFAULT_LOGO,
           contact:         d.contact ? { ...DEFAULT_CONTACT, ...d.contact } : DEFAULT_CONTACT,
           hiddenSections:  d.hiddenSections ?? [],
           selectedId:      null,
@@ -102,6 +105,10 @@ export const useEditorStore = create<EditorStore>()(
       setTemplate: (id) => set({
         templateId:      id,
         nodes:           TEMPLATES[id]!.initialNodes,
+        palette:         TEMPLATES[id]!.defaultPalette ?? DEFAULT_PALETTE,
+        typography:      TEMPLATES[id]!.defaultTypography ?? DEFAULT_TYPOGRAPHY,
+        buttons:         TEMPLATES[id]!.defaultButtons ?? DEFAULT_BUTTONS,
+        logo:            TEMPLATES[id]!.defaultLogo ?? DEFAULT_LOGO,
         selectedId:      null,
         editingId:       null,
         selectedSection: null,

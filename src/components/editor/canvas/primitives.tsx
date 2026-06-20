@@ -56,11 +56,13 @@ export function EditableNode({
   id,
   children,
   style,
+  className,
   tag: Tag = "div",
 }: {
   id: string;
   children: React.ReactNode;
   style?: React.CSSProperties;
+  className?: string;
   tag?: "div" | "h1" | "h2" | "h3" | "p" | "span" | "blockquote" | "header" | "section" | "footer";
 }) {
   const { selectedId, editingId, selectNode, setEditing, nodes } = useEditorStore();
@@ -83,9 +85,16 @@ export function EditableNode({
     <El
       data-editor-node=""
       data-node-id={id}
+      className={className}
       data-selected={selected ? "true" : undefined}
       data-editing={editing ? "true" : undefined}
-      onClick={(e) => { e.stopPropagation(); selectNode(id); }}
+      onClick={(e) => {
+        e.stopPropagation();
+        // A click inside a node that's already being edited (caret placement, or
+        // Space/Enter relayed by a host control) must not deselect it.
+        if (editing) return;
+        selectNode(id);
+      }}
       onDoubleClick={(e) => { e.stopPropagation(); selectNode(id); setEditing(id); }}
       style={{ position: "relative", ...style, ...overrides }}
     >
@@ -94,7 +103,7 @@ export function EditableNode({
   );
 }
 
-export function EditableText({ id, style }: { id: string; style?: React.CSSProperties }) {
+export function EditableText({ id, style, display = "block" }: { id: string; style?: React.CSSProperties; display?: "block" | "inline" | "inline-block" }) {
   const { nodes, editingId, updateNode } = useEditorStore();
   const content = nodes[id]?.content ?? "";
   const editing = editingId === id;
@@ -110,7 +119,7 @@ export function EditableText({ id, style }: { id: string; style?: React.CSSPrope
     );
   }
   return (
-    <span style={{ display: "block", ...style }} dangerouslySetInnerHTML={{ __html: content }} />
+    <span style={{ display, ...style }} dangerouslySetInnerHTML={{ __html: content }} />
   );
 }
 

@@ -3,6 +3,8 @@ import type { Viewport } from "../types";
 import type { TemplateDef } from "./types";
 import { MINIMAL_BW_NODES, MINIMAL_BW_SECTIONS } from "./minimal-bw";
 import { ATELIER_NODES, ATELIER_SECTIONS } from "./atelier";
+import { HALCYON_NODES, HALCYON_SECTIONS } from "./halcyon";
+import { DEFAULT_LOGO } from "../types";
 
 /* Lazy-loaded canvas components — kept out of the registry's import graph
    so the editor only loads the template it actually renders. */
@@ -12,6 +14,10 @@ const MinimalBWComponent = dynamic<{ viewport: Viewport }>(
 );
 const AtelierComponent = dynamic<{ viewport: Viewport }>(
   () => import("~/components/editor/canvas/AtelierTemplate").then((m) => m.AtelierTemplate),
+  { ssr: false }
+);
+const HalcyonComponent = dynamic<{ viewport: Viewport }>(
+  () => import("~/components/editor/canvas/HalcyonTemplate").then((m) => m.HalcyonTemplate),
   { ssr: false }
 );
 
@@ -29,6 +35,25 @@ export const TEMPLATES: Record<string, TemplateDef> = {
     initialNodes: ATELIER_NODES,
     sections: ATELIER_SECTIONS,
     Component: AtelierComponent,
+  },
+  "halcyon": {
+    id: "halcyon",
+    name: "Halcyon",
+    initialNodes: HALCYON_NODES,
+    sections: HALCYON_SECTIONS,
+    Component: HalcyonComponent,
+    /* Halcyon is a warm-dark editorial template — it opens with its own dark
+       palette + typography rather than the global light defaults. The Design
+       panel can then change any of them. Typography uses fonts already loaded
+       in the editor (Instrument Serif / Geist aren't bundled) that match the
+       warm-editorial character. */
+    defaultPalette: { bg: "#0E0D0B", fg: "#EFEAE0", accent: "#C2410C", muted: "#8A8378" },
+    defaultTypography: {
+      serif: "'Fraunces', Georgia, serif",
+      sans:  "'Inter', system-ui, sans-serif",
+      mono:  "'JetBrains Mono', monospace",
+    },
+    defaultLogo: { ...DEFAULT_LOGO, text: "Halcyon" },
   },
 };
 

@@ -76,6 +76,7 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     category: "Editorial",
     tags: ["Editorial", "Warm", "Italic"],
     href: "/template/halcyon",
+    editorHref: "/editor/halcyon",
     seed: 600,
     new: true,
     fonts: { serif: "Instrument Serif", sans: "Geist", mono: "Geist Mono" },

@@ -372,6 +372,7 @@ function DesignTab() {
 const BRAND_NODES: Record<string, string[]> = {
   "minimal-bw": ["nav-logo"],
   "atelier":    ["atl-nav-brand", "atl-footer-brand"],
+  "halcyon":    ["hl-mark-name", "hl-footer-mark"],
 };
 
 const LOGO_WIDTH_MIN  = 16;
