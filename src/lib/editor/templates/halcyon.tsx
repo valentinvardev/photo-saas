@@ -1,5 +1,6 @@
 import type { EditorNode } from "../types";
 import type { SectionDef } from "./types";
+import { HL_PHOTOS } from "~/lib/halcyon/data";
 
 /* ─── Icons ─── */
 function NavIcon()    { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>; }
@@ -16,10 +17,12 @@ export const HALCYON_NODES: Record<string, EditorNode> = {
   "hl-mark-sub":       { id: "hl-mark-sub",       type: "paragraph", content: "Studio · Lisbon" },
 
   /* Cover */
+  "hl-cover-image":    { id: "hl-cover-image",    type: "image",     src: HL_PHOTOS.arch![0]!.src, alt: "" },
   "hl-cover-title":    { id: "hl-cover-title",    type: "heading",   content: "The light<br/>keeps <em>arriving.</em>" },
 
   /* Selected work */
   "hl-work-label":     { id: "hl-work-label",     type: "paragraph", content: "Selected Work" },
+  "hl-viewall":        { id: "hl-viewall",        type: "paragraph", content: "View all works" },
 
   /* Archive banner */
   "hl-archive-eyebrow": { id: "hl-archive-eyebrow", type: "paragraph", content: "Browse the full archive" },
@@ -29,8 +32,10 @@ export const HALCYON_NODES: Record<string, EditorNode> = {
 
   /* About */
   "hl-about-label":    { id: "hl-about-label",    type: "paragraph", content: "About" },
+  "hl-about-image":    { id: "hl-about-image",    type: "image",     src: HL_PHOTOS.portraits![2]!.src, alt: "Portrait" },
   "hl-about-heading":  { id: "hl-about-heading",  type: "heading",   content: "Pictures to <em>live with,</em><br/>not scroll past." },
   "hl-about-bio":      { id: "hl-about-bio",      type: "paragraph", content: "Lior Avni makes photographs that feel like memory — patient, slightly out of reach. Trained at the Royal Academy of Art, The Hague; working between Lisbon and New York since 2018. Editorial work for The Gentlewoman, Apartamento, Cereal. Private commissions for families, couples, and brands who want pictures to live with, not scroll past." },
+  "hl-about-cta":      { id: "hl-about-cta",      type: "paragraph", content: "Contact" },
 
   /* Contact */
   "hl-contact-eyebrow": { id: "hl-contact-eyebrow", type: "paragraph", content: "Available for 2025 commissions" },
@@ -50,11 +55,13 @@ export const HALCYON_SECTIONS: SectionDef[] = [
     ] },
   { id: "hl-cover", label: "Cover", icon: <HeroIcon />, locked: false,
     elements: [
-      { nodeId: "hl-cover-title", label: "Title", type: "text" },
+      { nodeId: "hl-cover-image", label: "Cover image", type: "image" },
+      { nodeId: "hl-cover-title", label: "Title",       type: "text"  },
     ] },
   { id: "hl-work", label: "Selected Work", icon: <GridIcon />, locked: false,
     elements: [
-      { nodeId: "hl-work-label", label: "Section label", type: "text" },
+      { nodeId: "hl-work-label", label: "Section label",    type: "text" },
+      { nodeId: "hl-viewall",    label: "View-all button",  type: "text" },
     ] },
   { id: "hl-archive", label: "Archive", icon: <StarIcon />, locked: false,
     elements: [
@@ -65,9 +72,11 @@ export const HALCYON_SECTIONS: SectionDef[] = [
     ] },
   { id: "hl-about", label: "About", icon: <UserIcon />, locked: false,
     elements: [
-      { nodeId: "hl-about-label",   label: "Section label", type: "text" },
-      { nodeId: "hl-about-heading", label: "Heading",       type: "text" },
-      { nodeId: "hl-about-bio",     label: "Bio",           type: "text" },
+      { nodeId: "hl-about-label",   label: "Section label", type: "text"  },
+      { nodeId: "hl-about-image",   label: "Portrait",      type: "image" },
+      { nodeId: "hl-about-heading", label: "Heading",       type: "text"  },
+      { nodeId: "hl-about-bio",     label: "Bio",           type: "text"  },
+      { nodeId: "hl-about-cta",     label: "Contact button", type: "text" },
     ] },
   { id: "contact", label: "Contact", icon: <MailIcon />, locked: false,
     elements: [

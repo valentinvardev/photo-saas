@@ -65,7 +65,7 @@ export function EditableNode({
   className?: string;
   tag?: "div" | "h1" | "h2" | "h3" | "p" | "span" | "blockquote" | "header" | "section" | "footer";
 }) {
-  const { selectedId, editingId, selectNode, setEditing, nodes } = useEditorStore();
+  const { selectedId, editingId, selectNode, setEditing, nodes, readOnly } = useEditorStore();
   const node     = nodes[id];
   const selected = selectedId === id;
   const editing  = editingId  === id;
@@ -81,6 +81,13 @@ export function EditableNode({
   if (node?.fontFamily) overrides.fontFamily = node.fontFamily;
 
   const El = Tag as "div";
+
+  // Public site / preview (readOnly): render a plain element with no editor
+  // affordances — no data-editor-node, no select/edit handlers, no cursor.
+  if (readOnly) {
+    return <El className={className} style={{ position: "relative", ...style, ...overrides }}>{children}</El>;
+  }
+
   return (
     <El
       data-editor-node=""
@@ -104,11 +111,12 @@ export function EditableNode({
 }
 
 export function EditableText({ id, style, display = "block" }: { id: string; style?: React.CSSProperties; display?: "block" | "inline" | "inline-block" }) {
-  const { nodes, editingId, updateNode } = useEditorStore();
+  const { nodes, editingId, updateNode, readOnly } = useEditorStore();
   const content = nodes[id]?.content ?? "";
   const editing = editingId === id;
 
-  if (editing) {
+  // Never mount the inline editor on the public site / preview.
+  if (editing && !readOnly) {
     return (
       <TiptapEditor
         id={id}

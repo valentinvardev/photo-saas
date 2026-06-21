@@ -5,28 +5,30 @@
  * FRAME website builder.  See docs/template-adapter-guide.md.
  *
  * Differences from the source template:
- *  1. Colours + fonts are driven by the editor Design panel: the source's
- *     hardcoded HL_TOKENS / HL_FONTS are replaced by the editor CSS variables
- *     (--ed-bg/-fg/-accent/-muted and --tpl-serif/-sans/-mono). Halcyon's dark
- *     palette + typography ship as the template's design defaults (registry).
- *  2. The big <style> block is scoped under `.hl-scope` for its reset so it
- *     can't restyle the editor chrome; the unique hp- / hl- class rules are
- *     left global.
- *  3. Nav changed from `position: sticky` → `position: relative` so it stays
- *     inside the device frame.
- *  4. Key text is wrapped with EditableNode/EditableText; the project index,
- *     drawer, detail, gallery and lightbox stay as preview-only interactions
- *     and only fire on the live site (readOnly).
+ *  1. Colours + fonts are driven by the editor Design panel (--ed-* / --tpl-*);
+ *     Halcyon's dark palette + typography ship as the template's defaults.
+ *  2. Cover + portrait are real EditableImage nodes (not CSS background:url) so
+ *     they can be swapped/cropped from the Design panel.
+ *  3. Photo grids (archive, detail, lightbox, hover preview) read the user's
+ *     uploaded photos (store.galleryPhotos), falling back to demo seeds.
+ *  4. Buttons/links are editable via the Clickable pattern (real button/anchor
+ *     on the live site, plain element in the editor).
+ *  5. The contact section follows the user's choice (store.contact: inbox vs
+ *     WhatsApp) instead of hardcoded tabs.
+ *  6. Drawer / detail / gallery / lightbox render only on the live site
+ *     (readOnly) — they're preview-only and must not overlay the editor.
  */
 
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEditorStore } from "~/lib/editor/store";
+import { api } from "~/trpc/react";
 import type { Viewport } from "~/lib/editor/types";
-import { EditableNode, EditableText, LogoImage } from "./primitives";
-import { HL_PORTFOLIO, HL_PHOTOS, type HlPhoto } from "~/lib/halcyon/data";
+import { EditableNode, EditableText, EditableImage, LogoImage } from "./primitives";
+import { HL_PORTFOLIO, type HlPhoto } from "~/lib/halcyon/data";
 
-type Lightbox = { photos: (HlPhoto & { projectTitle?: string })[]; index: number } | null;
+type GalleryPhoto = HlPhoto & { projectTitle?: string };
+type Lightbox = { photos: GalleryPhoto[]; index: number } | null;
 
 /* Editor-driven design tokens — every colour/font resolves to a Design-panel
    variable, so palette + typography changes apply live. raised/line are derived
@@ -45,7 +47,18 @@ const HL_FONTS = {
   mono:  "var(--tpl-mono), ui-monospace, monospace",
 };
 
-/* Base rules — reset is scoped to .hl-scope so it never touches editor chrome. */
+/* WhatsApp template fill — mirrors Minimal BW's helper. */
+function fillWa(tpl: string, v: { name: string; email: string; message: string }) {
+  const hasVars = /\{(name|email|message)\}/i.test(tpl);
+  let s = (tpl || "").replace(/\{name\}/gi, v.name).replace(/\{email\}/gi, v.email).replace(/\{message\}/gi, v.message);
+  if (!hasVars) {
+    const who = [v.name, v.email].filter(Boolean).join(" · ");
+    s = [s.trim(), who, v.message].filter(Boolean).join("\n\n");
+  }
+  return s.trim() || v.message;
+}
+
+/* Base rules — reset scoped to .hl-scope so it never touches editor chrome. */
 function hlBaseCss() {
   return `
     .hl-scope, .hl-scope *{box-sizing:border-box}
@@ -54,14 +67,11 @@ function hlBaseCss() {
     .hl-serif{font-family:${HL_FONTS.serif};font-weight:400;letter-spacing:-0.01em}
     .hl-italic{font-family:${HL_FONTS.serif};font-style:italic;font-weight:400}
     .hl-mono{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase}
-    .hl-btn{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:14px 18px;border:1px solid ${t.line};background:transparent;color:${t.fg};cursor:pointer;transition:all .25s ease;display:inline-flex;align-items:center;gap:10px}
+    .hl-btn{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:14px 18px;border:1px solid ${t.line};background:transparent;color:${t.fg};cursor:pointer;transition:all .25s ease;display:inline-flex;align-items:center;gap:10px;text-decoration:none}
     .hl-btn:hover{border-color:${t.fg};background:${t.fg};color:${t.bg}}
     .hl-btn-accent{background:${t.accent};border-color:${t.accent};color:${t.fg}}
     .hl-btn-accent:hover{background:${t.fg};color:${t.bg};border-color:${t.fg}}
-    .hl-link{color:${t.muted};text-decoration:none;transition:color .2s ease}
-    .hl-link:hover{color:${t.fg}}
     .hl-eyebrow{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted}}
-    .hl-accent{color:${t.accent}}
   `;
 }
 
@@ -72,8 +82,29 @@ function useGuard() {
   return (fn: () => void) => () => { if (readOnly) fn(); };
 }
 
+/* Clickable — real <button>/<a> on the live site, plain <span> in the editor.
+   Editable text must never sit inside a real <button> (it hijacks Space/Enter
+   and clicking would deselect), so the editor renders a styled span instead. */
+function Clickable({
+  kind = "button", href, className, onActivate, children,
+}: {
+  kind?: "button" | "a";
+  href?: string;
+  className?: string;
+  onActivate?: () => void;
+  children: React.ReactNode;
+}) {
+  const readOnly = useEditorStore((s) => s.readOnly);
+  if (!readOnly) return <span className={className} style={{ cursor: "default" }}>{children}</span>;
+  if (kind === "a") return <a className={className} href={href}>{children}</a>;
+  return <button className={className} onClick={onActivate}>{children}</button>;
+}
+
 export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
-  const { selectNode, logo } = useEditorStore();
+  const selectNode      = useEditorStore((s) => s.selectNode);
+  const logo            = useEditorStore((s) => s.logo);
+  const readOnly        = useEditorStore((s) => s.readOnly);
+  const galleryPhotos   = useEditorStore((s) => s.galleryPhotos);
   const guard = useGuard();
   const data  = HL_PORTFOLIO;
 
@@ -84,24 +115,35 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
   const [hoverIdx,      setHoverIdx]      = useState(-1);
   const [drawerHoverId, setDrawerHoverId] = useState<string | null>(null);
   const [showAllWorks,  setShowAllWorks]  = useState(false);
-  const [contactTab,    setContactTab]    = useState<"letter" | "whatsapp">("letter");
-  const [waMsg,         setWaMsg]         = useState("Hola, me gustaría hablar contigo sobre una sesión. Mi proyecto es ");
 
-  const drawerProject  = drawerHoverId ? data.projects.find((p) => p.id === drawerHoverId) : null;
-  const drawerImageSrc = drawerProject ? drawerProject.photos[0]!.src : data.projects[0]!.cover;
-  const indexProject   = hoverIdx >= 0 ? data.projects[hoverIdx] : null;
-  const indexImageSrc  = indexProject ? indexProject.photos[0]!.src : null;
+  /* The user's uploaded photos drive every grid; demo seeds are the fallback. */
+  const userPhotos: HlPhoto[] = useMemo(
+    () => galleryPhotos.map((p, i) => ({ id: `g${i}`, src: p.src, title: p.title ?? "", date: "" })),
+    [galleryPhotos]
+  );
+  const hasUser = userPhotos.length > 0;
 
   const VISIBLE_WORKS = 3;
   const visibleProjects = showAllWorks ? data.projects : data.projects.slice(0, VISIBLE_WORKS);
   const hiddenCount     = data.projects.length - VISIBLE_WORKS;
 
-  const allPhotos = useMemo(
-    () => data.projects.flatMap((p) => p.photos.map((ph) => ({ ...ph, projectTitle: p.title }))),
-    [data]
-  );
+  /* All photos for the archive modal + lightbox. */
+  const allPhotos: GalleryPhoto[] = useMemo(() => {
+    if (hasUser) return userPhotos.map((ph) => ({ ...ph, projectTitle: "" }));
+    return data.projects.flatMap((p) => p.photos.map((ph) => ({ ...ph, projectTitle: p.title })));
+  }, [hasUser, userPhotos, data]);
+
+  const project       = data.projects.find((p) => p.id === activeProject);
+  const detailPhotos: HlPhoto[] = hasUser ? userPhotos : (project?.photos ?? []);
+
+  const drawerProject  = drawerHoverId ? data.projects.find((p) => p.id === drawerHoverId) : null;
+  const drawerImageSrc = hasUser ? userPhotos[0]!.src : (drawerProject ? drawerProject.photos[0]!.src : data.projects[0]!.cover);
+  const indexImageSrc  = hoverIdx < 0 ? null
+    : hasUser ? userPhotos[hoverIdx % userPhotos.length]!.src
+    : (data.projects[hoverIdx]?.photos[0]?.src ?? null);
 
   useEffect(() => {
+    if (!readOnly) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         if (lightbox)           setLightbox(null);
@@ -116,9 +158,7 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [lightbox, galleryOpen, activeProject, navOpen]);
-
-  const project = data.projects.find((p) => p.id === activeProject);
+  }, [readOnly, lightbox, galleryOpen, activeProject, navOpen]);
 
   const Socials = () => (
     <div className="hp-socials">
@@ -177,10 +217,10 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
         .hp-burger:hover span:first-child{transform:translateX(-3px)}
         .hp-burger:hover span:last-child{transform:translateX(3px)}
 
-        .hp-cover{position:relative;height:720px;overflow:hidden}
-        .hp-cover-img{position:absolute;inset:0;background:url('${data.projects[3]!.cover}') center/cover}
-        .hp-cover-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0.78) 0%,rgba(14,13,11,0.42) 14%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 50%,rgba(14,13,11,0.55) 75%,rgba(14,13,11,0.95) 100%)}
-        .hp-cover-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;gap:48px;flex-wrap:wrap}
+        .hp-cover{position:relative;height:720px;overflow:hidden;background:${t.raised}}
+        .hp-cover-img{position:absolute;inset:0;overflow:hidden}
+        .hp-cover-scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(14,13,11,0.78) 0%,rgba(14,13,11,0.42) 14%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 50%,rgba(14,13,11,0.55) 75%,rgba(14,13,11,0.95) 100%)}
+        .hp-cover-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;gap:48px;flex-wrap:wrap;z-index:2}
         .hp-cover-title{font-family:${HL_FONTS.serif};font-size:140px;line-height:0.92;letter-spacing:-0.04em;font-weight:400;color:#EFEAE0}
         .hp-cover-title em{font-style:italic;font-weight:400}
         @media(max-width:780px){
@@ -237,7 +277,7 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
 
         .hp-about{display:grid;grid-template-columns:320px 1fr;gap:64px;padding:0 32px 96px;align-items:stretch}
         @media(max-width:780px){.hp-about{grid-template-columns:1fr;gap:32px;padding-bottom:64px}.hp-about-portrait{aspect-ratio:1/1 !important;max-width:280px;min-height:0 !important}}
-        .hp-about-portrait{background:url('${HL_PHOTOS.portraits![2]!.src}') center/cover;background-color:${t.raised};width:100%;min-height:480px}
+        .hp-about-portrait{position:relative;overflow:hidden;background-color:${t.raised};width:100%;min-height:480px}
         .hp-about h2{font-family:${HL_FONTS.serif};font-size:72px;line-height:0.95;letter-spacing:-0.03em;margin-bottom:24px;font-weight:400}
         .hp-about h2 em{font-style:italic}
         .hp-about p{font-size:16px;line-height:1.7;color:${t.fg};max-width:520px}
@@ -253,19 +293,9 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
         .hp-contact-form input:focus,.hp-contact-form textarea:focus{border-color:${t.accent}}
         .hp-contact-form textarea{resize:none;min-height:120px}
         .hp-contact-actions{display:flex;justify-content:space-between;align-items:center;margin-top:32px;flex-wrap:wrap;gap:12px}
-        .hp-contact-tabs{display:inline-flex;gap:0;margin:0 auto 32px;border:1px solid ${t.line};border-radius:999px;padding:4px;background:${t.raised}}
-        .hp-contact-tab{background:transparent;border:0;cursor:pointer;padding:10px 22px;border-radius:999px;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted};transition:all .25s ease;display:inline-flex;align-items:center;gap:8px}
-        .hp-contact-tab.on{background:${t.fg};color:${t.bg}}
-        .hp-contact-tab:not(.on):hover{color:${t.fg}}
-        .hp-wa{max-width:520px;margin:0 auto;text-align:left;display:grid;gap:18px}
-        .hp-wa textarea{background:transparent;border:1px solid ${t.line};color:${t.fg};font-family:${HL_FONTS.sans};font-size:14px;line-height:1.6;padding:18px;outline:none;resize:vertical;min-height:160px;transition:border-color .2s ease}
-        .hp-wa textarea:focus{border-color:${t.accent}}
-        .hp-wa-actions{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-        .hp-wa-num{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase}
-        .hp-wa-num b{color:${t.fg};font-weight:400;letter-spacing:0.04em}
-        .hp-wa-send{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;background:#25D366;color:#0E0D0B;border:0;cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:transform .25s ease,filter .25s ease;text-decoration:none}
-        .hp-wa-send:hover{transform:translateY(-2px);filter:brightness(1.05)}
-        .hp-wa-send svg{width:16px;height:16px}
+        .hp-contact-sent{max-width:520px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:14px;color:${t.fg}}
+        .hp-contact-sent .ring{width:44px;height:44px;border-radius:50%;border:1px solid ${t.line};display:flex;align-items:center;justify-content:center}
+        .hp-contact-sent .msg{font-family:${HL_FONTS.serif};font-style:italic;font-size:22px}
 
         .hp-socials{display:inline-flex;gap:10px}
         .hp-socials a{width:38px;height:38px;border-radius:50%;border:1px solid ${t.line};color:${t.muted};display:inline-flex;align-items:center;justify-content:center;transition:color .25s ease,border-color .25s ease,background .25s ease}
@@ -348,7 +378,10 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
 
       {/* ── COVER ── */}
       <section className="hp-cover" id="hl-cover">
-        <div className="hp-cover-img" />
+        <EditableNode id="hl-cover-image" style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+          <EditableImage id="hl-cover-image" imgStyle={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        </EditableNode>
+        <div className="hp-cover-scrim" />
         <div className="hp-cover-meta">
           <EditableNode id="hl-cover-title" tag="h1" className="hp-cover-title">
             <EditableText id="hl-cover-title" />
@@ -393,9 +426,10 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
 
       {hiddenCount > 0 && !showAllWorks && (
         <div className="hp-view-all-row">
-          <button className="hl-btn hl-btn-accent" onClick={guard(() => setShowAllWorks(true))}>
-            View all {data.projects.length} works <span>↓</span>
-          </button>
+          <Clickable className="hl-btn hl-btn-accent" onActivate={() => setShowAllWorks(true)}>
+            <EditableNode id="hl-viewall" tag="span"><EditableText id="hl-viewall" display="inline" /></EditableNode>
+            <span>↓</span>
+          </Clickable>
         </div>
       )}
 
@@ -406,9 +440,10 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
           <EditableNode id="hl-archive-title" tag="h2"><EditableText id="hl-archive-title" /></EditableNode>
           <EditableNode id="hl-archive-sub" tag="p" className="sub"><EditableText id="hl-archive-sub" /></EditableNode>
         </div>
-        {/* Live: real button opens the archive. Editor: plain element so the
-            inline text editor keeps Space/Enter. */}
-        <ArchiveCta onActivate={() => setGalleryOpen(true)} />
+        <Clickable className="cta" onActivate={() => setGalleryOpen(true)}>
+          <EditableNode id="hl-archive-cta" tag="span"><EditableText id="hl-archive-cta" display="inline" /></EditableNode>
+          <span className="ico" aria-hidden>↗</span>
+        </Clickable>
       </section>
 
       {/* ── ABOUT ── */}
@@ -418,12 +453,17 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
         <span>Lior Avni · b. 1989</span>
       </div>
       <section className="hp-about" id="hl-about">
-        <div className="hp-about-portrait" role="img" aria-label="Portrait" />
+        <EditableNode id="hl-about-image" className="hp-about-portrait">
+          <EditableImage id="hl-about-image" imgStyle={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+        </EditableNode>
         <div>
           <EditableNode id="hl-about-heading" tag="h2"><EditableText id="hl-about-heading" /></EditableNode>
           <EditableNode id="hl-about-bio" tag="p"><EditableText id="hl-about-bio" /></EditableNode>
           <div className="hp-about-actions">
-            <a href="#contact" className="hl-btn hl-btn-accent">Contact <span>↓</span></a>
+            <Clickable kind="a" href="#contact" className="hl-btn hl-btn-accent">
+              <EditableNode id="hl-about-cta" tag="span"><EditableText id="hl-about-cta" display="inline" /></EditableNode>
+              <span>↓</span>
+            </Clickable>
             <Socials />
           </div>
         </div>
@@ -436,37 +476,7 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
         </EditableNode>
         <EditableNode id="hl-contact-heading" tag="h2"><EditableText id="hl-contact-heading" /></EditableNode>
         <EditableNode id="hl-contact-tag" tag="p" className="tag"><EditableText id="hl-contact-tag" /></EditableNode>
-
-        <div className="hp-contact-tabs" role="tablist">
-          <button role="tab" aria-selected={contactTab === "letter"}   className={`hp-contact-tab ${contactTab === "letter"   ? "on" : ""}`} onClick={() => setContactTab("letter")}>Letter</button>
-          <button role="tab" aria-selected={contactTab === "whatsapp"} className={`hp-contact-tab ${contactTab === "whatsapp" ? "on" : ""}`} onClick={() => setContactTab("whatsapp")}>WhatsApp</button>
-        </div>
-
-        {contactTab === "letter" && (
-          <form className="hp-contact-form" onSubmit={(e) => e.preventDefault()}>
-            <input placeholder="Your name" />
-            <input placeholder="Email" type="email" />
-            <input placeholder="Project · date · place" />
-            <textarea placeholder="A few sentences about what you have in mind." />
-            <div className="hp-contact-actions">
-              <span className="hl-mono" style={{ color: t.muted }}>or write to studio@halcyon.photo</span>
-              <button type="submit" className="hl-btn hl-btn-accent">Send letter →</button>
-            </div>
-          </form>
-        )}
-
-        {contactTab === "whatsapp" && (
-          <div className="hp-wa">
-            <textarea value={waMsg} onChange={(e) => setWaMsg(e.target.value)} />
-            <div className="hp-wa-actions">
-              <span className="hp-wa-num">WhatsApp · <b>+351 912 000 000</b></span>
-              <a className="hp-wa-send" href={`https://wa.me/351912000000?text=${encodeURIComponent(waMsg)}`} target="_blank" rel="noopener noreferrer">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-18.5A8.5 8.5 0 0 0 4.59 16.32L4 20l3.793-1.057A8.5 8.5 0 1 0 12 3.5z"/></svg>
-                Enviar
-              </a>
-            </div>
-          </div>
-        )}
+        <HlContactForm />
       </section>
 
       {/* ── FOOTER ── */}
@@ -476,113 +486,167 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
         <Socials />
       </footer>
 
-      {/* ── DRAWER (preview interaction) ── */}
-      <div className={`hp-drawer ${navOpen ? "open" : ""}`} onMouseLeave={() => setDrawerHoverId(null)}>
-        <button className="hp-drawer-close" onClick={() => setNavOpen(false)}>Close ✕</button>
-        <div className="col-l">
-          <div className="hl-eyebrow" style={{ marginBottom: 32 }}>My work</div>
-          <ul>
-            {data.projects.map((p) => (
-              <li key={p.id} onMouseEnter={() => setDrawerHoverId(p.id)} onClick={() => { setActiveProject(p.id); setNavOpen(false); }}>
-                <span>{p.title}</span>
-                <span className="n">{p.no} · {p.year}</span>
-              </li>
-            ))}
-            <li onMouseEnter={() => setDrawerHoverId(null)} onClick={() => { setGalleryOpen(true); setNavOpen(false); }}>
-              <span>All photographs</span>
-              <span className="all-icon" aria-hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg></span>
-            </li>
-          </ul>
-        </div>
-        <div className={`col-r ${drawerHoverId ? "has-hover" : ""}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img key={drawerImageSrc} src={drawerImageSrc} alt="" />
-          {drawerProject && (
-            <div className="label"><em>{drawerProject.title}</em><span>1 / {drawerProject.photos.length}</span></div>
-          )}
-        </div>
-      </div>
-
-      {/* ── DETAIL (preview interaction) ── */}
-      <AnimatePresence>
-        {project && (
-          <motion.div key="hp-detail" className="hp-detail"
-            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 32, transition: { duration: 0.3 } }} transition={{ duration: 0.4 }}>
-            <button className="hp-detail-close" onClick={() => setActiveProject(null)} aria-label="Close project"><span>✕</span></button>
-            <div className="hp-detail-hero">
+      {/* ── Preview-only interactions (live site only; never overlay the editor) ── */}
+      {readOnly && (
+        <>
+          {/* DRAWER */}
+          <div className={`hp-drawer ${navOpen ? "open" : ""}`} onMouseLeave={() => setDrawerHoverId(null)}>
+            <button className="hp-drawer-close" onClick={() => setNavOpen(false)}>Close ✕</button>
+            <div className="col-l">
+              <div className="hl-eyebrow" style={{ marginBottom: 32 }}>My work</div>
+              <ul>
+                {data.projects.map((p) => (
+                  <li key={p.id} onMouseEnter={() => setDrawerHoverId(p.id)} onClick={() => { setActiveProject(p.id); setNavOpen(false); }}>
+                    <span>{p.title}</span>
+                    <span className="n">{p.no} · {p.year}</span>
+                  </li>
+                ))}
+                <li onMouseEnter={() => setDrawerHoverId(null)} onClick={() => { setGalleryOpen(true); setNavOpen(false); }}>
+                  <span>All photographs</span>
+                  <span className="all-icon" aria-hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg></span>
+                </li>
+              </ul>
+            </div>
+            <div className={`col-r ${drawerHoverId ? "has-hover" : ""}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={project.cover} alt={project.title} />
-              <div className="hp-detail-meta">
-                <h1 className="hp-detail-title">{project.title.split(" ").map((w, i) => i % 2 ? <em key={i}>{w} </em> : <span key={i}>{w} </span>)}</h1>
-                <div className="hp-detail-info">
-                  <div className="row"><span>No.</span><span>{project.no}</span></div>
-                  <div className="row"><span>Year</span><span>{project.year}</span></div>
-                  <div className="row"><span>Tags</span><span>{project.tags.join(" · ")}</span></div>
-                  <div className="row"><span>Frames</span><span>{project.photos.length}</span></div>
+              <img key={drawerImageSrc} src={drawerImageSrc} alt="" />
+              {drawerProject && (
+                <div className="label"><em>{drawerProject.title}</em><span>1 / {drawerProject.photos.length}</span></div>
+              )}
+            </div>
+          </div>
+
+          {/* DETAIL */}
+          <AnimatePresence>
+            {project && (
+              <motion.div key="hp-detail" className="hp-detail"
+                initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 32, transition: { duration: 0.3 } }} transition={{ duration: 0.4 }}>
+                <button className="hp-detail-close" onClick={() => setActiveProject(null)} aria-label="Close project"><span>✕</span></button>
+                <div className="hp-detail-hero">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={detailPhotos[0]?.src ?? project.cover} alt={project.title} />
+                  <div className="hp-detail-meta">
+                    <h1 className="hp-detail-title">{project.title.split(" ").map((w, i) => i % 2 ? <em key={i}>{w} </em> : <span key={i}>{w} </span>)}</h1>
+                    <div className="hp-detail-info">
+                      <div className="row"><span>No.</span><span>{project.no}</span></div>
+                      <div className="row"><span>Year</span><span>{project.year}</span></div>
+                      <div className="row"><span>Tags</span><span>{project.tags.join(" · ")}</span></div>
+                      <div className="row"><span>Frames</span><span>{detailPhotos.length}</span></div>
+                    </div>
+                  </div>
                 </div>
+                <div className="hp-detail-grid">
+                  {detailPhotos.map((ph, i) => (
+                    <div key={ph.id} className="item" onClick={() => setLightbox({ photos: detailPhotos, index: i })}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={ph.src} alt={ph.title} loading="lazy" />
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* GALLERY */}
+          <AnimatePresence>
+            {galleryOpen && (
+              <motion.div key="hp-gallery" className="hp-gallery"
+                initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 32, transition: { duration: 0.3 } }} transition={{ duration: 0.4 }}>
+                <button className="hp-detail-close" style={{ position: "absolute" }} onClick={() => setGalleryOpen(false)} aria-label="Close gallery"><span>✕</span></button>
+                <div className="hp-gallery-head"><h2>Every <em>photograph,</em><br />in one room.</h2></div>
+                <div className="hp-mason">
+                  {allPhotos.map((ph, i) => (
+                    <div key={ph.id + i} className="cell" onClick={() => setLightbox({ photos: allPhotos, index: i })}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={ph.src} alt={ph.title} />
+                      {(ph.title || ph.projectTitle) && <div className="cap">{[ph.title, ph.projectTitle].filter(Boolean).join(" · ")}</div>}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* LIGHTBOX */}
+          {lightbox && lightbox.photos[lightbox.index] && (
+            <div className="hp-lb" onClick={(e) => { if (e.target === e.currentTarget) setLightbox(null); }}>
+              <button className="hp-lb-x" onClick={() => setLightbox(null)}>Close ✕</button>
+              <button className="hp-lb-arrow l" onClick={() => setLightbox((l) => l && ({ ...l, index: (l.index - 1 + l.photos.length) % l.photos.length }))}>←</button>
+              <button className="hp-lb-arrow r" onClick={() => setLightbox((l) => l && ({ ...l, index: (l.index + 1) % l.photos.length }))}>→</button>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="hp-lb-img" src={lightbox.photos[lightbox.index]!.src} alt="" />
+              <div className="hp-lb-meta">
+                <div className="hp-lb-counter">{String(lightbox.index + 1).padStart(3, "0")} / {String(lightbox.photos.length).padStart(3, "0")}</div>
+                <div className="hp-lb-cap">{lightbox.photos[lightbox.index]!.title}</div>
+                <div className="hp-lb-counter">{lightbox.photos[lightbox.index]!.date}</div>
               </div>
             </div>
-            <div className="hp-detail-grid">
-              {project.photos.map((ph, i) => (
-                <div key={ph.id} className="item" onClick={() => setLightbox({ photos: project.photos, index: i })}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ph.src} alt={ph.title} loading="lazy" />
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── GALLERY (preview interaction) ── */}
-      <AnimatePresence>
-        {galleryOpen && (
-          <motion.div key="hp-gallery" className="hp-gallery"
-            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 32, transition: { duration: 0.3 } }} transition={{ duration: 0.4 }}>
-            <button className="hp-detail-close" style={{ position: "absolute" }} onClick={() => setGalleryOpen(false)} aria-label="Close gallery"><span>✕</span></button>
-            <div className="hp-gallery-head"><h2>Every <em>photograph,</em><br />in one room.</h2></div>
-            <div className="hp-mason">
-              {allPhotos.map((ph, i) => (
-                <div key={ph.id + i} className="cell" onClick={() => setLightbox({ photos: allPhotos, index: i })}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ph.src} alt={ph.title} />
-                  <div className="cap">{ph.title} · {ph.projectTitle}</div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── LIGHTBOX (preview interaction) ── */}
-      {lightbox && lightbox.photos[lightbox.index] && (
-        <div className="hp-lb" onClick={(e) => { if (e.target === e.currentTarget) setLightbox(null); }}>
-          <button className="hp-lb-x" onClick={() => setLightbox(null)}>Close ✕</button>
-          <button className="hp-lb-arrow l" onClick={() => setLightbox((l) => l && ({ ...l, index: (l.index - 1 + l.photos.length) % l.photos.length }))}>←</button>
-          <button className="hp-lb-arrow r" onClick={() => setLightbox((l) => l && ({ ...l, index: (l.index + 1) % l.photos.length }))}>→</button>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="hp-lb-img" src={lightbox.photos[lightbox.index]!.src} alt="" />
-          <div className="hp-lb-meta">
-            <div className="hp-lb-counter">{String(lightbox.index + 1).padStart(3, "0")} / {String(lightbox.photos.length).padStart(3, "0")}</div>
-            <div className="hp-lb-cap">{lightbox.photos[lightbox.index]!.title}</div>
-            <div className="hp-lb-counter">{lightbox.photos[lightbox.index]!.date}</div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   );
 }
 
-/* Archive CTA — button on the live site, plain element in the editor so the
-   nested inline text editor keeps Space/Enter. */
-function ArchiveCta({ onActivate }: { onActivate: () => void }) {
+/* Contact section — follows the owner's choice (store.contact: inbox vs
+   WhatsApp), mirroring Minimal BW. Submits only on the live site (readOnly). */
+function HlContactForm() {
+  const contact  = useEditorStore((s) => s.contact);
+  const siteSlug = useEditorStore((s) => s.siteSlug);
   const readOnly = useEditorStore((s) => s.readOnly);
-  const inner = (
-    <>
-      <EditableNode id="hl-archive-cta" tag="span"><EditableText id="hl-archive-cta" display="inline" /></EditableNode>
-      <span className="ico" aria-hidden>↗</span>
-    </>
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const submit = api.contact.submit.useMutation();
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!readOnly) return; // editing the canvas — don't submit
+    const fd = new FormData(e.currentTarget);
+    const name    = String(fd.get("name") ?? "").trim();
+    const email   = String(fd.get("email") ?? "").trim();
+    const project = String(fd.get("project") ?? "").trim();
+    const body    = String(fd.get("message") ?? "").trim();
+    const message = [project, body].filter(Boolean).join(" — ");
+
+    if (contact.mode === "whatsapp") {
+      const digits = contact.whatsapp.replace(/[^\d]/g, "");
+      const text   = fillWa(contact.waTemplate, { name, email, message });
+      window.open(digits ? `https://wa.me/${digits}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+      setStatus("sent");
+      return;
+    }
+    if (!siteSlug) { setStatus("sent"); return; } // preview/editor: no real submit
+    try {
+      setStatus("sending");
+      await submit.mutateAsync({ slug: siteSlug, name: name || "—", email: email || "hello@example.com", message: message || "—" });
+      setStatus("sent");
+    } catch { setStatus("error"); }
+  }
+
+  if (status === "sent") {
+    return (
+      <div className="hp-contact-sent">
+        <div className="ring">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div className="msg">{contact.mode === "whatsapp" ? "Opening WhatsApp…" : "Message sent — thank you."}</div>
+      </div>
+    );
+  }
+
+  return (
+    <form className="hp-contact-form" onSubmit={onSubmit}>
+      <input name="name" placeholder="Your name" />
+      <input name="email" type="email" placeholder="Email" />
+      <input name="project" placeholder="Project · date · place" />
+      <textarea name="message" placeholder="A few sentences about what you have in mind." />
+      <div className="hp-contact-actions">
+        <span className="hl-mono" style={{ color: t.muted }}>
+          {contact.mode === "whatsapp" ? "Sends straight to WhatsApp" : "or write to studio@halcyon.photo"}
+        </span>
+        <button type="submit" className="hl-btn hl-btn-accent" disabled={status === "sending"}>
+          {contact.mode === "whatsapp" ? "Send via WhatsApp →" : status === "sending" ? "Sending…" : "Send letter →"}
+        </button>
+      </div>
+    </form>
   );
-  if (readOnly) return <button className="cta" onClick={onActivate}>{inner}</button>;
-  return <div className="cta" style={{ cursor: "default" }}>{inner}</div>;
 }
