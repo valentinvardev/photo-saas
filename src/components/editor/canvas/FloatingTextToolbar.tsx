@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { HexColorPicker, HexColorInput } from "react-colorful";
 import { useEditorStore } from "~/lib/editor/store";
 import type { EditorNode } from "~/lib/editor/types";
 import { FontPickerModal } from "./FontPickerModal";
@@ -83,9 +84,11 @@ export function FloatingTextToolbar() {
   const isText = !!node && (node.type === "heading" || node.type === "paragraph" || node.type === "logo");
 
   const barRef = useRef<HTMLDivElement>(null);
-  const colorRef = useRef<HTMLInputElement>(null);
+  const colorBtnRef = useRef<HTMLButtonElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [fontModalOpen, setFontModalOpen] = useState(false);
+  const [colorOpen, setColorOpen] = useState(false);
+  const [colorPos, setColorPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
   // Re-measure the selected element's position whenever it (or anything that
   // changes its box) updates, and on scroll/resize. The canvas frame isn't
@@ -215,24 +218,26 @@ export function FloatingTextToolbar() {
 
       <Divider />
 
-      {/* Text color — click opens the native picker; right-click resets */}
+      {/* Text color — opens the picker popover; right-click resets to default */}
       <button
-        onClick={() => colorRef.current?.click()}
+        ref={colorBtnRef}
+        onClick={() => {
+          const r = colorBtnRef.current?.getBoundingClientRect();
+          if (r) {
+            const top  = r.bottom + 260 > window.innerHeight ? Math.max(8, r.top - 260) : r.bottom + 8;
+            const left = Math.min(Math.max(8, r.left), window.innerWidth - 228);
+            setColorPos({ top, left });
+          }
+          setColorOpen((o) => !o);
+        }}
         onContextMenu={(e) => { e.preventDefault(); update({ color: undefined }); }}
         title={t("editor.toolbar.textColor")}
-        style={{ ...iconBtn(false), position: "relative" }}
+        style={{ ...iconBtn(colorOpen), position: "relative" }}
       >
         <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, lineHeight: 1 }}>
-          <span style={{ fontSize: 12, fontWeight: 800, color: "var(--ec-label)" }}>A</span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: colorOpen ? "#111" : "var(--ec-label)" }}>A</span>
           <span style={{ width: 14, height: 3, borderRadius: 1, background: color || "var(--ec-sub)" }} />
         </span>
-        <input
-          ref={colorRef}
-          type="color"
-          value={color || "#000000"}
-          onChange={(e) => update({ color: e.target.value })}
-          style={{ position: "absolute", left: 4, bottom: 0, width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
-        />
       </button>
 
       <Divider />
@@ -263,6 +268,41 @@ export function FloatingTextToolbar() {
       </button>
     </div>,
     document.body,
+    )}
+
+    {/* Colour picker popover — portalled so the panel/canvas overflow can't clip
+        it, and works on touch (the native <input type=color> didn't). */}
+    {colorOpen && createPortal(
+      <>
+        <div style={{ position: "fixed", inset: 0, zIndex: 1001 }} onPointerDown={() => setColorOpen(false)} />
+        <div
+          onPointerDown={(e) => e.stopPropagation()}
+          style={{
+            position: "fixed", top: colorPos.top, left: colorPos.left, zIndex: 1002,
+            width: 220, background: "var(--ec-raised)", border: "1px solid #333",
+            borderRadius: 6, padding: 12, display: "flex", flexDirection: "column", gap: 8,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+          }}
+        >
+          <HexColorPicker color={color || "#000000"} onChange={(c) => update({ color: c })} style={{ width: "100%" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ color: "var(--ec-sub)", fontSize: 11 }}>#</span>
+            <HexColorInput
+              color={color || "#000000"}
+              onChange={(c) => update({ color: c })}
+              style={{ background: "var(--ec-bg)", border: "1px solid #333", color: "var(--ec-bright)", fontSize: 12, padding: "4px 6px", flex: 1, borderRadius: 3, outline: "none", fontFamily: "monospace" }}
+            />
+            <button
+              onClick={() => { update({ color: undefined }); setColorOpen(false); }}
+              title={t("editor.toolbar.resetColor")}
+              style={{ background: "var(--ec-bg)", border: "1px solid #333", color: "var(--ec-sub)", fontSize: 11, padding: "4px 8px", borderRadius: 3, cursor: "pointer", flexShrink: 0, fontFamily: "inherit" }}
+            >
+              {t("editor.toolbar.resetColor")}
+            </button>
+          </div>
+        </div>
+      </>,
+      document.body,
     )}
 
     {fontModalOpen && (

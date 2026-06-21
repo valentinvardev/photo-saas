@@ -111,7 +111,10 @@ export function EditableNode({
         // A click inside a node that's already being edited (caret placement, or
         // Space/Enter relayed by a host control) must not deselect it.
         if (editing) return;
-        selectNode(id);
+        // Tap to select, tap again to edit — touch-friendly (dblclick is
+        // unreliable on phones). Images select only; they have no inline editor.
+        if (selected && isTextNode) setEditing(id);
+        else selectNode(id);
       }}
       onDoubleClick={(e) => { e.stopPropagation(); selectNode(id); setEditing(id); }}
       style={{ position: "relative", ...style, ...overrides }}
