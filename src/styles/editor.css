@@ -71,6 +71,22 @@
 .tiptap-inline p {
   margin: 0;
 }
+/* A template's descendant selectors (e.g. `.hp-about p { font-size: 16px }`)
+   would otherwise match the <p> Tiptap wraps content in and shrink a heading
+   while it's edited. `div.tiptap-inline p` (0,1,2) outranks a `.scope p` (0,1,1),
+   so the edited text keeps the surrounding size/weight/style. Inline font-family
+   from the typography picker still wins (inline specificity), so per-word fonts
+   are preserved. */
+div.tiptap-inline p,
+div.tiptap-inline h1,
+div.tiptap-inline h2,
+div.tiptap-inline h3 {
+  font: inherit;
+  margin: 0;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
 /* Inherit surrounding styles (font, size, color, etc.) */
 .tiptap-inline * {
   font: inherit;

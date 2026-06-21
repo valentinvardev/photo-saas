@@ -465,3 +465,28 @@ appears in the Pages tree.
 - [ ] Template injects no un-scoped global CSS; editor panels still open
 - [ ] Responsive driven by the `viewport` prop, not media queries
 - [ ] Preview tab shows zero editor affordances; actions work
+
+### 9. Don't let template element selectors hit Tiptap's `<p>`
+
+Tiptap wraps inline content in a `<p>` while editing. A template selector like
+`.section p { font-size: 16px }` (a body-copy rule) will match that `<p>` and
+shrink a heading's text mid-edit — and the `<p>` also persists in saved content,
+shrinking the static heading too. Two guards, both already in place for the
+shared primitives:
+- `EditableText` unwraps a single `<p>` before saving (no `<p>` in stored HTML).
+- `editor.css` raises the inherit rule to `div.tiptap-inline p` (specificity
+  0,1,2) so it outranks a `.scope p` (0,1,1) during editing.
+Avoid authoring template text styles as broad element selectors when possible.
+
+### 10. Editing must work by tap, not just double-click
+
+`dblclick` is unreliable on touch. The shared `EditableNode` enters edit mode on
+a **second click of an already-selected text node** (tap to select, tap to edit),
+not only on double-click — keep that path when adapting.
+
+### 11. Floating popovers (e.g. colour picker) must escape panel overflow
+
+The Design panel scrolls/clips, so an absolutely-positioned popover inside it is
+unreachable on the phone editor. Render popovers in a `createPortal` to
+`document.body` with `position: fixed`, positioned from the trigger's rect and
+clamped to the viewport (see `ColorSwatch`).

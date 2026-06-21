@@ -226,7 +226,6 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
         .hp-mark{display:inline-flex;flex-direction:column;align-items:center;gap:2px;color:${t.fg};line-height:1;justify-self:center}
         .hp-mark .wm{font-family:${HL_FONTS.serif};font-size:26px;letter-spacing:-0.02em;font-weight:400;display:flex;align-items:center;gap:8px}
         .hp-mark .wm em{font-style:italic;font-weight:400}
-        .hp-mark .wm .glyph{width:6px;height:6px;border-radius:50%;border:1px solid ${t.fg};display:inline-block}
         .hp-mark .sub{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.32em;text-transform:uppercase;opacity:0.85;margin-top:4px}
         .hp-burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:transparent;border:0;padding:8px;justify-self:end}
         .hp-burger span{display:block;width:22px;height:1px;background:${t.fg};transition:transform .3s ease}
@@ -393,7 +392,7 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
       <div className="hp-nav" id="section-nav">
         <span aria-hidden />
         <div className="hp-mark">
-          <div className="wm"><span className="glyph" aria-hidden /><Brand nodeId="hl-mark-name" /></div>
+          <div className="wm"><Brand nodeId="hl-mark-name" /></div>
           <EditableNode id="hl-mark-sub" tag="div" className="sub"><EditableText id="hl-mark-sub" display="inline" /></EditableNode>
         </div>
         <button className="hp-burger" onClick={guard(() => setNavOpen(true))} aria-label="Open menu">

@@ -9,6 +9,16 @@ import { useEditorStore } from "~/lib/editor/store";
 import { TiptapEditor } from "~/components/editor/toolbars/TiptapEditor";
 import type { ImageCrop } from "~/lib/editor/types";
 
+/* Tiptap wraps loose inline content in a <p>; templates author content as inline
+   HTML (e.g. "James<br/><em>Hollis</em>"), and a stray <p> both adds block
+   margins and lets template selectors like `.hp-about p { font-size:16px }` match
+   it — shrinking a heading. Unwrap a single paragraph back to inline; leave true
+   multi-paragraph content alone. */
+function unwrapParagraph(html: string): string {
+  const inner = /^<p>([\s\S]*?)<\/p>$/i.exec(html)?.[1];
+  return inner !== undefined && !/<p[\s>]/i.test(inner) ? inner : html;
+}
+
 /**
  * Renders a logo image, optionally cropped via Settings > Logo > Crop.
  * Uses logo.width as the displayed width; height auto-derives from the
@@ -69,6 +79,7 @@ export function EditableNode({
   const node     = nodes[id];
   const selected = selectedId === id;
   const editing  = editingId  === id;
+  const isTextNode = node?.type === "heading" || node?.type === "paragraph" || node?.type === "logo";
 
   if (node?.hidden) return null;
 
@@ -121,7 +132,7 @@ export function EditableText({ id, style, display = "block" }: { id: string; sty
       <TiptapEditor
         id={id}
         content={content}
-        onUpdate={(html) => updateNode(id, { content: html })}
+        onUpdate={(html) => updateNode(id, { content: unwrapParagraph(html) })}
         style={style}
       />
     );
