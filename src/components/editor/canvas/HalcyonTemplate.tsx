@@ -105,8 +105,14 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
   const logo            = useEditorStore((s) => s.logo);
   const readOnly        = useEditorStore((s) => s.readOnly);
   const galleryPhotos   = useEditorStore((s) => s.galleryPhotos);
+  const grid            = useEditorStore((s) => s.grid);
   const guard = useGuard();
   const data  = HL_PORTFOLIO;
+
+  /* Responsive flags from the editor viewport toggle (the photo grids need them;
+     the rest of the template still uses CSS media queries). */
+  const isMobile = viewport === "mobile";
+  const isTablet = viewport === "tablet";
 
   const [navOpen,       setNavOpen]       = useState(false);
   const [activeProject, setActiveProject] = useState<string | null>(null);
@@ -135,6 +141,16 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
 
   const project       = data.projects.find((p) => p.id === activeProject);
   const detailPhotos: HlPhoto[] = hasUser ? userPhotos : (project?.photos ?? []);
+
+  /* Photo-grid layouts (mosaic/uniform/masonry) — shared semantics with Minimal
+     BW, driven by the Design > Grid panel. "index" keeps Halcyon's list. */
+  const cols     = isMobile ? Math.min(grid.columns, 2) : isTablet ? Math.min(grid.columns, 3) : grid.columns;
+  const featured = allPhotos.slice(0, 8);
+  const [visibleCount, setVisibleCount] = useState(grid.pageSize);
+  useEffect(() => { setVisibleCount(grid.pageSize); }, [grid.pageSize, grid.loadMore, grid.layout, allPhotos.length]);
+  const pagedWorks  = grid.loadMore ? allPhotos.slice(0, visibleCount) : featured;
+  const canLoadMore = grid.loadMore && visibleCount < allPhotos.length;
+  const openLightbox = (photos: GalleryPhoto[], index: number) => { if (readOnly) setLightbox({ photos, index }); };
 
   const drawerProject  = drawerHoverId ? data.projects.find((p) => p.id === drawerHoverId) : null;
   const drawerImageSrc = hasUser ? userPhotos[0]!.src : (drawerProject ? drawerProject.photos[0]!.src : data.projects[0]!.cover);
@@ -261,6 +277,15 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
         .hp-thumb-float img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
         .hp-view-all-row{display:flex;justify-content:center;padding:32px 32px 0}
+
+        .hp-work{padding:0 32px}
+        @media(max-width:780px){.hp-work{padding:0 20px}}
+        .hp-cell{position:relative;overflow:hidden;cursor:pointer;background:${t.raised}}
+        .hp-cell>img{position:absolute;inset:0;width:100%;height:100%;display:block;transition:transform .6s cubic-bezier(0.22,1,0.36,1),filter .5s ease}
+        .hp-cell:hover>img{transform:scale(1.04);filter:brightness(0.82)}
+        .hp-mason-cell{position:relative;overflow:hidden;cursor:pointer;background:${t.raised};break-inside:avoid}
+        .hp-mason-cell>img{width:100%;height:auto;display:block;transition:transform .6s cubic-bezier(0.22,1,0.36,1),filter .5s ease}
+        .hp-mason-cell:hover>img{transform:scale(1.04);filter:brightness(0.82)}
 
         .hp-allphotos{margin:96px 32px 0;padding:80px 64px;background:${t.accent};color:${t.fg};position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:48px;align-items:end}
         .hp-allphotos::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 120% at 100% 0%,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0) 55%);pointer-events:none}
@@ -394,42 +419,76 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
       </section>
 
       {/* ── SELECTED WORK ── */}
-      <div className="hp-section-label hl-mono">
+      <div className="hp-section-label hl-mono" id="hl-work">
         <EditableNode id="hl-work-label" tag="span"><EditableText id="hl-work-label" display="inline" /></EditableNode>
         <hr />
         <span>{String(data.projects.length).padStart(2, "0")} Projects</span>
       </div>
-      <div
-        className="hp-index"
-        id="hl-work"
-        onMouseLeave={() => setHoverIdx(-1)}
-        onMouseMove={(e) => {
-          const r = e.currentTarget.getBoundingClientRect();
-          const el = document.getElementById("hp-thumb-float");
-          if (el) { el.style.left = `${e.clientX - r.left + 24}px`; el.style.top = `${e.clientY - r.top - 150}px`; }
-        }}
-      >
-        <div id="hp-thumb-float" className={`hp-thumb-float ${hoverIdx >= 0 ? "show" : ""}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          {indexImageSrc && <img key={indexImageSrc} src={indexImageSrc} alt="" />}
-        </div>
-        {visibleProjects.map((p, i) => (
-          <div key={p.id} className="hp-index-row" onMouseEnter={() => setHoverIdx(i)} onClick={guard(() => setActiveProject(p.id))}>
-            <span className="no">{p.no}</span>
-            <span className="ti">{p.title}</span>
-            <span className="ta">{p.tags.join(" · ")}</span>
-            <span className="yr">{p.year}</span>
-            <span className="ar">→</span>
-          </div>
-        ))}
-      </div>
 
-      {hiddenCount > 0 && !showAllWorks && (
-        <div className="hp-view-all-row">
-          <Clickable className="hl-btn hl-btn-accent" onActivate={() => setShowAllWorks(true)}>
-            <EditableNode id="hl-viewall" tag="span"><EditableText id="hl-viewall" display="inline" /></EditableNode>
-            <span>↓</span>
-          </Clickable>
+      {grid.layout === "index" ? (
+        <>
+          {/* Halcyon's signature: a typographic project list with hover preview. */}
+          <div
+            className="hp-index"
+            onMouseLeave={() => setHoverIdx(-1)}
+            onMouseMove={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              const el = document.getElementById("hp-thumb-float");
+              if (el) { el.style.left = `${e.clientX - r.left + 24}px`; el.style.top = `${e.clientY - r.top - 150}px`; }
+            }}
+          >
+            <div id="hp-thumb-float" className={`hp-thumb-float ${hoverIdx >= 0 ? "show" : ""}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {indexImageSrc && <img key={indexImageSrc} src={indexImageSrc} alt="" />}
+            </div>
+            {visibleProjects.map((p, i) => (
+              <div key={p.id} className="hp-index-row" onMouseEnter={() => setHoverIdx(i)} onClick={guard(() => setActiveProject(p.id))}>
+                <span className="no">{p.no}</span>
+                <span className="ti">{p.title}</span>
+                <span className="ta">{p.tags.join(" · ")}</span>
+                <span className="yr">{p.year}</span>
+                <span className="ar">→</span>
+              </div>
+            ))}
+          </div>
+          {hiddenCount > 0 && !showAllWorks && (
+            <div className="hp-view-all-row">
+              <Clickable className="hl-btn hl-btn-accent" onActivate={() => setShowAllWorks(true)}>
+                <EditableNode id="hl-viewall" tag="span"><EditableText id="hl-viewall" display="inline" /></EditableNode>
+                <span>↓</span>
+              </Clickable>
+            </div>
+          )}
+        </>
+      ) : (
+        /* Photo grids — shared layouts with Minimal BW, on the user's photos. */
+        <div className="hp-work">
+          {grid.layout === "masonry" ? (
+            <div style={{ columnCount: cols, columnGap: grid.gap }}>
+              {pagedWorks.map((w, i) => (
+                <div key={w.id + i} className="hp-mason-cell" style={{ marginBottom: grid.gap }} onClick={() => openLightbox(pagedWorks, i)}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={w.src} alt={w.title} />
+                </div>
+              ))}
+            </div>
+          ) : grid.layout === "mosaic" ? (
+            <MosaicGrid works={featured} gap={grid.gap} fit={grid.fit} isMobile={isMobile} isTablet={isTablet} onOpen={(i) => openLightbox(featured, i)} />
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: grid.gap }}>
+              {pagedWorks.map((w, i) => (
+                <div key={w.id + i} className="hp-cell" style={{ aspectRatio: isMobile ? "1 / 1" : "4 / 5" }} onClick={() => openLightbox(pagedWorks, i)}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={w.src} alt={w.title} style={{ objectFit: grid.fit }} />
+                </div>
+              ))}
+            </div>
+          )}
+          {canLoadMore && (
+            <div className="hp-view-all-row">
+              <button className="hl-btn" onClick={() => setVisibleCount((c) => c + grid.pageSize)}>Load more <span>↓</span></button>
+            </div>
+          )}
         </div>
       )}
 
@@ -648,5 +707,55 @@ function HlContactForm() {
         </button>
       </div>
     </form>
+  );
+}
+
+/* Mosaic — editorial mixed-size grid, mirroring Minimal BW's "mosaic" layout. */
+function MosaicGrid({ works, gap, fit, isMobile, isTablet, onOpen }: {
+  works: GalleryPhoto[];
+  gap: number;
+  fit: "cover" | "contain";
+  isMobile: boolean;
+  isTablet: boolean;
+  onOpen: (i: number) => void;
+}) {
+  const cell = (key: React.Key, i: number, style?: React.CSSProperties) => {
+    const w = works[i];
+    if (!w) return null;
+    return (
+      <div key={key} className="hp-cell" style={style} onClick={() => onOpen(i)}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={w.src} alt={w.title} style={{ objectFit: fit }} />
+      </div>
+    );
+  };
+
+  if (isMobile) {
+    return (
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap }}>
+        {works.map((_, i) => cell(i, i, { aspectRatio: "1 / 1" }))}
+      </div>
+    );
+  }
+  if (isTablet || works.length < 8) {
+    return (
+      <div style={{ display: "grid", gridTemplateColumns: isTablet ? "1fr 1fr" : "1fr 1fr 1fr", gap }}>
+        {works.map((_, i) => cell(i, i, { aspectRatio: "4 / 5" }))}
+      </div>
+    );
+  }
+  // Desktop editorial layout (≥ 8 photos).
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "280px 280px 360px 320px", gap }}>
+      {cell("a", 0, { gridRow: "1 / 3", gridColumn: "1" })}
+      {cell("b", 1, { gridRow: "1", gridColumn: "2" })}
+      {cell("c", 2, { gridRow: "1", gridColumn: "3" })}
+      {cell("d", 3, { gridRow: "2", gridColumn: "2" })}
+      {cell("e", 4, { gridRow: "2", gridColumn: "3" })}
+      {cell("f", 5, { gridRow: "3", gridColumn: "1 / 3" })}
+      {cell("g", 6, { gridRow: "3", gridColumn: "3" })}
+      {cell("h", 7, { gridRow: "4", gridColumn: "1" })}
+      {cell("i", 0, { gridRow: "4", gridColumn: "2 / 4" })}
+    </div>
   );
 }

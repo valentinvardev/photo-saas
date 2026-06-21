@@ -1,7 +1,11 @@
 "use client";
 
 import { useEditorStore } from "~/lib/editor/store";
+import { TEMPLATES } from "~/lib/editor/templates/registry";
+import type { GridSettings } from "~/lib/editor/types";
 import { useT } from "~/components/providers/LangProvider";
+
+type GridLayout = GridSettings["layout"];
 
 /* ─────────────────────────────────────────────────────────────────
    Gallery grid — layout, columns, spacing and "load more". Drives the
@@ -90,16 +94,26 @@ function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange:
 }
 
 export function GridPanel() {
-  const { grid, setGrid } = useEditorStore();
+  const { grid, setGrid, templateId } = useEditorStore();
   const { t } = useT();
-  const usesColumns = grid.layout !== "mosaic";   // uniform + masonry
-  const fixedCells  = grid.layout !== "masonry";  // mosaic + uniform
-  const canPaginate = grid.layout !== "mosaic";   // uniform + masonry
+  // Photo-grid controls only apply to the photo layouts, never to "index".
+  const usesColumns = grid.layout === "uniform" || grid.layout === "masonry";
+  const fixedCells  = grid.layout === "mosaic"  || grid.layout === "uniform";
+  const canPaginate = grid.layout === "uniform" || grid.layout === "masonry";
   const layoutDesc: Record<string, string> = {
     mosaic:  t("editor.grid.descMosaic"),
     uniform: t("editor.grid.descUniform"),
     masonry: t("editor.grid.descMasonry"),
+    index:   t("editor.grid.descIndex"),
   };
+  const labelFor: Record<string, string> = {
+    mosaic:  t("editor.grid.mosaic"),
+    uniform: t("editor.grid.uniform"),
+    masonry: t("editor.grid.masonry"),
+    index:   t("editor.grid.index"),
+  };
+  // Layouts this template offers (Halcyon adds "index"); default to photo grids.
+  const available = TEMPLATES[templateId]?.layouts ?? ["mosaic", "uniform", "masonry"];
 
   return (
     <div style={{ padding: "14px 14px 4px", display: "flex", flexDirection: "column", gap: 20 }}>
@@ -108,12 +122,8 @@ export function GridPanel() {
         <label style={labelStyle}>{t("editor.grid.layout")}</label>
         <Segmented
           value={grid.layout}
-          onChange={(v) => setGrid({ layout: v as "mosaic" | "uniform" | "masonry" })}
-          options={[
-            { value: "mosaic",  label: t("editor.grid.mosaic") },
-            { value: "uniform", label: t("editor.grid.uniform") },
-            { value: "masonry", label: t("editor.grid.masonry") },
-          ]}
+          onChange={(v) => setGrid({ layout: v as GridLayout })}
+          options={available.map((v) => ({ value: v, label: labelFor[v] ?? v }))}
         />
         <p style={{ margin: "8px 0 0", fontSize: 10.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
           {layoutDesc[grid.layout]}

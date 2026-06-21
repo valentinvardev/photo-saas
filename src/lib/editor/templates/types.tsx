@@ -1,4 +1,4 @@
-import type { EditorNode, Viewport, ColorPalette, Typography, ButtonStyle, LogoSettings } from "../types";
+import type { EditorNode, Viewport, ColorPalette, Typography, ButtonStyle, LogoSettings, GridSettings } from "../types";
 
 export interface SectionElement {
   nodeId: string;
@@ -27,4 +27,8 @@ export interface TemplateDef {
   defaultTypography?: Typography;
   defaultButtons?:    ButtonStyle;
   defaultLogo?:       LogoSettings;
+  defaultGrid?:       GridSettings;
+  /* Gallery layouts this template's "work" section supports, in the order shown
+     in the Design > Grid panel. Defaults to the photo grids when omitted. */
+  layouts?:           GridSettings["layout"][];
 }

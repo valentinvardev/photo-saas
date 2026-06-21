@@ -4,7 +4,7 @@ import type { TemplateDef } from "./types";
 import { MINIMAL_BW_NODES, MINIMAL_BW_SECTIONS } from "./minimal-bw";
 import { ATELIER_NODES, ATELIER_SECTIONS } from "./atelier";
 import { HALCYON_NODES, HALCYON_SECTIONS } from "./halcyon";
-import { DEFAULT_LOGO } from "../types";
+import { DEFAULT_LOGO, DEFAULT_GRID } from "../types";
 
 /* Lazy-loaded canvas components — kept out of the registry's import graph
    so the editor only loads the template it actually renders. */
@@ -52,6 +52,10 @@ export const TEMPLATES: Record<string, TemplateDef> = {
       mono:  "'Geist Mono', monospace",
     },
     defaultLogo: { ...DEFAULT_LOGO, text: "Halcyon" },
+    /* Halcyon's signature is the typographic project index; it also supports the
+       shared photo grids so the work section is consistent with Minimal BW. */
+    defaultGrid: { ...DEFAULT_GRID, layout: "index" },
+    layouts: ["index", "mosaic", "uniform", "masonry"],
   },
 };
 
