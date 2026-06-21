@@ -363,3 +363,105 @@ All injected on `.canvas-frame` by `EditorShell`'s `<style>` tag. Override hardc
 | Nav links | Functional; edit in code |
 | Form fields | Functional |
 | Decorative lines / dividers | Not user-content |
+
+---
+
+## Pitfalls & required behaviours — lessons from Halcyon
+
+The first Halcyon pass shipped with real gaps. Treat the items below as **hard
+requirements** for every future adaptation (and as the fix list for Halcyon
+itself — see `docs/halcyon-followups.md`). Minimal BW is the reference: when in
+doubt, do what it does.
+
+### 1. The shared primitives MUST respect `readOnly` (infra gap)
+
+`src/components/editor/canvas/primitives.tsx` (`EditableNode` / `EditableText`,
+used by Atelier + Halcyon) currently **always** emit editor affordances:
+`data-editor-node`, click-to-select, double-click-to-edit. On the public site
+and the **preview tab** (`readOnly === true`) this makes the page behave like the
+builder — clicking text opens the Tiptap editor on a live page.
+
+Minimal BW's *inline* `EditableNode`/`EditableText` short-circuit to a plain
+element when `readOnly`. The shared primitives must do the same:
+
+```tsx
+// EditableNode
+const readOnly = useEditorStore((s) => s.readOnly);
+if (readOnly) return <El className={className} style={{ ...style, ...overrides }}>{children}</El>;
+
+// EditableText — never mount Tiptap when readOnly
+if (editing && !readOnly) return <TiptapEditor … />;
+```
+
+⚠️ This fix also corrects Atelier's published/preview output, not just Halcyon.
+
+### 2. Editable images must be real `<img>` (EditableImage), never CSS `background:url()`
+
+Cover heroes and portraits authored as `background:url('…')` inside a `<style>`
+block (Halcyon's `.hp-cover-img`, `.hp-about-portrait`) **cannot be edited** —
+they're not nodes. Render them as `EditableImage` (an absolutely-positioned
+`<img>` with `object-fit:cover`) so they appear in the Pages tree and the image
+inspector and can be swapped/cropped. Register an `image` node for each.
+
+### 3. Galleries must read the user's photos (`galleryPhotos`), not demo arrays
+
+Halcyon renders every grid from its bundled demo data (`HL_PHOTOS` /
+`HL_PORTFOLIO`), so the "all photos" modal shows placeholders even after the user
+uploads. Source photo grids from the store like Minimal BW's `useWorks()`:
+
+```tsx
+const galleryPhotos = useEditorStore((s) => s.galleryPhotos);
+const works = galleryPhotos.length ? galleryPhotos.map(…) : DEMO; // demo only as fallback
+```
+
+### 4. Wrap ALL user-facing buttons/links, using the `Activatable` pattern
+
+Be exhaustive: nav links, CTAs, "view all", section labels, the contact button,
+footer links — every label a designer would change. Use the **Activatable
+pattern** (Minimal BW): render a real `<button>` only on the live site
+(`readOnly`); in the editor render a plain styled element. Editable text inside a
+real `<button>` is the cause of the Space-cancels-editing bug.
+
+### 5. Contact section must consume `ContactSettings` from the store
+
+`store.contact` is `{ mode: "inbox" | "whatsapp", whatsapp, waTemplate }`. The
+contact section must honour the user's choice instead of hardcoding tabs/numbers:
+
+- `mode === "inbox"`  → render the form that posts to the in-app inbox.
+- `mode === "whatsapp"` → render the WhatsApp CTA built from `contact.whatsapp`
+  and `contact.waTemplate` (placeholders `{name} {email} {message}`).
+
+Wire the choice into Settings (`setContact`) the same way Minimal BW does.
+
+### 6. Don't inject global/un-scoped `<style>` from the template
+
+A template that ships a big class-based `<style>` block leaks rules into the
+editor chrome and is a prime suspect for **"the sidebar/editor panels don't
+open"**. Either scope every selector under the template root (`.hl-scope …`) —
+not just the reset — or convert to inline styles like Minimal BW / Atelier.
+Always reproduce the editor with the new template open and confirm the Pages /
+Design / Settings panels still work.
+
+### 7. Drive responsive layout from the `viewport` prop, not CSS media queries
+
+CSS media queries respond to the real window, not the editor's device frame, so
+the viewport toggle won't switch the layout. Derive `isMobile/isTablet/isDesktop`
+from the `viewport` prop and branch with inline styles (see Minimal BW).
+
+### 8. Verify preview/published parity before shipping
+
+Open the **preview tab** and confirm: no selection outlines, default cursor,
+clicking text does *not* open an editor, and links/CTAs perform their real
+action. Open the **editor** and confirm the sidebar panels open and every node
+appears in the Pages tree.
+
+### Updated pre-ship checklist (in addition to the one above)
+
+- [ ] Shared primitives gate on `readOnly` (no affordances on public/preview)
+- [ ] Every hero/portrait image is an `EditableImage` node (no CSS `background:url`)
+- [ ] Photo grids read `galleryPhotos`, demo data only as fallback
+- [ ] Every user-facing button/link is editable via the `Activatable` pattern
+- [ ] Contact section reads `store.contact` (inbox vs WhatsApp)
+- [ ] Template injects no un-scoped global CSS; editor panels still open
+- [ ] Responsive driven by the `viewport` prop, not media queries
+- [ ] Preview tab shows zero editor affordances; actions work
