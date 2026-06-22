@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useMotionValue, animate, AnimatePresence, useAnimationFrame, type Variants } from "framer-motion";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ─── tokens ─────────────────────────────────────────────────────────── */
 const RED   = "#E8382C";
@@ -32,6 +33,96 @@ const PROJECTS = [
 
 type Project = typeof PROJECTS[number];
 
+/* ─── i18n demo data ─────────────────────────────────────────────────── */
+const DEMO_EN = {
+  // sidebar
+  tagline: "PHOTOGRAPHY · BROOKLYN",
+  // whatsapp modal
+  waDefault: "Hi Alex! I came across your photography work and I'd love to discuss a potential project. Could we schedule a call?",
+  waSendMessage: "Send a message",
+  waTo: "TO",
+  waMessage: "MESSAGE",
+  waCancel: "CANCEL",
+  waOpen: "OPEN WHATSAPP",
+  // cover
+  coverLabel: "PHOTOGRAPHY",
+  coverDocumentary: "DOCUMENTARY",
+  coverPortrait: "PORTRAIT",
+  coverFineArt: "FINE ART",
+  coverViewWork: "VIEW WORK",
+  coverScrollHint: "SCROLL DOWN TO VIEW WORK",
+  coverScroll: "SCROLL",
+  // work section
+  workSectionLabel: "02 · SELECTED WORK",
+  workPortfolio: "Portfolio",
+  workMarquee: "OPEN A PROJECT · EXPLORE THE WORK · HOVER TO NAVIGATE ·",
+  workArchive: (count: number) => `FULL ARCHIVE · ${count} PHOTOS`,
+  workViewAll: "VIEW ALL",
+  workMyWork: "MY WORK",
+  workAllWork: "ALL WORK",
+  // about
+  aboutBio: "Based in Brooklyn, I document the raw beauty of human connection — from intimate weddings in upstate New York to editorial shoots across Manhattan. Every frame is a conversation between light, shadow, and story.",
+  aboutYears: "YEARS",
+  aboutProjects: "PROJECTS",
+  aboutCities: "CITIES",
+  aboutNext: "NEXT · GET IN TOUCH",
+  // projects
+  projects: [
+    { title: "Sarah & James",       sub: "Wedding · Hudson Valley",   year: "2025", desc: "A golden hour celebration in the rolling hills of upstate New York. Documentary and fine art frames." },
+    { title: "Vogue Italia",         sub: "Editorial · Manhattan",      year: "2024", desc: "High-contrast fashion editorial shot across five Manhattan rooftops at dusk." },
+    { title: "The Brooklyn Series", sub: "Documentary · Williamsburg", year: "2024", desc: "A long-form documentary on the changing face of Williamsburg, two years in the making." },
+    { title: "Chen Family",         sub: "Portrait · DUMBO",           year: "2025", desc: "Intimate family portraits against the iconic DUMBO waterfront at golden hour." },
+  ],
+};
+
+const DEMO_ES = {
+  // sidebar
+  tagline: "FOTOGRAFÍA · BROOKLYN",
+  // whatsapp modal
+  waDefault: "¡Hola Alex! Encontré tu trabajo fotográfico y me gustaría hablar sobre un posible proyecto. ¿Podríamos coordinar una llamada?",
+  waSendMessage: "Enviar un mensaje",
+  waTo: "PARA",
+  waMessage: "MENSAJE",
+  waCancel: "CANCELAR",
+  waOpen: "ABRIR WHATSAPP",
+  // cover
+  coverLabel: "FOTOGRAFÍA",
+  coverDocumentary: "DOCUMENTAL",
+  coverPortrait: "RETRATO",
+  coverFineArt: "ARTE",
+  coverViewWork: "VER TRABAJO",
+  coverScrollHint: "DESPLÁZATE PARA VER EL TRABAJO",
+  coverScroll: "DESPLAZAR",
+  // work section
+  workSectionLabel: "02 · TRABAJO SELECCIONADO",
+  workPortfolio: "Portafolio",
+  workMarquee: "ABRE UN PROYECTO · EXPLORA EL TRABAJO · PASA EL CURSOR ·",
+  workArchive: (count: number) => `ARCHIVO COMPLETO · ${count} FOTOS`,
+  workViewAll: "VER TODO",
+  workMyWork: "MI TRABAJO",
+  workAllWork: "TODO EL TRABAJO",
+  // about
+  aboutBio: "Con base en Brooklyn, documento la belleza cruda de la conexión humana — desde bodas íntimas en el norte de Nueva York hasta editoriales por Manhattan. Cada encuadre es una conversación entre luz, sombra e historia.",
+  aboutYears: "AÑOS",
+  aboutProjects: "PROYECTOS",
+  aboutCities: "CIUDADES",
+  aboutNext: "SIGUIENTE · CONTÁCTAME",
+  // projects
+  projects: [
+    { title: "Sarah & James",       sub: "Wedding · Hudson Valley",   year: "2025", desc: "Una celebración a la hora dorada en las colinas de upstate New York. Fotografía documental y de bellas artes." },
+    { title: "Vogue Italia",         sub: "Editorial · Manhattan",      year: "2024", desc: "Editorial de moda de alto contraste fotografiada en cinco terrazas de Manhattan al atardecer." },
+    { title: "The Brooklyn Series", sub: "Documentary · Williamsburg", year: "2024", desc: "Un documental de largo aliento sobre el rostro cambiante de Williamsburg, dos años de trabajo." },
+    { title: "Chen Family",         sub: "Portrait · DUMBO",           year: "2025", desc: "Retratos familiares íntimos frente al icónico frente marítimo de DUMBO a la hora dorada." },
+  ],
+};
+
+function demo(locale: string) { return locale === "es" ? DEMO_ES : DEMO_EN; }
+
+/* ─── locale-aware projects ──────────────────────────────────────────── */
+function getProjects(locale: string) {
+  const D = demo(locale);
+  return PROJECTS.map((p, i) => ({ ...p, ...D.projects[i] }));
+}
 
 /* ─── variants ───────────────────────────────────────────────────────── */
 const stagger: Variants = {
@@ -113,9 +204,10 @@ function HamburgerBtn({ open, onClick, light }: { open: boolean; onClick: () => 
 /* ══════════════════════════════════════════════════════════════════════
    SIDEBAR
 ══════════════════════════════════════════════════════════════════════ */
-function Sidebar({ open, onClose, current, goTo }: {
-  open: boolean; onClose: () => void; current: number; goTo: (i: number) => void;
+function Sidebar({ open, onClose, current, goTo, locale }: {
+  open: boolean; onClose: () => void; current: number; goTo: (i: number) => void; locale: string;
 }) {
+  const D = demo(locale);
   useEffect(() => {
     if (!open) return;
     const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -156,7 +248,7 @@ function Sidebar({ open, onClose, current, goTo }: {
             {/* logo */}
             <div style={{ marginBottom: 40 }}>
               <div style={{ fontFamily: "var(--bk-serif)", fontStyle: "italic", fontSize: 40, color: "#fff", lineHeight: 1 }}>Morrison</div>
-              <div style={{ fontFamily: "var(--bk-mono)", fontSize: 13, color: "rgba(255,255,255,0.65)", letterSpacing: "0.2em", marginTop: 8 }}>PHOTOGRAPHY · BROOKLYN</div>
+              <div style={{ fontFamily: "var(--bk-mono)", fontSize: 13, color: "rgba(255,255,255,0.65)", letterSpacing: "0.2em", marginTop: 8 }}>{D.tagline}</div>
             </div>
 
             <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.22)", marginBottom: 40 }} />
@@ -210,9 +302,9 @@ function Sidebar({ open, onClose, current, goTo }: {
 /* ══════════════════════════════════════════════════════════════════════
    WHATSAPP MODAL
 ══════════════════════════════════════════════════════════════════════ */
-function WhatsAppModal({ onClose }: { onClose: () => void }) {
-  const DEFAULT = "Hi Alex! I came across your photography work and I'd love to discuss a potential project. Could we schedule a call?";
-  const [msg, setMsg] = useState(DEFAULT);
+function WhatsAppModal({ onClose, locale }: { onClose: () => void; locale: string }) {
+  const D = demo(locale);
+  const [msg, setMsg] = useState(D.waDefault);
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -235,19 +327,19 @@ function WhatsAppModal({ onClose }: { onClose: () => void }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
           <div>
             <div style={{ fontFamily: "var(--bk-mono)", fontSize: 13, color: "#25D366", letterSpacing: "0.18em", marginBottom: 6 }}>WHATSAPP</div>
-            <div style={{ fontFamily: "var(--bk-serif)", fontStyle: "italic", fontSize: 24, color: "#fff" }}>Send a message</div>
+            <div style={{ fontFamily: "var(--bk-serif)", fontStyle: "italic", fontSize: 24, color: "#fff" }}>{D.waSendMessage}</div>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: GRAY }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
           </button>
         </div>
 
-        <div style={{ fontFamily: "var(--bk-mono)", fontSize: 13, color: GRAY, letterSpacing: "0.14em", marginBottom: 6 }}>TO</div>
+        <div style={{ fontFamily: "var(--bk-mono)", fontSize: 13, color: GRAY, letterSpacing: "0.14em", marginBottom: 6 }}>{D.waTo}</div>
         <div style={{ fontFamily: "var(--bk-mono)", fontSize: 12, color: "#fff", borderBottom: `1px solid ${DIM}`, paddingBottom: 10, marginBottom: 20 }}>
           Alex Morrison · Photography
         </div>
 
-        <div style={{ fontFamily: "var(--bk-mono)", fontSize: 13, color: GRAY, letterSpacing: "0.14em", marginBottom: 8 }}>MESSAGE</div>
+        <div style={{ fontFamily: "var(--bk-mono)", fontSize: 13, color: GRAY, letterSpacing: "0.14em", marginBottom: 8 }}>{D.waMessage}</div>
         <textarea
           value={msg}
           onChange={(e) => setMsg(e.target.value)}
@@ -261,14 +353,14 @@ function WhatsAppModal({ onClose }: { onClose: () => void }) {
 
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: "12px", background: "none", border: `1px solid ${DIM}`, color: GRAY, fontFamily: "var(--bk-mono)", fontSize: 13, letterSpacing: "0.12em", cursor: "pointer" }}>
-            CANCEL
+            {D.waCancel}
           </button>
           <button
             onClick={() => window.open(`https://wa.me/15550000000?text=${encodeURIComponent(msg)}`, "_blank")}
             style={{ flex: 2, padding: "12px", background: "#25D366", border: "none", color: "#fff", fontFamily: "var(--bk-mono)", fontSize: 13, letterSpacing: "0.12em", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
-            OPEN WHATSAPP
+            {D.waOpen}
           </button>
         </div>
       </motion.div>
@@ -487,8 +579,9 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
 /* ══════════════════════════════════════════════════════════════════════
    COVER SECTION
 ══════════════════════════════════════════════════════════════════════ */
-function CoverSection({ isActive, onNext }: { isActive: boolean; onNext: () => void }) {
+function CoverSection({ isActive, onNext, locale }: { isActive: boolean; onNext: () => void; locale: string }) {
   const isMobile = useIsMobile();
+  const D = demo(locale);
   return (
     <section style={{ height: "100dvh", background: BLACK, display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
       {/* watermark */}
@@ -507,7 +600,7 @@ function CoverSection({ isActive, onNext }: { isActive: boolean; onNext: () => v
         >
           <motion.div variants={fadeIn} style={{ fontFamily: "var(--bk-mono)", fontSize: 13, color: RED, letterSpacing: "0.22em", marginBottom: 24, display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ display: "inline-block", width: 20, height: 1.5, background: RED }} />
-            PHOTOGRAPHY
+            {D.coverLabel}
           </motion.div>
 
           <motion.div variants={slideUp} style={{ lineHeight: 1, marginBottom: 30 }}>
@@ -518,11 +611,11 @@ function CoverSection({ isActive, onNext }: { isActive: boolean; onNext: () => v
           <motion.div variants={growX} style={{ width: 80, height: 3.5, background: RED, marginBottom: 24, transformOrigin: "left center" }} />
 
           <motion.div variants={slideUp} style={{ display: "flex", gap: 20, fontFamily: "var(--bk-mono)", fontSize: 13, color: GRAY, letterSpacing: "0.16em", flexWrap: "wrap" }}>
-            <span>DOCUMENTARY</span>
+            <span>{D.coverDocumentary}</span>
             <span style={{ color: RED }}>·</span>
-            <span>PORTRAIT</span>
+            <span>{D.coverPortrait}</span>
             <span style={{ color: RED }}>·</span>
-            <span>FINE ART</span>
+            <span>{D.coverFineArt}</span>
           </motion.div>
 
           <motion.div variants={fadeIn} style={{ marginTop: 44, display: "flex", alignItems: "center", gap: 8 }}>
@@ -533,7 +626,7 @@ function CoverSection({ isActive, onNext }: { isActive: boolean; onNext: () => v
               whileTap={{ scale: 0.97 }}
               style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "var(--bk-sans)", fontSize: 13, fontWeight: 600, color: "#fff", background: "transparent", border: `1px solid ${DIM}`, padding: "13px 24px", cursor: "pointer", letterSpacing: "0.1em", transition: "border-color 0.25s, background 0.25s" }}
             >
-              VIEW WORK
+              {D.coverViewWork}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
             </motion.button>
 
@@ -565,7 +658,7 @@ function CoverSection({ isActive, onNext }: { isActive: boolean; onNext: () => v
               <polyline points="6 9 12 15 18 9" />
             </motion.svg>
             <span style={{ fontFamily: "var(--bk-mono)", fontSize: 8, color: GRAY, letterSpacing: "0.22em" }}>
-              SCROLL DOWN TO VIEW WORK
+              {D.coverScrollHint}
             </span>
           </motion.div>
         </motion.div>
@@ -600,7 +693,7 @@ function CoverSection({ isActive, onNext }: { isActive: boolean; onNext: () => v
       <div style={{ padding: "20px clamp(28px, 5vw, 48px)", display: "flex", justifyContent: "flex-end", alignItems: "center", borderTop: `1px solid ${DIM}`, flexShrink: 0 }}>
         <motion.div animate={{ y: [0, 7, 0] }} transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
           style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: "var(--bk-mono)", fontSize: 8, color: GRAY, letterSpacing: "0.12em" }}>
-          SCROLL
+          {D.coverScroll}
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={GRAY} strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" /></svg>
         </motion.div>
       </div>
@@ -677,7 +770,9 @@ function FolderDetail({ project, onLightbox, cols }: { project: Project; onLight
   );
 }
 
-function GalleryOverlay({ onClose }: { onClose: () => void }) {
+function GalleryOverlay({ onClose, locale }: { onClose: () => void; locale: string }) {
+  const D = demo(locale);
+  const localProjects = getProjects(locale);
   const isMobile = useIsMobile();
   const [view, setView] = useState<"grid" | "folder">("grid");
   const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -713,11 +808,11 @@ function GalleryOverlay({ onClose }: { onClose: () => void }) {
           {view === "folder" && (
             <button onClick={goBack} style={{ background: "none", border: "none", cursor: "pointer", color: GRAY, display: "flex", alignItems: "center", gap: 6, fontFamily: "var(--bk-mono)", fontSize: 8, letterSpacing: "0.14em" }}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
-              ALL WORK
+              {D.workAllWork}
             </button>
           )}
           <div style={{ fontFamily: "var(--bk-serif)", fontStyle: "italic", fontSize: 20, color: "#fff" }}>
-            {view === "folder" && activeProject ? activeProject.title : "All Work"}
+            {view === "folder" && activeProject ? activeProject.title : D.workAllWork}
           </div>
         </div>
         <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: GRAY, display: "flex", padding: 4 }}>
@@ -731,7 +826,7 @@ function GalleryOverlay({ onClose }: { onClose: () => void }) {
           <>
             <div style={{ fontFamily: "var(--bk-mono)", fontSize: 8, color: RED, letterSpacing: "0.22em", marginBottom: 14 }}>PROJECTS</div>
             <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 3, marginBottom: 3 }}>
-              {PROJECTS.map((p) => (
+              {localProjects.map((p) => (
                 <FolderCard key={p.seed} project={p} onClick={() => { setActiveProject(p); setView("folder"); }} />
               ))}
             </div>
@@ -767,7 +862,9 @@ function GalleryOverlay({ onClose }: { onClose: () => void }) {
 }
 
 /* ── Work section ────────────────────────────────────────────────── */
-function WorkSection({ isActive, onSelect, current, onNav, onGalleryOpen }: { isActive: boolean; onSelect: (p: Project) => void; current: number; onNav: (i: number) => void; onGalleryOpen: () => void }) {
+function WorkSection({ isActive, onSelect, current, onNav, onGalleryOpen, locale }: { isActive: boolean; onSelect: (p: Project) => void; current: number; onNav: (i: number) => void; onGalleryOpen: () => void; locale: string }) {
+  const D = demo(locale);
+  const localProjects = getProjects(locale);
   const x = useMotionValue(0);
   const speedRef  = useRef(BASE_SPEED);
   const targetRef = useRef(BASE_SPEED);
@@ -820,8 +917,8 @@ function WorkSection({ isActive, onSelect, current, onNav, onGalleryOpen }: { is
         style={{ padding: "18px clamp(24px, 4vw, 48px) 14px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", borderBottom: `1px solid ${DIM}`, flexShrink: 0 }}
       >
         <div>
-          <motion.div variants={fadeIn} style={{ fontFamily: "var(--bk-mono)", fontSize: 8, color: RED, letterSpacing: "0.22em", marginBottom: 6 }}>02 · SELECTED WORK</motion.div>
-          <motion.h2 variants={slideUp} style={{ fontFamily: "var(--bk-serif)", fontSize: "clamp(20px, 2.8vw, 38px)", color: "#fff", lineHeight: 1 }}>Portfolio</motion.h2>
+          <motion.div variants={fadeIn} style={{ fontFamily: "var(--bk-mono)", fontSize: 8, color: RED, letterSpacing: "0.22em", marginBottom: 6 }}>{D.workSectionLabel}</motion.div>
+          <motion.h2 variants={slideUp} style={{ fontFamily: "var(--bk-serif)", fontSize: "clamp(20px, 2.8vw, 38px)", color: "#fff", lineHeight: 1 }}>{D.workPortfolio}</motion.h2>
         </div>
         <motion.div variants={fadeIn} style={{ fontFamily: "var(--bk-mono)", fontSize: 8, color: GRAY, letterSpacing: "0.1em", textAlign: "right", lineHeight: 1.8 }}>
           <div>BROOKLYN · NYC</div>
@@ -838,7 +935,7 @@ function WorkSection({ isActive, onSelect, current, onNav, onGalleryOpen }: { is
         <div style={{ display: "inline-flex", animation: "bk-marquee 22s linear infinite", whiteSpace: "nowrap" }}>
           {Array.from({ length: 12 }).map((_, i) => (
             <span key={i} style={{ fontFamily: "var(--bk-mono)", fontSize: 8, color: "rgba(255,255,255,0.88)", letterSpacing: "0.26em", padding: "0 28px" }}>
-              OPEN A PROJECT · EXPLORE THE WORK · HOVER TO NAVIGATE ·
+              {D.workMarquee}
             </span>
           ))}
         </div>
@@ -857,7 +954,7 @@ function WorkSection({ isActive, onSelect, current, onNav, onGalleryOpen }: { is
           ref={trackRef}
           style={{ x, display: "flex", gap: 10, height: "100%", width: "max-content", paddingLeft: 10, alignItems: "stretch" }}
         >
-          {[...PROJECTS, ...PROJECTS].map((p, i) => (
+          {[...localProjects, ...localProjects].map((p, i) => (
             <GlideCard key={`${p.seed}-${i}`} project={p} onSelect={onSelect} />
           ))}
         </motion.div>
@@ -879,11 +976,11 @@ function WorkSection({ isActive, onSelect, current, onNav, onGalleryOpen }: { is
         >
           <div style={{ position: "absolute", right: -8, bottom: -12, fontFamily: "var(--bk-serif)", fontSize: "clamp(50px, 9vw, 120px)", color: "rgba(0,0,0,0.12)", lineHeight: 1, pointerEvents: "none" }}>ALL</div>
           <div style={{ fontFamily: "var(--bk-mono)", fontSize: 8, color: "rgba(255,255,255,0.6)", letterSpacing: "0.22em", marginBottom: 10 }}>
-            FULL ARCHIVE · {PROJECTS.length * 4 + EXTRA_SEEDS.length} PHOTOS
+            {D.workArchive(PROJECTS.length * 4 + EXTRA_SEEDS.length)}
           </div>
           <div style={{ fontFamily: "var(--bk-sans)", fontWeight: 800, fontSize: "clamp(22px, 3.2vw, 52px)", lineHeight: 1.05, marginBottom: 18 }}>
-            <span style={{ color: "#fff" }}>VIEW ALL</span><br />
-            <span style={{ color: "rgba(0,0,0,0.35)" }}>MY WORK</span>
+            <span style={{ color: "#fff" }}>{D.workViewAll}</span><br />
+            <span style={{ color: "rgba(0,0,0,0.35)" }}>{D.workMyWork}</span>
           </div>
           {/* circle arrow button */}
           <div style={{ width: 46, height: 46, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -950,8 +1047,9 @@ function GlideCard({ project, onSelect }: { project: Project; onSelect: (p: Proj
 /* ══════════════════════════════════════════════════════════════════════
    ABOUT SECTION
 ══════════════════════════════════════════════════════════════════════ */
-function AboutSection({ isActive }: { isActive: boolean }) {
+function AboutSection({ isActive, locale }: { isActive: boolean; locale: string }) {
   const isMobile = useIsMobile();
+  const D = demo(locale);
   return (
     <section style={{ height: "100dvh", background: STONE, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
       {/* watermark */}
@@ -984,12 +1082,11 @@ function AboutSection({ isActive }: { isActive: boolean }) {
           <motion.div variants={growX} style={{ width: 44, height: 3, background: RED, marginBottom: 20, transformOrigin: "left center" }} />
 
           <motion.p variants={slideUp} style={{ fontFamily: "var(--bk-sans)", fontSize: 14, fontWeight: 300, color: "#4A4747", lineHeight: 1.82, maxWidth: 500, marginBottom: 36 }}>
-            Based in Brooklyn, I document the raw beauty of human connection — from intimate weddings in upstate New York to editorial shoots across Manhattan.
-            Every frame is a conversation between light, shadow, and story.
+            {D.aboutBio}
           </motion.p>
 
           <motion.div variants={stagger} style={{ display: "flex", gap: 40 }}>
-            {[{ v: "8+", l: "YEARS" }, { v: "340", l: "PROJECTS" }, { v: "12", l: "CITIES" }].map((s) => (
+            {[{ v: "8+", l: D.aboutYears }, { v: "340", l: D.aboutProjects }, { v: "12", l: D.aboutCities }].map((s) => (
               <motion.div key={s.l} variants={slideUp}>
                 <div style={{ fontFamily: "var(--bk-serif)", fontSize: "clamp(26px, 3.5vw, 48px)", color: BLACK, lineHeight: 1 }}>{s.v}</div>
                 <div style={{ fontFamily: "var(--bk-mono)", fontSize: 7, color: GRAY, letterSpacing: "0.2em", marginTop: 5 }}>{s.l}</div>
@@ -1005,7 +1102,7 @@ function AboutSection({ isActive }: { isActive: boolean }) {
                 style={{ display: "inline-flex", alignItems: "center", gap: 10, background: RED, padding: "10px 18px" }}
               >
                 <span style={{ fontFamily: "var(--bk-mono)", fontSize: 8, color: "#fff", letterSpacing: "0.2em" }}>
-                  NEXT · GET IN TOUCH
+                  {D.aboutNext}
                 </span>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
                   <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
@@ -1124,6 +1221,7 @@ function ContactSection({ isActive, onWhatsApp }: { isActive: boolean; onWhatsAp
    MAIN PAGE
 ══════════════════════════════════════════════════════════════════════ */
 export default function BrooklynPage() {
+  const { locale } = useT();
   const [current, setCurrent]           = useState(0);
   const [sidebarOpen, setSidebarOpen]   = useState(false);
   const [waOpen, setWaOpen]             = useState(false);
@@ -1221,9 +1319,9 @@ export default function BrooklynPage() {
 
         {/* sliding container */}
         <motion.div ref={sliderRef} style={{ y: containerY, position: "absolute", top: 0, left: 0, width: "100%" }}>
-          <CoverSection   isActive={current === 0} onNext={() => goTo(1)} />
-          <WorkSection    isActive={current === 1} onSelect={setSelected} current={current} onNav={goTo} onGalleryOpen={() => setGalleryOpen(true)} />
-          <AboutSection   isActive={current === 2} />
+          <CoverSection   isActive={current === 0} onNext={() => goTo(1)} locale={locale} />
+          <WorkSection    isActive={current === 1} onSelect={setSelected} current={current} onNav={goTo} onGalleryOpen={() => setGalleryOpen(true)} locale={locale} />
+          <AboutSection   isActive={current === 2} locale={locale} />
           <ContactSection isActive={current === 3} onWhatsApp={() => setWaOpen(true)} />
         </motion.div>
 
@@ -1293,10 +1391,10 @@ export default function BrooklynPage() {
       </div>
 
       {/* overlays */}
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} current={current} goTo={goTo} />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} current={current} goTo={goTo} locale={locale} />
 
       <AnimatePresence>
-        {waOpen && <WhatsAppModal key="wa" onClose={() => setWaOpen(false)} />}
+        {waOpen && <WhatsAppModal key="wa" onClose={() => setWaOpen(false)} locale={locale} />}
       </AnimatePresence>
 
       <AnimatePresence>
@@ -1304,7 +1402,7 @@ export default function BrooklynPage() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {galleryOpen && <GalleryOverlay key="gallery" onClose={() => setGalleryOpen(false)} />}
+        {galleryOpen && <GalleryOverlay key="gallery" onClose={() => setGalleryOpen(false)} locale={locale} />}
       </AnimatePresence>
     </>
   );
