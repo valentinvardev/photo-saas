@@ -110,6 +110,13 @@ export function buildMinimalNodes(locale: string, id: Identity, logoText?: strin
     put(n("stat-1-label", "paragraph", "Años"));
     put(n("stat-2-label", "paragraph", "Proyectos"));
     put(n("stat-3-label", "paragraph", "Ciudades"));
+    /* Demo content — only applied when identity is empty (preview mode) */
+    if (!id.first && !id.last) {
+      put(n("hero-eyebrow", "paragraph", "Documental y Retrato · Nueva York"));
+      put(n("hero-sub", "paragraph", "Documentando la tensión silenciosa entre la presencia y la ausencia. Trabajo exhibido en América del Norte y Europa."));
+      put(n("about-body-1", "paragraph", "Documentando la tensión silenciosa entre la presencia y la ausencia. Trabajo exhibido en América del Norte y Europa."));
+      put(n("contact-d1-label", "paragraph", "General"));
+    }
   }
 
   /* Identity overrides (only when provided) */
