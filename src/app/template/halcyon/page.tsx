@@ -1,12 +1,105 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HL_TOKENS, HL_FONTS, HL_PORTFOLIO, HL_PHOTOS, hlBaseCss, type HlPhoto } from "~/lib/halcyon/data";
+import { useT } from "~/components/providers/LangProvider";
 
 type Lightbox = { photos: (HlPhoto & { projectTitle?: string })[]; index: number } | null;
 
+/* ── i18n demo strings ─────────────────────────────────────────── */
+
+const DEMO_EN = {
+  waDefault:           "Hi Lior, I'd like to talk to you about a session. My project is ",
+  heroTitle1:          "The light",
+  heroTitle2:          "keeps",
+  heroTitleEm:         "arriving.",
+  scroll:              "Scroll",
+  selectedWork:        "Selected Work",
+  viewAllWorks:        (n: number) => `View all ${n} works`,
+  browseArchive:       "Browse the full archive",
+  everyPhotograph:     "Every",
+  photographEm:        "photograph,",
+  inOneRoom:           "in one room.",
+  archiveSub:          "Twelve years of weddings, editorial and quiet rooms — gathered together. Open the archive and wander.",
+  photographs:         "Photographs",
+  projects:            "Projects",
+  span:                "Span",
+  openArchive:         "Open the archive",
+  about:               "About",
+  picturesToLive:      "Pictures to",
+  liveWithEm:          "live with,",
+  notScrollPast:       "not scroll past.",
+  availableFor:        "Available for 2025 commissions",
+  beginA:              "Begin a",
+  conversationEm:      "conversation.",
+  contactTag:          "Tell me about the day, the room, the people. The best work always starts with a long letter and a slow reply.",
+  letterTab:           "Letter",
+  namePlaceholder:     "Your name",
+  emailPlaceholder:    "Email",
+  projectPlaceholder:  "Project · date · place",
+  messagePlaceholder:  "A few sentences about what you have in mind.",
+  orWriteTo:           "or write to studio@halcyon.photo",
+  sendLetter:          "Send letter →",
+  waNumLabel:          "WhatsApp",
+  waSend:              "Send",
+  footerCopy:          "© 2024 · All photographs © Lior Avni",
+  myWork:              "My work",
+  allPhotographs:      "All photographs",
+  galleryTitle1:       "Every",
+  galleryTitleEm:      "photograph,",
+  galleryTitle2:       "in one room.",
+};
+
+const DEMO_ES = {
+  waDefault:           "Hola Lior, me gustaría hablar contigo sobre una sesión. Mi proyecto es ",
+  heroTitle1:          "La luz",
+  heroTitle2:          "sigue",
+  heroTitleEm:         "llegando.",
+  scroll:              "Desplazar",
+  selectedWork:        "Trabajo Seleccionado",
+  viewAllWorks:        (n: number) => `Ver los ${n} trabajos`,
+  browseArchive:       "Explorar el archivo completo",
+  everyPhotograph:     "Cada",
+  photographEm:        "fotografía,",
+  inOneRoom:           "en una sola sala.",
+  archiveSub:          "Doce años de bodas, editoriales y habitaciones silenciosas — reunidas aquí. Abre el archivo y explora.",
+  photographs:         "Fotografías",
+  projects:            "Proyectos",
+  span:                "Período",
+  openArchive:         "Abrir el archivo",
+  about:               "Sobre mí",
+  picturesToLive:      "Imágenes para",
+  liveWithEm:          "quedarse,",
+  notScrollPast:       "no para deslizar.",
+  availableFor:        "Disponible para comisiones 2025",
+  beginA:              "Inicia una",
+  conversationEm:      "conversación.",
+  contactTag:          "Cuéntame sobre el día, el lugar, las personas. El mejor trabajo siempre empieza con una carta larga y una respuesta pausada.",
+  letterTab:           "Carta",
+  namePlaceholder:     "Tu nombre",
+  emailPlaceholder:    "Email",
+  projectPlaceholder:  "Proyecto · fecha · lugar",
+  messagePlaceholder:  "Algunas frases sobre lo que tienes en mente.",
+  orWriteTo:           "o escribe a studio@halcyon.photo",
+  sendLetter:          "Enviar carta →",
+  waNumLabel:          "WhatsApp",
+  waSend:              "Enviar",
+  footerCopy:          "© 2024 · Todas las fotografías © Lior Avni",
+  myWork:              "Mi trabajo",
+  allPhotographs:      "Todas las fotografías",
+  galleryTitle1:       "Cada",
+  galleryTitleEm:      "fotografía,",
+  galleryTitle2:       "en una sola sala.",
+};
+
+function demo(locale: string) {
+  return locale === "es" ? DEMO_ES : DEMO_EN;
+}
+
 export default function HalcyonPortfolioPage() {
+  const { locale } = useT();
+  const D    = demo(locale);
   const t    = HL_TOKENS;
   const data = HL_PORTFOLIO;
 
@@ -20,7 +113,13 @@ export default function HalcyonPortfolioPage() {
   const [indexPhotoIdx, setIndexPhotoIdx] = useState(0);
   const [drawerPhotoIdx,setDrawerPhotoIdx]= useState(0);
   const [contactTab,    setContactTab]    = useState<"letter" | "whatsapp">("letter");
-  const [waMsg,         setWaMsg]         = useState("Hola Lior, me gustaría hablar contigo sobre una sesión. Mi proyecto es ");
+  const [waMsg,         setWaMsg]         = useState(D.waDefault);
+
+  /* Sync waMsg default when locale changes */
+  useEffect(() => {
+    setWaMsg(D.waDefault);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale]);
 
   /* Cycle the floating index thumbnail through that project's photos. */
   useEffect(() => {
@@ -338,20 +437,20 @@ export default function HalcyonPortfolioPage() {
         <div className="hp-cover-meta">
           <div>
             <h1 className="hp-cover-title">
-              The light<br />keeps <em>arriving.</em>
+              {D.heroTitle1}<br />{D.heroTitle2} <em>{D.heroTitleEm}</em>
             </h1>
           </div>
           <div className="hp-scroll-hint">
-            <span className="hl-mono" style={{ color: t.fg, opacity: 0.75, letterSpacing: "0.18em" }}>Scroll</span>
+            <span className="hl-mono" style={{ color: t.fg, opacity: 0.75, letterSpacing: "0.18em" }}>{D.scroll}</span>
             <div className="track" />
           </div>
         </div>
       </section>
 
       <div className="hp-section-label hl-mono">
-        <span>Selected Work</span>
+        <span>{D.selectedWork}</span>
         <hr />
-        <span>{String(data.projects.length).padStart(2, "0")} Projects</span>
+        <span>{String(data.projects.length).padStart(2, "0")} {D.projects}</span>
       </div>
       <div
         className="hp-index"
@@ -393,37 +492,37 @@ export default function HalcyonPortfolioPage() {
       {hiddenCount > 0 && !showAllWorks && (
         <div className="hp-view-all-row">
           <button className="hl-btn hl-btn-accent" onClick={() => setShowAllWorks(true)}>
-            View all {data.projects.length} works <span>↓</span>
+            {D.viewAllWorks(data.projects.length)} <span>↓</span>
           </button>
         </div>
       )}
 
       <section className="hp-allphotos">
         <div>
-          <div className="eyebrow">Browse the full archive</div>
-          <h2>Every <em>photograph,</em><br />in one room.</h2>
-          <p className="sub">Twelve years of weddings, editorial and quiet rooms — gathered together. Open the archive and wander.</p>
+          <div className="eyebrow">{D.browseArchive}</div>
+          <h2>{D.everyPhotograph} <em>{D.photographEm}</em><br />{D.inOneRoom}</h2>
+          <p className="sub">{D.archiveSub}</p>
           <div className="meta">
-            <div><b>184</b>Photographs</div>
-            <div><b>{data.projects.length}</b>Projects</div>
-            <div><b>2014–2024</b>Span</div>
+            <div><b>184</b>{D.photographs}</div>
+            <div><b>{data.projects.length}</b>{D.projects}</div>
+            <div><b>2014–2024</b>{D.span}</div>
           </div>
         </div>
         <button className="cta" onClick={() => setGalleryOpen(true)}>
-          Open the archive
+          {D.openArchive}
           <span className="ico" aria-hidden>↗</span>
         </button>
       </section>
 
       <div className="hp-section-label hl-mono">
-        <span>About</span>
+        <span>{D.about}</span>
         <hr />
         <span>Lior Avni · b. 1989</span>
       </div>
       <section className="hp-about">
         <div className="hp-about-portrait" role="img" aria-label="Portrait" />
         <div>
-          <h2>Pictures to <em>live with,</em><br />not scroll past.</h2>
+          <h2>{D.picturesToLive} <em>{D.liveWithEm}</em><br />{D.notScrollPast}</h2>
           <p>{data.brand.bio}</p>
           <div className="hp-about-actions">
             <a href="#contact" className="hl-btn hl-btn-accent">Contact <span>↓</span></a>
@@ -433,24 +532,24 @@ export default function HalcyonPortfolioPage() {
       </section>
 
       <section id="contact" className="hp-contact">
-        <div className="hl-eyebrow" style={{ marginBottom: 24 }}>Available for 2025 commissions</div>
-        <h2>Begin a <em>conversation.</em></h2>
-        <p className="tag">Tell me about the day, the room, the people. The best work always starts with a long letter and a slow reply.</p>
+        <div className="hl-eyebrow" style={{ marginBottom: 24 }}>{D.availableFor}</div>
+        <h2>{D.beginA} <em>{D.conversationEm}</em></h2>
+        <p className="tag">{D.contactTag}</p>
 
         <div className="hp-contact-tabs" role="tablist">
-          <button role="tab" aria-selected={contactTab === "letter"}   className={`hp-contact-tab ${contactTab === "letter"   ? "on" : ""}`} onClick={() => setContactTab("letter")}>Letter</button>
+          <button role="tab" aria-selected={contactTab === "letter"}   className={`hp-contact-tab ${contactTab === "letter"   ? "on" : ""}`} onClick={() => setContactTab("letter")}>{D.letterTab}</button>
           <button role="tab" aria-selected={contactTab === "whatsapp"} className={`hp-contact-tab ${contactTab === "whatsapp" ? "on" : ""}`} onClick={() => setContactTab("whatsapp")}>WhatsApp</button>
         </div>
 
         {contactTab === "letter" && (
           <form className="hp-contact-form" onSubmit={(e) => e.preventDefault()}>
-            <input placeholder="Your name" />
-            <input placeholder="Email" type="email" />
-            <input placeholder="Project · date · place" />
-            <textarea placeholder="A few sentences about what you have in mind." />
+            <input placeholder={D.namePlaceholder} />
+            <input placeholder={D.emailPlaceholder} type="email" />
+            <input placeholder={D.projectPlaceholder} />
+            <textarea placeholder={D.messagePlaceholder} />
             <div className="hp-contact-actions">
-              <span className="hl-mono" style={{ color: t.muted }}>or write to studio@halcyon.photo</span>
-              <button type="submit" className="hl-btn hl-btn-accent">Send letter →</button>
+              <span className="hl-mono" style={{ color: t.muted }}>{D.orWriteTo}</span>
+              <button type="submit" className="hl-btn hl-btn-accent">{D.sendLetter}</button>
             </div>
           </form>
         )}
@@ -459,7 +558,7 @@ export default function HalcyonPortfolioPage() {
           <div className="hp-wa">
             <textarea value={waMsg} onChange={(e) => setWaMsg(e.target.value)} />
             <div className="hp-wa-actions">
-              <span className="hp-wa-num">WhatsApp · <b>+351 912 000 000</b></span>
+              <span className="hp-wa-num">{D.waNumLabel} · <b>+351 912 000 000</b></span>
               <a
                 className="hp-wa-send"
                 href={`https://wa.me/351912000000?text=${encodeURIComponent(waMsg)}`}
@@ -469,7 +568,7 @@ export default function HalcyonPortfolioPage() {
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-18.5A8.5 8.5 0 0 0 4.59 16.32L4 20l3.793-1.057A8.5 8.5 0 1 0 12 3.5z"/>
                 </svg>
-                Enviar
+                {D.waSend}
               </a>
             </div>
           </div>
@@ -478,14 +577,14 @@ export default function HalcyonPortfolioPage() {
 
       <footer className="hp-foot">
         <div className="mark">Halcyon<em> Studio</em></div>
-        <div className="hl-mono">© 2024 · All photographs © Lior Avni</div>
+        <div className="hl-mono">{D.footerCopy}</div>
         <Socials />
       </footer>
 
       <div className={`hp-drawer ${navOpen ? "open" : ""}`} onMouseLeave={() => setDrawerHoverId(null)}>
         <button className="hp-drawer-close" onClick={() => setNavOpen(false)}>Close ✕</button>
         <div className="col-l">
-          <div className="hl-eyebrow" style={{ marginBottom: 32 }}>My work</div>
+          <div className="hl-eyebrow" style={{ marginBottom: 32 }}>{D.myWork}</div>
           <ul>
             {data.projects.map((p) => (
               <li
@@ -501,7 +600,7 @@ export default function HalcyonPortfolioPage() {
               onMouseEnter={() => setDrawerHoverId(null)}
               onClick={() => { setGalleryOpen(true); setNavOpen(false); }}
             >
-              <span>All photographs</span>
+              <span>{D.allPhotographs}</span>
               <span className="all-icon" aria-hidden>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14" />
@@ -571,7 +670,7 @@ export default function HalcyonPortfolioPage() {
         >
           <button className="hp-detail-close" style={{ position: "absolute" }} onClick={() => setGalleryOpen(false)} aria-label="Close gallery"><span>✕</span></button>
           <div className="hp-gallery-head">
-            <h2>Every <em>photograph,</em><br />in one room.</h2>
+            <h2>{D.galleryTitle1} <em>{D.galleryTitleEm}</em><br />{D.galleryTitle2}</h2>
           </div>
           <div className="hp-mason">
             {allPhotos.map((ph, i) => (

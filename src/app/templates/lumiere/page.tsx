@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ═══════════════════════════════════════════════════════════════
    Petal — Playful pastel portfolio template · FRAME platform
@@ -32,16 +33,145 @@ const C = {
 const SANS = "var(--tpl-sans), 'DM Sans', system-ui, sans-serif";
 const MONO = "var(--tpl-mono), 'Space Mono', ui-monospace, monospace";
 
+/* ── i18n demo strings ─────────────────────────────────────────── */
+
+const DEMO_EN = {
+  /* Nav */
+  navItems:          ["Work", "About", "Shop"] as string[],
+  letsTalk:          "Let's talk",
+  /* Hero */
+  heroBadge:         "Photographer · Berlin",
+  heroH1a:           "Making light",
+  heroH1work:        "work",
+  heroH1b:           "for you.",
+  heroBio:           "I'm Mia — a photographer obsessed with natural light, genuine moments, and the kind of images you actually want to keep forever.",
+  seeMyWork:         "See my work",
+  downloadKit:       "Download press kit",
+  heroLocation:      "Berlin, 2024",
+  statsYears:        "Years",
+  statsProjects:     "Projects",
+  statsCountries:    "Countries",
+  /* Works */
+  selectedProjects:  "Selected projects",
+  recentWork:        "Recent work",
+  allProjects:       "All projects →",
+  viewProject:       "View project",
+  /* Works data */
+  works: [
+    { title: "Golden Hour",     year: "2024", cat: "Portrait",    desc: "Sun-drenched portraits for a debut album campaign." },
+    { title: "Still Waters",    year: "2024", cat: "Landscape",   desc: "Six weeks chasing coastlines at low tide." },
+    { title: "Bloom",           year: "2023", cat: "Editorial",   desc: "Fashion in an overgrown greenhouse." },
+    { title: "Saturday Market", year: "2023", cat: "Documentary", desc: "A year spent at the same market stall." },
+    { title: "Small Hours",     year: "2022", cat: "Portrait",    desc: "Night portraits in neon-lit city corners." },
+    { title: "Overgrown",       year: "2022", cat: "Landscape",   desc: "Abandoned spaces swallowed by plants." },
+  ],
+  /* Gallery */
+  theArchive:        "The archive",
+  allShots:          "All shots",
+  photographs:       "photographs",
+  openPhoto:         "↗ Open",
+  /* About */
+  heyIm:             "Hey, I'm Mia!",
+  aboutH2a:          "I shoot what",
+  aboutH2highlight:  "feels real.",
+  aboutBio1:         "Based in Berlin, I've been making pictures for eleven years. Drawn to in-between moments — the laugh before the pose, the glance before the ceremony, the quiet after the gig.",
+  aboutBio2:         "I work with musicians, brands, couples, and anyone who wants images that don't feel like stock photos.",
+  pills: [
+    { label: "11 years shooting", bg: C.coral },
+    { label: "6 countries",       bg: C.lemon },
+    { label: "2 dogs",            bg: C.peach },
+    { label: "∞ cups of tea",     bg: C.periwi },
+  ],
+  happyClients:      "happy clients",
+  myFullStory:       "My full story →",
+  /* Contact */
+  sayHello:          "Say hello",
+  contactH2:         "Got a project in mind?",
+  contactSub:        "Whether it's a wedding, a campaign, or just an idea on a napkin — let's figure it out together.",
+  sendMessage:       "Send me a message",
+  bookCall:          "Book a call",
+  /* Footer */
+  footerCopy:        "© 2024 · Made with love in Berlin",
+  footerLinks:       ["Privacy", "Terms", "Colophon"] as string[],
+  /* Lightbox */
+  lbClose:           "Close",
+  lbReset:           "Reset",
+};
+
+const DEMO_ES = {
+  /* Nav */
+  navItems:          ["Trabajo", "Sobre mí", "Tienda"] as string[],
+  letsTalk:          "Hablemos",
+  /* Hero */
+  heroBadge:         "Fotógrafa · Berlín",
+  heroH1a:           "Haciendo que la luz",
+  heroH1work:        "trabaje",
+  heroH1b:           "para ti.",
+  heroBio:           "Soy Mia — una fotógrafa obsesionada con la luz natural, los momentos auténticos y el tipo de imágenes que realmente quieres conservar para siempre.",
+  seeMyWork:         "Ver mi trabajo",
+  downloadKit:       "Descargar press kit",
+  heroLocation:      "Berlín, 2024",
+  statsYears:        "Años",
+  statsProjects:     "Proyectos",
+  statsCountries:    "Países",
+  /* Works */
+  selectedProjects:  "Proyectos seleccionados",
+  recentWork:        "Trabajo reciente",
+  allProjects:       "Todos los proyectos →",
+  viewProject:       "Ver proyecto",
+  /* Works data */
+  works: [
+    { title: "Golden Hour",     year: "2024", cat: "Retrato",      desc: "Retratos bañados de sol para una campaña de debut discográfico." },
+    { title: "Still Waters",    year: "2024", cat: "Paisaje",       desc: "Seis semanas persiguiendo costas en marea baja." },
+    { title: "Bloom",           year: "2023", cat: "Editorial",     desc: "Moda en un invernadero salvaje." },
+    { title: "Saturday Market", year: "2023", cat: "Documental",    desc: "Un año en el mismo puesto de mercado." },
+    { title: "Small Hours",     year: "2022", cat: "Retrato",       desc: "Retratos nocturnos en esquinas de ciudad iluminadas de neón." },
+    { title: "Overgrown",       year: "2022", cat: "Paisaje",       desc: "Espacios abandonados engullidos por las plantas." },
+  ],
+  /* Gallery */
+  theArchive:        "El archivo",
+  allShots:          "Todas las tomas",
+  photographs:       "fotografías",
+  openPhoto:         "↗ Abrir",
+  /* About */
+  heyIm:             "¡Hola, soy Mia!",
+  aboutH2a:          "Fotografío lo que",
+  aboutH2highlight:  "se siente real.",
+  aboutBio1:         "Con base en Berlín, llevo once años haciendo fotos. Me atraen los momentos intermedios — la risa antes de la pose, la mirada antes de la ceremonia, el silencio después del concierto.",
+  aboutBio2:         "Trabajo con músicos, marcas, parejas y cualquiera que quiera imágenes que no parezcan fotos de banco.",
+  pills: [
+    { label: "11 años fotografiando", bg: C.coral },
+    { label: "6 países",              bg: C.lemon },
+    { label: "2 perros",              bg: C.peach },
+    { label: "∞ tazas de té",         bg: C.periwi },
+  ],
+  happyClients:      "clientes felices",
+  myFullStory:       "Mi historia completa →",
+  /* Contact */
+  sayHello:          "Di hola",
+  contactH2:         "¿Tienes un proyecto en mente?",
+  contactSub:        "Ya sea una boda, una campaña o solo una idea en una servilleta — vamos a resolverlo juntos.",
+  sendMessage:       "Envíame un mensaje",
+  bookCall:          "Reservar una llamada",
+  /* Footer */
+  footerCopy:        "© 2024 · Hecho con amor en Berlín",
+  footerLinks:       ["Privacidad", "Términos", "Colofón"] as string[],
+  /* Lightbox */
+  lbClose:           "Cerrar",
+  lbReset:           "Restablecer",
+};
+
+function demo(locale: string) {
+  return locale === "es" ? DEMO_ES : DEMO_EN;
+}
+
+type DemoStrings = ReturnType<typeof demo>;
+
 /* ── Data ───────────────────────────────────────────────────── */
 
-const WORKS = [
-  { seed: 452, title: "Golden Hour",     year: "2024", cat: "Portrait",    bg: C.coral,  tag: C.coralDk,  desc: "Sun-drenched portraits for a debut album campaign." },
-  { seed: 338, title: "Still Waters",    year: "2024", cat: "Landscape",   bg: C.mint,   tag: C.mintDk,   desc: "Six weeks chasing coastlines at low tide." },
-  { seed: 866, title: "Bloom",           year: "2023", cat: "Editorial",   bg: C.periwi, tag: C.periwiDk, desc: "Fashion in an overgrown greenhouse." },
-  { seed: 730, title: "Saturday Market", year: "2023", cat: "Documentary", bg: C.peach,  tag: "#c2710a",  desc: "A year spent at the same market stall." },
-  { seed: 575, title: "Small Hours",     year: "2022", cat: "Portrait",    bg: C.lemon,  tag: "#8a8000",  desc: "Night portraits in neon-lit city corners." },
-  { seed: 190, title: "Overgrown",       year: "2022", cat: "Landscape",   bg: C.mint,   tag: C.mintDk,   desc: "Abandoned spaces swallowed by plants." },
-];
+const WORK_SEEDS = [452, 338, 866, 730, 575, 190];
+const WORK_BGS   = [C.coral, C.mint, C.periwi, C.peach, C.lemon, C.mint] as const;
+const WORK_TAGS  = [C.coralDk, C.mintDk, C.periwiDk, "#c2710a", "#8a8000", C.mintDk] as const;
 
 const BENTO_SPANS = [4, 2, 2, 4, 3, 3];
 const BENTO_IMG_H = [280, 200, 200, 280, 240, 240];
@@ -93,6 +223,9 @@ function revealStyle(visible: boolean, delay = 0): React.CSSProperties {
 /* ── Page ───────────────────────────────────────────────────── */
 
 export default function PetalPage() {
+  const { locale } = useT();
+  const D = demo(locale);
+
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [scrolled,    setScrolled]    = useState(false);
 
@@ -115,16 +248,16 @@ export default function PetalPage() {
         a   { text-decoration: none; }
       `}</style>
 
-      <PetalNav scrolled={scrolled} />
-      <HeroSection />
-      <WorksSection />
-      <GallerySection onOpen={setLightboxIdx} />
-      <AboutSection />
-      <ContactSection />
-      <FooterBar />
+      <PetalNav scrolled={scrolled} D={D} />
+      <HeroSection D={D} />
+      <WorksSection D={D} />
+      <GallerySection onOpen={setLightboxIdx} D={D} />
+      <AboutSection D={D} />
+      <ContactSection D={D} />
+      <FooterBar D={D} />
 
       {lightboxIdx !== null && (
-        <PetalLightbox photos={GALLERY} startIndex={lightboxIdx} onClose={() => setLightboxIdx(null)} />
+        <PetalLightbox photos={GALLERY} startIndex={lightboxIdx} onClose={() => setLightboxIdx(null)} D={D} />
       )}
     </main>
   );
@@ -132,7 +265,7 @@ export default function PetalPage() {
 
 /* ── Nav ────────────────────────────────────────────────────── */
 
-function PetalNav({ scrolled }: { scrolled: boolean }) {
+function PetalNav({ scrolled, D }: { scrolled: boolean; D: DemoStrings }) {
   return (
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 200,
@@ -148,7 +281,7 @@ function PetalNav({ scrolled }: { scrolled: boolean }) {
       </span>
 
       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-        {["Work", "About", "Shop"].map((item) => (
+        {D.navItems.map((item) => (
           <a key={item} href="#" style={{
             fontFamily: SANS, fontSize: 13, fontWeight: 500, color: C.mid,
             padding: "7px 16px", borderRadius: 100,
@@ -165,7 +298,7 @@ function PetalNav({ scrolled }: { scrolled: boolean }) {
         }}
           onMouseEnter={(e) => { e.currentTarget.style.background = C.coralDk; e.currentTarget.style.transform = "scale(1.05)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; e.currentTarget.style.transform = "scale(1)"; }}
-        >Let's talk</a>
+        >{D.letsTalk}</a>
       </div>
     </nav>
   );
@@ -173,7 +306,7 @@ function PetalNav({ scrolled }: { scrolled: boolean }) {
 
 /* ── Hero ───────────────────────────────────────────────────── */
 
-function HeroSection() {
+function HeroSection({ D }: { D: DemoStrings }) {
   return (
     <section style={{
       minHeight: "100svh", paddingTop: 60,
@@ -192,7 +325,7 @@ function HeroSection() {
           borderRadius: 100, alignSelf: "flex-start",
           animation: "fadeUp 0.6s 0.1s both cubic-bezier(0.2,0.8,0.2,1)",
         }}>
-          Photographer · Berlin
+          {D.heroBadge}
         </span>
 
         <h1 style={{
@@ -202,14 +335,14 @@ function HeroSection() {
           maxWidth: "13ch",
           animation: "fadeUp 0.7s 0.22s both cubic-bezier(0.2,0.8,0.2,1)",
         }}>
-          Making light{" "}
+          {D.heroH1a}{" "}
           <span style={{
             display: "inline-block", background: C.coral,
             borderRadius: 14, padding: "2px 18px",
             transform: "rotate(-1.8deg)",
             whiteSpace: "nowrap",
-          }}>work</span>{" "}
-          for you.
+          }}>{D.heroH1work}</span>{" "}
+          {D.heroH1b}
         </h1>
 
         <p style={{
@@ -217,8 +350,7 @@ function HeroSection() {
           lineHeight: 1.7, color: C.mid, maxWidth: 440,
           animation: "fadeUp 0.7s 0.38s both cubic-bezier(0.2,0.8,0.2,1)",
         }}>
-          I'm Mia — a photographer obsessed with natural light, genuine moments,
-          and the kind of images you actually want to keep forever.
+          {D.heroBio}
         </p>
 
         <div style={{
@@ -235,7 +367,7 @@ function HeroSection() {
             onMouseEnter={(e) => { e.currentTarget.style.background = C.coralDk; e.currentTarget.style.transform = "translateY(-3px)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; e.currentTarget.style.transform = "translateY(0)"; }}
           >
-            See my work
+            {D.seeMyWork}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
           <a href="#" style={{
@@ -246,7 +378,7 @@ function HeroSection() {
           }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.ink; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = C.dimMed; }}
-          >Download press kit</a>
+          >{D.downloadKit}</a>
         </div>
 
         {/* Stats row */}
@@ -255,7 +387,7 @@ function HeroSection() {
           borderTop: `1px solid ${C.dimMed}`,
           animation: "fadeUp 0.7s 0.64s both cubic-bezier(0.2,0.8,0.2,1)",
         }}>
-          {[{ v: "11", l: "Years" }, { v: "340+", l: "Projects" }, { v: "6", l: "Countries" }].map((s) => (
+          {[{ v: "11", l: D.statsYears }, { v: "340+", l: D.statsProjects }, { v: "6", l: D.statsCountries }].map((s) => (
             <div key={s.l}>
               <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 28, letterSpacing: "-0.03em" }}>{s.v}</div>
               <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: C.muted, marginTop: 3 }}>{s.l}</div>
@@ -288,7 +420,7 @@ function HeroSection() {
             fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em",
             textTransform: "uppercase", color: C.mid,
           }}>
-            Berlin, 2024
+            {D.heroLocation}
           </div>
         </div>
       </div>
@@ -298,16 +430,23 @@ function HeroSection() {
 
 /* ── Works — Bento grid ─────────────────────────────────────── */
 
-function WorksSection() {
+function WorksSection({ D }: { D: DemoStrings }) {
   const { ref, visible } = useReveal();
+
+  const works = D.works.map((w, i) => ({
+    ...w,
+    seed: WORK_SEEDS[i]!,
+    bg:   WORK_BGS[i]!,
+    tag:  WORK_TAGS[i]!,
+  }));
 
   return (
     <section style={{ padding: "100px clamp(20px, 5vw, 64px)" }}>
       {/* Header */}
       <div ref={ref} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 40, ...revealStyle(visible) }}>
         <div>
-          <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: C.mid, marginBottom: 10 }}>Selected projects</p>
-          <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-0.03em" }}>Recent work</h2>
+          <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: C.mid, marginBottom: 10 }}>{D.selectedProjects}</p>
+          <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-0.03em" }}>{D.recentWork}</h2>
         </div>
         <a href="#" style={{
           fontFamily: SANS, fontSize: 13, fontWeight: 600, color: C.ink,
@@ -316,20 +455,23 @@ function WorksSection() {
         }}
           onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.ink; }}
           onMouseLeave={(e) => { e.currentTarget.style.borderColor = C.dimMed; }}
-        >All projects →</a>
+        >{D.allProjects}</a>
       </div>
 
       {/* Bento */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 16 }}>
-        {WORKS.map((work, i) => (
-          <BentoCard key={work.seed} work={work} span={BENTO_SPANS[i]!} imgH={BENTO_IMG_H[i]!} delay={i * 80} />
+        {works.map((work, i) => (
+          <BentoCard key={work.seed} work={work} span={BENTO_SPANS[i]!} imgH={BENTO_IMG_H[i]!} delay={i * 80} viewProjectLabel={D.viewProject} />
         ))}
       </div>
     </section>
   );
 }
 
-function BentoCard({ work, span, imgH, delay }: { work: typeof WORKS[0]; span: number; imgH: number; delay: number }) {
+function BentoCard({ work, span, imgH, delay, viewProjectLabel }: {
+  work: { seed: number; title: string; year: string; cat: string; desc: string; bg: string; tag: string };
+  span: number; imgH: number; delay: number; viewProjectLabel: string;
+}) {
   const [hovered, setHovered] = useState(false);
   const { ref, visible } = useReveal();
 
@@ -382,7 +524,7 @@ function BentoCard({ work, span, imgH, delay }: { work: typeof WORKS[0]; span: n
           display: "flex", alignItems: "center", gap: 4,
           opacity: hovered ? 1 : 0.35, transition: "opacity 0.25s",
         }}>
-          View project
+          {viewProjectLabel}
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </span>
       </div>
@@ -392,7 +534,7 @@ function BentoCard({ work, span, imgH, delay }: { work: typeof WORKS[0]; span: n
 
 /* ── Gallery — CSS columns masonry ─────────────────────────── */
 
-function GallerySection({ onOpen }: { onOpen: (i: number) => void }) {
+function GallerySection({ onOpen, D }: { onOpen: (i: number) => void; D: DemoStrings }) {
   const { ref, visible } = useReveal();
 
   return (
@@ -403,23 +545,23 @@ function GallerySection({ onOpen }: { onOpen: (i: number) => void }) {
     }}>
       <div ref={ref} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 40, ...revealStyle(visible) }}>
         <div>
-          <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: C.periwiDk, marginBottom: 10 }}>The archive</p>
-          <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-0.03em", color: C.ink }}>All shots</h2>
+          <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: C.periwiDk, marginBottom: 10 }}>{D.theArchive}</p>
+          <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-0.03em", color: C.ink }}>{D.allShots}</h2>
         </div>
-        <span style={{ fontFamily: MONO, fontSize: 13, color: C.periwiDk }}>{GALLERY.length} photographs</span>
+        <span style={{ fontFamily: MONO, fontSize: 13, color: C.periwiDk }}>{GALLERY.length} {D.photographs}</span>
       </div>
 
       {/* True masonry via CSS columns */}
       <div style={{ columns: 3, columnGap: 12 }}>
         {GALLERY.map((photo, i) => (
-          <MasonryItem key={photo.seed} photo={photo} index={i} onOpen={onOpen} />
+          <MasonryItem key={photo.seed} photo={photo} index={i} onOpen={onOpen} openLabel={D.openPhoto} />
         ))}
       </div>
     </section>
   );
 }
 
-function MasonryItem({ photo, index, onOpen }: { photo: typeof GALLERY[0]; index: number; onOpen: (i: number) => void }) {
+function MasonryItem({ photo, index, onOpen, openLabel }: { photo: typeof GALLERY[0]; index: number; onOpen: (i: number) => void; openLabel: string }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -458,7 +600,7 @@ function MasonryItem({ photo, index, onOpen }: { photo: typeof GALLERY[0]; index
           backdropFilter: "blur(8px)", borderRadius: 100,
           padding: "8px 18px",
           fontFamily: SANS, fontSize: 12, fontWeight: 600, color: "#fff",
-        }}>↗ Open</div>
+        }}>{openLabel}</div>
       </div>
     </div>
   );
@@ -466,7 +608,7 @@ function MasonryItem({ photo, index, onOpen }: { photo: typeof GALLERY[0]; index
 
 /* ── About ──────────────────────────────────────────────────── */
 
-function AboutSection() {
+function AboutSection({ D }: { D: DemoStrings }) {
   const { ref, visible } = useReveal();
 
   return (
@@ -493,34 +635,29 @@ function AboutSection() {
             boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
           }}>
             <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 30, letterSpacing: "-0.03em", lineHeight: 1 }}>340+</div>
-            <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, color: C.mid, marginTop: 4 }}>happy clients</div>
+            <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, color: C.mid, marginTop: 4 }}>{D.happyClients}</div>
           </div>
         </div>
 
         {/* Text */}
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div>
-            <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.26em", textTransform: "uppercase", color: C.mintDk, marginBottom: 14 }}>Hey, I'm Mia!</p>
+            <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.26em", textTransform: "uppercase", color: C.mintDk, marginBottom: 14 }}>{D.heyIm}</p>
             <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(32px, 4vw, 52px)", letterSpacing: "-0.03em", lineHeight: 1.08 }}>
-              I shoot what{" "}
-              <span style={{ background: C.coral, borderRadius: 10, padding: "1px 12px", display: "inline-block" }}>feels real.</span>
+              {D.aboutH2a}{" "}
+              <span style={{ background: C.coral, borderRadius: 10, padding: "1px 12px", display: "inline-block" }}>{D.aboutH2highlight}</span>
             </h2>
           </div>
           <p style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.75, color: C.mid }}>
-            Based in Berlin, I've been making pictures for eleven years. Drawn to in-between moments — the laugh before the pose, the glance before the ceremony, the quiet after the gig.
+            {D.aboutBio1}
           </p>
           <p style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.75, color: C.mid }}>
-            I work with musicians, brands, couples, and anyone who wants images that don't feel like stock photos.
+            {D.aboutBio2}
           </p>
 
           {/* Pill stats */}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {[
-              { label: "11 years shooting", bg: C.coral },
-              { label: "6 countries",       bg: C.lemon },
-              { label: "2 dogs",             bg: C.peach },
-              { label: "∞ cups of tea",      bg: C.periwi },
-            ].map((pill) => (
+            {D.pills.map((pill) => (
               <span key={pill.label} style={{
                 fontFamily: SANS, fontSize: 13, fontWeight: 600,
                 background: pill.bg, color: C.ink,
@@ -539,7 +676,7 @@ function AboutSection() {
           }}
             onMouseEnter={(e) => { e.currentTarget.style.background = C.mintDk; e.currentTarget.style.transform = "translateY(-2px)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; e.currentTarget.style.transform = "translateY(0)"; }}
-          >My full story →</a>
+          >{D.myFullStory}</a>
         </div>
       </div>
     </section>
@@ -548,7 +685,7 @@ function AboutSection() {
 
 /* ── Contact ────────────────────────────────────────────────── */
 
-function ContactSection() {
+function ContactSection({ D }: { D: DemoStrings }) {
   const { ref, visible } = useReveal();
 
   return (
@@ -558,12 +695,12 @@ function ContactSection() {
       textAlign: "center",
     }}>
       <div ref={ref} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24, ...revealStyle(visible) }}>
-        <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.26em", textTransform: "uppercase", color: C.mid }}>Say hello</p>
+        <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.26em", textTransform: "uppercase", color: C.mid }}>{D.sayHello}</p>
         <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(36px, 6vw, 80px)", letterSpacing: "-0.04em", maxWidth: "14ch", lineHeight: 0.97 }}>
-          Got a project in mind?
+          {D.contactH2}
         </h2>
         <p style={{ fontFamily: SANS, fontSize: 16, lineHeight: 1.7, color: C.mid, maxWidth: 460 }}>
-          Whether it's a wedding, a campaign, or just an idea on a napkin — let's figure it out together.
+          {D.contactSub}
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
           <a href="#" style={{
@@ -573,7 +710,7 @@ function ContactSection() {
           }}
             onMouseEnter={(e) => { e.currentTarget.style.background = C.coralDk; e.currentTarget.style.transform = "translateY(-2px)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = C.ink; e.currentTarget.style.transform = "translateY(0)"; }}
-          >Send me a message</a>
+          >{D.sendMessage}</a>
           <a href="#" style={{
             fontFamily: SANS, fontSize: 15, fontWeight: 600, color: C.ink,
             padding: "15px 36px", borderRadius: 100, border: `2px solid ${C.dimMed}`,
@@ -581,7 +718,7 @@ function ContactSection() {
           }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.ink; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = C.dimMed; }}
-          >Book a call</a>
+          >{D.bookCall}</a>
         </div>
 
         {/* Social pills */}
@@ -605,7 +742,7 @@ function ContactSection() {
 
 /* ── Footer ─────────────────────────────────────────────────── */
 
-function FooterBar() {
+function FooterBar({ D }: { D: DemoStrings }) {
   return (
     <footer style={{
       background: C.ink, padding: "0 clamp(20px, 5vw, 64px)",
@@ -615,10 +752,10 @@ function FooterBar() {
         mia.<span style={{ color: C.coralDk }}>photo</span>
       </span>
       <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", color: "rgba(255,255,255,0.28)" }}>
-        © 2024 · Made with love in Berlin
+        {D.footerCopy}
       </span>
       <div style={{ display: "flex", gap: 20 }}>
-        {["Privacy", "Terms", "Colophon"].map((item) => (
+        {D.footerLinks.map((item) => (
           <a key={item} href="#" style={{
             fontFamily: SANS, fontSize: 12, fontWeight: 500,
             color: "rgba(255,255,255,0.32)", transition: "color 0.18s",
@@ -635,8 +772,8 @@ function FooterBar() {
 /* ── Lightbox ───────────────────────────────────────────────── */
 
 function PetalLightbox({
-  photos, startIndex, onClose,
-}: { photos: typeof GALLERY; startIndex: number; onClose: () => void }) {
+  photos, startIndex, onClose, D,
+}: { photos: typeof GALLERY; startIndex: number; onClose: () => void; D: DemoStrings }) {
   const [index, setIndex]   = useState(startIndex);
   const [zoom, setZoom]     = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -705,14 +842,14 @@ function PetalLightbox({
           onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          Close
+          {D.lbClose}
         </button>
         <span style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.2em", color: "rgba(255,255,255,0.3)" }}>
           {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
         </span>
         {zoom > 1 ? (
           <button onClick={resetView} style={{ background: C.coral, border: "none", cursor: "pointer", color: C.ink, padding: "8px 18px", borderRadius: 100, fontFamily: SANS, fontSize: 12, fontWeight: 700 }}>
-            {Math.round(zoom * 100)}% · Reset
+            {Math.round(zoom * 100)}% · {D.lbReset}
           </button>
         ) : <div style={{ width: 90 }} />}
       </div>
