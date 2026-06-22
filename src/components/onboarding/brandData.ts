@@ -152,3 +152,71 @@ export function buildMinimalNodes(locale: string, id: Identity, logoText?: strin
 
   return out;
 }
+
+/* Locale-aware default nodes for the Atelier template. */
+export function buildAtelierNodes(locale: string, id: Identity): Record<string, EditorNode> {
+  const es = locale === "es";
+  const out: Record<string, EditorNode> = {};
+  const n = (nid: string, type: EditorNode["type"], content: string): void => { out[nid] = { id: nid, type, content }; };
+
+  if (es) {
+    n("atl-hero-eyebrow",  "paragraph", "Una celebración en movimiento · 247 fotografías");
+    n("atl-hero-subtitle", "paragraph", "Un fin de semana en los jardines de Buenos Aires, capturado al ritmo más lento.");
+    n("atl-hero-caption",  "paragraph", "Placa 01 · La portada");
+    n("atl-hero-date",     "paragraph", "14 de abril de 2026");
+    n("atl-coll-title",    "heading",   "La colección");
+    n("atl-coll-meta",     "paragraph", "247 fotografías · curadas a mano");
+    n("atl-quote-text",    "paragraph", "“La tarde más lenta y más hermosa. Cada momento ya parecía un recuerdo.”");
+    n("atl-close-eyebrow", "paragraph", "III · Una nota");
+    n("atl-close-heading", "heading",   "Gracias por dejarnos estar allí.");
+    n("atl-close-body",    "paragraph", "Tu galería es tuya para siempre. Descarga la colección completa en alta resolución, comparte imágenes con quien quieras o imprime directamente desde el estudio.");
+    n("atl-close-cta-1",   "paragraph", "Descargar todo");
+    n("atl-close-cta-2",   "paragraph", "Pedir impresiones");
+  }
+
+  if (id.first || id.last) {
+    const year = new Date().getFullYear();
+    const name = fullName(id);
+    n("atl-nav-brand",    "logo",      esc(name || "Atelier"));
+    n("atl-hero-title",   "heading",   esc(id.first) + (id.last ? ` <em>&amp;</em> ${esc(id.last)}` : ""));
+    n("atl-footer-brand", "paragraph", esc(name));
+    n("atl-footer-copy",  "paragraph", `© ${year}${id.location ? " · " + esc(id.location) : ""}`);
+    n("atl-nav-subtitle", "paragraph", esc(name) + (es ? " · Abr 2026" : " · Apr 2026"));
+  }
+
+  return out;
+}
+
+/* Locale-aware default nodes for the Halcyon template. */
+export function buildHalcyonNodes(locale: string, id: Identity): Record<string, EditorNode> {
+  const es = locale === "es";
+  const out: Record<string, EditorNode> = {};
+  const n = (nid: string, type: EditorNode["type"], content: string): void => { out[nid] = { id: nid, type, content }; };
+
+  if (es) {
+    n("hl-cover-title",      "heading",   "La luz<br/>sigue <em>llegando.</em>");
+    n("hl-work-label",       "paragraph", "Trabajo Seleccionado");
+    n("hl-viewall",          "paragraph", "Ver todos los trabajos");
+    n("hl-archive-eyebrow",  "paragraph", "Explorar el archivo completo");
+    n("hl-archive-title",    "heading",   "Cada <em>fotografía,</em><br/>en una sola sala.");
+    n("hl-archive-sub",      "paragraph", "Doce años de bodas, editoriales y habitaciones silenciosas — reunidas aquí. Abre el archivo y explora.");
+    n("hl-archive-cta",      "paragraph", "Abrir el archivo");
+    n("hl-about-label",      "paragraph", "Sobre mí");
+    n("hl-about-heading",    "heading",   "Imágenes para <em>quedarse,</em><br/>no para deslizar.");
+    n("hl-about-cta",        "paragraph", "Contacto");
+    n("hl-contact-eyebrow",  "paragraph", "Disponible para comisiones 2025");
+    n("hl-contact-heading",  "heading",   "Inicia una <em>conversación.</em>");
+    n("hl-contact-tag",      "paragraph", "Cuéntame sobre el día, el lugar, las personas. El mejor trabajo siempre empieza con una carta larga y una respuesta pausada.");
+    n("hl-footer-copy",      "paragraph", "© 2024 · Todas las fotografías © Lior Avni");
+  }
+
+  if (id.first || id.last) {
+    const name = fullName(id);
+    n("hl-mark-name", "logo",      esc(name || "Halcyon"));
+    n("hl-mark-sub",  "paragraph", es ? "Estudio · Fotografía" : "Studio · Photography");
+    if (id.bio) n("hl-about-bio", "paragraph", esc(id.bio));
+    if (id.location) n("hl-mark-sub", "paragraph", (es ? "Estudio · " : "Studio · ") + esc(id.location));
+  }
+
+  return out;
+}

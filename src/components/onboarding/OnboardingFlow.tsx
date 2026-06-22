@@ -16,7 +16,7 @@ import { useUploadPhotos } from "~/lib/photo/upload";
 import { LiveTemplatePreview } from "./LiveTemplatePreview";
 import {
   PALETTES, PAIRINGS, pairingTypography, TEMPLATE_OPTIONS,
-  buildMinimalNodes, buildOnboardingContent, fullName, initials,
+  buildMinimalNodes, buildAtelierNodes, buildHalcyonNodes, buildOnboardingContent, fullName, initials,
   type Identity, type OnbFolder, type OnbPhoto,
 } from "./brandData";
 
@@ -110,7 +110,11 @@ export function OnboardingFlow() {
   // Wordmark shown in the nav when the logo uses text (text or image+text mode).
   const navLogoText = hasLogo && logoMode !== "image" ? (logoText.trim() || initials(identity)) : undefined;
   const contact = { email, phone };
-  const previewNodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact, avatarUrl) : undefined;
+  const previewNodes =
+    template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact, avatarUrl) :
+    template.id === "atelier"    ? buildAtelierNodes(locale, identity) :
+    template.id === "halcyon"    ? buildHalcyonNodes(locale, identity) :
+    undefined;
 
   const logoSettings: LogoSettings | undefined = hasLogo
     ? { mode: logoMode, text: logoText.trim() || initials(identity), imageUrl: logoUrl, altImageUrl: altLogoUrl, faviconUrl: iconUrl, width: logoWidth, imageCrop: logoCrop }
@@ -189,7 +193,11 @@ export function OnboardingFlow() {
         avatarUrl: avatarUrl || undefined,
       });
       const base = name || "Portfolio";
-      const nodes = template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact, avatarUrl) : undefined;
+      const nodes =
+        template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact, avatarUrl) :
+        template.id === "atelier"    ? buildAtelierNodes(locale, identity) :
+        template.id === "halcyon"    ? buildHalcyonNodes(locale, identity) :
+        undefined;
       const content = contentPhotos.length > 0 ? buildOnboardingContent(locale, folders, contentPhotos) : undefined;
       const editorState = { templateId: template.id, palette, typography: typo, nodes, logo: logoSettings, contact: contactSettings };
 
