@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { useT } from "~/components/providers/LangProvider";
 
 const SERIF = "var(--atelier-serif), 'Cormorant Garamond', 'Playfair Display', Georgia, serif";
 const SANS  = "var(--atelier-sans), Inter, -apple-system, sans-serif";
@@ -9,6 +10,95 @@ const MONO  = "var(--atelier-mono), 'Space Mono', ui-monospace, monospace";
 
 const HERO_SEED = 1015;
 const ATELIER_PASSWORD = "sarah2026";
+
+/* ── Demo string tables ─────────────────────────────────────── */
+const DEMO_EN = {
+  welcomeLabel:       "Welcome",
+  coupleNames:        "Sarah & James",
+  galleryReady:       "Your gallery is ready.",
+  celebrationMeta:    "A celebration in motion · 247 photographs",
+  tagline:            "A weekend in the gardens of Buenos Aires, captured at the slowest pace.",
+  plate01Caption:     "Plate 01 · The cover",
+  heroDate:           "April 14, 2026",
+  sectionRomanII:     "II",
+  theCollection:      "The collection",
+  photosMeta:         "247 photographs · curated by hand",
+  pullQuote:          "The slowest, most beautiful afternoon. Every moment looked like it was already a memory.",
+  photographerCredit: "Felipe Aravena · Photographer",
+  noteLabel:          "III · A note",
+  thankYou:           "Thank you for letting us be there.",
+  galleryBody:        "Your gallery is yours forever. Download the full collection in high resolution, share single images with anyone you’d like, or print directly through the studio.",
+  downloadAll:        "Download all",
+  orderPrints:        "Order prints",
+  contact:            "Contact",
+  printShop:          "Print shop",
+  footerCopyright:    "© 2026 · Buenos Aires",
+  topbarCouple:       "Sarah & James · Apr 2026",
+  topbarCollection:   "The collection",
+  topbarDownload:     "Download ↓",
+  atelierPrivate:     "Atelier · Private",
+  coupleHeader:       "Sarah & James",
+  waitingMessage:     "We’ve been waiting for this moment. Your gallery is ready.",
+  enterButton:        "Enter",
+  privateCollection:  "A private collection · Apr 2026",
+  accessKeyPrompt:    "Enter your access key to continue.",
+  accessKeyLabel:     "Access key",
+  accessKeyPlaceholder: "From your photographer",
+  incorrectError:     "Incorrect — try again",
+  unlockButton:       "Unlock the gallery",
+  backButton:         "← Back",
+  hintText:           "Hint: sarah2026",
+  lightboxBack:       "Back",
+  lightboxCouple:     "Sarah & James · Apr 14, 2026",
+  lightboxHint:       "Scroll to zoom · ← → to navigate",
+  curtainCouple:      "Sarah & James",
+};
+
+const DEMO_ES = {
+  welcomeLabel:       "Bienvenidos",
+  coupleNames:        "Sara y Santiago",
+  galleryReady:       "Tu galería está lista.",
+  celebrationMeta:    "Una celebración en movimiento · 247 fotografías",
+  tagline:            "Un fin de semana en los jardines de Buenos Aires, capturado al ritmo más lento.",
+  plate01Caption:     "Placa 01 · La portada",
+  heroDate:           "14 de abril de 2026",
+  sectionRomanII:     "II",
+  theCollection:      "La colección",
+  photosMeta:         "247 fotografías · curadas a mano",
+  pullQuote:          "La tarde más lenta y más hermosa. Cada momento ya parecía un recuerdo.",
+  photographerCredit: "Felipe Aravena · Photographer",
+  noteLabel:          "III · Una nota",
+  thankYou:           "Gracias por dejarnos estar allí.",
+  galleryBody:        "Tu galería es tuya para siempre. Descarga la colección completa en alta resolución, comparte imágenes con quien quieras o imprime directamente desde el estudio.",
+  downloadAll:        "Descargar todo",
+  orderPrints:        "Pedir impresiones",
+  contact:            "Contacto",
+  printShop:          "Tienda de impresión",
+  footerCopyright:    "© 2026 · Buenos Aires",
+  topbarCouple:       "Sara y Santiago · Abr 2026",
+  topbarCollection:   "La colección",
+  topbarDownload:     "Descargar ↓",
+  atelierPrivate:     "Atelier · Privado",
+  coupleHeader:       "Sara y Santiago",
+  waitingMessage:     "Estuvimos esperando este momento. Tu galería está lista.",
+  enterButton:        "Entrar",
+  privateCollection:  "Una colección privada · Abr 2026",
+  accessKeyPrompt:    "Ingresa tu clave de acceso para continuar.",
+  accessKeyLabel:     "Clave de acceso",
+  accessKeyPlaceholder: "De tu fotógrafo",
+  incorrectError:     "Incorrecto — intenta de nuevo",
+  unlockButton:       "Desbloquear la galería",
+  backButton:         "← Volver",
+  hintText:           "Hint: sarah2026",
+  lightboxBack:       "Volver",
+  lightboxCouple:     "Sara y Santiago · 14 Abr, 2026",
+  lightboxHint:       "Desplázate para hacer zoom · ← → para navegar",
+  curtainCouple:      "Sara y Santiago",
+};
+
+function demo(locale: string) {
+  return locale === "es" ? DEMO_ES : DEMO_EN;
+}
 
 /* Editorial layout — each photo gets a deliberate column/row span to create rhythm */
 const PHOTOS: { seed: number; col: number; row: number }[] = [
@@ -29,9 +119,10 @@ const PHOTOS: { seed: number; col: number; row: number }[] = [
 ];
 
 export default function AtelierPage() {
+  const { locale } = useT();
   const [unlocked, setUnlocked] = useState(false);
-  if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
-  return <AtelierGallery />;
+  if (!unlocked) return <PasswordGate locale={locale} onUnlock={() => setUnlocked(true)} />;
+  return <AtelierGallery locale={locale} />;
 }
 
 /* Stagger variants for the hero entrance — start after curtain begins lifting */
@@ -50,7 +141,8 @@ const drawLine: Variants = {
   show:   { scaleY: 1, opacity: 1, transition: { duration: 0.7, ease: EASE_OUT } },
 };
 
-function AtelierGallery() {
+function AtelierGallery({ locale }: { locale: string }) {
+  const D = demo(locale);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [curtainUp, setCurtainUp]     = useState(false);
 
@@ -84,7 +176,7 @@ function AtelierGallery() {
               transition={{ duration: 0.8, delay: 0.15 }}
               style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 28 }}
             >
-              Welcome
+              {D.welcomeLabel}
             </motion.p>
             <motion.h2
               initial={{ opacity: 0, y: 16 }}
@@ -92,7 +184,7 @@ function AtelierGallery() {
               transition={{ duration: 1.0, delay: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
               style={{ fontFamily: SERIF, fontSize: "clamp(56px, 9vw, 100px)", fontWeight: 300, letterSpacing: "-0.025em", lineHeight: 1, margin: 0, color: "#fafaf8", textAlign: "center" }}
             >
-              Sarah <span style={{ fontStyle: "italic", fontWeight: 400, color: "rgba(255,255,255,0.7)" }}>&amp;</span> James
+              {D.curtainCouple}
             </motion.h2>
             <motion.div
               initial={{ scaleX: 0, opacity: 0 }}
@@ -106,7 +198,7 @@ function AtelierGallery() {
               transition={{ duration: 0.7, delay: 1.0 }}
               style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, color: "rgba(255,255,255,0.65)", fontWeight: 300 }}
             >
-              Your gallery is ready.
+              {D.galleryReady}
             </motion.p>
           </motion.div>
         )}
@@ -118,7 +210,7 @@ function AtelierGallery() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 1.8 }}
       >
-        <Topbar />
+        <Topbar D={D} />
       </motion.div>
 
       {/* ── Hero ────────────────────────────────────────────── */}
@@ -129,21 +221,21 @@ function AtelierGallery() {
         style={{ padding: "140px 48px 80px", textAlign: "center", maxWidth: 980, margin: "0 auto" }}
       >
         <motion.p variants={fadeUp} style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 36 }}>
-          A celebration in motion · 247 photographs
+          {D.celebrationMeta}
         </motion.p>
         <motion.h1 variants={fadeUp} style={{
           fontFamily: SERIF, fontSize: "clamp(72px, 12vw, 152px)",
           fontWeight: 300, lineHeight: 0.92, letterSpacing: "-0.035em",
           margin: 0, marginBottom: 20, color: "#0a0a0a",
         }}>
-          Sarah <span style={{ fontStyle: "italic", fontWeight: 400, color: "#3a3a3a" }}>&amp;</span> James
+          {D.coupleNames}
         </motion.h1>
         <motion.p variants={fadeUp} style={{
           fontFamily: SERIF, fontSize: "clamp(20px, 2.4vw, 28px)",
           fontStyle: "italic", color: "#4a4742", lineHeight: 1.4,
           fontWeight: 300, maxWidth: 640, margin: "0 auto",
         }}>
-          A weekend in the gardens of Buenos Aires, captured at the slowest pace.
+          {D.tagline}
         </motion.p>
         <motion.div variants={drawLine} style={{ width: 1, height: 48, background: "#0a0a0a", margin: "72px auto 0", transformOrigin: "top" }} />
       </motion.header>
@@ -165,10 +257,10 @@ function AtelierGallery() {
         </div>
         <div style={{ marginTop: 24, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
           <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f" }}>
-            Plate 01 · The cover
+            {D.plate01Caption}
           </p>
           <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: "#4a4742" }}>
-            April 14, 2026
+            {D.heroDate}
           </p>
         </div>
       </motion.section>
@@ -183,19 +275,19 @@ function AtelierGallery() {
       }}>
         <div>
           <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 12 }}>
-            II
+            {D.sectionRomanII}
           </p>
           <h2 style={{
             fontFamily: SERIF, fontSize: "clamp(44px, 6vw, 72px)",
             fontWeight: 300, fontStyle: "italic", letterSpacing: "-0.015em",
             margin: 0, lineHeight: 1, color: "#0a0a0a",
           }}>
-            The collection
+            {D.theCollection}
           </h2>
         </div>
         <div style={{ textAlign: "right" }}>
           <p style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f" }}>
-            247 photographs · curated by hand
+            {D.photosMeta}
           </p>
         </div>
       </section>
@@ -235,11 +327,10 @@ function AtelierGallery() {
           fontWeight: 300, fontStyle: "italic", lineHeight: 1.35,
           letterSpacing: "-0.005em", margin: 0, color: "#1a1a1a",
         }}>
-          &ldquo;The slowest, most beautiful afternoon. Every moment looked like
-          it was already a memory.&rdquo;
+          &ldquo;{D.pullQuote}&rdquo;
         </p>
         <p style={{ marginTop: 32, fontFamily: MONO, fontSize: 12, letterSpacing: "0.25em", textTransform: "uppercase", color: "#7a766f" }}>
-          Felipe Aravena · Photographer
+          {D.photographerCredit}
         </p>
       </section>
 
@@ -256,19 +347,17 @@ function AtelierGallery() {
           </div>
           <div>
             <p style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 24 }}>
-              III · A note
+              {D.noteLabel}
             </p>
             <h3 style={{
               fontFamily: SERIF, fontSize: "clamp(36px, 4.5vw, 56px)",
               fontWeight: 300, fontStyle: "italic", letterSpacing: "-0.015em",
               lineHeight: 1.05, margin: 0, marginBottom: 28, color: "#0a0a0a",
             }}>
-              Thank you for letting us be there.
+              {D.thankYou}
             </h3>
             <p style={{ fontSize: 15, lineHeight: 1.7, color: "#3a3a3a", maxWidth: 460, marginBottom: 28 }}>
-              Your gallery is yours forever. Download the full collection in
-              high resolution, share single images with anyone you&rsquo;d like, or
-              print directly through the studio.
+              {D.galleryBody}
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <a href="#download" style={{
@@ -277,7 +366,7 @@ function AtelierGallery() {
                 fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em",
                 textTransform: "uppercase", textDecoration: "none",
               }}>
-                Download all
+                {D.downloadAll}
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
               </a>
               <a href="#print" style={{
@@ -287,7 +376,7 @@ function AtelierGallery() {
                 fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em",
                 textTransform: "uppercase", textDecoration: "none",
               }}>
-                Order prints
+                {D.orderPrints}
               </a>
             </div>
           </div>
@@ -306,26 +395,26 @@ function AtelierGallery() {
             Atelier
           </p>
           <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7a766f" }}>
-            © 2026 · Buenos Aires
+            {D.footerCopyright}
           </p>
         </div>
         <nav style={{ display: "flex", gap: 28, fontFamily: MONO, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-          <a href="#contact" style={{ color: "#3a3a3a", textDecoration: "none", borderBottom: "1px solid transparent", paddingBottom: 2 }}>Contact</a>
+          <a href="#contact" style={{ color: "#3a3a3a", textDecoration: "none", borderBottom: "1px solid transparent", paddingBottom: 2 }}>{D.contact}</a>
           <a href="#instagram" style={{ color: "#3a3a3a", textDecoration: "none", borderBottom: "1px solid transparent", paddingBottom: 2 }}>Instagram</a>
-          <a href="#print" style={{ color: "#3a3a3a", textDecoration: "none", borderBottom: "1px solid transparent", paddingBottom: 2 }}>Print shop</a>
+          <a href="#print" style={{ color: "#3a3a3a", textDecoration: "none", borderBottom: "1px solid transparent", paddingBottom: 2 }}>{D.printShop}</a>
         </nav>
       </footer>
 
       {/* ── Lightbox ────────────────────────────────────────── */}
       {lightboxIdx !== null && (
-        <Lightbox photos={PHOTOS} startIndex={lightboxIdx} onClose={() => setLightboxIdx(null)} />
+        <Lightbox photos={PHOTOS} startIndex={lightboxIdx} D={D} onClose={() => setLightboxIdx(null)} />
       )}
     </main>
   );
 }
 
 /* ── Top nav with scroll-aware backdrop ───────────────────── */
-function Topbar() {
+function Topbar({ D }: { D: typeof DEMO_EN }) {
   return (
     <nav style={{
       position: "sticky", top: 0, zIndex: 50,
@@ -340,13 +429,13 @@ function Topbar() {
       textTransform: "uppercase", color: "#0a0a0a",
     }}>
       <span>Atelier</span>
-      <span style={{ color: "#7a766f", textAlign: "center" }}>Sarah &amp; James · Apr 2026</span>
+      <span style={{ color: "#7a766f", textAlign: "center" }}>{D.topbarCouple}</span>
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 24 }}>
-        <a href="#collection" style={{ color: "#0a0a0a", textDecoration: "none" }}>The collection</a>
+        <a href="#collection" style={{ color: "#0a0a0a", textDecoration: "none" }}>{D.topbarCollection}</a>
         <a href="#download" style={{
           color: "#0a0a0a", textDecoration: "none",
           borderBottom: "1px solid #0a0a0a", paddingBottom: 1,
-        }}>Download ↓</a>
+        }}>{D.topbarDownload}</a>
       </div>
     </nav>
   );
@@ -409,7 +498,8 @@ function Plate({ seed, idx, total, col, row, onOpen }: { seed: number; idx: numb
 }
 
 /* ── Password gate ────────────────────────────────────────── */
-function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
+function PasswordGate({ locale, onUnlock }: { locale: string; onUnlock: () => void }) {
+  const D = demo(locale);
   const [step, setStep] = useState<"welcome" | "password">("welcome");
   const [pwd, setPwd] = useState("");
   const [error, setError] = useState(false);
@@ -444,14 +534,14 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
         {/* Persistent header — stays across steps */}
         <motion.div layout="position">
           <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 28 }}>
-            Atelier · Private
+            {D.atelierPrivate}
           </p>
           <h1 style={{
             fontFamily: SERIF, fontSize: 56, fontWeight: 300,
             letterSpacing: "-0.02em", lineHeight: 1, margin: 0, marginBottom: 12,
             color: "#fafaf8",
           }}>
-            Sarah <span style={{ fontStyle: "italic", fontWeight: 400 }}>&amp;</span> James
+            {D.coupleHeader}
           </h1>
         </motion.div>
 
@@ -466,9 +556,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
               transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
             >
               <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, color: "rgba(250,250,248,0.78)", marginTop: 4, marginBottom: 36, fontWeight: 300, lineHeight: 1.5 }}>
-                We&rsquo;ve been waiting for this moment.
-                <br />
-                Your gallery is ready.
+                {D.waitingMessage}
               </p>
 
               <div style={{ width: 32, height: 1, background: "rgba(255,255,255,0.3)", margin: "0 auto 36px" }} />
@@ -484,12 +572,12 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
                   display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 10,
                 }}
               >
-                Enter
+                {D.enterButton}
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
 
               <p style={{ marginTop: 32, fontFamily: MONO, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
-                A private collection · Apr 2026
+                {D.privateCollection}
               </p>
             </motion.div>
           ) : (
@@ -502,18 +590,18 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
               transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
             >
               <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: "rgba(250,250,248,0.7)", marginTop: 4, marginBottom: 36, fontWeight: 300 }}>
-                Enter your access key to continue.
+                {D.accessKeyPrompt}
               </p>
 
               <div style={{ width: 32, height: 1, background: "rgba(255,255,255,0.3)", margin: "0 auto 32px" }} />
 
               <label style={{ display: "block", fontFamily: MONO, fontSize: 13, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 10, textAlign: "left" }}>
-                Access key
+                {D.accessKeyLabel}
               </label>
               <input
                 autoFocus type="password" value={pwd}
                 onChange={(e) => { setPwd(e.target.value); setError(false); }}
-                placeholder="From your photographer"
+                placeholder={D.accessKeyPlaceholder}
                 style={{
                   width: "100%", boxSizing: "border-box",
                   padding: "14px 0",
@@ -526,7 +614,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
               />
               {error && (
                 <p style={{ marginTop: 12, fontFamily: MONO, fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: "#f59e9e", textAlign: "left" }}>
-                  Incorrect — try again
+                  {D.incorrectError}
                 </p>
               )}
 
@@ -537,7 +625,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
                 border: "none", cursor: "pointer",
                 fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700,
               }}>
-                Unlock the gallery
+                {D.unlockButton}
               </button>
 
               <button
@@ -549,11 +637,11 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
                   fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase",
                 }}
               >
-                ← Back
+                {D.backButton}
               </button>
 
               <p style={{ marginTop: 24, fontFamily: MONO, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
-                Hint: sarah2026
+                {D.hintText}
               </p>
             </motion.form>
           )}
@@ -564,7 +652,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
 }
 
 /* ── Lightbox ─────────────────────────────────────────────── */
-function Lightbox({ photos, startIndex, onClose }: { photos: typeof PHOTOS; startIndex: number; onClose: () => void }) {
+function Lightbox({ photos, startIndex, D, onClose }: { photos: typeof PHOTOS; startIndex: number; D: typeof DEMO_EN; onClose: () => void }) {
   const [index, setIndex]   = useState(startIndex);
   const [zoom, setZoom]     = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -627,7 +715,7 @@ function Lightbox({ photos, startIndex, onClose }: { photos: typeof PHOTOS; star
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", background: "linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)", pointerEvents: "none" }}>
         <button onClick={onClose} style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.7)", padding: "6px 10px", fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          Back
+          {D.lightboxBack}
         </button>
         <span style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>
           {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
@@ -684,11 +772,11 @@ function Lightbox({ photos, startIndex, onClose }: { photos: typeof PHOTOS; star
             Plate {String(index + 1).padStart(2, "0")}
           </p>
           <p style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", margin: 0 }}>
-            Sarah &amp; James · Apr 14, 2026
+            {D.lightboxCouple}
           </p>
         </div>
         <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
-          Scroll to zoom · ← → to navigate
+          {D.lightboxHint}
         </span>
       </div>
     </div>
