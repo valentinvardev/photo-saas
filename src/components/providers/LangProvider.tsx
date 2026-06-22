@@ -19,11 +19,15 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");
 
   useEffect(() => {
-    // A previously chosen language always wins.
-    const stored = localStorage.getItem("lang") as Locale | null;
+    // 1. User manually chose a language → highest priority.
+    const stored = (localStorage.getItem("lang-user") ?? localStorage.getItem("lang")) as Locale | null;
     if (stored && ["en", "es", "pt"].includes(stored)) { setLocaleState(stored); return; }
-    // Otherwise auto-detect from the browser's language (the most reliable
-    // signal for which language a person reads — more so than IP geolocation).
+
+    // 2. Geo cookie set by the middleware (Vercel country or Accept-Language header).
+    const geoCookie = document.cookie.split("; ").find(c => c.startsWith("lang-geo="))?.split("=")[1] as Locale | undefined;
+    if (geoCookie && ["en", "es", "pt"].includes(geoCookie)) { setLocaleState(geoCookie); return; }
+
+    // 3. Browser navigator.language as last resort.
     const nav = (navigator.language || "en").toLowerCase();
     const detected: Locale = nav.startsWith("es") ? "es" : nav.startsWith("pt") ? "pt" : "en";
     setLocaleState(detected);
@@ -31,7 +35,9 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
-    localStorage.setItem("lang", l);
+    localStorage.setItem("lang-user", l);
+    // Also write a cookie so the middleware skips geo detection for this user.
+    document.cookie = `lang-user=${l};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
   }, []);
 
   const t = useCallback(createT(locale), [locale]);
