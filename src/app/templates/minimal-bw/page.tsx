@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ─────────────────────────────────────────────
    Minimal BW — A portfolio template for FRAME
    Fonts: Cormorant Garamond · DM Sans · Space Mono
 ───────────────────────────────────────────── */
 
-const WORKS = [
+/* ═══════════════════════════════════════════
+   I18N — locale-aware demo data
+═══════════════════════════════════════════ */
+const WORKS_EN = [
   { id: 1,  seed: 20,  title: "Wanderers",        year: "2024", cat: "Documentary", w: 5472, h: 3648 },
   { id: 2,  seed: 37,  title: "The Quiet City",    year: "2023", cat: "Urban",       w: 4000, h: 5000 },
   { id: 3,  seed: 48,  title: "Peripheral",        year: "2023", cat: "Street",      w: 6000, h: 4000 },
@@ -22,11 +26,40 @@ const WORKS = [
   { id: 12, seed: 167, title: "Anonymous",         year: "2024", cat: "Portrait",    w: 4000, h: 5000 },
 ];
 
-const STATS = [
+const WORKS_ES = [
+  { id: 1,  seed: 20,  title: "Vagabundos",              year: "2024", cat: "Documentary", w: 5472, h: 3648 },
+  { id: 2,  seed: 37,  title: "La Ciudad Silenciosa",    year: "2023", cat: "Urban",       w: 4000, h: 5000 },
+  { id: 3,  seed: 48,  title: "Periférico",              year: "2023", cat: "Street",      w: 6000, h: 4000 },
+  { id: 4,  seed: 63,  title: "Las Secuelas",            year: "2022", cat: "Documentary", w: 5472, h: 3648 },
+  { id: 5,  seed: 71,  title: "Naturaleza Muerta Nº 4",  year: "2022", cat: "Studio",      w: 4000, h: 4000 },
+  { id: 6,  seed: 82,  title: "Luz del Norte",           year: "2024", cat: "Landscape",   w: 7000, h: 4667 },
+  { id: 7,  seed: 95,  title: "Entre Sesiones",          year: "2021", cat: "Portrait",    w: 3840, h: 5760 },
+  { id: 8,  seed: 108, title: "El Umbral",               year: "2021", cat: "Documentary", w: 5472, h: 3648 },
+  { id: 9,  seed: 133, title: "Márgenes",                year: "2020", cat: "Urban",       w: 4500, h: 3000 },
+  { id: 10, seed: 145, title: "Estudio de Salinas",      year: "2023", cat: "Landscape",   w: 6000, h: 4000 },
+  { id: 11, seed: 156, title: "Interior IV",             year: "2022", cat: "Studio",      w: 3500, h: 4375 },
+  { id: 12, seed: 167, title: "Anónimo",                 year: "2024", cat: "Portrait",    w: 4000, h: 5000 },
+];
+
+function works(locale: string) {
+  return locale === "es" ? WORKS_ES : WORKS_EN;
+}
+
+const STATS_EN = [
   { value: "14",   unit: "Years"    },
   { value: "280+", unit: "Projects" },
   { value: "9",    unit: "Cities"   },
 ];
+
+const STATS_ES = [
+  { value: "14",   unit: "Años"       },
+  { value: "280+", unit: "Proyectos"  },
+  { value: "9",    unit: "Ciudades"   },
+];
+
+function stats(locale: string) {
+  return locale === "es" ? STATS_ES : STATS_EN;
+}
 
 const PRESS = [
   { name: "The New Yorker", year: "2023" },
@@ -36,7 +69,115 @@ const PRESS = [
   { name: "LensCulture",    year: "2020" },
 ];
 
-type Work = typeof WORKS[0];
+const DEMO_EN = {
+  // nav
+  navWork:    "Work",
+  navAbout:   "About",
+  navPress:   "Press",
+  navContact: "Contact",
+  hireCta:    "Hire me",
+  available:  "Available for commissions — Q4 2025",
+
+  // hero
+  discipline:    "Documentary & Portrait · New York",
+  heroBio:       "Documenting the quiet tension between presence and absence. Work exhibited across North America and Europe.",
+  viewWork:      "View work",
+  heroAboutLink: "About",
+
+  // work section
+  sectionWork:    "Selected Work",
+  selectedProj:   "Selected projects",
+  recentWork:     "Recent work",
+  allProjects:    "All projects",
+
+  // gallery modal
+  allWork: "All Work",
+
+  // pull quote label
+  onPractice: "On practice",
+
+  // about
+  sectionAbout: "About",
+  aboutHeadline1: "A career built on",
+  aboutHeadline2: "patience",
+  aboutBio1: "James Hollis is a New York-based documentary and portrait photographer with over a decade of work spanning editorial commissions, personal projects, and exhibition photography.",
+  aboutBio2: "His long-form projects explore the intersection of memory, geography, and identity — often through extended collaborations with communities in transition.",
+
+  // press
+  sectionPress: "Press & Features",
+
+  // contact
+  sectionContact:    "Contact",
+  contactHeadline1:  "Let’s create",
+  contactHeadline2:  "something.",
+  contactSubtitle:   "For editorial commissions, exhibition inquiries, and long-form project proposals.",
+  contactGeneral:    "General",
+  contactBookings:   "Bookings",
+  contactAgent:      "Agent",
+  formFirstName:     "First name",
+  formLastName:      "Last name",
+  formEmail:         "Email address",
+  formMessage:       "Tell me about your project...",
+  formSubmit:        "Send message",
+};
+
+const DEMO_ES = {
+  // nav
+  navWork:    "Trabajo",
+  navAbout:   "Sobre mí",
+  navPress:   "Prensa",
+  navContact: "Contacto",
+  hireCta:    "Contrátame",
+  available:  "Disponible para comisiones — T4 2025",
+
+  // hero
+  discipline:    "Documental y Retrato · Nueva York",
+  heroBio:       "Documentando la tensión silenciosa entre la presencia y la ausencia. Trabajo exhibido en América del Norte y Europa.",
+  viewWork:      "Ver trabajo",
+  heroAboutLink: "Sobre mí",
+
+  // work section
+  sectionWork:    "Trabajo Seleccionado",
+  selectedProj:   "Proyectos seleccionados",
+  recentWork:     "Trabajo reciente",
+  allProjects:    "Todos los proyectos",
+
+  // gallery modal
+  allWork: "Todo el trabajo",
+
+  // pull quote label
+  onPractice: "Sobre la práctica",
+
+  // about
+  sectionAbout: "Sobre mí",
+  aboutHeadline1: "Una carrera construida en la",
+  aboutHeadline2: "paciencia",
+  aboutBio1: "James Hollis es un fotógrafo documental y de retrato con base en Nueva York, con más de una década de trabajo que abarca comisiones editoriales, proyectos personales y fotografía de exposición.",
+  aboutBio2: "Sus proyectos de largo aliento exploran la intersección de la memoria, la geografía y la identidad, a menudo a través de colaboraciones extendidas con comunidades en transición.",
+
+  // press
+  sectionPress: "Prensa y Publicaciones",
+
+  // contact
+  sectionContact:    "Contacto",
+  contactHeadline1:  "Creemos algo",
+  contactHeadline2:  "juntos.",
+  contactSubtitle:   "Para comisiones editoriales, consultas de exposiciones y propuestas de proyectos a largo plazo.",
+  contactGeneral:    "General",
+  contactBookings:   "Reservas",
+  contactAgent:      "Agente",
+  formFirstName:     "Nombre",
+  formLastName:      "Apellido",
+  formEmail:         "Correo electrónico",
+  formMessage:       "Cuéntame sobre tu proyecto...",
+  formSubmit:        "Enviar mensaje",
+};
+
+function demo(locale: string) {
+  return locale === "es" ? DEMO_ES : DEMO_EN;
+}
+
+type Work = typeof WORKS_EN[0];
 
 /* ═══════════════════════════════════════════
    BREAKPOINT HOOK
@@ -55,7 +196,7 @@ function useBreakpoint() {
 /* ═══════════════════════════════════════════
    NAV
 ═══════════════════════════════════════════ */
-function Nav({ onOpenGallery }: { onOpenGallery: () => void }) {
+function Nav({ onOpenGallery, D }: { onOpenGallery: () => void; D: typeof DEMO_EN }) {
   const [scrolled, setScrolled]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
   const { isMobile }              = useBreakpoint();
@@ -104,7 +245,7 @@ function Nav({ onOpenGallery }: { onOpenGallery: () => void }) {
           {/* CTA */}
           <button onClick={onOpenGallery}
             style={{ ...sans, marginLeft: "auto", fontSize: "10px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0a0a0a", background: "none", border: "1px solid #0a0a0a", padding: "6px 14px", cursor: "pointer" }}>
-            Work
+            {D.navWork}
           </button>
         </nav>
 
@@ -130,10 +271,10 @@ function Nav({ onOpenGallery }: { onOpenGallery: () => void }) {
             {/* Nav links */}
             <nav style={{ flex: 1, padding: "2rem 1.5rem", display: "flex", flexDirection: "column", gap: "0" }}>
               {[
-                { label: "Work",    action: () => { setMenuOpen(false); onOpenGallery(); } },
-                { label: "About",   action: () => { setMenuOpen(false); document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }); } },
-                { label: "Press",   action: () => { setMenuOpen(false); document.getElementById("press")?.scrollIntoView({ behavior: "smooth" }); } },
-                { label: "Contact", action: () => { setMenuOpen(false); document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); } },
+                { label: D.navWork,    action: () => { setMenuOpen(false); onOpenGallery(); } },
+                { label: D.navAbout,   action: () => { setMenuOpen(false); document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }); } },
+                { label: D.navPress,   action: () => { setMenuOpen(false); document.getElementById("press")?.scrollIntoView({ behavior: "smooth" }); } },
+                { label: D.navContact, action: () => { setMenuOpen(false); document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); } },
               ].map((item, i) => (
                 <button key={item.label} onClick={item.action}
                   style={{ ...sans, textAlign: "left", background: "none", border: "none", borderBottom: "1px solid #f0f0f0", padding: "1.25rem 0", fontSize: "22px", fontWeight: 300, color: "#0a0a0a", cursor: "pointer", letterSpacing: "-0.01em",
@@ -147,11 +288,11 @@ function Nav({ onOpenGallery }: { onOpenGallery: () => void }) {
             {/* Drawer footer */}
             <div style={{ padding: "1.5rem", borderTop: "1px solid #e8e8e8" }}>
               <button style={{ ...sans, width: "100%", padding: "13px", background: "#0a0a0a", color: "#fafafa", border: "none", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
-                Hire me
+                {D.hireCta}
               </button>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "1rem" }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />
-                <span style={{ ...mono, fontSize: "9px", color: "#888", letterSpacing: "0.12em" }}>Available for commissions — Q4 2025</span>
+                <span style={{ ...mono, fontSize: "9px", color: "#888", letterSpacing: "0.12em" }}>{D.available}</span>
               </div>
             </div>
           </div>
@@ -166,22 +307,22 @@ function Nav({ onOpenGallery }: { onOpenGallery: () => void }) {
       <span style={{ ...mono, fontSize: "13px", fontWeight: 700, letterSpacing: "0.18em", color: "#0a0a0a", textTransform: "uppercase" }}>J·H</span>
       <div style={{ display: "flex", gap: "2.5rem", alignItems: "center", marginLeft: "auto" }}>
         {[
-          { label: "Work",    fn: onOpenGallery },
-          { label: "About",   fn: () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }) },
-          { label: "Press",   fn: () => document.getElementById("press")?.scrollIntoView({ behavior: "smooth" }) },
-          { label: "Contact", fn: () => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }) },
+          { label: D.navWork,    fn: onOpenGallery },
+          { label: D.navAbout,   fn: () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }) },
+          { label: D.navPress,   fn: () => document.getElementById("press")?.scrollIntoView({ behavior: "smooth" }) },
+          { label: D.navContact, fn: () => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }) },
         ].map((item) => (
           <button key={item.label} onClick={item.fn}
-            style={{ ...sans, background: "none", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 400, letterSpacing: "0.06em", color: "#0a0a0a", opacity: 0.55, transition: "opacity 0.2s", padding: 0 }}
+            style={{ fontFamily: "var(--tpl-sans,sans-serif)", background: "none", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 400, letterSpacing: "0.06em", color: "#0a0a0a", opacity: 0.55, transition: "opacity 0.2s", padding: 0 }}
             onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
             onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.55"; }}>
             {item.label}
           </button>
         ))}
-        <button style={{ ...sans, fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: "#fafafa", background: "#0a0a0a", padding: "7px 18px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
+        <button style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: "#fafafa", background: "#0a0a0a", padding: "7px 18px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
           onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#0a0a0a"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "#0a0a0a"; e.currentTarget.style.color = "#fafafa"; }}>
-          Hire me
+          {D.hireCta}
         </button>
       </div>
     </nav>
@@ -235,26 +376,26 @@ function Cell({ w, onClick }: { w: Work; onClick?: () => void }) {
 /* ═══════════════════════════════════════════
    LIGHTBOX
 ═══════════════════════════════════════════ */
-function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: number; onClose: () => void }) {
+function Lightbox({ works: workList, startIndex, onClose }: { works: Work[]; startIndex: number; onClose: () => void }) {
   const [index, setIndex]   = useState(startIndex);
   const [zoom, setZoom]     = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [dragging, setDrag] = useState(false);
   const dragRef             = useRef({ sx: 0, sy: 0, ox: 0, oy: 0 });
   const containerRef        = useRef<HTMLDivElement>(null);
-  const w                   = works[index]!;
+  const w                   = workList[index]!;
 
   const resetView = useCallback(() => { setZoom(1); setOffset({ x: 0, y: 0 }); }, []);
 
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (e.key === "Escape")     onClose();
-      if (e.key === "ArrowRight") { setIndex((i) => Math.min(i + 1, works.length - 1)); resetView(); }
+      if (e.key === "ArrowRight") { setIndex((i) => Math.min(i + 1, workList.length - 1)); resetView(); }
       if (e.key === "ArrowLeft")  { setIndex((i) => Math.max(i - 1, 0)); resetView(); }
     };
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
-  }, [onClose, works.length, resetView]);
+  }, [onClose, workList.length, resetView]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -275,7 +416,7 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
   const onMM = (e: React.MouseEvent) => { if (!dragging) return; setOffset({ x: dragRef.current.ox + e.clientX - dragRef.current.sx, y: dragRef.current.oy + e.clientY - dragRef.current.sy }); };
   const onMU = () => setDrag(false);
   const prev = () => { setIndex((i) => Math.max(i - 1, 0)); resetView(); };
-  const next = () => { setIndex((i) => Math.min(i + 1, works.length - 1)); resetView(); };
+  const next = () => { setIndex((i) => Math.min(i + 1, workList.length - 1)); resetView(); };
 
   // Touch swipe — only when not zoomed
   const touchStartX = useRef(0);
@@ -297,7 +438,7 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
           Back
         </button>
         <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>
-          {w.title} · {index + 1} / {works.length}
+          {w.title} · {index + 1} / {workList.length}
         </span>
         <div style={{ pointerEvents: "auto" }}>
           {zoom > 1 && (
@@ -324,7 +465,7 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
       )}
-      {index < works.length - 1 && (
+      {index < workList.length - 1 && (
         <button onClick={next} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)", cursor: "pointer", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
@@ -345,13 +486,13 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
 /* ═══════════════════════════════════════════
    GALLERY MODAL
 ═══════════════════════════════════════════ */
-function GalleryModal({ onClose }: { onClose: () => void }) {
+function GalleryModal({ onClose, workList, D }: { onClose: () => void; workList: Work[]; D: typeof DEMO_EN }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [filter, setFilter]               = useState("All");
   const { isMobile, isTablet }            = useBreakpoint();
 
-  const cats    = ["All", ...Array.from(new Set(WORKS.map((w) => w.cat)))];
-  const visible = filter === "All" ? WORKS : WORKS.filter((w) => w.cat === filter);
+  const cats    = ["All", ...Array.from(new Set(workList.map((w) => w.cat)))];
+  const visible = filter === "All" ? workList : workList.filter((w) => w.cat === filter);
   const cols    = isMobile ? 2 : isTablet ? 3 : 4;
 
   useEffect(() => {
@@ -374,7 +515,7 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
             <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.45)", display: "flex", alignItems: "center", padding: 0 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
-            {!isMobile && <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "#fff" }}>All Work</span>}
+            {!isMobile && <span style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontSize: "18px", color: "#fff" }}>{D.allWork}</span>}
             <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", color: "rgba(255,255,255,0.3)", letterSpacing: "0.1em" }}>{visible.length}</span>
           </div>
 
@@ -412,15 +553,20 @@ function GalleryModal({ onClose }: { onClose: () => void }) {
    MAIN PAGE
 ═══════════════════════════════════════════ */
 export default function MinimalBWTemplate() {
-  const [galleryOpen, setGalleryOpen] = useState(false);
-  const { isMobile, isTablet }        = useBreakpoint();
+  const { locale }                     = useT();
+  const D                              = demo(locale);
+  const WORKS                          = works(locale);
+  const STATS                          = stats(locale);
 
-  const px      = isMobile ? "1.5rem" : isTablet ? "5vw" : "7vw";
+  const [galleryOpen, setGalleryOpen]  = useState(false);
+  const { isMobile, isTablet }         = useBreakpoint();
+
+  const px       = isMobile ? "1.5rem" : isTablet ? "5vw" : "7vw";
   const featured = WORKS.slice(0, 8);
 
   return (
     <div style={{ background: "#fafafa", color: "#0a0a0a", minHeight: "100vh", fontFamily: "var(--tpl-sans,sans-serif)" }}>
-      <Nav onOpenGallery={() => setGalleryOpen(true)} />
+      <Nav onOpenGallery={() => setGalleryOpen(true)} D={D} />
 
       {/* ════ HERO ════ */}
       <section style={{
@@ -432,33 +578,33 @@ export default function MinimalBWTemplate() {
         {/* Left — text */}
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: isMobile ? "3rem 1.5rem 2.5rem" : isTablet ? "4rem 3rem 4rem 5vw" : "5rem 5rem 5rem 7vw" }}>
           <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "10px", letterSpacing: "0.25em", color: "#999", textTransform: "uppercase", marginBottom: "2rem" }}>
-            Documentary & Portrait · New York
+            {D.discipline}
           </span>
           <h1 style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "72px" : "clamp(72px,8vw,128px)", lineHeight: 0.92, letterSpacing: "-0.02em", color: "#0a0a0a", margin: 0 }}>
             James<br /><span style={{ fontStyle: "italic" }}>Hollis</span>
           </h1>
           <div style={{ width: "40px", height: "1px", background: "#0a0a0a", margin: "2rem 0" }} />
           <p style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.7, color: "#555", maxWidth: "380px" }}>
-            Documenting the quiet tension between presence and absence. Work exhibited across North America and Europe.
+            {D.heroBio}
           </p>
           <div style={{ display: "flex", gap: "0.75rem", marginTop: "2.5rem", flexWrap: "wrap" }}>
             <button onClick={() => setGalleryOpen(true)}
               style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "#fafafa", background: "#0a0a0a", padding: "12px 24px", border: "1px solid #0a0a0a", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
               onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#0a0a0a"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "#0a0a0a"; e.currentTarget.style.color = "#fafafa"; }}>
-              View work
+              {D.viewWork}
             </button>
             <a href="#about"
               style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 400, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0a0a0a", padding: "12px 24px", border: "1px solid #ccc", textDecoration: "none", transition: "border-color 0.2s", display: "inline-block" }}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#0a0a0a"; }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#ccc"; }}>
-              About
+              {D.heroAboutLink}
             </a>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: isMobile ? "2rem" : "auto", paddingTop: isMobile ? "0" : "4rem" }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 8px rgba(34,197,94,0.5)", flexShrink: 0 }} />
             <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#888", letterSpacing: "0.12em" }}>
-              Available for commissions — Q4 2025
+              {D.available}
             </span>
           </div>
         </div>
@@ -491,7 +637,7 @@ export default function MinimalBWTemplate() {
 
       {/* ════ WORK ════ */}
       <section id="work" style={{ padding: `5rem ${px}` }}>
-        <Label index="01" text="Selected Work" />
+        <Label index="01" text={D.sectionWork} />
 
         {/* Desktop: asymmetric grid */}
         {!isMobile && (
@@ -534,7 +680,7 @@ export default function MinimalBWTemplate() {
             style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#0a0a0a", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.75rem", borderBottom: "1px solid #0a0a0a", paddingBottom: "2px" }}
             onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.45"; }}
             onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}>
-            All projects ({WORKS.length})
+            {D.allProjects} ({WORKS.length})
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         </div>
@@ -542,7 +688,7 @@ export default function MinimalBWTemplate() {
 
       {/* ════ PULL QUOTE ════ */}
       <section style={{ padding: `${isMobile ? "4rem" : "6rem"} ${px}`, background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
-        <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>On practice</span>
+        <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>{D.onPractice}</span>
         <blockquote style={{ fontFamily: "var(--tpl-serif,serif)", fontStyle: "italic", fontWeight: 300, fontSize: isMobile ? "clamp(22px,7vw,36px)" : "clamp(28px,3.5vw,52px)", lineHeight: 1.3, color: "#f0f0f0", maxWidth: "900px", textAlign: "center", margin: 0, letterSpacing: "-0.01em" }}>
           &ldquo;The camera is an instrument that teaches people how to see without a camera.&rdquo;
         </blockquote>
@@ -552,15 +698,15 @@ export default function MinimalBWTemplate() {
       {/* ════ ABOUT ════ */}
       <section id="about" style={{ padding: `${isMobile ? "4rem" : "7rem"} ${px}`, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "3rem" : "6rem", alignItems: "center" }}>
         <div>
-          <Label index="02" text="About" />
+          <Label index="02" text={D.sectionAbout} />
           <h2 style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 400, fontSize: isMobile ? "clamp(32px,10vw,48px)" : "clamp(36px,4vw,56px)", lineHeight: 1.1, color: "#0a0a0a", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
-            A career built on<br /><span style={{ fontStyle: "italic" }}>patience</span>
+            {D.aboutHeadline1}<br /><span style={{ fontStyle: "italic" }}>{D.aboutHeadline2}</span>
           </h2>
           <p style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.8, color: "#4a4a4a", marginBottom: "1.25rem" }}>
-            James Hollis is a New York-based documentary and portrait photographer with over a decade of work spanning editorial commissions, personal projects, and exhibition photography.
+            {D.aboutBio1}
           </p>
           <p style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.8, color: "#4a4a4a", marginBottom: "2rem" }}>
-            His long-form projects explore the intersection of memory, geography, and identity — often through extended collaborations with communities in transition.
+            {D.aboutBio2}
           </p>
           <div style={{ display: "flex", gap: isMobile ? "2rem" : "3rem", paddingTop: "2rem", borderTop: "1px solid #e0e0e0" }}>
             {STATS.map((s) => (
@@ -588,7 +734,7 @@ export default function MinimalBWTemplate() {
 
       {/* ════ PRESS ════ */}
       <section id="press" style={{ padding: `${isMobile ? "3.5rem" : "5rem"} ${px}`, background: "#f2f2f0", borderTop: "1px solid #e0e0e0" }}>
-        <Label index="03" text="Press & Features" />
+        <Label index="03" text={D.sectionPress} />
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : isTablet ? "repeat(3, 1fr)" : "repeat(5, 1fr)", gap: "1px", background: "#d8d8d8" }}>
           {(isMobile ? PRESS.slice(0, 4) : PRESS).map((p) => (
             <div key={p.name} style={{ background: "#f2f2f0", padding: isMobile ? "1.25rem" : "2rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
@@ -602,18 +748,18 @@ export default function MinimalBWTemplate() {
       {/* ════ CONTACT ════ */}
       <section id="contact" style={{ padding: `${isMobile ? "4rem" : "8rem"} ${px}`, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "3rem" : "6rem", alignItems: "start" }}>
         <div>
-          <Label index="04" text="Contact" />
+          <Label index="04" text={D.sectionContact} />
           <h2 style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "clamp(36px,11vw,56px)" : "clamp(40px,5vw,72px)", lineHeight: 1.05, color: "#0a0a0a", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
-            Let&apos;s create<br /><span style={{ fontStyle: "italic" }}>something.</span>
+            {D.contactHeadline1}<br /><span style={{ fontStyle: "italic" }}>{D.contactHeadline2}</span>
           </h2>
           <p style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "14px", lineHeight: 1.7, color: "#666", marginBottom: "2rem" }}>
-            For editorial commissions, exhibition inquiries, and long-form project proposals.
+            {D.contactSubtitle}
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
             {[
-              { label: "General",  value: "hello@jameshollis.com" },
-              { label: "Bookings", value: "bookings@jameshollis.com" },
-              { label: "Agent",    value: "+1 (212) 555 0184" },
+              { label: D.contactGeneral,  value: "hello@jameshollis.com" },
+              { label: D.contactBookings, value: "bookings@jameshollis.com" },
+              { label: D.contactAgent,    value: "+1 (212) 555 0184" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", gap: "1.25rem", alignItems: "baseline" }}>
                 <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#aaa", letterSpacing: "0.2em", textTransform: "uppercase", minWidth: "52px" }}>{row.label}</span>
@@ -625,18 +771,18 @@ export default function MinimalBWTemplate() {
 
         <form style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            {["First name", "Last name"].map((ph) => (
+            {[D.formFirstName, D.formLastName].map((ph) => (
               <input key={ph} placeholder={ph}
                 style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "#0a0a0a", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
                 onFocus={(e) => { e.currentTarget.style.borderColor = "#0a0a0a"; }}
                 onBlur={(e) => { e.currentTarget.style.borderColor = "#d8d8d8"; }} />
             ))}
           </div>
-          <input type="email" placeholder="Email address"
+          <input type="email" placeholder={D.formEmail}
             style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "#0a0a0a", outline: "none", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
             onFocus={(e) => { e.currentTarget.style.borderColor = "#0a0a0a"; }}
             onBlur={(e) => { e.currentTarget.style.borderColor = "#d8d8d8"; }} />
-          <textarea placeholder="Tell me about your project..." rows={5}
+          <textarea placeholder={D.formMessage} rows={5}
             style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "13px", fontWeight: 300, padding: "11px 13px", border: "1px solid #d8d8d8", background: "transparent", color: "#0a0a0a", outline: "none", resize: "vertical", transition: "border-color 0.2s", width: "100%", boxSizing: "border-box" as const }}
             onFocus={(e) => { e.currentTarget.style.borderColor = "#0a0a0a"; }}
             onBlur={(e) => { e.currentTarget.style.borderColor = "#d8d8d8"; }} />
@@ -644,7 +790,7 @@ export default function MinimalBWTemplate() {
             style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "#fafafa", background: "#0a0a0a", border: "1px solid #0a0a0a", padding: "13px", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#0a0a0a"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "#0a0a0a"; e.currentTarget.style.color = "#fafafa"; }}>
-            Send message
+            {D.formSubmit}
           </button>
         </form>
       </section>
@@ -671,7 +817,7 @@ export default function MinimalBWTemplate() {
         {isMobile && <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: "9px", color: "#bbb", letterSpacing: "0.1em" }}>© 2025 James Hollis Photography</span>}
       </footer>
 
-      {galleryOpen && <GalleryModal onClose={() => setGalleryOpen(false)} />}
+      {galleryOpen && <GalleryModal onClose={() => setGalleryOpen(false)} workList={WORKS} D={D} />}
     </div>
   );
 }
