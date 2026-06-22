@@ -950,7 +950,8 @@
       "uploadPhotos": "Subir fotos",
       "uploading": "Subiendo {done}/{total}…",
       "emptyTitle": "Tu biblioteca está vacía",
-      "emptyBody": "Sube fotos para incluirlas ahora, o agrégalas después en el editor."
+      "emptyBody": "Sube fotos para incluirlas ahora, o agrégalas después en el editor.",
+      "hint": "Selecciona fotos de tu galería para integrar en el portafolio"
     },
     "preview": {
       "none": "No seleccionaste fotos — puedes agregarlas en el editor luego de crear.",

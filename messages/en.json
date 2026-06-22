@@ -950,7 +950,8 @@
       "uploadPhotos": "Upload photos",
       "uploading": "Uploading {done}/{total}…",
       "emptyTitle": "Your library is empty",
-      "emptyBody": "Upload photos to include them now, or add them later in the editor."
+      "emptyBody": "Upload photos to include them now, or add them later in the editor.",
+      "hint": "Select photos from your gallery to include in your portfolio"
     },
     "preview": {
       "none": "No photos selected — you can add them in the editor after creating.",

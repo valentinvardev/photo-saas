@@ -67,6 +67,15 @@ function PickerGrid({
         </button>
       </div>
 
+      {!isLoading && library.length > 0 && (
+        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-yellow/10 border border-yellow/25 mb-1">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <span className="font-sans text-xs font-medium text-yellow leading-tight">{t("nw.picker.hint")}</span>
+        </div>
+      )}
+
       {isLoading ? (
         <div className="grid grid-cols-4 gap-[3px]">
           {Array.from({ length: 8 }).map((_, i) => <div key={i} className="aspect-[4/3] bg-[var(--bg-subtle)] animate-pulse rounded" />)}
