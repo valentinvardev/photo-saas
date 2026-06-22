@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useCart } from "~/lib/cart";
@@ -52,9 +52,9 @@ function FreeDomainRow({ isActive }: { isActive: boolean }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-mono text-sm text-[var(--fg)]">{FREE_DOMAIN}</span>
-          <span className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded border border-[var(--border)] text-[var(--fg-muted)]">Free</span>
+          <span className="font-mono text-[13px] uppercase tracking-widest px-1.5 py-0.5 rounded border border-[var(--border)] text-[var(--fg-muted)]">Free</span>
           {isActive && (
-            <span className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-green-400/10 border border-green-400/20 text-green-400">Active</span>
+            <span className="font-mono text-[13px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-green-400/10 border border-green-400/20 text-green-400">Active</span>
           )}
         </div>
         {!isActive && (
@@ -80,11 +80,11 @@ function CustomDomainRow({ domain, verified, onRemove }: {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-mono text-sm text-[var(--fg)]">{domain}</span>
-          <span className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded border border-[var(--border)] text-[var(--fg-muted)]">Custom</span>
+          <span className="font-mono text-[13px] uppercase tracking-widest px-1.5 py-0.5 rounded border border-[var(--border)] text-[var(--fg-muted)]">Custom</span>
           {verified ? (
-            <span className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-green-400/10 border border-green-400/20 text-green-400">Active</span>
+            <span className="font-mono text-[13px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-green-400/10 border border-green-400/20 text-green-400">Active</span>
           ) : (
-            <span className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-yellow/10 border border-yellow/20 text-yellow">Pending DNS</span>
+            <span className="font-mono text-[13px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-yellow/10 border border-yellow/20 text-yellow">Pending DNS</span>
           )}
         </div>
       </div>
@@ -131,7 +131,7 @@ function SetupBanner({ domain, onVerify }: { domain: string; onVerify: () => voi
       <div className="grid grid-cols-3 gap-2">
         {[["Type", "CNAME"], ["Name", "@"], ["Value", "cname.portapic.app"]].map(([k, v]) => (
           <div key={k} className="bg-[var(--bg-card)] border border-[var(--border)] rounded-lg px-3 py-2">
-            <p className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-wider mb-0.5">{k}</p>
+            <p className="font-mono text-[13px] text-[var(--fg-muted)] uppercase tracking-wider mb-0.5">{k}</p>
             <p className="font-mono text-xs text-[var(--fg)] break-all">{v}</p>
           </div>
         ))}
@@ -265,7 +265,7 @@ function AddDomainPanel({ onConnect, onClose }: {
             Back
           </button>
           <div>
-            <label className="block font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-1.5">Your domain</label>
+            <label className="block font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mb-1.5">Your domain</label>
             <input
               autoFocus
               className={`${inputCls} w-full`}
@@ -387,7 +387,7 @@ function ManageModal({ pageId, url, onClose }: { pageId: PageId; url: string; on
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
           <div>
             <h2 className="font-sans text-sm font-semibold text-[var(--fg)]">{titles[pageId]}</h2>
-            <p className="font-mono text-[11px] text-[var(--fg-muted)] mt-0.5">{url}</p>
+            <p className="font-mono text-[13px] text-[var(--fg-muted)] mt-0.5">{url}</p>
           </div>
           <button onClick={onClose} className="text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors p-1 rounded-lg hover:bg-[var(--bg-subtle)]">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -413,7 +413,7 @@ function ManageModal({ pageId, url, onClose }: { pageId: PageId; url: string; on
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-sans text-sm font-medium text-[var(--fg)]">Visual builder</p>
-                <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">Template: {builderTemplate[pageId]}</p>
+                <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5">Template: {builderTemplate[pageId]}</p>
               </div>
               <span className="shrink-0 font-sans text-xs font-semibold bg-yellow text-[#111] px-3.5 py-2 rounded-lg flex items-center gap-1.5">Open builder</span>
             </a>
@@ -490,7 +490,7 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
               <span className="font-sans text-sm font-semibold text-[var(--fg)]">{label}</span>
               <button
                 onClick={() => setStatus(s => s === "live" ? "draft" : "live")}
-                className={`font-mono text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border transition-colors ${
+                className={`font-mono text-[13px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border transition-colors ${
                   status === "live"
                     ? "bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20"
                     : "bg-[var(--bg-subtle)] text-[var(--fg-muted)] border-[var(--border)] hover:border-yellow/40 hover:text-yellow"
@@ -499,7 +499,7 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
             </div>
             <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-1.5">
               {metaChips.map((chip, i) => (
-                <span key={i} className="inline-flex items-center font-sans text-[11px] text-[var(--fg-muted)]">
+                <span key={i} className="inline-flex items-center font-sans text-[13px] text-[var(--fg-muted)]">
                   {i > 0 && <span className="text-[var(--border)] mr-1.5">·</span>}
                   {chip}
                 </span>
@@ -509,7 +509,7 @@ function PageCard({ pageId, label, url, status: initialStatus, meta, icon, editH
         </div>
         <div className="flex items-center gap-2 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-lg px-3 py-2 min-w-0">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <span className="font-mono text-[11px] text-[var(--fg-muted)] truncate flex-1 min-w-0">{url}</span>
+          <span className="font-mono text-[13px] text-[var(--fg-muted)] truncate flex-1 min-w-0">{url}</span>
           <CopyButton value={`https://${url}`} className="border-0 bg-transparent px-1 py-0.5" />
         </div>
         <div className="flex items-center gap-2 mt-auto">
@@ -673,15 +673,15 @@ export default function DomainPage() {
             />
           </div>
           <div className="px-4 sm:px-6 py-4 border-t border-[var(--border)] bg-[var(--bg-subtle)] flex flex-col gap-1.5">
-            <p className="font-sans text-[11px] font-semibold text-[var(--fg-muted)] uppercase tracking-wider mb-0.5">Live URLs</p>
+            <p className="font-sans text-[13px] font-semibold text-[var(--fg-muted)] uppercase tracking-wider mb-0.5">Live URLs</p>
             {[
               { label: "Portfolio", path: "" },
               { label: "Links",     path: `/${routeLinks || "links"}` },
               { label: "Delivery",  path: `/${routeDelivery || "d"}/client-name` },
             ].map(({ label, path }) => (
               <div key={label} className="flex items-baseline gap-2 min-w-0">
-                <span className="font-sans text-[11px] text-[var(--fg-muted)] w-16 shrink-0">{label}</span>
-                <span className="font-mono text-[11px] text-[var(--fg)] truncate min-w-0">{activeDomain}{path}</span>
+                <span className="font-sans text-[13px] text-[var(--fg-muted)] w-16 shrink-0">{label}</span>
+                <span className="font-mono text-[13px] text-[var(--fg)] truncate min-w-0">{activeDomain}{path}</span>
               </div>
             ))}
           </div>

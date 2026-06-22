@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -87,7 +87,7 @@ function PagesTab() {
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#facc15" strokeWidth="1.75" strokeLinecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span style={{ color: "var(--ec-bright)", fontSize: 12, fontWeight: 600 }}>{t("editor.pages.home")}</span>
-        <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 9, color: "var(--ec-dim)", background: "var(--ec-raised)", padding: "1px 5px", borderRadius: 2 }}>{t("editor.pages.pageBadge")}</span>
+        <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 13, color: "var(--ec-dim)", background: "var(--ec-raised)", padding: "1px 5px", borderRadius: 2 }}>{t("editor.pages.pageBadge")}</span>
       </div>
 
       {/* Section rows */}
@@ -101,10 +101,10 @@ function PagesTab() {
           return (
             <div key={section.id} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 14px 4px 28px", opacity: 0.45 }}>
               <span style={{ color: "var(--ec-dim)", display: "flex" }}>{section.icon}</span>
-              <span style={{ fontSize: 11, color: "var(--ec-dim)", flex: 1, textDecoration: "line-through" }}>{secLabel(section)}</span>
+              <span style={{ fontSize: 13, color: "var(--ec-dim)", flex: 1, textDecoration: "line-through" }}>{secLabel(section)}</span>
               <button
                 onClick={() => showSection(section.id)}
-                style={{ background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-sub)", fontSize: 9, padding: "2px 6px", borderRadius: 3, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-sub)", fontSize: 13, padding: "2px 6px", borderRadius: 3, cursor: "pointer", fontFamily: "inherit" }}
               >
                 {t("editor.pages.restore")}
               </button>
@@ -157,7 +157,7 @@ function PagesTab() {
                 <span style={{ color: isSelected ? "#facc15" : "var(--ec-dim)", display: "flex" }}>{section.icon}</span>
 
                 {/* Label */}
-                <span style={{ flex: 1, fontSize: 11, fontWeight: isSelected ? 500 : 400 }}>{secLabel(section)}</span>
+                <span style={{ flex: 1, fontSize: 13, fontWeight: isSelected ? 500 : 400 }}>{secLabel(section)}</span>
 
                 {/* Lock or drag handle */}
                 {section.locked ? (
@@ -208,8 +208,8 @@ function PagesTab() {
                       <span style={{ color: el.type === "image" ? "#7c3aed" : "#facc15", display: "flex" }}>
                         {el.type === "image" ? <ImageNodeIcon /> : <TextNodeIcon />}
                       </span>
-                      <span style={{ fontSize: 11 }}>{el.label}</span>
-                      <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 9, color: "var(--ec-border)" }}>
+                      <span style={{ fontSize: 13 }}>{el.label}</span>
+                      <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: 13, color: "var(--ec-border)" }}>
                         {el.type}
                       </span>
                     </button>
@@ -300,14 +300,14 @@ function MenuItem({ label, onClick, disabled, danger }: { label: string; onClick
       style={{
         display: "block", width: "100%", textAlign: "left",
         background: "none", border: "none",
-        padding: "7px 12px", fontSize: 11,
+        padding: "7px 12px", fontSize: 13,
         color: disabled ? "var(--ec-ghost)" : danger ? "#f87171" : "var(--ec-label)",
         cursor: disabled ? "default" : "pointer",
       }}
       onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.background = "var(--ec-lift)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
     >
-      {label} {disabled && <span style={{ fontSize: 9, color: "var(--ec-border)" }}>— {t("editor.pages.templateLocked")}</span>}
+      {label} {disabled && <span style={{ fontSize: 13, color: "var(--ec-border)" }}>— {t("editor.pages.templateLocked")}</span>}
     </button>
   );
 }
@@ -319,7 +319,7 @@ function PanelHeading({ title, desc }: { title: string; desc?: string }) {
   return (
     <div style={{ padding: "18px 16px 10px" }}>
       <h3 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--ec-bright)", letterSpacing: "-0.01em" }}>{title}</h3>
-      {desc && <p style={{ margin: "4px 0 0", fontSize: 11, color: "var(--ec-dim)", lineHeight: 1.5 }}>{desc}</p>}
+      {desc && <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--ec-dim)", lineHeight: 1.5 }}>{desc}</p>}
     </div>
   );
 }
@@ -395,7 +395,7 @@ function LogoWidthSlider({
     <div>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 5 }}>
         <label style={{ ...labelStyle, marginBottom: 0 }}>{t("editor.settings.logoWidth")}</label>
-        <span style={{ fontFamily: "monospace", fontSize: 11, color: "var(--ec-muted)" }}>{width}<span style={{ color: "var(--ec-dim)" }}>px</span></span>
+        <span style={{ fontFamily: "monospace", fontSize: 13, color: "var(--ec-muted)" }}>{width}<span style={{ color: "var(--ec-dim)" }}>px</span></span>
       </div>
       <input
         type="range"
@@ -456,7 +456,7 @@ function LogoCropButton({
         disabled={!imageUrl}
         style={{
           width: "100%", background: "var(--ec-raised)", border: "1px solid var(--ec-border)",
-          color: imageUrl ? "var(--ec-muted)" : "var(--ec-ghost)", fontSize: 11, padding: "7px 10px",
+          color: imageUrl ? "var(--ec-muted)" : "var(--ec-ghost)", fontSize: 13, padding: "7px 10px",
           borderRadius: 4, cursor: imageUrl ? "pointer" : "default",
           fontFamily: "inherit", textAlign: "left",
           display: "flex", alignItems: "center", gap: 8,
@@ -467,7 +467,7 @@ function LogoCropButton({
         </svg>
         <span style={{ flex: 1 }}>{hasCrop ? t("editor.settings.adjustCrop") : t("editor.settings.cropImage")}</span>
         {hasCrop && (
-          <span style={{ fontFamily: "monospace", fontSize: 9, color: "#facc15", background: "rgba(250,204,21,0.12)", border: "1px solid #facc15", padding: "1px 5px", borderRadius: 3 }}>
+          <span style={{ fontFamily: "monospace", fontSize: 13, color: "#facc15", background: "rgba(250,204,21,0.12)", border: "1px solid #facc15", padding: "1px 5px", borderRadius: 3 }}>
             ON
           </span>
         )}
@@ -500,7 +500,7 @@ function SettingsTab() {
     outline: "none", boxSizing: "border-box", fontFamily: "inherit",
   };
   const labelStyle: React.CSSProperties = {
-    color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase",
+    color: "var(--ec-sub)", fontSize: 12, textTransform: "uppercase",
     letterSpacing: "0.1em", display: "block", marginBottom: 5,
   };
 
@@ -508,7 +508,7 @@ function SettingsTab() {
     flex: 1, background: active ? "rgba(250,204,21,0.12)" : "var(--ec-raised)",
     border: `1px solid ${active ? "#facc15" : "var(--ec-border)"}`,
     color: active ? "#facc15" : "var(--ec-sub)",
-    fontSize: 10, padding: "5px 4px", borderRadius: 3,
+    fontSize: 12, padding: "5px 4px", borderRadius: 3,
     cursor: "pointer", fontFamily: "inherit", textAlign: "center",
   });
 
@@ -517,7 +517,7 @@ function SettingsTab() {
 
       {/* Logo */}
       <div>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.logo")}</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.logo")}</p>
 
         {/* Mode selector */}
         <label style={labelStyle}>{t("editor.settings.displayMode")}</label>
@@ -567,7 +567,7 @@ function SettingsTab() {
 
       {/* Contact form routing */}
       <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.contact")}</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.contact")}</p>
 
         <label style={labelStyle}>{t("editor.settings.contactMode")}</label>
         <div style={{ display: "flex", gap: 2, marginBottom: 12 }}>
@@ -579,7 +579,7 @@ function SettingsTab() {
         </div>
 
         {contact.mode === "inbox" ? (
-          <p style={{ color: "var(--ec-dim)", fontSize: 10, lineHeight: 1.6, margin: 0 }}>{t("editor.settings.contactInboxHint")}</p>
+          <p style={{ color: "var(--ec-dim)", fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t("editor.settings.contactInboxHint")}</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <div>
@@ -589,7 +589,7 @@ function SettingsTab() {
             <div>
               <label style={labelStyle}>{t("editor.settings.contactTemplate")}</label>
               <textarea value={contact.waTemplate} onChange={(e) => setContact({ waTemplate: e.target.value })} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
-              <p style={{ color: "var(--ec-dim)", fontSize: 9.5, marginTop: 5, lineHeight: 1.5 }}>{t("editor.settings.contactTemplateHint")}</p>
+              <p style={{ color: "var(--ec-dim)", fontSize: 13.5, marginTop: 5, lineHeight: 1.5 }}>{t("editor.settings.contactTemplateHint")}</p>
             </div>
           </div>
         )}
@@ -597,7 +597,7 @@ function SettingsTab() {
 
       {/* Site info */}
       <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.site")}</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.site")}</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div>
             <label style={labelStyle}>{t("editor.settings.title")}</label>
@@ -611,14 +611,14 @@ function SettingsTab() {
           <div>
             <label style={labelStyle}>{t("editor.settings.domain")}</label>
             <input defaultValue="portapic.com/jameshollis" style={{ ...inputStyle, color: "var(--ec-dim)" }} disabled />
-            <p style={{ color: "var(--ec-border)", fontSize: 10, margin: "4px 0 0" }}>{t("editor.settings.customDomainsPro")}</p>
+            <p style={{ color: "var(--ec-border)", fontSize: 12, margin: "4px 0 0" }}>{t("editor.settings.customDomainsPro")}</p>
           </div>
         </div>
       </div>
 
       {/* SEO */}
       <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.socialLinks")}</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px", fontWeight: 600 }}>{t("editor.settings.socialLinks")}</p>
         {[
           { label: "Instagram", placeholder: "@jameshollis" },
           { label: "X / Twitter", placeholder: "@jhollis" },
@@ -632,26 +632,26 @@ function SettingsTab() {
 
       {/* Export */}
       <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px", fontWeight: 600 }}>{t("editor.settings.export")}</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 10px", fontWeight: 600 }}>{t("editor.settings.export")}</p>
         <button
           onClick={() => alert(t("editor.settings.exportComingSoon"))}
           style={{
             width: "100%", background: "var(--ec-raised)", border: "1px solid var(--ec-border)",
-            color: "var(--ec-muted)", fontSize: 11, padding: "8px", borderRadius: 4,
+            color: "var(--ec-muted)", fontSize: 13, padding: "8px", borderRadius: 4,
             cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
           }}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
           {t("editor.settings.exportHtml")}
         </button>
-        <p style={{ color: "var(--ec-border)", fontSize: 10, margin: "6px 0 0", lineHeight: 1.4 }}>
+        <p style={{ color: "var(--ec-border)", fontSize: 12, margin: "6px 0 0", lineHeight: 1.4 }}>
           {t("editor.settings.exportDesc")}
         </p>
       </div>
 
       {/* More — coming soon */}
       <div style={{ borderTop: "1px solid var(--ec-raised)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-dim)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px", fontWeight: 600 }}>{t("editor.settings.more")}</p>
+        <p style={{ color: "var(--ec-dim)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px", fontWeight: 600 }}>{t("editor.settings.more")}</p>
         <div style={{ margin: "0 -14px" }}>
           <ComingSoonRow label={t("editor.settings.seoManager")} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>} />
           <ComingSoonRow label={t("editor.settings.tracking")} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>} />
@@ -719,7 +719,7 @@ export function Sidebar({ tab, setTab }: { tab: SidebarTab; setTab: (t: SidebarT
                 color: active ? "#facc15" : "var(--ec-dim)",
                 cursor: "pointer",
                 fontFamily: "inherit",
-                fontSize: 10.5,
+                fontSize: 12.5,
                 fontWeight: active ? 600 : 500,
                 padding: "10px 0 8px",
                 display: "flex",

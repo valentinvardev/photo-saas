@@ -39,7 +39,7 @@ export function ColorSwatch({ label, value, onChange }: Props) {
       >
         <div style={{ width: 18, height: 18, borderRadius: 3, background: value, border: "1px solid rgba(255,255,255,0.15)", flexShrink: 0 }} />
         <span style={{ flex: 1, color: "var(--ec-label)", fontSize: 12 }}>{label}</span>
-        <span style={{ fontFamily: "monospace", fontSize: 10, color: "var(--ec-sub)" }}>{value}</span>
+        <span style={{ fontFamily: "monospace", fontSize: 12, color: "var(--ec-sub)" }}>{value}</span>
       </div>
 
       {/* Portalled to <body> with fixed positioning so the panel's overflow can't
@@ -61,7 +61,7 @@ export function ColorSwatch({ label, value, onChange }: Props) {
           >
             <HexColorPicker color={value} onChange={onChange} style={{ width: "100%" }} />
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "var(--ec-sub)", fontSize: 11 }}>#</span>
+              <span style={{ color: "var(--ec-sub)", fontSize: 13 }}>#</span>
               <HexColorInput
                 color={value}
                 onChange={onChange}

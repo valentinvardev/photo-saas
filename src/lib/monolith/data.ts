@@ -1,4 +1,4 @@
-/* Monolith — sans-first photographer collection. Sibling to Halcyon.
+﻿/* Monolith — sans-first photographer collection. Sibling to Halcyon.
    Reuses Halcyon's photo library so both templates share the same archive. */
 
 import { HL_PHOTOS, type HlPhoto } from "~/lib/halcyon/data";
@@ -82,8 +82,8 @@ export function mnBaseCss(t: typeof MN_TOKENS) {
   return `
     .mn-root{background:${t.bg};color:${t.fg};font-family:${MN_FONTS.sans};-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv11","tnum"}
     .mn-display{font-family:${MN_FONTS.display};font-weight:700;letter-spacing:-0.04em;line-height:0.92}
-    .mn-mono{font-family:${MN_FONTS.mono};font-size:11px;letter-spacing:0.02em;text-transform:uppercase}
-    .mn-eyebrow{font-family:${MN_FONTS.sans};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;font-weight:500}
+    .mn-mono{font-family:${MN_FONTS.mono};font-size:13px;letter-spacing:0.02em;text-transform:uppercase}
+    .mn-eyebrow{font-family:${MN_FONTS.sans};font-size:12px;letter-spacing:0.16em;text-transform:uppercase;font-weight:500}
     .mn-img{display:block;width:100%;height:100%;object-fit:cover;background:${t.hairline}}
     .mn-btn{font-family:${MN_FONTS.sans};font-size:12px;font-weight:500;letter-spacing:0.02em;padding:14px 18px;border:1px solid ${t.line};background:transparent;color:${t.fg};cursor:pointer;transition:all .18s ease;display:inline-flex;align-items:center;gap:12px;text-transform:uppercase}
     .mn-btn:hover{background:${t.fg};color:${t.bg}}

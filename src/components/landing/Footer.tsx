@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -72,12 +72,12 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-16 pt-6 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="font-mono text-[11px] text-[var(--fg-muted)] tracking-wide">
+          <p className="font-mono text-[13px] text-[var(--fg-muted)] tracking-wide">
             © {new Date().getFullYear()} Portapic. {t("landing.footer.rights")}
           </p>
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            <span className="font-mono text-[11px] text-[var(--fg-muted)]">
+            <span className="font-mono text-[13px] text-[var(--fg-muted)]">
               {t("landing.footer.operational")}
             </span>
           </div>

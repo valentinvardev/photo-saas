@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -93,7 +93,7 @@ export default function MinimalDeliveryPage() {
     <div style={{ background: T.bg, color: T.fg, minHeight: "100dvh", fontFamily: F.sans, position: "relative", overflow: "hidden" }}>
       <style>{`
         .mn-link{text-decoration:none;color:inherit}
-        .mn-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;font-family:${F.mono};font-size:11px;letter-spacing:0.18em;text-transform:uppercase;border:1px solid ${T.line};background:${T.raised};color:${T.fg};cursor:pointer;transition:background .25s ease,color .25s ease,border-color .25s ease}
+        .mn-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;font-family:${F.mono};font-size:13px;letter-spacing:0.18em;text-transform:uppercase;border:1px solid ${T.line};background:${T.raised};color:${T.fg};cursor:pointer;transition:background .25s ease,color .25s ease,border-color .25s ease}
         .mn-btn:hover{background:${T.fg};color:${T.bg};border-color:${T.fg}}
         .mn-btn-primary{background:${T.fg};color:${T.bg};border-color:${T.fg}}
         .mn-btn-primary:hover{background:transparent;color:${T.fg}}
@@ -109,7 +109,7 @@ export default function MinimalDeliveryPage() {
         .mn-mark em{font-style:italic}
         .mn-gate h1{font-family:${F.serif};font-size:64px;line-height:0.95;letter-spacing:-0.02em;font-weight:400;margin:0}
         .mn-gate h1 em{font-style:italic;color:${T.muted}}
-        .mn-meta{font-family:${F.mono};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${T.muted}}
+        .mn-meta{font-family:${F.mono};font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:${T.muted}}
         .mn-pwd-form{width:100%;display:flex;flex-direction:column;gap:12px}
         .mn-pwd{background:${T.raised};border:1px solid ${T.line};color:${T.fg};padding:14px 16px;font-family:${F.mono};font-size:13px;letter-spacing:0.06em;text-align:center;outline:none;transition:border-color .25s ease}
         .mn-pwd:focus{border-color:${T.fg}}
@@ -119,11 +119,11 @@ export default function MinimalDeliveryPage() {
         .mn-nav{display:flex;justify-content:space-between;align-items:center;padding:24px 32px;border-bottom:1px solid ${T.line};background:${T.raised};position:sticky;top:0;z-index:30;animation:mnFade .5s ease both}
         .mn-nav .brand{font-family:${F.serif};font-size:22px;letter-spacing:-0.02em;font-weight:500}
         .mn-nav .brand em{font-style:italic;color:${T.muted}}
-        .mn-nav .meta{font-family:${F.mono};font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted}}
+        .mn-nav .meta{font-family:${F.mono};font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted}}
         @media(max-width:680px){.mn-nav{padding:16px 20px}.mn-nav .meta{display:none}}
 
         .mn-hero{padding:96px 32px 64px;text-align:center;border-bottom:1px solid ${T.line};animation:mnFade .6s ease both}
-        .mn-eyebrow{font-family:${F.mono};font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:${T.muted};margin-bottom:24px}
+        .mn-eyebrow{font-family:${F.mono};font-size:12px;letter-spacing:0.3em;text-transform:uppercase;color:${T.muted};margin-bottom:24px}
         .mn-hero h1{font-family:${F.serif};font-size:96px;line-height:0.95;letter-spacing:-0.025em;font-weight:400;margin:0 0 16px}
         .mn-hero h1 em{font-style:italic}
         .mn-hero .sub{font-family:${F.serif};font-size:18px;line-height:1.6;color:${T.muted};max-width:520px;margin:24px auto 0;font-style:italic}
@@ -133,26 +133,26 @@ export default function MinimalDeliveryPage() {
         .mn-info > div{padding:18px 0;border-right:1px solid ${T.line};text-align:center}
         .mn-info > div:last-child{border-right:0}
         .mn-info .v{font-family:${F.serif};font-size:22px;letter-spacing:-0.01em;line-height:1;font-weight:400}
-        .mn-info .l{font-family:${F.mono};font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted};margin-top:6px}
+        .mn-info .l{font-family:${F.mono};font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted};margin-top:6px}
         @media(max-width:680px){.mn-info{grid-template-columns:repeat(2,1fr)}.mn-info > div:nth-child(2){border-right:0}.mn-info > div:nth-child(1),.mn-info > div:nth-child(2){border-bottom:1px solid ${T.line}}}
 
         .mn-toolbar{position:sticky;top:65px;z-index:20;background:${T.bg};border-bottom:1px solid ${T.line};padding:14px 32px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
         .mn-tabs{display:inline-flex;border:1px solid ${T.line};background:${T.raised};border-radius:0}
-        .mn-tab{background:transparent;border:0;padding:8px 18px;font-family:${F.mono};font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted};cursor:pointer;transition:color .25s ease,background .25s ease}
+        .mn-tab{background:transparent;border:0;padding:8px 18px;font-family:${F.mono};font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted};cursor:pointer;transition:color .25s ease,background .25s ease}
         .mn-tab.on{background:${T.fg};color:${T.bg}}
         .mn-tab:not(.on):hover{color:${T.fg}}
         .mn-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-        .mn-counter{font-family:${F.mono};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:${T.muted}}
+        .mn-counter{font-family:${F.mono};font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:${T.muted}}
         .mn-counter b{color:${T.fg};font-weight:400}
         @media(max-width:680px){.mn-toolbar{padding:12px 20px;top:57px}}
 
         .mn-section{padding:48px 32px}
         .mn-section-head{display:flex;align-items:baseline;gap:14px;margin-bottom:24px}
-        .mn-section-no{font-family:${F.mono};font-size:10px;letter-spacing:0.18em;color:${T.muted};text-transform:uppercase}
+        .mn-section-no{font-family:${F.mono};font-size:12px;letter-spacing:0.18em;color:${T.muted};text-transform:uppercase}
         .mn-section-title{font-family:${F.serif};font-size:36px;letter-spacing:-0.02em;line-height:1;font-weight:400}
         .mn-section-title em{font-style:italic;color:${T.muted}}
         .mn-section-line{flex:1;border:0;border-top:1px solid ${T.line}}
-        .mn-section-count{font-family:${F.mono};font-size:10px;color:${T.muted}}
+        .mn-section-count{font-family:${F.mono};font-size:12px;color:${T.muted}}
 
         .mn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
         @media(max-width:1100px){.mn-grid{grid-template-columns:repeat(3,1fr)}}
@@ -169,21 +169,21 @@ export default function MinimalDeliveryPage() {
         .mn-foot{padding:48px 32px;border-top:1px solid ${T.line};display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
         .mn-foot .mark{font-family:${F.serif};font-size:18px}
         .mn-foot .mark em{font-style:italic;color:${T.muted}}
-        .mn-foot .mono{font-family:${F.mono};font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted}}
+        .mn-foot .mono{font-family:${F.mono};font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted}}
 
         .mn-floater{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${T.fg};color:${T.bg};display:flex;gap:12px;align-items:center;padding:10px 14px 10px 18px;border-radius:999px;box-shadow:0 16px 48px rgba(0,0,0,0.18);z-index:40;animation:mnFade .25s ease both}
-        .mn-floater .label{font-family:${F.mono};font-size:11px;letter-spacing:0.16em;text-transform:uppercase}
-        .mn-floater .dl{background:${T.bg};color:${T.fg};border:0;padding:8px 14px;font-family:${F.mono};font-size:10px;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;border-radius:999px}
+        .mn-floater .label{font-family:${F.mono};font-size:13px;letter-spacing:0.16em;text-transform:uppercase}
+        .mn-floater .dl{background:${T.bg};color:${T.fg};border:0;padding:8px 14px;font-family:${F.mono};font-size:12px;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;border-radius:999px}
 
         .mn-lb{position:fixed;inset:0;background:rgba(20,20,20,0.94);z-index:60;display:flex;align-items:center;justify-content:center;animation:mnFade .25s ease both}
         .mn-lb img{max-width:88vw;max-height:82vh;object-fit:contain;background:${T.bg};box-shadow:0 30px 80px rgba(0,0,0,0.5)}
-        .mn-lb-x{position:fixed;top:24px;right:32px;background:transparent;border:0;color:${T.bg};font-family:${F.mono};font-size:11px;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer}
+        .mn-lb-x{position:fixed;top:24px;right:32px;background:transparent;border:0;color:${T.bg};font-family:${F.mono};font-size:13px;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer}
         .mn-lb-arrow{position:fixed;top:50%;transform:translateY(-50%);width:48px;height:48px;background:transparent;border:1px solid rgba(255,255,255,0.4);color:${T.bg};font-family:${F.mono};font-size:14px;cursor:pointer;transition:background .2s ease,color .2s ease}
         .mn-lb-arrow:hover{background:${T.bg};color:${T.fg}}
         .mn-lb-arrow.l{left:24px}.mn-lb-arrow.r{right:24px}
         .mn-lb-meta{position:fixed;bottom:24px;left:0;right:0;display:flex;justify-content:space-between;padding:0 32px;color:${T.bg};flex-wrap:wrap;gap:8px}
         .mn-lb-meta .cap{font-family:${F.serif};font-style:italic;font-size:18px}
-        .mn-lb-meta .num{font-family:${F.mono};font-size:11px;letter-spacing:0.16em;text-transform:uppercase}
+        .mn-lb-meta .num{font-family:${F.mono};font-size:13px;letter-spacing:0.16em;text-transform:uppercase}
       `}</style>
 
       {/* ── Gate ─────────────────────────────────────────── */}

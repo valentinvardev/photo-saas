@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -95,7 +95,7 @@ export function ChatSharePicker({ onClose, onShared }: { onClose: () => void; on
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="font-sans text-sm font-medium text-[var(--fg)] truncate">{f.name}</div>
-                      <div className="font-mono text-[10px] text-[var(--fg-muted)]">{f.count} {f.count === 1 ? t("share.photoOne") : t("share.photoN")}</div>
+                      <div className="font-mono text-[12px] text-[var(--fg-muted)]">{f.count} {f.count === 1 ? t("share.photoOne") : t("share.photoN")}</div>
                     </div>
                   </button>
                 ))}
@@ -117,7 +117,7 @@ export function ChatSharePicker({ onClose, onShared }: { onClose: () => void; on
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="font-sans text-sm font-medium text-[var(--fg)] truncate">{p.title}</div>
-                        <div className="font-mono text-[10px] text-[var(--fg-muted)]">{published ? `/p/${p.slug}` : t("share.draftOnly")}</div>
+                        <div className="font-mono text-[12px] text-[var(--fg-muted)]">{published ? `/p/${p.slug}` : t("share.draftOnly")}</div>
                       </div>
                     </button>
                   );

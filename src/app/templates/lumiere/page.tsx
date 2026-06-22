@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -186,7 +186,7 @@ function HeroSection() {
         gap: 28,
       }}>
         <span style={{
-          fontFamily: MONO, fontSize: 10, letterSpacing: "0.26em",
+          fontFamily: MONO, fontSize: 12, letterSpacing: "0.26em",
           textTransform: "uppercase", color: C.coralDk,
           background: C.coral, padding: "6px 16px",
           borderRadius: 100, alignSelf: "flex-start",
@@ -258,7 +258,7 @@ function HeroSection() {
           {[{ v: "11", l: "Years" }, { v: "340+", l: "Projects" }, { v: "6", l: "Countries" }].map((s) => (
             <div key={s.l}>
               <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 28, letterSpacing: "-0.03em" }}>{s.v}</div>
-              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: C.muted, marginTop: 3 }}>{s.l}</div>
+              <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: C.muted, marginTop: 3 }}>{s.l}</div>
             </div>
           ))}
         </div>
@@ -285,7 +285,7 @@ function HeroSection() {
             position: "absolute", bottom: 20, left: 20,
             background: "rgba(240,235,227,0.85)", backdropFilter: "blur(10px)",
             borderRadius: 14, padding: "10px 16px",
-            fontFamily: MONO, fontSize: 9, letterSpacing: "0.22em",
+            fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em",
             textTransform: "uppercase", color: C.mid,
           }}>
             Berlin, 2024
@@ -306,7 +306,7 @@ function WorksSection() {
       {/* Header */}
       <div ref={ref} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 40, ...revealStyle(visible) }}>
         <div>
-          <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: C.mid, marginBottom: 10 }}>Selected projects</p>
+          <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: C.mid, marginBottom: 10 }}>Selected projects</p>
           <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-0.03em" }}>Recent work</h2>
         </div>
         <a href="#" style={{
@@ -366,11 +366,11 @@ function BentoCard({ work, span, imgH, delay }: { work: typeof WORKS[0]; span: n
       <div style={{ padding: "18px 20px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
           <span style={{
-            fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase",
+            fontFamily: MONO, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase",
             color: work.tag, background: "rgba(255,255,255,0.5)",
             padding: "4px 10px", borderRadius: 100,
           }}>{work.cat}</span>
-          <span style={{ fontFamily: MONO, fontSize: 10, color: C.mid }}>{work.year}</span>
+          <span style={{ fontFamily: MONO, fontSize: 12, color: C.mid }}>{work.year}</span>
         </div>
         <h3 style={{
           fontFamily: SANS, fontWeight: 700, fontSize: span >= 4 ? 22 : 17,
@@ -403,10 +403,10 @@ function GallerySection({ onOpen }: { onOpen: (i: number) => void }) {
     }}>
       <div ref={ref} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 40, ...revealStyle(visible) }}>
         <div>
-          <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: C.periwiDk, marginBottom: 10 }}>The archive</p>
+          <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: C.periwiDk, marginBottom: 10 }}>The archive</p>
           <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-0.03em", color: C.ink }}>All shots</h2>
         </div>
-        <span style={{ fontFamily: MONO, fontSize: 11, color: C.periwiDk }}>{GALLERY.length} photographs</span>
+        <span style={{ fontFamily: MONO, fontSize: 13, color: C.periwiDk }}>{GALLERY.length} photographs</span>
       </div>
 
       {/* True masonry via CSS columns */}
@@ -500,7 +500,7 @@ function AboutSection() {
         {/* Text */}
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div>
-            <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.26em", textTransform: "uppercase", color: C.mintDk, marginBottom: 14 }}>Hey, I'm Mia!</p>
+            <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.26em", textTransform: "uppercase", color: C.mintDk, marginBottom: 14 }}>Hey, I'm Mia!</p>
             <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(32px, 4vw, 52px)", letterSpacing: "-0.03em", lineHeight: 1.08 }}>
               I shoot what{" "}
               <span style={{ background: C.coral, borderRadius: 10, padding: "1px 12px", display: "inline-block" }}>feels real.</span>
@@ -558,7 +558,7 @@ function ContactSection() {
       textAlign: "center",
     }}>
       <div ref={ref} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24, ...revealStyle(visible) }}>
-        <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.26em", textTransform: "uppercase", color: C.mid }}>Say hello</p>
+        <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.26em", textTransform: "uppercase", color: C.mid }}>Say hello</p>
         <h2 style={{ fontFamily: SANS, fontWeight: 800, fontSize: "clamp(36px, 6vw, 80px)", letterSpacing: "-0.04em", maxWidth: "14ch", lineHeight: 0.97 }}>
           Got a project in mind?
         </h2>
@@ -614,7 +614,7 @@ function FooterBar() {
       <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 14, letterSpacing: "-0.02em", color: "#fff" }}>
         mia.<span style={{ color: C.coralDk }}>photo</span>
       </span>
-      <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em", color: "rgba(255,255,255,0.28)" }}>
+      <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", color: "rgba(255,255,255,0.28)" }}>
         © 2024 · Made with love in Berlin
       </span>
       <div style={{ display: "flex", gap: 20 }}>
@@ -707,7 +707,7 @@ function PetalLightbox({
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
           Close
         </button>
-        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", color: "rgba(255,255,255,0.3)" }}>
+        <span style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.2em", color: "rgba(255,255,255,0.3)" }}>
           {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
         </span>
         {zoom > 1 ? (

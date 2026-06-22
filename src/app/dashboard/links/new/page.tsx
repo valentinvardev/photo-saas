@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -208,7 +208,7 @@ export default function LinksWizardPage() {
             <iframe src={url} className="w-full h-full border-0 pointer-events-none"
               style={{ background: TEMPLATE_BG[templateId] ?? "#0D0D0D" }} />
           </PhoneMockup>
-          <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)]">Live preview</p>
+          <p className="font-mono text-[12px] uppercase tracking-widest text-[var(--fg-muted)]">Live preview</p>
         </div>
       );
     }
@@ -228,17 +228,17 @@ export default function LinksWizardPage() {
 
         <div className="flex flex-col gap-4">
           <div>
-            <label className="block font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-1.5">Display name</label>
+            <label className="block font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mb-1.5">Display name</label>
             <input className={inputCls} placeholder="Sofia Chen" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
           </div>
           <div>
-            <label className="block font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-1.5">Bio <span className="normal-case">— optional</span></label>
+            <label className="block font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mb-1.5">Bio <span className="normal-case">— optional</span></label>
             <textarea className={`${inputCls} resize-none`} rows={2} placeholder="Documentary photographer based in Lisbon."
               value={bio} onChange={(e) => setBio(e.target.value.slice(0, 120))} />
-            <p className="font-mono text-[9px] text-[var(--fg-muted)] mt-1 text-right">{bio.length}/120</p>
+            <p className="font-mono text-[13px] text-[var(--fg-muted)] mt-1 text-right">{bio.length}/120</p>
           </div>
           <div>
-            <label className="block font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-2">Avatar color</label>
+            <label className="block font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mb-2">Avatar color</label>
             <div className="flex gap-2 flex-wrap">
               {AVATAR_COLORS.map((c) => (
                 <button
@@ -251,7 +251,7 @@ export default function LinksWizardPage() {
             </div>
           </div>
           <div>
-            <label className="block font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-1.5">Avatar initial <span className="normal-case">— optional</span></label>
+            <label className="block font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mb-1.5">Avatar initial <span className="normal-case">— optional</span></label>
             <input className={`${inputCls}`} style={{ maxWidth: 80 }} maxLength={1}
               placeholder={displayName.charAt(0).toUpperCase() || "S"}
               value={customInitial} onChange={(e) => setCustomInitial(e.target.value.toUpperCase())} />
@@ -288,7 +288,7 @@ export default function LinksWizardPage() {
                     <button
                       key={t.type}
                       onClick={() => updateLink(link.id, { type: t.type, label: t.label, value: "" })}
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono text-[9px] uppercase tracking-widest border transition-colors ${
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono text-[13px] uppercase tracking-widest border transition-colors ${
                         link.type === t.type
                           ? "bg-yellow/10 border-yellow/30 text-yellow"
                           : "border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)]"
@@ -467,7 +467,7 @@ export default function LinksWizardPage() {
           {STEPS.map((s, i) => (
             <div key={s} className="flex items-center gap-1.5">
               {i > 0 && <div className="w-4 h-px bg-[var(--border)]" />}
-              <span className={`font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 rounded ${
+              <span className={`font-mono text-[13px] uppercase tracking-widest px-2 py-0.5 rounded ${
                 s === step ? "bg-yellow/10 text-yellow" :
                 STEP_IDX[s] < stepIndex ? "text-[var(--fg-muted)]" : "text-[var(--border)]"
               }`}>{s}</span>

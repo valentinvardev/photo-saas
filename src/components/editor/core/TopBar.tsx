@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -246,9 +246,9 @@ export function TopBar({ portfolioId, saving }: {
       {/* Logo */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 6 }}>
         <div style={{ width: 20, height: 20, background: "#facc15", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontWeight: 900, fontSize: 9, color: "#111", lineHeight: 1 }}>F</span>
+          <span style={{ fontWeight: 900, fontSize: 13, color: "#111", lineHeight: 1 }}>F</span>
         </div>
-        <span style={{ color: "var(--ec-muted)", fontSize: 11, letterSpacing: "-0.01em" }}>{t("editor.builder")}</span>
+        <span style={{ color: "var(--ec-muted)", fontSize: 13, letterSpacing: "-0.01em" }}>{t("editor.builder")}</span>
       </div>
 
       {divider}
@@ -290,7 +290,7 @@ export function TopBar({ portfolioId, saving }: {
       </div>
 
       {/* Viewport size label */}
-      <span style={{ fontFamily: "monospace", fontSize: 10, color: "var(--ec-dim)", marginLeft: 2 }}>
+      <span style={{ fontFamily: "monospace", fontSize: 12, color: "var(--ec-dim)", marginLeft: 2 }}>
         {viewport === "desktop" ? "1280" : viewport === "tablet" ? "768" : "375"}px
       </span>
 
@@ -317,7 +317,7 @@ export function TopBar({ portfolioId, saving }: {
       {/* Reset */}
       <button
         onClick={() => { if (confirm(t("editor.resetConfirm"))) reset(); }}
-        style={{ background: "none", border: "1px solid rgba(248,113,113,0.4)", cursor: "pointer", color: "#f87171", padding: "3px 9px", borderRadius: 4, fontSize: 11 }}
+        style={{ background: "none", border: "1px solid rgba(248,113,113,0.4)", cursor: "pointer", color: "#f87171", padding: "3px 9px", borderRadius: 4, fontSize: 13 }}
         onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(248,113,113,0.1)"; e.currentTarget.style.borderColor = "#f87171"; }}
         onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.4)"; }}
       >
@@ -329,7 +329,7 @@ export function TopBar({ portfolioId, saving }: {
         href={portfolioId ? `/editor/${portfolioId}/preview` : "/templates/minimal-bw"}
         target="_blank"
         rel="noopener noreferrer"
-        style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-label)", padding: "5px 11px", borderRadius: 4, fontSize: 11, textDecoration: "none" }}
+        style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "1px solid var(--ec-border)", color: "var(--ec-label)", padding: "5px 11px", borderRadius: 4, fontSize: 13, textDecoration: "none" }}
       >
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         {t("editor.preview")}
@@ -342,7 +342,7 @@ export function TopBar({ portfolioId, saving }: {
             onClick={togglePublish}
             disabled={updateStatus.isPending}
             title={t("editor.unpublishHint")}
-            style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.5)", color: "#22c55e", padding: "5px 11px", borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: updateStatus.isPending ? "default" : "pointer" }}
+            style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.5)", color: "#22c55e", padding: "5px 11px", borderRadius: 4, fontSize: 13, fontWeight: 600, cursor: updateStatus.isPending ? "default" : "pointer" }}
           >
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
             {updateStatus.isPending ? t("editor.updating") : t("editor.published")}
@@ -352,7 +352,7 @@ export function TopBar({ portfolioId, saving }: {
             onClick={togglePublish}
             disabled={updateStatus.isPending || portfolioQuery.isLoading}
             title={t("editor.publishHint")}
-            style={{ display: "flex", alignItems: "center", gap: 5, background: "#facc15", border: "1px solid #facc15", color: "#111", padding: "5px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700, cursor: updateStatus.isPending ? "default" : "pointer" }}
+            style={{ display: "flex", alignItems: "center", gap: 5, background: "#facc15", border: "1px solid #facc15", color: "#111", padding: "5px 12px", borderRadius: 4, fontSize: 13, fontWeight: 700, cursor: updateStatus.isPending ? "default" : "pointer" }}
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
             {updateStatus.isPending ? t("editor.publishing") : t("editor.publish")}
@@ -362,7 +362,7 @@ export function TopBar({ portfolioId, saving }: {
 
       {/* Save — DB autosave indicator when tied to a portfolio, else manual localStorage save */}
       {portfolioId ? (
-        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--ec-sub)", padding: "5px 12px", minWidth: 74 }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--ec-sub)", padding: "5px 12px", minWidth: 74 }}>
           {saving ? (
             <>
               <span style={{ width: 11, height: 11, borderRadius: "50%", border: "1.5px solid var(--ec-border)", borderTopColor: "#facc15", display: "inline-block", animation: "ed-spin 0.7s linear infinite" }} />
@@ -379,7 +379,7 @@ export function TopBar({ portfolioId, saving }: {
       ) : (
         <button
           onClick={() => saveState({ nodes, palette, typography, logo })}
-          style={{ background: "#facc15", border: "none", cursor: "pointer", color: "#111", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}
+          style={{ background: "#facc15", border: "none", cursor: "pointer", color: "#111", padding: "4px 12px", borderRadius: 4, fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}
         >
           <SaveIcon /> {t("editor.save")}
         </button>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -55,7 +55,7 @@ function PickerGrid({
               </div>
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-1 flex items-center gap-1">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-                <span className="font-sans text-[9px] font-semibold text-white truncate">{folder.name}</span>
+                <span className="font-sans text-[13px] font-semibold text-white truncate">{folder.name}</span>
                 <span className="font-mono text-[8px] text-white/50 ml-auto shrink-0">{folder.seeds.length}</span>
               </div>
               {on && (
@@ -83,7 +83,7 @@ function PickerGrid({
           );
         })}
       </div>
-      <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-2">
+      <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-2">
         {totalSelected > 0
           ? `${selectedFolders.size > 0 ? `${selectedFolders.size} folder${selectedFolders.size !== 1 ? "s" : ""}` : ""}${selectedFolders.size > 0 && selectedPhotos.size > 0 ? " + " : ""}${selectedPhotos.size > 0 ? `${selectedPhotos.size} photo${selectedPhotos.size !== 1 ? "s" : ""}` : ""} selected`
           : "Select folders or individual photos for this delivery"}
@@ -155,11 +155,11 @@ export default function NewDeliveryPage() {
             <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-full bg-yellow flex items-center justify-center shrink-0">
-                  <span className="font-sans font-black text-[#111] text-[10px]">S</span>
+                  <span className="font-sans font-black text-[#111] text-[12px]">S</span>
                 </div>
                 <div>
                   <p className="font-sans text-xs font-semibold text-[var(--fg)] leading-none">{title || "Gallery title"}</p>
-                  <p className="font-sans text-[10px] text-[var(--fg-muted)] mt-0.5">from Sofia Chen</p>
+                  <p className="font-sans text-[12px] text-[var(--fg-muted)] mt-0.5">from Sofia Chen</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -213,7 +213,7 @@ export default function NewDeliveryPage() {
 
             {/* Footer CTA */}
             <div className="px-4 py-3 flex items-center justify-between gap-2">
-              <span className="font-mono text-[10px] text-[var(--fg-muted)]">
+              <span className="font-mono text-[12px] text-[var(--fg-muted)]">
                 {totalSel > 0 ? `${totalSel} item${totalSel !== 1 ? "s" : ""} · ` : ""}Expires in 30 days
               </span>
               <button className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 transition-colors">
@@ -237,7 +237,7 @@ export default function NewDeliveryPage() {
           {step === 0 ? "Delivery" : "Back"}
         </button>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest hidden sm:block">{STEPS[Math.min(step, STEPS.length - 1)]}</span>
+          <span className="font-mono text-[12px] text-[var(--fg-muted)] uppercase tracking-widest hidden sm:block">{STEPS[Math.min(step, STEPS.length - 1)]}</span>
           <StepDots current={step} total={STEPS.length} />
         </div>
       </div>
@@ -309,7 +309,7 @@ export default function NewDeliveryPage() {
                   transition={{ duration: 0.18 }}
                   className="px-6 py-6 min-h-[280px]"
                 >
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-4">{STEPS[step]}</p>
+                  <p className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mb-4">{STEPS[step]}</p>
 
                   {step === 0 && (
                     <div className="space-y-4">
@@ -319,7 +319,7 @@ export default function NewDeliveryPage() {
                       </div>
                       <div className="space-y-3">
                         <div>
-                          <label className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] block mb-1.5">Gallery title</label>
+                          <label className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] block mb-1.5">Gallery title</label>
                           <input
                             autoFocus value={title} onChange={(e) => setTitle(e.target.value)}
                             placeholder="Wedding Gallery"
@@ -327,7 +327,7 @@ export default function NewDeliveryPage() {
                           />
                         </div>
                         <div>
-                          <label className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] block mb-1.5">Client name</label>
+                          <label className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] block mb-1.5">Client name</label>
                           <input
                             value={client} onChange={(e) => setClient(e.target.value)}
                             onKeyDown={(e) => { if (e.key === "Enter" && canNext) setStep(1); }}
@@ -337,7 +337,7 @@ export default function NewDeliveryPage() {
                         </div>
                       </div>
                       {totalSel > 0 && (
-                        <p className="font-mono text-[10px] text-yellow">
+                        <p className="font-mono text-[12px] text-yellow">
                           {selectedFolders.size > 0 && `${selectedFolders.size} folder${selectedFolders.size !== 1 ? "s" : ""}`}
                           {selectedFolders.size > 0 && selectedPhotos.size > 0 && " + "}
                           {selectedPhotos.size > 0 && `${selectedPhotos.size} photo${selectedPhotos.size !== 1 ? "s" : ""}`} selected →

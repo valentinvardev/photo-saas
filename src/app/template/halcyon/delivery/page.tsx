@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { HL_TOKENS, HL_FONTS, HL_DELIVERY, hlBaseCss, type HlPhoto } from "~/lib/halcyon/data";
@@ -74,13 +74,13 @@ export default function HalcyonDeliveryPage() {
         .hd-mark em{font-style:italic}
         .hd-gate h1{font-family:${HL_FONTS.serif};font-size:72px;line-height:0.95;letter-spacing:-0.03em;text-align:center;font-weight:400}
         .hd-gate h1 em{font-style:italic;color:${t.accent}}
-        .hd-gate .meta{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:${t.muted};text-align:center}
+        .hd-gate .meta{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:${t.muted};text-align:center}
         .hd-gate-form{width:100%;display:flex;flex-direction:column;gap:14px}
         .hd-pwd{background:${t.raised};border:1px solid ${t.line};color:${t.fg};padding:18px 20px;font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.06em;text-align:center;outline:none;transition:border-color .25s ease}
         .hd-pwd:focus{border-color:${t.accent}}
         .hd-pwd.shake{animation:hdShake .42s cubic-bezier(.36,.07,.19,.97);border-color:${t.accent}}
         @keyframes hdShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
-        .hd-gate-foot{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.1em;color:${t.muted};text-align:center;text-transform:uppercase}
+        .hd-gate-foot{font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.1em;color:${t.muted};text-align:center;text-transform:uppercase}
 
         .hd-curtain{position:absolute;inset:0;background:${t.accent};z-index:60;transform:translateX(-100%);pointer-events:none}
         .hd-curtain.run{animation:hdCurtain 1.1s cubic-bezier(0.76,0,0.24,1) forwards}
@@ -95,7 +95,7 @@ export default function HalcyonDeliveryPage() {
         .hd-hero-meta{position:absolute;bottom:48px;left:32px;right:32px;display:flex;justify-content:space-between;align-items:flex-end;color:${t.fg};z-index:2;flex-wrap:wrap;gap:24px}
         .hd-hero-title{font-family:${HL_FONTS.serif};font-size:96px;letter-spacing:-0.03em;line-height:0.95;font-weight:400}
         .hd-hero-title em{font-style:italic;color:${t.accent}}
-        .hd-hero-sub{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:${t.fg};opacity:0.85;margin-top:18px}
+        .hd-hero-sub{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:${t.fg};opacity:0.85;margin-top:18px}
 
         .hd-cta{display:grid;grid-template-columns:1fr auto;gap:48px;padding:64px 32px;border-bottom:1px solid ${t.line};align-items:end}
         .hd-cta h3{font-family:${HL_FONTS.serif};font-size:36px;line-height:1.1;letter-spacing:-0.02em;font-weight:400;margin-bottom:14px}
@@ -105,22 +105,22 @@ export default function HalcyonDeliveryPage() {
 
         .hd-tb{position:sticky;top:0;background:${t.bg};display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid ${t.line};z-index:10;flex-wrap:wrap;gap:12px}
         .hd-tb-l{display:flex;gap:8px;align-items:center}
-        .hd-pill{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 14px;border:1px solid ${t.line};color:${t.muted};background:transparent;cursor:pointer;transition:all .2s ease}
+        .hd-pill{font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 14px;border:1px solid ${t.line};color:${t.muted};background:transparent;cursor:pointer;transition:all .2s ease}
         .hd-pill.active{background:${t.fg};color:${t.bg};border-color:${t.fg}}
         .hd-pill:hover:not(.active){color:${t.fg}}
         .hd-pill .c{margin-left:8px;color:${t.accent}}
         .hd-pill.active .c{color:${t.bg};opacity:0.6}
-        .hd-tb-r{display:flex;gap:12px;align-items:center;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:${t.muted};flex-wrap:wrap}
+        .hd-tb-r{display:flex;gap:12px;align-items:center;font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:${t.muted};flex-wrap:wrap}
 
         .hd-chap{padding:96px 32px 32px;border-top:1px solid ${t.line}}
         .hd-chap:first-of-type{border-top:0}
         .hd-chap-head{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-bottom:48px;align-items:end}
         @media(max-width:780px){.hd-chap-head{grid-template-columns:1fr}}
-        .hd-chap-eyebrow{display:flex;align-items:center;gap:14px;color:${t.muted};margin-bottom:24px;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.14em;text-transform:uppercase}
+        .hd-chap-eyebrow{display:flex;align-items:center;gap:14px;color:${t.muted};margin-bottom:24px;font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.14em;text-transform:uppercase}
         .hd-chap-eyebrow .n{color:${t.accent}}
         .hd-chap h2{font-family:${HL_FONTS.serif};font-size:84px;line-height:0.95;letter-spacing:-0.03em;font-weight:400}
         .hd-chap h2 em{font-style:italic}
-        .hd-chap-meta{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:${t.muted};margin-bottom:14px}
+        .hd-chap-meta{font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:${t.muted};margin-bottom:14px}
         .hd-chap-note{font-family:${HL_FONTS.serif};font-style:italic;font-size:18px;line-height:1.5;color:${t.fg};opacity:0.85;max-width:440px}
 
         .hd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
@@ -132,7 +132,7 @@ export default function HalcyonDeliveryPage() {
         .hd-cell-meta{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:10px;pointer-events:none;background:linear-gradient(180deg,rgba(14,13,11,0.4) 0%,rgba(14,13,11,0) 30%,rgba(14,13,11,0) 70%,rgba(14,13,11,0.5) 100%);opacity:0;transition:opacity .25s ease}
         .hd-cell:hover .hd-cell-meta{opacity:1}
         .hd-cell-actions{display:flex;justify-content:space-between;pointer-events:auto}
-        .hd-cell-no{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.1em;color:${t.fg};opacity:0.85;text-transform:uppercase}
+        .hd-cell-no{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.1em;color:${t.fg};opacity:0.85;text-transform:uppercase}
         .hd-cell-fav{position:absolute;top:10px;right:10px;width:28px;height:28px;border:1px solid rgba(239,234,224,0.4);background:rgba(14,13,11,0.4);color:${t.fg};display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px);transition:all .2s ease;opacity:0}
         .hd-cell:hover .hd-cell-fav,.hd-cell-fav.on{opacity:1}
         .hd-cell-fav.on{background:${t.accent};border-color:${t.accent}}
@@ -145,9 +145,9 @@ export default function HalcyonDeliveryPage() {
         .hd-foot .m{font-family:${HL_FONTS.serif};font-size:18px}
         .hd-foot .m em{font-style:italic}
 
-        .hd-floater{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:${t.fg};color:${t.bg};display:flex;align-items:center;gap:18px;padding:14px 14px 14px 22px;border-radius:48px;box-shadow:0 24px 60px rgba(0,0,0,0.5);font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;z-index:15;animation:hdFloat .35s cubic-bezier(0.22,1,0.36,1)}
+        .hd-floater{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:${t.fg};color:${t.bg};display:flex;align-items:center;gap:18px;padding:14px 14px 14px 22px;border-radius:48px;box-shadow:0 24px 60px rgba(0,0,0,0.5);font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.08em;text-transform:uppercase;z-index:15;animation:hdFloat .35s cubic-bezier(0.22,1,0.36,1)}
         @keyframes hdFloat{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
-        .hd-floater button{appearance:none;border:0;background:transparent;color:${t.bg};font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;padding:8px 12px;border-radius:24px}
+        .hd-floater button{appearance:none;border:0;background:transparent;color:${t.bg};font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;padding:8px 12px;border-radius:24px}
         .hd-floater .dl{background:${t.accent};color:${t.fg}}
         .hd-floater .dl:hover{background:${t.bg};color:${t.fg}}
 
@@ -155,16 +155,16 @@ export default function HalcyonDeliveryPage() {
         @keyframes hdFade{from{opacity:0}to{opacity:1}}
         .hd-lb-img{max-width:78vw;max-height:78vh;object-fit:contain;box-shadow:0 30px 80px rgba(0,0,0,0.6)}
         .hd-lb-meta{position:fixed;bottom:32px;left:0;right:0;padding:0 48px;display:flex;justify-content:space-between;color:${t.fg};flex-wrap:wrap;gap:12px}
-        .hd-lb-counter{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase}
+        .hd-lb-counter{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.1em;text-transform:uppercase}
         .hd-lb-cap{font-family:${HL_FONTS.serif};font-style:italic;font-size:18px}
         .hd-lb-actions{display:flex;gap:8px}
-        .hd-lb-btn{background:transparent;border:1px solid ${t.line};color:${t.fg};font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:all .2s ease}
+        .hd-lb-btn{background:transparent;border:1px solid ${t.line};color:${t.fg};font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:all .2s ease}
         .hd-lb-btn:hover{background:${t.fg};color:${t.bg}}
         .hd-lb-btn.on{background:${t.accent};border-color:${t.accent};color:${t.fg}}
         .hd-lb-arrow{position:fixed;top:50%;transform:translateY(-50%);background:transparent;border:1px solid ${t.line};color:${t.fg};width:48px;height:48px;cursor:pointer;font-family:${HL_FONTS.mono};font-size:14px;transition:all .25s ease;z-index:81}
         .hd-lb-arrow:hover{background:${t.fg};color:${t.bg}}
         .hd-lb-arrow.l{left:32px}.hd-lb-arrow.r{right:32px}
-        .hd-lb-x{position:fixed;top:32px;right:32px;background:transparent;border:0;color:${t.fg};cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase;z-index:81}
+        .hd-lb-x{position:fixed;top:32px;right:32px;background:transparent;border:0;color:${t.fg};cursor:pointer;font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.1em;text-transform:uppercase;z-index:81}
       `}</style>
 
       <div className="hd-stripe" />

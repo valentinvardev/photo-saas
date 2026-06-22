@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -22,7 +22,7 @@ function PlanBadge({ tier }: { tier: PlanTier }) {
   const t = TIER_CONFIG[tier];
   return (
     <span
-      className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border"
+      className="inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-wider px-2 py-0.5 rounded-full border"
       style={{ color: t.color, borderColor: `${t.color}40`, background: t.glow }}
     >
       {t.icon}
@@ -85,7 +85,7 @@ function ActionCard({
           {icon}
         </div>
         {status && (
-          <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[var(--fg-muted)]">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-wider text-[var(--fg-muted)]">
             <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
             {status.label}
           </span>
@@ -93,7 +93,7 @@ function ActionCard({
       </div>
       <div>
         {eyebrow && (
-          <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--fg-muted)] mb-1.5">{eyebrow}</div>
+          <div className="font-mono text-[12px] uppercase tracking-[0.14em] text-[var(--fg-muted)] mb-1.5">{eyebrow}</div>
         )}
         <div className="font-sans text-base font-semibold text-[var(--fg)]">{title}</div>
         <p className="font-sans text-xs text-[var(--fg-muted)] mt-1 leading-relaxed">{body}</p>
@@ -117,7 +117,7 @@ function MiniAction({ href, icon, label, sub }: { href: string; icon: React.Reac
       </span>
       <div className="flex-1 min-w-0">
         <div className="font-sans text-sm font-medium text-[var(--fg)] truncate">{label}</div>
-        {sub && <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{sub}</div>}
+        {sub && <div className="font-sans text-[13px] text-[var(--fg-muted)] truncate">{sub}</div>}
       </div>
       <span className="text-[var(--fg-muted)]">{I.arrow}</span>
     </Link>
@@ -141,17 +141,17 @@ function StorageCard() {
         <div className="w-10 h-10 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] flex items-center justify-center text-[var(--fg)]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0018 0V5"/><path d="M3 12a9 3 0 0018 0"/></svg>
         </div>
-        <Link href="/dashboard/gallery" className="inline-flex items-center font-mono text-[10px] uppercase tracking-wider text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors shrink-0">
+        <Link href="/dashboard/gallery" className="inline-flex items-center font-mono text-[12px] uppercase tracking-wider text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors shrink-0">
           {t("home.storagePhotos", { n: data?.count ?? 0 })}
         </Link>
       </div>
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--fg-muted)] mb-1.5">{t("home.storageFree")}</div>
+        <div className="font-mono text-[12px] uppercase tracking-[0.14em] text-[var(--fg-muted)] mb-1.5">{t("home.storageFree")}</div>
         <div className="font-sans text-base font-semibold text-[var(--fg)]">{t("home.storageTitle")}</div>
         <div className="h-2 rounded-full bg-[var(--bg-subtle)] overflow-hidden mt-3">
           <div className={`h-full rounded-full transition-all duration-500 ${near ? "bg-red-500" : "bg-yellow"}`} style={{ width: `${pct}%` }} />
         </div>
-        <p className="font-mono text-[11px] text-[var(--fg-muted)] mt-2">{t("home.storageUsed", { used: fmt(used), total: "2 GB" })}</p>
+        <p className="font-mono text-[13px] text-[var(--fg-muted)] mt-2">{t("home.storageUsed", { used: fmt(used), total: "2 GB" })}</p>
       </div>
       <Link href="/dashboard/settings" className="mt-auto inline-flex items-center gap-2 font-sans text-xs font-semibold text-[var(--fg)] group-hover:gap-3 transition-all">
         {t("home.upgradePlan")}
@@ -208,7 +208,7 @@ function RecentActivity() {
             {ACT_ICON[row.kind]}
           </span>
           <div className="flex-1 min-w-0 font-sans text-sm text-[var(--fg)] truncate">{t(ACT_KEY[row.kind]!, { label: row.label })}</div>
-          <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--fg-muted)] shrink-0">{timeAgo(row.at, t)}</span>
+          <span className="font-mono text-[12px] uppercase tracking-wider text-[var(--fg-muted)] shrink-0">{timeAgo(row.at, t)}</span>
         </div>
       ))}
     </div>

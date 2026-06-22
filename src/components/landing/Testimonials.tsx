@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { useT } from "~/components/providers/LangProvider";
@@ -131,7 +131,7 @@ export function Testimonials() {
                 <div className="text-2xl font-black title-yellow font-serif">
                   {item.stat}
                 </div>
-                <div className="font-mono text-[11px] text-[var(--fg-muted)] tracking-wide">
+                <div className="font-mono text-[13px] text-[var(--fg-muted)] tracking-wide">
                   {t(`landing.testimonials.items.${i}.statLabel`)}
                 </div>
               </div>
@@ -151,7 +151,7 @@ export function Testimonials() {
                   <div className="font-sans font-semibold text-sm text-[var(--fg)]">
                     {item.name}
                   </div>
-                  <div className="font-mono text-[10px] text-[var(--fg-muted)] tracking-wide">
+                  <div className="font-mono text-[12px] text-[var(--fg-muted)] tracking-wide">
                     {t(`landing.testimonials.items.${i}.role`)} · {item.location}
                   </div>
                 </div>

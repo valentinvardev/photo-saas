@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
@@ -73,7 +73,7 @@ export function PhotoPickerModal({ multi = true, onPick, onClose }: {
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
           <div>
             <h2 className="font-sans font-black text-[var(--fg)] text-base leading-none">Pick photo{multi ? "s" : ""}</h2>
-            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1 uppercase tracking-widest">
+            <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-1 uppercase tracking-widest">
               From your library · {photos.length} photo{photos.length !== 1 ? "s" : ""}
             </p>
           </div>
@@ -150,7 +150,7 @@ export function PhotoPickerModal({ multi = true, onPick, onClose }: {
         {/* Footer */}
         {multi && (
           <div className="shrink-0 flex items-center justify-between gap-3 px-5 py-4 border-t border-[var(--border)]">
-            <span className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest">
+            <span className="font-mono text-[12px] text-[var(--fg-muted)] uppercase tracking-widest">
               {selected.size} selected
             </span>
             <div className="flex gap-2">

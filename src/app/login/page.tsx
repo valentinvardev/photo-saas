@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -161,7 +161,7 @@ export default function LoginPage() {
           {/* Form */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label className="block font-mono text-[11px] text-[var(--fg-muted)] tracking-widest uppercase mb-1.5">
+              <label className="block font-mono text-[13px] text-[var(--fg-muted)] tracking-widest uppercase mb-1.5">
                 Email
               </label>
               <input
@@ -175,12 +175,12 @@ export default function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block font-mono text-[11px] text-[var(--fg-muted)] tracking-widest uppercase">
+                <label className="block font-mono text-[13px] text-[var(--fg-muted)] tracking-widest uppercase">
                   Password
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="font-mono text-[11px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                  className="font-mono text-[13px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
                 >
                   Forgot?
                 </Link>
@@ -195,7 +195,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p className="font-mono text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              <p className="font-mono text-[13px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
@@ -212,7 +212,7 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-[var(--border)]" />
-            <span className="font-mono text-[10px] text-[var(--fg-muted)] tracking-widest uppercase">
+            <span className="font-mono text-[12px] text-[var(--fg-muted)] tracking-widest uppercase">
               or
             </span>
             <div className="flex-1 h-px bg-[var(--border)]" />

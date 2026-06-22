@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -231,7 +231,7 @@ export function OnboardingFlow() {
         <div className="w-28 sm:w-48 h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
           <div className="h-full bg-yellow rounded-full transition-all duration-300" style={{ width: `${(step / (TOTAL - 1)) * 100}%` }} />
         </div>
-        <span className="font-mono text-[10px] text-[var(--fg-muted)]">{t("onb.stepOf", { n: Math.min(step + 1, TOTAL), total: TOTAL })}</span>
+        <span className="font-mono text-[12px] text-[var(--fg-muted)]">{t("onb.stepOf", { n: Math.min(step + 1, TOTAL), total: TOTAL })}</span>
         <div className="flex-1" />
         {showPreview && (
           <button onClick={() => setPreviewOpen(true)} className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg)] font-sans text-xs font-medium hover:border-[var(--fg-muted)] transition-colors">
@@ -269,7 +269,7 @@ export function OnboardingFlow() {
                       <p className="font-sans text-[13px] text-[var(--fg-muted)] mt-3 leading-relaxed opacity-80">{t("onb.welcome.hint")}</p>
                       <div className="inline-flex items-center gap-2 mt-6 px-3 py-1.5 rounded-full bg-[var(--bg-subtle)] border border-[var(--border)]">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--fg-muted)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18"/></svg>
-                        <span className="font-mono text-[10px] text-[var(--fg-muted)]">{t("onb.welcome.langDetected", { lang: langLabel })}</span>
+                        <span className="font-mono text-[12px] text-[var(--fg-muted)]">{t("onb.welcome.langDetected", { lang: langLabel })}</span>
                       </div>
                     </div>
                   )}
@@ -317,7 +317,7 @@ export function OnboardingFlow() {
                       </div>
                       <div className="flex items-center gap-1.5 mt-2 text-[var(--fg-muted)]">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1012 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.6-4.1-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2.1.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.7 1.8c.1.2.1.4 0 .5l-.3.5c-.1.2-.3.3-.1.6.1.3.6 1 1.3 1.6.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.6-.7c.2-.2.3-.2.6-.1l1.6.8c.3.1.5.2.5.4.1.1.1.6-.1 1z"/></svg>
-                        <span className="font-sans text-[11px]">{t("onb.identity.phoneHint")}</span>
+                        <span className="font-sans text-[13px]">{t("onb.identity.phoneHint")}</span>
                       </div>
                       <div className="mt-5">
                         <label className="block font-sans text-xs font-semibold text-[var(--fg-muted)] mb-1.5">{t("onb.contact.label")}</label>
@@ -349,7 +349,7 @@ export function OnboardingFlow() {
                               <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
                                 {(["text", "image", "image+text"] as const).map((m) => (
                                   <button key={m} onClick={() => setLogoMode(m)}
-                                    className={`flex-1 px-2 py-1.5 font-sans text-[11px] font-semibold transition-colors ${logoMode === m ? "bg-yellow/15 text-[var(--fg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"} ${m !== "text" ? "border-l border-[var(--border)]" : ""}`}>
+                                    className={`flex-1 px-2 py-1.5 font-sans text-[13px] font-semibold transition-colors ${logoMode === m ? "bg-yellow/15 text-[var(--fg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"} ${m !== "text" ? "border-l border-[var(--border)]" : ""}`}>
                                     {m === "text" ? t("onb.logo.modeText") : m === "image" ? t("onb.logo.modeImage") : t("onb.logo.modeBoth")}
                                   </button>
                                 ))}
@@ -372,7 +372,7 @@ export function OnboardingFlow() {
                                         className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] text-xs font-sans font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/></svg>
                                         <span className="flex-1 text-left">{logoCrop ? t("onb.logo.adjustCrop") : t("onb.logo.crop")}</span>
-                                        {logoCrop && <span className="font-mono text-[9px] text-yellow border border-yellow/60 bg-yellow/10 px-1.5 py-0.5 rounded">ON</span>}
+                                        {logoCrop && <span className="font-mono text-[13px] text-yellow border border-yellow/60 bg-yellow/10 px-1.5 py-0.5 rounded">ON</span>}
                                       </button>
                                       <LogoWidthSlider label={t("onb.logo.width")} width={logoWidth} onChange={setLogoWidth} />
                                     </>
@@ -445,7 +445,7 @@ export function OnboardingFlow() {
                                   <span className="flex-1" style={{ background: p.accent }} />
                                   <span className="flex-1" style={{ background: p.muted }} />
                                 </div>
-                                <div className="font-sans text-[11px] text-[var(--fg-muted)] mt-1.5 text-center truncate">{t(`onb.palettes.${p.id}`)}</div>
+                                <div className="font-sans text-[13px] text-[var(--fg-muted)] mt-1.5 text-center truncate">{t(`onb.palettes.${p.id}`)}</div>
                               </button>
                             );
                           })}
@@ -524,7 +524,7 @@ export function OnboardingFlow() {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                         <span className="font-sans text-sm font-semibold">{uploadingCount > 0 ? t("onb.content.uploadingN", { n: uploadingCount }) : t("onb.content.upload")}</span>
                       </button>
-                      {contentUpload.error && <p className="font-mono text-[10px] text-red-400">{contentUpload.error}</p>}
+                      {contentUpload.error && <p className="font-mono text-[12px] text-red-400">{contentUpload.error}</p>}
 
                       {/* Thumbnails (+ loading placeholders for in-flight uploads) */}
                       {visibleContent.length > 0 || uploadingCount > 0 ? (
@@ -589,7 +589,7 @@ export function OnboardingFlow() {
                   {stepKey === "welcome" ? t("onb.close") : t("onb.back")}
                 </button>
                 <div className="flex items-center gap-3">
-                  {error && <span className="font-mono text-[10px] text-red-400 max-w-[160px] truncate" title={error}>{error}</span>}
+                  {error && <span className="font-mono text-[12px] text-red-400 max-w-[160px] truncate" title={error}>{error}</span>}
                   <button onClick={next} disabled={creating} className="px-6 py-2.5 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 disabled:opacity-50 transition-colors">
                     {stepKey === "welcome" ? t("onb.welcome.start") : stepKey === "content" ? (creating ? t("onb.done.creating") : t("onb.finish")) : t("onb.next")}
                   </button>
@@ -603,7 +603,7 @@ export function OnboardingFlow() {
             <div className="hidden lg:flex flex-1 min-w-0 flex-col bg-[var(--bg-subtle)] p-5">
               <div className="flex items-center gap-2 mb-3 px-1 shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500" style={{ boxShadow: "0 0 8px rgba(34,197,94,0.6)" }} />
-                <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)]">{t("onb.livePreview")}</span>
+                <span className="font-mono text-[12px] uppercase tracking-[0.15em] text-[var(--fg-muted)]">{t("onb.livePreview")}</span>
               </div>
               <div className="flex-1 min-h-0 rounded-xl overflow-hidden border border-[var(--border)] shadow-lg">
                 <LiveTemplatePreview templateId={template.id} palette={palette} typography={typo} nodes={previewNodes} logo={logoSettings} contact={contactSettings} galleryPhotos={previewGallery} slug={slug} scrollable={stepKey === "content"} />
@@ -623,7 +623,7 @@ export function OnboardingFlow() {
               <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border)] shrink-0">
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500" style={{ boxShadow: "0 0 8px rgba(34,197,94,0.6)" }} />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)]">{t("onb.livePreview")}</span>
+                  <span className="font-mono text-[12px] uppercase tracking-[0.15em] text-[var(--fg-muted)]">{t("onb.livePreview")}</span>
                 </div>
                 <button onClick={() => setPreviewOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -664,7 +664,7 @@ function LogoWidthSlider({ label, width, onChange }: { label: string; width: num
     <div>
       <div className="flex items-baseline justify-between mb-1.5">
         <label className="font-sans text-xs font-semibold text-[var(--fg-muted)]">{label}</label>
-        <span className="font-mono text-[11px] text-[var(--fg-muted)]">{width}px</span>
+        <span className="font-mono text-[13px] text-[var(--fg-muted)]">{width}px</span>
       </div>
       <input type="range" min={min} max={max} value={width} onChange={(e) => onChange(Number(e.target.value))}
         className="onb-range w-full"
@@ -698,7 +698,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-2.5">{children}</div>;
+  return <div className="font-mono text-[12px] uppercase tracking-[0.15em] text-[var(--fg-muted)] mb-2.5">{children}</div>;
 }
 
 /* A single editable colour variable: swatch (opens the native picker) + hex. */
@@ -710,7 +710,7 @@ function ColorVar({ label, value, onChange }: { label: string; value: string; on
         <input type="color" value={safe} onChange={(e) => onChange(e.target.value)} className="absolute inset-[-4px] w-[calc(100%+8px)] h-[calc(100%+8px)] opacity-0 cursor-pointer" aria-label={label} />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="font-sans text-[10px] font-semibold text-[var(--fg-muted)] uppercase tracking-wide">{label}</div>
+        <div className="font-sans text-[12px] font-semibold text-[var(--fg-muted)] uppercase tracking-wide">{label}</div>
         <input value={value} onChange={(e) => onChange(e.target.value)} spellCheck={false} className="w-full bg-transparent font-mono text-xs text-[var(--fg)] outline-none mt-0.5" />
       </div>
     </div>
@@ -795,12 +795,12 @@ function AssetUpload({ label, hint, value, onChange }: { label: string; hint: st
       </div>
       <div className="min-w-0 flex-1">
         <div className="font-sans text-xs font-semibold text-[var(--fg)]">{label}</div>
-        <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{value ? t("onb.logo.set") : hint}</div>
+        <div className="font-sans text-[13px] text-[var(--fg-muted)] truncate">{value ? t("onb.logo.set") : hint}</div>
       </div>
       <input ref={ref} type="file" accept="image/*" className="hidden" onChange={onFile} />
       <div className="flex items-center gap-1 shrink-0">
         <button onClick={() => ref.current?.click()} disabled={uploading}
-          className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-[11px] font-sans font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] disabled:opacity-50 transition-colors">
+          className="px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-[13px] font-sans font-medium text-[var(--fg)] hover:border-[var(--fg-muted)] disabled:opacity-50 transition-colors">
           {uploading ? t("onb.logo.uploading") : value ? t("onb.logo.change") : t("onb.logo.upload")}
         </button>
         {value && (

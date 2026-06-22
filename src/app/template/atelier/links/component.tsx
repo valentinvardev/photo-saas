@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /* ─── Atelier Links — canonical component ────────────────────────────
    Warm minimal editorial: Cormorant Garamond + Inter + Space Mono,
@@ -69,7 +69,7 @@ export function AtelierLinks({ page }: AtelierLinksProps) {
         .al-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
         .al-avatar-init{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:${F.serif};font-size:34px;font-style:italic;background:${T.raised}}
 
-        .al-eyebrow{font-family:${F.mono};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${T.muted};text-align:center}
+        .al-eyebrow{font-family:${F.mono};font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:${T.muted};text-align:center}
 
         .al-name{font-family:${F.serif};font-size:52px;line-height:0.96;letter-spacing:-0.025em;font-weight:300;text-align:center;margin-top:-6px}
         .al-name em{font-style:italic;font-weight:400}
@@ -78,7 +78,7 @@ export function AtelierLinks({ page }: AtelierLinksProps) {
 
         .al-divider{display:flex;align-items:center;gap:16px;width:100%}
         .al-divider hr{flex:1;border:0;border-top:1px solid ${T.line}}
-        .al-divider span{font-family:${F.mono};font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:${T.muted}}
+        .al-divider span{font-family:${F.mono};font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:${T.muted}}
 
         .al-stack{display:flex;flex-direction:column;width:100%}
         .al-link{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid ${T.line};color:${T.fg};text-decoration:none;transition:padding-left .3s ease;gap:12px}
@@ -86,7 +86,7 @@ export function AtelierLinks({ page }: AtelierLinksProps) {
         .al-link:hover{padding-left:8px}
         .al-link .l{font-family:${F.serif};font-size:20px;font-weight:300;line-height:1.1;transition:font-style .2s}
         .al-link:hover .l{font-style:italic}
-        .al-link .s{font-family:${F.mono};font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:${T.muted};display:block;margin-top:3px}
+        .al-link .s{font-family:${F.mono};font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:${T.muted};display:block;margin-top:3px}
         .al-link .ar{font-family:${F.mono};font-size:13px;color:${T.muted};flex-shrink:0;transition:transform .3s ease,color .3s ease}
         .al-link:hover .ar{color:${T.fg};transform:translateX(2px)}
 
@@ -96,9 +96,9 @@ export function AtelierLinks({ page }: AtelierLinksProps) {
         .al-stats>div{padding:18px 0;border-right:1px solid ${T.line};text-align:center}
         .al-stats>div:last-child{border-right:0}
         .al-stats .v{font-family:${F.serif};font-size:28px;font-weight:300;letter-spacing:-0.01em;line-height:1}
-        .al-stats .l{font-family:${F.mono};font-size:9px;letter-spacing:0.14em;color:${T.muted};text-transform:uppercase;margin-top:6px}
+        .al-stats .l{font-family:${F.mono};font-size:13px;letter-spacing:0.14em;color:${T.muted};text-transform:uppercase;margin-top:6px}
 
-        .al-foot{font-family:${F.mono};font-size:9px;letter-spacing:0.16em;color:${T.muted};text-transform:uppercase;text-align:center}
+        .al-foot{font-family:${F.mono};font-size:13px;letter-spacing:0.16em;color:${T.muted};text-transform:uppercase;text-align:center}
       `}</style>
 
       <div className="al-line" />

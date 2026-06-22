@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -33,7 +33,7 @@ export function ShareModal({ url, title, onClose }: { url: string; title?: strin
             </span>
             <div className="min-w-0">
               <h2 className="font-sans text-base font-bold text-[var(--fg)]">{t("share.title")}</h2>
-              {title && <p className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{title}</p>}
+              {title && <p className="font-sans text-[13px] text-[var(--fg-muted)] truncate">{title}</p>}
             </div>
           </div>
           <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5">

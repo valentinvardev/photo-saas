@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { motion } from "framer-motion";
@@ -207,7 +207,7 @@ export function DevicePreviewModal({
           <div className="min-w-0">
             <div className="font-sans font-black text-white text-sm truncate">{title}</div>
             {(subtitle || accentChip) && (
-              <div className="font-mono text-[9px] uppercase tracking-widest text-white/40 truncate flex items-center gap-2 mt-0.5">
+              <div className="font-mono text-[13px] uppercase tracking-widest text-white/40 truncate flex items-center gap-2 mt-0.5">
                 {subtitle && <span className="truncate">{subtitle}</span>}
                 {accentChip}
               </div>
@@ -250,8 +250,8 @@ export function DevicePreviewModal({
 
       {/* Footer */}
       <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center justify-between px-4 py-2 border-t border-white/10">
-        <span className="font-mono text-[10px] text-white/30 uppercase tracking-wider">{dims.label} · {device}</span>
-        <a href={url} target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] text-white/40 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1.5">
+        <span className="font-mono text-[12px] text-white/30 uppercase tracking-wider">{dims.label} · {device}</span>
+        <a href={url} target="_blank" rel="noopener noreferrer" className="font-mono text-[12px] text-white/40 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1.5">
           Open in new tab
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         </a>

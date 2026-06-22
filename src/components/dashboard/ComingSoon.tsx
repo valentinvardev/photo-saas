@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -38,7 +38,7 @@ export function ComingSoon({
 
           <span className="inline-flex items-center gap-1.5 bg-[var(--bg-subtle)] border border-[var(--border)] rounded-full px-3 py-1 mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-yellow animate-pulse" />
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--fg-muted)]">{t("cs.badge")}</span>
+            <span className="font-mono text-[12px] uppercase tracking-wider text-[var(--fg-muted)]">{t("cs.badge")}</span>
           </span>
 
           <h1 className="font-sans text-2xl sm:text-3xl font-bold text-[var(--fg)] tracking-tight">{title}</h1>

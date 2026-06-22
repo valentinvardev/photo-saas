@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -32,7 +32,7 @@ const selectStyle: React.CSSProperties = {
   background: "var(--ec-raised)",
   border: "1px solid var(--ec-lift)",
   color: "var(--ec-label)",
-  fontSize: 11,
+  fontSize: 13,
   fontFamily: "inherit",
   padding: "4px 18px 4px 7px",
   borderRadius: 5,
@@ -52,7 +52,7 @@ const numStyle: React.CSSProperties = {
   background: "var(--ec-raised)",
   border: "1px solid var(--ec-lift)",
   color: "var(--ec-label)",
-  fontSize: 11,
+  fontSize: 13,
   fontFamily: "inherit",
   padding: "4px 5px 4px 7px",
   borderRadius: 5,

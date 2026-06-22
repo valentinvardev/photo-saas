@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
@@ -111,7 +111,7 @@ function Lightbox({ photos, index, onIndex, onClose }: {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={photo.src} alt={photo.title ?? ""} className="max-w-full max-h-full object-contain rounded" />
       {photo.title && (
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[11px] text-white/60">{photo.title}</div>
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[13px] text-white/60">{photo.title}</div>
       )}
     </motion.div>
   );
@@ -144,7 +144,7 @@ function CategorySection({ category, content, onOpenPhoto }: {
         if (photos.length === 0) return null;
         return (
           <div key={fol.id} className="mb-8">
-            <h3 className="font-mono text-[11px] uppercase tracking-widest text-[var(--fg-muted)] mb-3">{fol.title}</h3>
+            <h3 className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mb-3">{fol.title}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
               {photos.map((p) => <PhotoTile key={p.id} photo={p} onOpen={() => onOpenPhoto(p.src)} />)}
             </div>
@@ -175,7 +175,7 @@ function PasswordGate({ title, wrong, onSubmit }: { title: string; wrong: boolea
             placeholder="Password"
             className={`w-full rounded-xl px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border ${wrong ? "border-red-500" : "border-[var(--border)]"} placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors`}
           />
-          {wrong && <p className="font-mono text-[11px] text-red-400 mt-2">Wrong password — try again.</p>}
+          {wrong && <p className="font-mono text-[13px] text-red-400 mt-2">Wrong password — try again.</p>}
           <button type="submit" className="btn-primary w-full rounded-xl py-3 font-sans font-bold text-sm mt-3">Unlock</button>
         </form>
       </div>

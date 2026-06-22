@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Logo } from "~/components/ui/Logo";
@@ -61,7 +61,7 @@ function Lightbox({
         className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent"
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="font-mono text-[11px] text-white/50 truncate max-w-[60%]">
+        <span className="font-mono text-[13px] text-white/50 truncate max-w-[60%]">
           {photo.name} · {index + 1} / {photos.length}
         </span>
         <button
@@ -115,10 +115,10 @@ export function ShareView({ shareId }: { shareId: string }) {
       <header className="flex items-center justify-between px-5 py-4 border-b border-white/8">
         <Logo height={40} />
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[10px] text-white/40 uppercase tracking-widest hidden sm:block">
+          <span className="font-mono text-[12px] text-white/40 uppercase tracking-widest hidden sm:block">
             View only · expires in {MOCK_EXPIRES}
           </span>
-          <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/6 border border-white/10 text-white/50">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[13px] uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/6 border border-white/10 text-white/50">
             <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             {MOCK_EXPIRES}
           </span>
@@ -131,13 +131,13 @@ export function ShareView({ shareId }: { shareId: string }) {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-1">
             <div className="w-8 h-8 rounded-full bg-yellow flex items-center justify-center shrink-0">
-              <span className="font-sans font-black text-[#111] text-[11px]">
+              <span className="font-sans font-black text-[#111] text-[13px]">
                 {MOCK_SENDER.charAt(0)}
               </span>
             </div>
             <div>
               <p className="font-sans text-sm font-semibold text-white leading-none">{MOCK_SENDER}</p>
-              <p className="font-mono text-[10px] text-white/40 mt-0.5">shared {MOCK_PHOTOS.length} photos with you</p>
+              <p className="font-mono text-[12px] text-white/40 mt-0.5">shared {MOCK_PHOTOS.length} photos with you</p>
             </div>
           </div>
         </div>
@@ -168,7 +168,7 @@ export function ShareView({ shareId }: { shareId: string }) {
 
         {/* Footer note */}
         <div className="mt-12 text-center">
-          <p className="font-mono text-[10px] text-white/25 uppercase tracking-widest">
+          <p className="font-mono text-[12px] text-white/25 uppercase tracking-widest">
             This link will expire automatically · Powered by Portapic
           </p>
         </div>

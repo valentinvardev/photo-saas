@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
@@ -48,7 +48,7 @@ function PortfolioMockup({ inView }: { inView: boolean }) {
           <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
         </div>
         <div
-          className="flex-1 mx-2 rounded-full px-2 py-0.5 text-[10px] font-mono text-center"
+          className="flex-1 mx-2 rounded-full px-2 py-0.5 text-[12px] font-mono text-center"
           style={{
             background: "var(--mockup-surface)",
             color: "var(--mockup-text-muted)",
@@ -94,7 +94,7 @@ function PortfolioMockup({ inView }: { inView: boolean }) {
           >
             SOFIA CHEN
           </span>
-          <span className="font-mono text-[10px] text-yellow tracking-widest">// Portfolio</span>
+          <span className="font-mono text-[12px] text-yellow tracking-widest">// Portfolio</span>
         </div>
 
         <motion.div
@@ -202,7 +202,7 @@ function SalesMockup({ inView }: { inView: boolean }) {
           className="absolute bottom-3 left-3 backdrop-blur-sm rounded-md px-2 py-1"
           style={{ background: "rgba(0,0,0,0.45)" }}
         >
-          <span className="font-mono text-[10px] text-white/70">RAW + JPEG · Full Res</span>
+          <span className="font-mono text-[12px] text-white/70">RAW + JPEG · Full Res</span>
         </motion.div>
       </div>
 
@@ -215,7 +215,7 @@ function SalesMockup({ inView }: { inView: boolean }) {
           Golden Hour, Patagonia
         </div>
         <div
-          className="mb-4 font-mono text-[10px]"
+          className="mb-4 font-mono text-[12px]"
           style={{ color: "var(--mockup-text-muted)" }}
         >
           Commercial License · Unlimited use
@@ -268,12 +268,12 @@ function SalesMockup({ inView }: { inView: boolean }) {
           className="mt-3 flex items-center justify-between"
         >
           <span
-            className="font-mono text-[10px]"
+            className="font-mono text-[12px]"
             style={{ color: "var(--mockup-text-muted)" }}
           >
             This month
           </span>
-          <span className="font-mono text-[11px] font-bold text-yellow">$4,820</span>
+          <span className="font-mono text-[13px] font-bold text-yellow">$4,820</span>
         </motion.div>
       </div>
     </div>
@@ -352,7 +352,7 @@ function StorageMockup({ inView }: { inView: boolean }) {
           {["RAW", "TIFF", "JPEG"].map((f) => (
             <span
               key={f}
-              className="font-mono text-[9px] px-1.5 py-0.5 rounded"
+              className="font-mono text-[13px] px-1.5 py-0.5 rounded"
               style={{
                 border: "1px solid var(--mockup-border)",
                 color: "var(--mockup-text-muted)",
@@ -371,13 +371,13 @@ function StorageMockup({ inView }: { inView: boolean }) {
       >
         <div className="flex items-center justify-between mb-1.5">
           <span
-            className="font-mono text-[10px]"
+            className="font-mono text-[12px]"
             style={{ color: "var(--mockup-text-muted)" }}
           >
             Used storage
           </span>
           <span
-            className="font-mono text-[10px] font-bold"
+            className="font-mono text-[12px] font-bold"
             style={{ color: "var(--mockup-text)" }}
           >
             2.4 TB / 5 TB
@@ -422,14 +422,14 @@ function StorageMockup({ inView }: { inView: boolean }) {
                 {f.type.toUpperCase()}
               </div>
               <span
-                className="font-mono text-[10px]"
+                className="font-mono text-[12px]"
                 style={{ color: "var(--mockup-text-muted)" }}
               >
                 {f.name}
               </span>
             </div>
             <span
-              className="font-mono text-[10px]"
+              className="font-mono text-[12px]"
               style={{ color: "var(--mockup-text-muted)", opacity: 0.6 }}
             >
               {f.size}
@@ -446,12 +446,12 @@ function StorageMockup({ inView }: { inView: boolean }) {
           >
             <div className="flex items-center justify-between mb-1.5">
               <span
-                className="font-mono text-[10px]"
+                className="font-mono text-[12px]"
                 style={{ color: "var(--mockup-text-muted)" }}
               >
                 Uploading DSC_1204.RAW…
               </span>
-              <span className="font-mono text-[10px] text-yellow">{progress}%</span>
+              <span className="font-mono text-[12px] text-yellow">{progress}%</span>
             </div>
             <div
               className="h-1 rounded-full overflow-hidden"
@@ -525,14 +525,14 @@ function DeliveryMockup({ inView }: { inView: boolean }) {
               Chen & Park Wedding
             </div>
             <div
-              className="font-mono text-[10px] mt-0.5"
+              className="font-mono text-[12px] mt-0.5"
               style={{ color: "var(--mockup-text-muted)" }}
             >
               847 photos · Client gallery
             </div>
           </div>
           <div
-            className="flex items-center gap-1.5 font-mono text-[10px]"
+            className="flex items-center gap-1.5 font-mono text-[12px]"
             style={{ color: "var(--mockup-text-muted)" }}
           >
             <div className="w-1.5 h-1.5 rounded-full bg-yellow animate-pulse" />
@@ -585,12 +585,12 @@ function DeliveryMockup({ inView }: { inView: boolean }) {
       <div className="px-4 pb-4">
         <div className="flex items-center justify-between mb-3">
           <span
-            className="font-mono text-[10px]"
+            className="font-mono text-[12px]"
             style={{ color: "var(--mockup-text-muted)" }}
           >
             {selected.size} selected · {847 - selected.size} remaining
           </span>
-          <span className="font-mono text-[10px] text-yellow">
+          <span className="font-mono text-[12px] text-yellow">
             {selected.size > 0 ? `${selected.size} ✓` : "Select to approve"}
           </span>
         </div>

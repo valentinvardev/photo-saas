@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEditorStore } from "~/lib/editor/store";
 import { TEMPLATES } from "~/lib/editor/templates/registry";
@@ -12,7 +12,7 @@ type GridLayout = GridSettings["layout"];
    "Selected work" section. Lives in the Design tab.
 ───────────────────────────────────────────────────────────────── */
 const labelStyle: React.CSSProperties = {
-  color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase",
+  color: "var(--ec-sub)", fontSize: 12, textTransform: "uppercase",
   letterSpacing: "0.1em", display: "block", marginBottom: 9,
 };
 
@@ -34,7 +34,7 @@ function Segmented({ value, onChange, options }: {
               background: active ? "rgba(250,204,21,0.14)" : "var(--ec-raised)",
               border: `1px solid ${active ? "#facc15" : "var(--ec-lift)"}`,
               color: active ? "#facc15" : "var(--ec-sub)",
-              fontSize: 11, fontWeight: active ? 600 : 500,
+              fontSize: 13, fontWeight: active ? 600 : 500,
               padding: "7px 4px", borderRadius: 6, cursor: "pointer",
               fontFamily: "inherit", textAlign: "center",
             }}
@@ -55,7 +55,7 @@ function Slider({ label, value, suffix, min, max, step, onChange }: {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
         <label style={{ ...labelStyle, marginBottom: 0 }}>{label}</label>
-        <span style={{ fontFamily: "monospace", fontSize: 11, color: "var(--ec-muted)" }}>{value}{suffix}</span>
+        <span style={{ fontFamily: "monospace", fontSize: 13, color: "var(--ec-muted)" }}>{value}{suffix}</span>
       </div>
       <input
         type="range" min={min} max={max} step={step}
@@ -125,7 +125,7 @@ export function GridPanel() {
           onChange={(v) => setGrid({ layout: v as GridLayout })}
           options={available.map((v) => ({ value: v, label: labelFor[v] ?? v }))}
         />
-        <p style={{ margin: "8px 0 0", fontSize: 10.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
+        <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
           {layoutDesc[grid.layout]}
         </p>
       </div>
@@ -152,7 +152,7 @@ export function GridPanel() {
               { value: "contain", label: t("editor.grid.fitWhole") },
             ]}
           />
-          <p style={{ margin: "8px 0 0", fontSize: 10.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
+          <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
             {grid.fit === "cover" ? t("editor.grid.fitCropDesc") : t("editor.grid.fitWholeDesc")}
           </p>
         </div>
@@ -166,7 +166,7 @@ export function GridPanel() {
             <Slider label={t("editor.grid.perBatch")} value={grid.pageSize} min={3} max={24} step={3}
               onChange={(v) => setGrid({ pageSize: v })} />
           )}
-          <p style={{ margin: "-4px 0 0", fontSize: 10.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
+          <p style={{ margin: "-4px 0 0", fontSize: 12.5, color: "var(--ec-dim)", lineHeight: 1.5 }}>
             {grid.loadMore ? t("editor.grid.loadMoreOn") : t("editor.grid.loadMoreOff")}
           </p>
         </div>

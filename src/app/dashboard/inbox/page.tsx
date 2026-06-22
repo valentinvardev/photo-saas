@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
@@ -73,10 +73,10 @@ export default function InboxPage() {
                     {!m.read && <span className="w-1.5 h-1.5 rounded-full bg-yellow shrink-0" />}
                     <span className="font-sans font-bold text-[var(--fg)] text-sm truncate">{m.name}</span>
                   </div>
-                  <a href={`mailto:${m.email}`} className="font-mono text-[11px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">{m.email}</a>
+                  <a href={`mailto:${m.email}`} className="font-mono text-[13px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">{m.email}</a>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className="font-mono text-[10px] text-[var(--fg-muted)] mr-1">{fmtDate(m.createdAt)}</span>
+                  <span className="font-mono text-[12px] text-[var(--fg-muted)] mr-1">{fmtDate(m.createdAt)}</span>
                   <button onClick={() => toggleRead(m.id, !m.read)} title={m.read ? t("inbox.markUnread") : t("inbox.markRead")}
                     className="p-1.5 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
                     {m.read ? (
@@ -95,9 +95,9 @@ export default function InboxPage() {
               <p className="font-serif text-sm text-[var(--fg)] mt-3 whitespace-pre-wrap leading-relaxed">{m.message}</p>
 
               <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-[var(--border)]">
-                <span className="font-mono text-[10px] text-[var(--fg-muted)] truncate">{m.portfolio?.title ?? "—"}</span>
+                <span className="font-mono text-[12px] text-[var(--fg-muted)] truncate">{m.portfolio?.title ?? "—"}</span>
                 <a href={`mailto:${m.email}?subject=${encodeURIComponent(t("inbox.replySubject"))}`}
-                  className="font-mono text-[10px] text-yellow uppercase tracking-widest hover:underline shrink-0">
+                  className="font-mono text-[12px] text-yellow uppercase tracking-widest hover:underline shrink-0">
                   {t("inbox.reply")}
                 </a>
               </div>

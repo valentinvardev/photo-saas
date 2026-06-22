@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
@@ -82,7 +82,7 @@ function AtelierGallery() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.15 }}
-              style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 28 }}
+              style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 28 }}
             >
               Welcome
             </motion.p>
@@ -128,7 +128,7 @@ function AtelierGallery() {
         animate="show"
         style={{ padding: "140px 48px 80px", textAlign: "center", maxWidth: 980, margin: "0 auto" }}
       >
-        <motion.p variants={fadeUp} style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 36 }}>
+        <motion.p variants={fadeUp} style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 36 }}>
           A celebration in motion · 247 photographs
         </motion.p>
         <motion.h1 variants={fadeUp} style={{
@@ -164,7 +164,7 @@ function AtelierGallery() {
           />
         </div>
         <div style={{ marginTop: 24, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-          <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f" }}>
+          <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f" }}>
             Plate 01 · The cover
           </p>
           <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: "#4a4742" }}>
@@ -182,7 +182,7 @@ function AtelierGallery() {
         flexWrap: "wrap", gap: 24,
       }}>
         <div>
-          <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 12 }}>
+          <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 12 }}>
             II
           </p>
           <h2 style={{
@@ -194,7 +194,7 @@ function AtelierGallery() {
           </h2>
         </div>
         <div style={{ textAlign: "right" }}>
-          <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f" }}>
+          <p style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f" }}>
             247 photographs · curated by hand
           </p>
         </div>
@@ -238,7 +238,7 @@ function AtelierGallery() {
           &ldquo;The slowest, most beautiful afternoon. Every moment looked like
           it was already a memory.&rdquo;
         </p>
-        <p style={{ marginTop: 32, fontFamily: MONO, fontSize: 10, letterSpacing: "0.25em", textTransform: "uppercase", color: "#7a766f" }}>
+        <p style={{ marginTop: 32, fontFamily: MONO, fontSize: 12, letterSpacing: "0.25em", textTransform: "uppercase", color: "#7a766f" }}>
           Felipe Aravena · Photographer
         </p>
       </section>
@@ -255,7 +255,7 @@ function AtelierGallery() {
             />
           </div>
           <div>
-            <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 24 }}>
+            <p style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "#7a766f", marginBottom: 24 }}>
               III · A note
             </p>
             <h3 style={{
@@ -274,7 +274,7 @@ function AtelierGallery() {
               <a href="#download" style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
                 padding: "14px 26px", background: "#0a0a0a", color: "#fafaf8",
-                fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em",
+                fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em",
                 textTransform: "uppercase", textDecoration: "none",
               }}>
                 Download all
@@ -284,7 +284,7 @@ function AtelierGallery() {
                 display: "inline-flex", alignItems: "center", gap: 10,
                 padding: "14px 26px", background: "transparent", color: "#0a0a0a",
                 border: "1px solid #0a0a0a",
-                fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em",
+                fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em",
                 textTransform: "uppercase", textDecoration: "none",
               }}>
                 Order prints
@@ -305,11 +305,11 @@ function AtelierGallery() {
           <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: "#0a0a0a", margin: 0, marginBottom: 8, fontWeight: 300, letterSpacing: "-0.01em" }}>
             Atelier
           </p>
-          <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7a766f" }}>
+          <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "#7a766f" }}>
             © 2026 · Buenos Aires
           </p>
         </div>
-        <nav style={{ display: "flex", gap: 28, fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+        <nav style={{ display: "flex", gap: 28, fontFamily: MONO, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase" }}>
           <a href="#contact" style={{ color: "#3a3a3a", textDecoration: "none", borderBottom: "1px solid transparent", paddingBottom: 2 }}>Contact</a>
           <a href="#instagram" style={{ color: "#3a3a3a", textDecoration: "none", borderBottom: "1px solid transparent", paddingBottom: 2 }}>Instagram</a>
           <a href="#print" style={{ color: "#3a3a3a", textDecoration: "none", borderBottom: "1px solid transparent", paddingBottom: 2 }}>Print shop</a>
@@ -336,7 +336,7 @@ function Topbar() {
       background: "rgba(250,250,248,0.85)",
       backdropFilter: "blur(12px)",
       WebkitBackdropFilter: "blur(12px)",
-      fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em",
+      fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em",
       textTransform: "uppercase", color: "#0a0a0a",
     }}>
       <span>Atelier</span>
@@ -393,11 +393,11 @@ function Plate({ seed, idx, total, col, row, onOpen }: { seed: number; idx: numb
         transition: "transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1)",
         transform: hover ? "translateY(0)" : "translateY(2px)",
       }}>
-        <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", opacity: 0.85 }}>
+        <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.25em", textTransform: "uppercase", opacity: 0.85 }}>
           {String(idx + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
         </span>
         <span style={{
-          fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
+          fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase",
           opacity: hover ? 1 : 0,
           transition: "opacity 300ms ease",
         }}>
@@ -443,7 +443,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
       >
         {/* Persistent header — stays across steps */}
         <motion.div layout="position">
-          <p style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 28 }}>
+          <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 28 }}>
             Atelier · Private
           </p>
           <h1 style={{
@@ -480,7 +480,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
                   padding: "16px 24px",
                   background: "#fafaf8", color: "#0a0a0a",
                   border: "none", cursor: "pointer",
-                  fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700,
+                  fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700,
                   display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 10,
                 }}
               >
@@ -488,7 +488,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
 
-              <p style={{ marginTop: 32, fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
+              <p style={{ marginTop: 32, fontFamily: MONO, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
                 A private collection · Apr 2026
               </p>
             </motion.div>
@@ -507,7 +507,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
 
               <div style={{ width: 32, height: 1, background: "rgba(255,255,255,0.3)", margin: "0 auto 32px" }} />
 
-              <label style={{ display: "block", fontFamily: MONO, fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 10, textAlign: "left" }}>
+              <label style={{ display: "block", fontFamily: MONO, fontSize: 13, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 10, textAlign: "left" }}>
                 Access key
               </label>
               <input
@@ -525,7 +525,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
                 }}
               />
               {error && (
-                <p style={{ marginTop: 12, fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "#f59e9e", textAlign: "left" }}>
+                <p style={{ marginTop: 12, fontFamily: MONO, fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: "#f59e9e", textAlign: "left" }}>
                   Incorrect — try again
                 </p>
               )}
@@ -535,7 +535,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
                 padding: "16px 24px",
                 background: "#fafaf8", color: "#0a0a0a",
                 border: "none", cursor: "pointer",
-                fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700,
+                fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700,
               }}>
                 Unlock the gallery
               </button>
@@ -546,13 +546,13 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
                 style={{
                   marginTop: 16, background: "none", border: "none", cursor: "pointer",
                   color: "rgba(255,255,255,0.45)",
-                  fontFamily: MONO, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase",
+                  fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase",
                 }}
               >
                 ← Back
               </button>
 
-              <p style={{ marginTop: 24, fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
+              <p style={{ marginTop: 24, fontFamily: MONO, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
                 Hint: sarah2026
               </p>
             </motion.form>
@@ -625,20 +625,20 @@ function Lightbox({ photos, startIndex, onClose }: { photos: typeof PHOTOS; star
       style={{ position: "fixed", inset: 0, zIndex: 1100, background: "#0a0a0a", display: "flex", flexDirection: "column", userSelect: "none" }}>
       {/* Top bar */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", background: "linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)", pointerEvents: "none" }}>
-        <button onClick={onClose} style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.7)", padding: "6px 10px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
+        <button onClick={onClose} style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.7)", padding: "6px 10px", fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
           Back
         </button>
-        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>
+        <span style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>
           {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
         </span>
         <div style={{ pointerEvents: "auto", display: "flex", gap: 8 }}>
           {zoom > 1 && (
-            <button onClick={resetView} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)", cursor: "pointer", padding: "5px 10px", fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+            <button onClick={resetView} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)", cursor: "pointer", padding: "5px 10px", fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase" }}>
               {Math.round(zoom * 100)}% · Reset
             </button>
           )}
-          <button style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)", cursor: "pointer", padding: "5px 12px", fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          <button style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)", cursor: "pointer", padding: "5px 12px", fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase" }}>
             ↓ Download
           </button>
         </div>
@@ -683,11 +683,11 @@ function Lightbox({ photos, startIndex, onClose }: { photos: typeof PHOTOS; star
           <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 22, color: "#fafaf8", margin: 0, marginBottom: 4, fontWeight: 300, letterSpacing: "-0.005em" }}>
             Plate {String(index + 1).padStart(2, "0")}
           </p>
-          <p style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", margin: 0 }}>
+          <p style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", margin: 0 }}>
             Sarah &amp; James · Apr 14, 2026
           </p>
         </div>
-        <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
+        <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
           Scroll to zoom · ← → to navigate
         </span>
       </div>

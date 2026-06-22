@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /* ─── Brooklyn Links — canonical component ───────────────────────────
    Same design language as the Brooklyn portfolio: urban dark, red
@@ -146,7 +146,7 @@ export function BrooklynLinks({ page, patch, onRequestAvatarChange }: BrooklynLi
             whiteSpace: "nowrap",
           }}>
             {Array.from({ length: 6 }).map((_, i) => (
-              <span key={i} style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: t.bg, padding: "0 32px" }}>
+              <span key={i} style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.28em", textTransform: "uppercase", color: t.bg, padding: "0 32px" }}>
                 {lbl(page, "marquee", "Morrison Photo · NYC · est. 2013 · Book now")}&nbsp;·&nbsp;
               </span>
             ))}
@@ -169,7 +169,7 @@ export function BrooklynLinks({ page, patch, onRequestAvatarChange }: BrooklynLi
             onChange={setLbl(patch, page, "marquee")}
             as="span"
             placeholder="Marquee text · click to edit"
-            style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: t.sub, opacity: 0.7 }}
+            style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: t.sub, opacity: 0.7 }}
           />
         </div>
       )}
@@ -225,7 +225,7 @@ export function BrooklynLinks({ page, patch, onRequestAvatarChange }: BrooklynLi
           as="p"
           hideIfEmpty
           style={{
-            fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em",
+            fontFamily: MONO, fontSize: 12, letterSpacing: "0.28em",
             textTransform: "uppercase", color: t.accent,
             margin: "0 0 10px",
           }}
@@ -247,7 +247,7 @@ export function BrooklynLinks({ page, patch, onRequestAvatarChange }: BrooklynLi
         {/* Links */}
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
           {visibleLinks.length === 0 && isEditor && (
-            <div style={{ padding: "32px 16px", textAlign: "center", border: `1px dashed ${t.line}`, color: t.sub, fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+            <div style={{ padding: "32px 16px", textAlign: "center", border: `1px dashed ${t.line}`, color: t.sub, fontFamily: MONO, fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase" }}>
               No links yet — add some from the sidebar
             </div>
           )}
@@ -262,7 +262,7 @@ export function BrooklynLinks({ page, patch, onRequestAvatarChange }: BrooklynLi
         {/* Footer */}
         <div style={{
           marginTop: 36, display: "flex", alignItems: "center", gap: 4,
-          fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em",
+          fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em",
           textTransform: "uppercase", color: t.line,
         }}>
           <span>Built with</span>
@@ -316,7 +316,7 @@ function BrooklynLinkRow({ link, index, page, t, patch }: {
           style={{ fontSize: 14, fontWeight: 600, letterSpacing: "-0.01em", color: "inherit" }}
         />
         {subtitle && (
-          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.16em", marginTop: 2, opacity: 0.6, color: "inherit", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.16em", marginTop: 2, opacity: 0.6, color: "inherit", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {subtitle}
           </div>
         )}
@@ -358,7 +358,7 @@ function StatsRow({ page, patch, t }: { page: LinksPage; patch?: Patch; t: Retur
             value={lbl(page, s.lKey, s.lDef)}
             onChange={setLbl(patch, page, s.lKey)}
             as="div" hideIfEmpty
-            style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: t.sub, marginTop: 5 }}
+            style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: t.sub, marginTop: 5 }}
           />
         </div>
       ))}

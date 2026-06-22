@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useEditorStore } from "~/lib/editor/store";
@@ -31,7 +31,7 @@ export function ImagePanel({ nodeId }: Props) {
     flex: 1, background: "none", border: "none",
     borderBottom: `2px solid ${active ? "#facc15" : "transparent"}`,
     color: active ? "#facc15" : "#444",
-    fontSize: 11, padding: "7px 0", cursor: "pointer",
+    fontSize: 13, padding: "7px 0", cursor: "pointer",
     fontFamily: "inherit", transition: "color 0.15s",
   });
 
@@ -43,7 +43,7 @@ export function ImagePanel({ nodeId }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={node.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)" }} />
-          <span style={{ position: "absolute", bottom: 6, left: 8, fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.6)" }}>current</span>
+          <span style={{ position: "absolute", bottom: 6, left: 8, fontFamily: "monospace", fontSize: 13, color: "rgba(255,255,255,0.6)" }}>current</span>
         </div>
       )}
 
@@ -55,7 +55,7 @@ export function ImagePanel({ nodeId }: Props) {
 
       {tab === "gallery" && (
         <div style={{ padding: "0 12px" }}>
-          <p style={{ color: "#444", fontSize: 10, margin: "0 0 10px", lineHeight: 1.5 }}>
+          <p style={{ color: "#444", fontSize: 12, margin: "0 0 10px", lineHeight: 1.5 }}>
             Click any photo to apply. More images coming from your media library.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 3 }}>
@@ -88,7 +88,7 @@ export function ImagePanel({ nodeId }: Props) {
 
       {tab === "url" && (
         <div style={{ padding: "0 12px" }}>
-          <label style={{ color: "#555", fontSize: 10, display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          <label style={{ color: "#555", fontSize: 12, display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>
             Image URL
           </label>
           <input
@@ -113,7 +113,7 @@ export function ImagePanel({ nodeId }: Props) {
           >
             Apply URL
           </button>
-          <p style={{ color: "#333", fontSize: 10, marginTop: 8, lineHeight: 1.5 }}>
+          <p style={{ color: "#333", fontSize: 12, marginTop: 8, lineHeight: 1.5 }}>
             Paste any direct image URL. Supports JPG, PNG, WebP, GIF, SVG.
           </p>
         </div>

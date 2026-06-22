@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /* ─── Brooklyn Delivery — canonical client gallery ────────────────────
    Single source of truth: this component is rendered both by the
@@ -283,13 +283,13 @@ function PasswordGate({ page, set, onSubmit }: { page: DeliveryPage; set?: Sette
           <LogoMark
             page={page} set={set} fallback="STUDIO" fontSlot={3}
             imageHeight={20}
-            textStyle={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }}
+            textStyle={{ fontFamily: fMono, fontSize: 12, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }}
           />
           {page.logoMode !== "none" && (
             <EditableText
               fieldPath="labels.gateSuffix" value={lbl(page, "gateSuffix", "· Client Gallery")}
               onChange={setLbl(set, page, "gateSuffix")} as="span" fontSlot={3} hideIfEmpty
-              style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }}
+              style={{ fontFamily: fMono, fontSize: 12, letterSpacing: "0.3em", textTransform: "uppercase", color: t.accent }}
             />
           )}
         </div>
@@ -310,7 +310,7 @@ function PasswordGate({ page, set, onSubmit }: { page: DeliveryPage; set?: Sette
           value={page.passwordSubtitle}
           onChange={set ? (v) => set("passwordSubtitle", v) : undefined}
           as="p" multiline fontSlot={3}
-          style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: t.muted, margin: "0 0 40px", textAlign: "center", maxWidth: 380 }}
+          style={{ fontFamily: fMono, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: t.muted, margin: "0 0 40px", textAlign: "center", maxWidth: 380 }}
         />
 
         <div style={{ width: "100%", maxWidth: 340, animation: shake ? "bk-shake 0.4s ease" : "none" }}>
@@ -323,7 +323,7 @@ function PasswordGate({ page, set, onSubmit }: { page: DeliveryPage; set?: Sette
           `}</style>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <label style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: t.muted }}>
+            <label style={{ fontFamily: fMono, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: t.muted }}>
               Access code
             </label>
             <input
@@ -341,7 +341,7 @@ function PasswordGate({ page, set, onSubmit }: { page: DeliveryPage; set?: Sette
               }}
             />
             {error && (
-              <p style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.16em", color: t.accent, margin: 0 }}>
+              <p style={{ fontFamily: fMono, fontSize: 13, letterSpacing: "0.16em", color: t.accent, margin: 0 }}>
                 Incorrect code. Try again.
               </p>
             )}
@@ -353,7 +353,7 @@ function PasswordGate({ page, set, onSubmit }: { page: DeliveryPage; set?: Sette
               style={{
                 width: "100%", padding: "14px",
                 background: t.btnBg, border: "none",
-                color: t.btnFg, fontFamily: fMono, fontSize: 11,
+                color: t.btnFg, fontFamily: fMono, fontSize: 13,
                 fontWeight: 700, letterSpacing: "0.18em",
                 textTransform: "uppercase", cursor: "pointer",
                 transition: "background 0.2s", marginTop: 4,
@@ -368,7 +368,7 @@ function PasswordGate({ page, set, onSubmit }: { page: DeliveryPage; set?: Sette
           onChange={set ? (v) => set("passwordHint", v) : undefined}
           as="p" multiline fontSlot={3}
           placeholder={set ? "Optional hint" : ""}
-          style={{ fontFamily: fMono, fontSize: 9, color: t.muted, letterSpacing: "0.12em", marginTop: 32, textAlign: "center", maxWidth: 320 }}
+          style={{ fontFamily: fMono, fontSize: 13, color: t.muted, letterSpacing: "0.12em", marginTop: 32, textAlign: "center", maxWidth: 320 }}
         />
       </div>
     </main>
@@ -477,7 +477,7 @@ function Gallery({
               <LogoMark
                 page={page} set={set} fallback="STUDIO" fontSlot={3}
                 imageHeight={20}
-                textStyle={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: t.fg }}
+                textStyle={{ fontFamily: fMono, fontSize: 13, letterSpacing: "0.3em", textTransform: "uppercase", color: t.fg }}
               />
             </div>
           )}
@@ -490,7 +490,7 @@ function Gallery({
             bottom: "clamp(20px, 4vw, 40px)",
           }}>
             <p style={{
-              fontFamily: fMono, fontSize: 10, letterSpacing: "0.28em",
+              fontFamily: fMono, fontSize: 12, letterSpacing: "0.28em",
               textTransform: "uppercase", color: t.accent, margin: "0 0 12px",
             }} data-font-slot={3}>
               <EditableText fieldPath="title" value={page.title} onChange={set ? (v) => set("title", v) : undefined} as="span" fontSlot={3} />
@@ -515,7 +515,7 @@ function Gallery({
             <div style={{
               display: "flex", gap: "clamp(8px, 2vw, 20px)",
               flexWrap: "wrap", alignItems: "center",
-              fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em",
+              fontFamily: fMono, fontSize: 12, letterSpacing: "0.18em",
               textTransform: "uppercase", color: t.fg,
             }} data-font-slot={3}>
               <span>{page.createdAt}</span>
@@ -548,7 +548,7 @@ function Gallery({
               flexShrink: 0,
               background: downloading ? t.line : t.btnBg, border: "none",
               color: downloading ? t.muted : t.btnFg,
-              fontFamily: fMono, fontSize: 10, letterSpacing: "0.2em",
+              fontFamily: fMono, fontSize: 12, letterSpacing: "0.2em",
               textTransform: "uppercase", fontWeight: 700,
               padding: "11px 20px", cursor: isEditor || downloading ? "default" : "pointer",
               display: "inline-flex", alignItems: "center", gap: 8,
@@ -559,12 +559,12 @@ function Gallery({
             {downloading ? (
               <EditableText fieldPath="labels.preparingZip" value={lbl(page, "preparingZip", "Preparing zip…")}
                 onChange={setLbl(set, page, "preparingZip")} as="span" fontSlot={3}
-                style={{ color: "inherit", fontFamily: fMono, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 700 }}
+                style={{ color: "inherit", fontFamily: fMono, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 700 }}
               />
             ) : (
               <EditableText fieldPath="labels.downloadAll" value={lbl(page, "downloadAll", "Download all")}
                 onChange={setLbl(set, page, "downloadAll")} as="span" fontSlot={3}
-                style={{ color: "inherit", fontFamily: fMono, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 700 }}
+                style={{ color: "inherit", fontFamily: fMono, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 700 }}
               />
             )}
           </button>
@@ -583,7 +583,7 @@ function Gallery({
             <FilterPill active={filter === "all"} onClick={() => setFilter("all")} accent={t.accent} muted={t.muted} fg={t.fg} mono={fMono}>
               <EditableText fieldPath="labels.filterAll" value={lbl(page, "filterAll", "All")}
                 onChange={setLbl(set, page, "filterAll")} as="span" fontSlot={3}
-                style={{ color: "inherit", fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}
+                style={{ color: "inherit", fontFamily: fMono, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase" }}
               />
               <span style={{ opacity: 0.55, marginLeft: 4 }}>{allPhotos.length}</span>
             </FilterPill>
@@ -591,7 +591,7 @@ function Gallery({
               <Heart filled={filter === "favorites"} size={9} />
               <EditableText fieldPath="labels.filterFavorites" value={lbl(page, "filterFavorites", "Favorites")}
                 onChange={setLbl(set, page, "filterFavorites")} as="span" fontSlot={3}
-                style={{ color: "inherit", marginLeft: 5, fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}
+                style={{ color: "inherit", marginLeft: 5, fontFamily: fMono, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase" }}
               />
               <span style={{ opacity: 0.55, marginLeft: 4 }}>{favorites.size}</span>
             </FilterPill>
@@ -601,7 +601,7 @@ function Gallery({
 
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {selected.size > 0 && (
-              <span style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", color: t.accent, textTransform: "uppercase" }}>
+              <span style={{ fontFamily: fMono, fontSize: 13, letterSpacing: "0.18em", color: t.accent, textTransform: "uppercase" }}>
                 {selected.size} selected
               </span>
             )}
@@ -609,7 +609,7 @@ function Gallery({
               onClick={() => selectAllVisible(visibleIndices)}
               style={{
                 background: "none", border: `1px solid ${t.line}`, color: t.muted,
-                fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
+                fontFamily: fMono, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase",
                 padding: "6px 12px", cursor: isEditor ? "default" : "pointer",
               }}
             >
@@ -622,7 +622,7 @@ function Gallery({
               style={{
                 background: downloading ? t.line : t.btnBg, border: "none",
                 color: downloading ? t.muted : t.btnFg,
-                fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase",
+                fontFamily: fMono, fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase",
                 fontWeight: 700, padding: "7px 14px",
                 cursor: isEditor || downloading ? "default" : "pointer",
                 display: "inline-flex", alignItems: "center", gap: 6,
@@ -660,7 +660,7 @@ function Gallery({
               borderTop: si > 0 ? `1px solid ${t.line}` : "none",
             }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
-                <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
+                <span style={{ fontFamily: fMono, fontSize: 12, letterSpacing: "0.32em", textTransform: "uppercase", color: t.accent }} data-font-slot={3}>
                   Ch {String(si + 1).padStart(2, "0")}
                 </span>
                 <EditableText
@@ -675,7 +675,7 @@ function Gallery({
                     margin: 0,
                   }}
                 />
-                <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", color: t.accent, textTransform: "uppercase" }} data-font-slot={3}>
+                <span style={{ fontFamily: fMono, fontSize: 12, letterSpacing: "0.18em", color: t.accent, textTransform: "uppercase" }} data-font-slot={3}>
                   {indices.length} photos
                 </span>
                 <EditableText
@@ -772,13 +772,13 @@ function Gallery({
               />
             </div>
             <p style={{
-              fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em",
+              fontFamily: fMono, fontSize: 13, letterSpacing: "0.2em",
               textTransform: "uppercase", color: t.muted, margin: 0,
             }} data-font-slot={3}>
               © {new Date().getFullYear()} · Delivered with Portapic
             </p>
           </div>
-          <nav style={{ display: "flex", gap: 20, fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+          <nav style={{ display: "flex", gap: 20, fontFamily: fMono, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase" }}>
             {[
               { key: "footerLink1", fallback: "Contact" },
               { key: "footerLink2", fallback: "Instagram" },
@@ -789,7 +789,7 @@ function Gallery({
                 value={lbl(page, key, fallback)}
                 onChange={setLbl(set, page, key)}
                 as="a" fontSlot={3} hideIfEmpty
-                style={{ color: t.muted, textDecoration: "none", fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase" }}
+                style={{ color: t.muted, textDecoration: "none", fontFamily: fMono, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase" }}
               />
             ))}
           </nav>
@@ -814,7 +814,7 @@ function Gallery({
               }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.22em", color: t.accent, textTransform: "uppercase" }}>
+                <div style={{ fontFamily: fMono, fontSize: 13, letterSpacing: "0.22em", color: t.accent, textTransform: "uppercase" }}>
                   {selected.size} selected
                 </div>
                 <div style={{ fontFamily: fMono, fontSize: 8, letterSpacing: "0.18em", color: t.muted, textTransform: "uppercase", marginTop: 2 }}>
@@ -825,7 +825,7 @@ function Gallery({
                 onClick={() => setSelected(new Set())}
                 style={{
                   background: "none", border: `1px solid ${t.line}`, color: t.muted,
-                  fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
+                  fontFamily: fMono, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase",
                   padding: "8px 12px", cursor: "pointer",
                 }}
               >Clear</button>
@@ -835,7 +835,7 @@ function Gallery({
                 style={{
                   background: downloading ? t.line : t.btnBg, border: "none",
                   color: downloading ? t.muted : t.btnFg,
-                  fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700,
+                  fontFamily: fMono, fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700,
                   padding: "9px 14px", cursor: downloading ? "default" : "pointer",
                   display: "inline-flex", alignItems: "center", gap: 6,
                 }}
@@ -877,7 +877,7 @@ function EmptyFavorites({ onClear, fSerif, fSans, fMono, t }: { onClear: () => v
       </p>
       <button onClick={onClear} style={{
         background: "none", border: `1px solid ${t.line}`, color: t.fg,
-        fontFamily: fMono, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase",
+        fontFamily: fMono, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase",
         padding: "10px 18px", cursor: "pointer", marginTop: 8,
       }}>Browse all photos →</button>
     </div>
@@ -896,7 +896,7 @@ function FilterPill({ active, onClick, children, accent, muted, fg, mono }: {
         background: active ? accent : "none",
         border: "none",
         color: active ? fg === STONE ? BLACK : "#000" : muted,
-        fontFamily: mono, fontSize: 9, letterSpacing: "0.18em",
+        fontFamily: mono, fontSize: 13, letterSpacing: "0.18em",
         textTransform: "uppercase", fontWeight: active ? 700 : 400,
         padding: "7px 12px", cursor: "pointer",
         display: "inline-flex", alignItems: "center",
@@ -1015,7 +1015,7 @@ function GalleryThumb({
 
       <span style={{
         position: "absolute", bottom: 8, left: 10,
-        fontFamily: mono, fontSize: 9, letterSpacing: "0.18em",
+        fontFamily: mono, fontSize: 13, letterSpacing: "0.18em",
         color: "rgba(255,255,255,0.85)",
         opacity: showOverlay ? 1 : 0, transition: "opacity 0.2s", pointerEvents: "none",
       }}>
@@ -1116,7 +1116,7 @@ function BrooklynLightbox({
       }}>
         <button onClick={onClose} style={{
           background: "none", border: `1px solid ${theme.line}`, cursor: "pointer", color: theme.muted,
-          fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase",
+          fontFamily: fMono, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase",
           padding: "7px 12px", display: "inline-flex", alignItems: "center", gap: 6,
         }}>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -1124,7 +1124,7 @@ function BrooklynLightbox({
         </button>
 
         <span style={{
-          fontFamily: fMono, fontSize: 9, letterSpacing: "0.22em",
+          fontFamily: fMono, fontSize: 13, letterSpacing: "0.22em",
           textTransform: "uppercase", color: theme.muted,
         }}>
           {String(index + 1).padStart(3, "0")} / {String(allPhotos.length).padStart(3, "0")} ·{" "}
@@ -1147,7 +1147,7 @@ function BrooklynLightbox({
           </button>
           <button style={{
             background: theme.accent, border: "none", cursor: "pointer", color: theme.btnFg,
-            fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
+            fontFamily: fMono, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase",
             fontWeight: 700, padding: "7px 12px",
             display: "inline-flex", alignItems: "center", gap: 6,
           }}>
@@ -1229,7 +1229,7 @@ export default function BrooklynDeliveryDemo() {
   if (!hydrated && !storePage) {
     return (
       <div style={{ height: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: BLACK, color: GRAY }}>
-        <span style={{ fontFamily: FALLBACK_MONO, fontSize: 11 }}>Loading…</span>
+        <span style={{ fontFamily: FALLBACK_MONO, fontSize: 13 }}>Loading…</span>
       </div>
     );
   }

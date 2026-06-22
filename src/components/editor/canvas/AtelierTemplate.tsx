@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * AtelierTemplate — adapted fork of src/app/template/atelier/page.tsx
@@ -122,7 +122,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
         }}
       >
         <EditableNode id="atl-hero-eyebrow" tag="p" style={{
-          fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em",
+          fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em",
           textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", marginBottom: 36,
         }}>
           <EditableText id="atl-hero-eyebrow" />
@@ -163,7 +163,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
 
         <div style={{ marginTop: 24, display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
           <EditableNode id="atl-hero-caption" tag="p" style={{
-            fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em",
+            fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em",
             textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", margin: 0,
           }}>
             <EditableText id="atl-hero-caption" />
@@ -189,7 +189,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
       >
         <div>
           <EditableNode id="atl-coll-roman" tag="p" style={{
-            fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em",
+            fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em",
             textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", marginBottom: 12, margin: 0,
           }}>
             <EditableText id="atl-coll-roman" />
@@ -204,7 +204,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
           </EditableNode>
         </div>
         <EditableNode id="atl-coll-meta" tag="p" style={{
-          fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em",
+          fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em",
           textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", textAlign: "right", margin: 0,
         }}>
           <EditableText id="atl-coll-meta" />
@@ -253,7 +253,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
           <EditableText id="atl-quote-text" />
         </EditableNode>
         <EditableNode id="atl-quote-author" tag="p" style={{
-          marginTop: 32, fontFamily: MONO, fontSize: 10, letterSpacing: "0.25em",
+          marginTop: 32, fontFamily: MONO, fontSize: 12, letterSpacing: "0.25em",
           textTransform: "uppercase", color: "var(--ed-muted, #7a766f)",
         }}>
           <EditableText id="atl-quote-author" />
@@ -279,7 +279,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
 
           <div>
             <EditableNode id="atl-close-eyebrow" tag="p" style={{
-              fontFamily: MONO, fontSize: 11, letterSpacing: "0.22em",
+              fontFamily: MONO, fontSize: 13, letterSpacing: "0.22em",
               textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", marginBottom: 24, margin: 0,
             }}>
               <EditableText id="atl-close-eyebrow" />
@@ -304,7 +304,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
               <EditableNode id="atl-close-cta-1" tag="span" style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
                 padding: "14px 26px", background: "var(--ed-fg, #0a0a0a)", color: "var(--ed-bg, #fafaf8)",
-                fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em",
+                fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em",
                 textTransform: "uppercase", cursor: "pointer",
               }}>
                 <EditableText id="atl-close-cta-1" />
@@ -314,7 +314,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
                 display: "inline-flex", alignItems: "center", gap: 10,
                 padding: "14px 26px", background: "transparent", color: "var(--ed-fg, #0a0a0a)",
                 border: "1px solid var(--ed-fg, #0a0a0a)",
-                fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em",
+                fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em",
                 textTransform: "uppercase", cursor: "pointer",
               }}>
                 <EditableText id="atl-close-cta-2" />
@@ -342,13 +342,13 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
             <Brand nodeId="atl-footer-brand" />
           </div>
           <EditableNode id="atl-footer-copy" tag="p" style={{
-            fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em",
+            fontFamily: MONO, fontSize: 12, letterSpacing: "0.2em",
             textTransform: "uppercase", color: "var(--ed-muted, #7a766f)", margin: 0,
           }}>
             <EditableText id="atl-footer-copy" />
           </EditableNode>
         </div>
-        <nav style={{ display: "flex", gap: 28, fontFamily: MONO, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+        <nav style={{ display: "flex", gap: 28, fontFamily: MONO, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase" }}>
           <span style={{ color: "var(--ed-fg, #3a3a3a)", paddingBottom: 2 }}>Contact</span>
           <span style={{ color: "var(--ed-fg, #3a3a3a)", paddingBottom: 2 }}>Instagram</span>
           <span style={{ color: "var(--ed-fg, #3a3a3a)", paddingBottom: 2 }}>Print shop</span>
@@ -403,11 +403,11 @@ function Plate({ seed, idx, total, col, row, onOpen }: { seed: number; idx: numb
         transform: hover ? "translateY(0)" : "translateY(2px)",
         pointerEvents: "none",
       }}>
-        <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", opacity: 0.85 }}>
+        <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: "0.25em", textTransform: "uppercase", opacity: 0.85 }}>
           {String(idx + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
         </span>
         <span style={{
-          fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
+          fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase",
           opacity: hover ? 1 : 0,
           transition: "opacity 300ms ease",
         }}>
@@ -467,16 +467,16 @@ function Lightbox({ photos, startIndex, onClose }: { photos: typeof PHOTOS; star
       style={{ position: "fixed", inset: 0, zIndex: 1100, background: "var(--ed-bg, #0a0a0a)", display: "flex", flexDirection: "column", userSelect: "none" }}
     >
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", background: "linear-gradient(to bottom, color-mix(in srgb, var(--ed-bg, #000) 70%, transparent), transparent)", pointerEvents: "none" }}>
-        <button onClick={onClose} style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "color-mix(in srgb, var(--ed-fg, #fff) 70%, transparent)", padding: "6px 10px", fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
+        <button onClick={onClose} style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer", color: "color-mix(in srgb, var(--ed-fg, #fff) 70%, transparent)", padding: "6px 10px", fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
           Back
         </button>
-        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "color-mix(in srgb, var(--ed-fg, #fff) 45%, transparent)" }}>
+        <span style={{ fontFamily: MONO, fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "color-mix(in srgb, var(--ed-fg, #fff) 45%, transparent)" }}>
           {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
         </span>
         <div style={{ pointerEvents: "auto" }}>
           {zoom > 1 && (
-            <button onClick={resetView} style={{ background: "color-mix(in srgb, var(--ed-fg, #fff) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--ed-fg, #fff) 12%, transparent)", color: "color-mix(in srgb, var(--ed-fg, #fff) 65%, transparent)", cursor: "pointer", padding: "5px 10px", fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+            <button onClick={resetView} style={{ background: "color-mix(in srgb, var(--ed-fg, #fff) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--ed-fg, #fff) 12%, transparent)", color: "color-mix(in srgb, var(--ed-fg, #fff) 65%, transparent)", cursor: "pointer", padding: "5px 10px", fontFamily: MONO, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase" }}>
               {Math.round(zoom * 100)}% · Reset
             </button>
           )}

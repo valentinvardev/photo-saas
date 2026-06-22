@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -55,7 +55,7 @@ function BrowserMockup() {
           </div>
           <div className="flex-1">
             <div
-              className="mx-auto max-w-[200px] rounded-full px-3 py-1 text-[11px] font-mono text-center tracking-wide"
+              className="mx-auto max-w-[200px] rounded-full px-3 py-1 text-[13px] font-mono text-center tracking-wide"
               style={{
                 background: "var(--mockup-surface)",
                 color: "var(--mockup-text-muted)",
@@ -83,7 +83,7 @@ function BrowserMockup() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.05, duration: 0.4 }}
-              className="font-mono text-[11px] text-yellow tracking-[0.15em] uppercase mt-0.5"
+              className="font-mono text-[13px] text-yellow tracking-[0.15em] uppercase mt-0.5"
             >
               // Commercial Photography
             </motion.div>
@@ -92,7 +92,7 @@ function BrowserMockup() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.15, duration: 0.4 }}
-            className="flex gap-4 text-[11px] font-sans"
+            className="flex gap-4 text-[13px] font-sans"
             style={{ color: "var(--mockup-text-muted)" }}
           >
             <span>Work</span>
@@ -153,7 +153,7 @@ function BrowserMockup() {
         >
           <div className="flex gap-4">
             <div
-              className="text-[11px] font-mono"
+              className="text-[13px] font-mono"
               style={{ color: "var(--mockup-text-muted)" }}
             >
               <span style={{ color: d ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)" }}>
@@ -162,14 +162,14 @@ function BrowserMockup() {
               photos
             </div>
             <div
-              className="text-[11px] font-mono"
+              className="text-[13px] font-mono"
               style={{ color: "var(--mockup-text-muted)" }}
             >
               <span className="text-yellow">$2,450</span> earned
             </div>
           </div>
           <div
-            className="text-[11px] font-mono"
+            className="text-[13px] font-mono"
             style={{ color: "var(--mockup-text-muted)" }}
           >
             <span className="w-2 h-2 bg-green-400 rounded-full inline-block mr-1.5" />
@@ -185,7 +185,7 @@ function BrowserMockup() {
         transition={{ delay: 1.6, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="absolute -right-4 top-12 bg-yellow rounded-xl px-3 py-2 shadow-lg"
       >
-        <div className="text-[10px] font-mono text-[#111] font-bold tracking-wider">
+        <div className="text-[12px] font-mono text-[#111] font-bold tracking-wider">
           +$349 today
         </div>
       </motion.div>
@@ -209,13 +209,13 @@ function BrowserMockup() {
           </div>
           <div>
             <div
-              className="text-[10px] font-sans font-medium"
+              className="text-[12px] font-sans font-medium"
               style={{ color: "var(--mockup-text)" }}
             >
               Gallery delivered
             </div>
             <div
-              className="text-[10px] font-mono"
+              className="text-[12px] font-mono"
               style={{ color: "var(--mockup-text-muted)" }}
             >
               Chen & Park Wedding
@@ -261,7 +261,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] px-3 py-1.5 mb-8"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-yellow animate-pulse" />
-            <span className="font-mono text-[11px] text-[var(--fg-muted)] tracking-wider uppercase">
+            <span className="font-mono text-[13px] text-[var(--fg-muted)] tracking-wider uppercase">
               {t("landing.hero.tag")}
             </span>
           </motion.div>
@@ -355,7 +355,7 @@ export function Hero() {
                 <div className="font-sans font-black text-[var(--fg)] text-2xl">
                   {t(`landing.hero.stats.${i}.value`)}
                 </div>
-                <div className="font-mono text-[11px] text-[var(--fg-muted)] tracking-wide mt-0.5">
+                <div className="font-mono text-[13px] text-[var(--fg-muted)] tracking-wide mt-0.5">
                   {t(`landing.hero.stats.${i}.label`)}
                 </div>
               </div>
@@ -419,7 +419,7 @@ export function Hero() {
         transition={{ delay: 2.5, duration: 0.6 }}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
-        <span className="font-mono text-[10px] text-[var(--fg-muted)] tracking-[0.2em] uppercase">
+        <span className="font-mono text-[12px] text-[var(--fg-muted)] tracking-[0.2em] uppercase">
           {t("landing.hero.scroll")}
         </span>
         <motion.div

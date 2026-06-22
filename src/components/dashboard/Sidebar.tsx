@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -175,7 +175,7 @@ function NavItem({ labelKey, label, href, icon: Icon, soon, exact, badge }: { la
       >
         <span className={active ? "text-yellow" : "text-[var(--fg-muted)] group-hover:text-[var(--fg)]"}><Icon /></span>
         <span className="font-sans text-sm font-medium flex-1">{displayLabel}</span>
-        <span className="font-mono text-[9px] bg-[var(--bg-subtle)] text-[var(--fg-muted)] px-1.5 py-0.5 rounded tracking-wider uppercase">Soon</span>
+        <span className="font-mono text-[13px] bg-[var(--bg-subtle)] text-[var(--fg-muted)] px-1.5 py-0.5 rounded tracking-wider uppercase">Soon</span>
       </Link>
     );
   }
@@ -193,7 +193,7 @@ function NavItem({ labelKey, label, href, icon: Icon, soon, exact, badge }: { la
         <Icon />
       </span>
       <span className="font-sans text-sm font-medium flex-1">{displayLabel}</span>
-      {badge ? <span className="font-mono text-[9px] font-bold bg-yellow text-[#111] px-1.5 py-0.5 rounded-full min-w-[18px] text-center">{badge > 99 ? "99+" : badge}</span> : null}
+      {badge ? <span className="font-mono text-[13px] font-bold bg-yellow text-[#111] px-1.5 py-0.5 rounded-full min-w-[18px] text-center">{badge > 99 ? "99+" : badge}</span> : null}
     </Link>
   );
 }
@@ -264,12 +264,12 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
               ) : (
-                <span className="font-sans font-black text-[#111] text-[10px]">{initial}</span>
+                <span className="font-sans font-black text-[#111] text-[12px]">{initial}</span>
               )}
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{user?.name ?? "—"}</div>
-              <div className="font-mono text-[10px] text-[var(--fg-muted)] truncate">{user?.email ?? ""}</div>
+              <div className="font-mono text-[12px] text-[var(--fg-muted)] truncate">{user?.email ?? ""}</div>
             </div>
           </Link>
           <button

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /* ─── Minimal Links — canonical component ────────────────────────────
    Same visual language as the Minimal delivery: white, square, clean.
@@ -68,7 +68,7 @@ export function MinimalLinks({ page }: MinimalLinksProps) {
         .ml-avatar img{width:100%;height:100%;object-fit:cover;display:block}
         .ml-avatar-init{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:${F.serif};font-size:32px;font-style:italic}
 
-        .ml-eyebrow{font-family:${F.mono};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${T.muted}}
+        .ml-eyebrow{font-family:${F.mono};font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:${T.muted}}
 
         .ml-name{font-family:${F.serif};font-size:52px;line-height:1;letter-spacing:-0.02em;font-weight:400}
         .ml-name em{font-style:italic}
@@ -85,7 +85,7 @@ export function MinimalLinks({ page }: MinimalLinksProps) {
         .ml-link.primary:hover{background:#333;color:${T.bg}}
         .ml-link .l{font-family:${F.serif};font-size:18px;text-align:left}
         .ml-link.primary .l{font-style:italic}
-        .ml-link .s{font-family:${F.mono};font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:${T.muted};display:block;margin-top:2px;text-align:left}
+        .ml-link .s{font-family:${F.mono};font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:${T.muted};display:block;margin-top:2px;text-align:left}
         .ml-link.primary .s,.ml-link:hover .s{color:rgba(250,250,250,0.6)}
         .ml-link .ar{font-family:${F.mono};font-size:13px;transition:transform .25s ease;flex-shrink:0}
         .ml-link:hover .ar{transform:translateX(2px)}
@@ -94,9 +94,9 @@ export function MinimalLinks({ page }: MinimalLinksProps) {
         .ml-stats>div{padding:16px 0;border-right:1px solid ${T.line}}
         .ml-stats>div:last-child{border-right:0}
         .ml-stats .v{font-family:${F.serif};font-size:28px;line-height:1}
-        .ml-stats .l{font-family:${F.mono};font-size:9px;letter-spacing:0.14em;color:${T.muted};text-transform:uppercase;margin-top:5px}
+        .ml-stats .l{font-family:${F.mono};font-size:13px;letter-spacing:0.14em;color:${T.muted};text-transform:uppercase;margin-top:5px}
 
-        .ml-foot{font-family:${F.mono};font-size:9px;letter-spacing:0.16em;color:${T.muted};text-transform:uppercase}
+        .ml-foot{font-family:${F.mono};font-size:13px;letter-spacing:0.16em;color:${T.muted};text-transform:uppercase}
       `}</style>
 
       <div className="ml-stripe" />

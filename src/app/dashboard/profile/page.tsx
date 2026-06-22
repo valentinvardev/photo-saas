@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -59,7 +59,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
     <div>
       <label className="block font-sans text-xs font-semibold text-[var(--fg-muted)] mb-1.5">{label}</label>
       {children}
-      {hint && <p className="mt-1.5 font-sans text-[11px] text-[var(--fg-muted)]">{hint}</p>}
+      {hint && <p className="mt-1.5 font-sans text-[13px] text-[var(--fg-muted)]">{hint}</p>}
     </div>
   );
 }
@@ -148,7 +148,7 @@ export default function ProfilePage() {
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={form.coverUrl} alt="" className="w-full h-full object-cover" />
           ) : (
-            <span className="absolute inset-0 flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)]">{t("profilePage.noCover")}</span>
+            <span className="absolute inset-0 flex items-center justify-center font-mono text-[12px] uppercase tracking-widest text-[var(--fg-muted)]">{t("profilePage.noCover")}</span>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">

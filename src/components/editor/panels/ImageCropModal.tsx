@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
@@ -140,7 +140,7 @@ export function ImageCropModal({
       >
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid #1a1a1a", flexShrink: 0 }}>
-          <span style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em" }}>Crop logo</span>
+          <span style={{ color: "#888", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em" }}>Crop logo</span>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "#444", cursor: "pointer", padding: 2, display: "flex" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
@@ -246,7 +246,7 @@ export function ImageCropModal({
                     }}
                   />
                 </div>
-                <div style={{ flex: 1, fontFamily: "monospace", fontSize: 11, color: "#666", lineHeight: 1.6 }}>
+                <div style={{ flex: 1, fontFamily: "monospace", fontSize: 13, color: "#666", lineHeight: 1.6 }}>
                   <div>x {Math.round(crop.x)}% · y {Math.round(crop.y)}%</div>
                   <div>w {Math.round(crop.w)}% · h {Math.round(crop.h)}%</div>
                   <div style={{ color: "#444" }}>
@@ -264,7 +264,7 @@ export function ImageCropModal({
             onClick={reset}
             style={{
               background: "none", border: "1px solid #2a2a2a",
-              color: "#666", fontSize: 11, padding: "7px 12px", borderRadius: 4,
+              color: "#666", fontSize: 13, padding: "7px 12px", borderRadius: 4,
               cursor: "pointer", fontFamily: "inherit",
             }}
           >
@@ -275,7 +275,7 @@ export function ImageCropModal({
             onClick={onClose}
             style={{
               background: "#1a1a1a", border: "1px solid #2a2a2a",
-              color: "#888", fontSize: 11, padding: "7px 14px", borderRadius: 4,
+              color: "#888", fontSize: 13, padding: "7px 14px", borderRadius: 4,
               cursor: "pointer", fontFamily: "inherit",
             }}
           >
@@ -286,7 +286,7 @@ export function ImageCropModal({
             disabled={!imgSize}
             style={{
               background: "rgba(250,204,21,0.12)", border: "1px solid #facc15",
-              color: "#facc15", fontSize: 11, padding: "7px 16px", borderRadius: 4,
+              color: "#facc15", fontSize: 13, padding: "7px 16px", borderRadius: 4,
               cursor: imgSize ? "pointer" : "default", fontFamily: "inherit", fontWeight: 600,
             }}
           >

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -112,7 +112,7 @@ function Lightbox({ photos, index, onIndex, onClose }: { photos: GPhoto[]; index
         />
       </div>
 
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[11px] text-white/50">
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[13px] text-white/50">
         {photo.filename} · {fmtSize(photo.size)}{photo.width ? ` · ${photo.width}×${photo.height}px` : ""} · {index + 1}/{photos.length}
       </div>
     </motion.div>
@@ -271,7 +271,7 @@ export default function GalleryPage() {
                   </>
                 )}
               </div>
-              <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">
+              <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-1">
                 {isLoading ? t("galleryPage.loading") : (photos.length === 1 ? t("galleryPage.photoOne") : t("galleryPage.photos", { n: photos.length }))}
                 {uploading && ` · ${t("galleryPage.uploadingInline", { done: progress.done, total: progress.total })}`}
               </p>
@@ -280,8 +280,8 @@ export default function GalleryPage() {
           <div className="flex items-center gap-2">
             {photos.length > 0 && (
               selectMode
-                ? <button onClick={clearSel} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">{t("galleryPage.done")}</button>
-                : <button onClick={() => setSelectMode(true)} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">{t("galleryPage.select")}</button>
+                ? <button onClick={clearSel} className="font-mono text-[12px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">{t("galleryPage.done")}</button>
+                : <button onClick={() => setSelectMode(true)} className="font-mono text-[12px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 py-1 rounded-lg transition-colors">{t("galleryPage.select")}</button>
             )}
             {activeFolder === null && (
               <button onClick={() => setFolderModal({ mode: "create" })} className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--border)] bg-[var(--bg-card)] text-[var(--fg)] text-xs font-sans font-medium hover:border-[var(--fg-muted)] transition-colors rounded-lg">
@@ -294,7 +294,7 @@ export default function GalleryPage() {
             </button>
           </div>
         </div>
-        {error && <p className="font-mono text-[10px] text-red-400 mt-2">{error}</p>}
+        {error && <p className="font-mono text-[12px] text-red-400 mt-2">{error}</p>}
       </div>
 
       {/* Grid: folders + photos share one grid (prototype style) */}
@@ -310,7 +310,7 @@ export default function GalleryPage() {
             <button onClick={() => { setActiveFolder(null); clearSel(); }}
               className="relative aspect-square bg-[var(--bg-subtle)] flex flex-col items-center justify-center gap-1.5 group hover:bg-[var(--bg-card)] transition-colors">
               <span className="text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors"><BackIcon /></span>
-              <span className="font-mono text-[9px] text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors">{t("galleryPage.allPhotos")}</span>
+              <span className="font-mono text-[13px] text-[var(--fg-muted)] group-hover:text-[var(--fg)] transition-colors">{t("galleryPage.allPhotos")}</span>
             </button>
           )}
 
@@ -326,7 +326,7 @@ export default function GalleryPage() {
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 px-2 text-center">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="white" opacity="0.7"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
                 <span className="font-sans font-bold text-white text-xs truncate max-w-full">{f.name}</span>
-                <span className="font-mono text-[9px] text-white/60">{f.count === 1 ? t("galleryPage.photoOne") : t("galleryPage.photos", { n: f.count })}</span>
+                <span className="font-mono text-[13px] text-white/60">{f.count === 1 ? t("galleryPage.photoOne") : t("galleryPage.photos", { n: f.count })}</span>
               </div>
             </button>
           ))}
@@ -343,7 +343,7 @@ export default function GalleryPage() {
                 <img src={photo.url} alt={photo.filename} loading="lazy" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                 <div className="absolute bottom-0 inset-x-0 px-1.5 py-1 bg-gradient-to-t from-black/70 to-transparent translate-y-full group-hover:translate-y-0 transition-transform">
-                  <p className="font-mono text-[9px] text-white truncate">{photo.filename}</p>
+                  <p className="font-mono text-[13px] text-white truncate">{photo.filename}</p>
                 </div>
                 {/* Selection checkbox — shows on hover (unchecked) so you can pick
                     photos without first entering select mode; stays once checked. */}
@@ -390,7 +390,7 @@ export default function GalleryPage() {
           <motion.div initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
             transition={{ type: "spring", stiffness: 400, damping: 32 }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] shadow-2xl">
-            <span className="font-mono text-[11px] text-[var(--fg-muted)]">{t("galleryPage.selected", { n: selected.size })}</span>
+            <span className="font-mono text-[13px] text-[var(--fg-muted)]">{t("galleryPage.selected", { n: selected.size })}</span>
 
             <button onClick={shareSelected} disabled={createShare.isPending}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg)] font-sans text-xs font-medium hover:border-[var(--fg-muted)] disabled:opacity-50 transition-colors">
@@ -413,7 +413,7 @@ export default function GalleryPage() {
                       <span className="text-[var(--fg-muted)]"><FolderIcon /></span>{f.name}
                     </button>
                   ))}
-                  {folders.length === 0 && <p className="px-3 py-2 font-sans text-[11px] text-[var(--fg-muted)]">{t("galleryPage.noFolders")}</p>}
+                  {folders.length === 0 && <p className="px-3 py-2 font-sans text-[13px] text-[var(--fg-muted)]">{t("galleryPage.noFolders")}</p>}
                 </div>
               )}
             </div>
@@ -422,7 +422,7 @@ export default function GalleryPage() {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/40 text-red-400 font-sans text-xs font-bold hover:bg-red-500/10 disabled:opacity-50 transition-colors">
               <TrashIcon /> {deleting ? t("galleryPage.deleting") : t("galleryPage.delete")}
             </button>
-            <button onClick={clearSel} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 transition-colors">{t("galleryPage.clear")}</button>
+            <button onClick={clearSel} className="font-mono text-[12px] text-[var(--fg-muted)] hover:text-[var(--fg)] px-2 transition-colors">{t("galleryPage.clear")}</button>
           </motion.div>
         )}
       </AnimatePresence>

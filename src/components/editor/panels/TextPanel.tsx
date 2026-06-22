@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEditorStore } from "~/lib/editor/store";
 
@@ -23,7 +23,7 @@ export function TextPanel({ nodeId }: Props) {
 
   return (
     <div style={{ padding: "16px 12px" }}>
-      <label style={{ color: "var(--ec-sub)", fontSize: 10, display: "block", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+      <label style={{ color: "var(--ec-sub)", fontSize: 12, display: "block", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
         {node.type === "heading" ? "Heading" : "Paragraph"}
       </label>
 
@@ -49,7 +49,7 @@ export function TextPanel({ nodeId }: Props) {
         onBlur={(e)  => { e.currentTarget.style.borderColor = "var(--ec-border)"; }}
       />
 
-      <p style={{ color: "var(--ec-dim)", fontSize: 10, margin: "8px 0 0", lineHeight: 1.5 }}>
+      <p style={{ color: "var(--ec-dim)", fontSize: 12, margin: "8px 0 0", lineHeight: 1.5 }}>
         Double-click on the canvas to edit with rich text formatting.
       </p>
     </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /* Atelier Delivery — standalone client gallery demo
    Visual language: warm editorial (#fafaf8, Cormorant Garamond + Space Mono).
@@ -80,12 +80,12 @@ export default function AtelierDeliveryPage() {
       <style>{`
         .atd-nav{position:sticky;top:0;z-index:30;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:20px 40px;border-bottom:1px solid ${T.line};background:rgba(250,250,248,0.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
         .atd-brand{font-family:${F.serif};font-size:20px;font-weight:300;font-style:italic;letter-spacing:-0.01em}
-        .atd-meta{font-family:${F.mono};font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:${T.muted};text-align:center}
-        .atd-dl{font-family:${F.mono};font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:${T.fg};text-decoration:none;border-bottom:1px solid ${T.fg};padding-bottom:1px;justify-self:end}
+        .atd-meta{font-family:${F.mono};font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:${T.muted};text-align:center}
+        .atd-dl{font-family:${F.mono};font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:${T.fg};text-decoration:none;border-bottom:1px solid ${T.fg};padding-bottom:1px;justify-self:end}
         @media(max-width:600px){.atd-nav{grid-template-columns:1fr auto;padding:16px 20px}.atd-meta{display:none}}
 
         .atd-hero{padding:80px 40px 56px;text-align:center;border-bottom:1px solid ${T.line}}
-        .atd-eyebrow{font-family:${F.mono};font-size:10px;letter-spacing:0.26em;text-transform:uppercase;color:${T.muted};margin-bottom:20px}
+        .atd-eyebrow{font-family:${F.mono};font-size:12px;letter-spacing:0.26em;text-transform:uppercase;color:${T.muted};margin-bottom:20px}
         .atd-h1{font-family:${F.serif};font-size:clamp(56px,10vw,100px);line-height:0.95;letter-spacing:-0.025em;font-weight:300;margin:0 0 14px}
         .atd-h1 em{font-style:italic;font-weight:400;color:#3a3a3a}
         .atd-sub{font-family:${F.serif};font-style:italic;font-size:clamp(15px,2vw,20px);color:${T.muted};max-width:460px;margin:14px auto 0;font-weight:300;line-height:1.55}
@@ -95,23 +95,23 @@ export default function AtelierDeliveryPage() {
         .atd-info>div{padding:16px 0;border-right:1px solid ${T.line};text-align:center}
         .atd-info>div:last-child{border-right:0}
         .atd-info .v{font-family:${F.serif};font-size:24px;font-weight:300;letter-spacing:-0.01em;line-height:1}
-        .atd-info .l{font-family:${F.mono};font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted};margin-top:6px}
+        .atd-info .l{font-family:${F.mono};font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted};margin-top:6px}
         @media(max-width:600px){.atd-info{grid-template-columns:repeat(2,1fr)}.atd-info>div:nth-child(2){border-right:0}.atd-info>div:nth-child(1),.atd-info>div:nth-child(2){border-bottom:1px solid ${T.line}}}
 
         .atd-bar{position:sticky;top:61px;z-index:20;background:${T.bg};border-bottom:1px solid ${T.line};padding:14px 40px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
         .atd-tabs{display:inline-flex;border:1px solid ${T.line}}
-        .atd-tab{background:transparent;border:0;padding:8px 18px;font-family:${F.mono};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:${T.muted};cursor:pointer;transition:color .2s,background .2s}
+        .atd-tab{background:transparent;border:0;padding:8px 18px;font-family:${F.mono};font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:${T.muted};cursor:pointer;transition:color .2s,background .2s}
         .atd-tab.on{background:${T.fg};color:${T.bg}}
         .atd-tab:not(.on):hover{color:${T.fg}}
-        .atd-count{font-family:${F.mono};font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:${T.muted}}
+        .atd-count{font-family:${F.mono};font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:${T.muted}}
         .atd-count b{color:${T.fg};font-weight:400}
         @media(max-width:600px){.atd-bar{padding:12px 20px;top:53px}}
 
         .atd-sect{padding:56px 40px}
         .atd-sect-head{display:flex;align-items:baseline;gap:14px;margin-bottom:28px;border-bottom:1px solid ${T.line};padding-bottom:16px}
-        .atd-sect-no{font-family:${F.mono};font-size:10px;letter-spacing:0.2em;color:${T.muted};text-transform:uppercase}
+        .atd-sect-no{font-family:${F.mono};font-size:12px;letter-spacing:0.2em;color:${T.muted};text-transform:uppercase}
         .atd-sect-title{font-family:${F.serif};font-size:clamp(28px,4vw,44px);font-weight:300;font-style:italic;letter-spacing:-0.015em;line-height:1}
-        .atd-sect-n{font-family:${F.mono};font-size:10px;color:${T.muted};margin-left:auto}
+        .atd-sect-n{font-family:${F.mono};font-size:12px;color:${T.muted};margin-left:auto}
         @media(max-width:600px){.atd-sect{padding:40px 20px}}
 
         .atd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -131,23 +131,23 @@ export default function AtelierDeliveryPage() {
 
         .atd-foot{padding:48px 40px 64px;border-top:1px solid ${T.line};display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px}
         .atd-foot-brand{font-family:${F.serif};font-size:22px;font-weight:300;font-style:italic;letter-spacing:-0.01em}
-        .atd-foot-mono{font-family:${F.mono};font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted}}
+        .atd-foot-mono{font-family:${F.mono};font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:${T.muted}}
         @media(max-width:600px){.atd-foot{padding:40px 20px 56px}}
 
         .atd-floater{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${T.fg};color:${T.bg};display:flex;gap:12px;align-items:center;padding:10px 14px 10px 20px;box-shadow:0 16px 48px rgba(0,0,0,0.15);z-index:50;white-space:nowrap}
-        .atd-floater .label{font-family:${F.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase}
-        .atd-floater .act{background:${T.bg};color:${T.fg};border:0;padding:8px 14px;font-family:${F.mono};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer}
+        .atd-floater .label{font-family:${F.mono};font-size:13px;letter-spacing:0.14em;text-transform:uppercase}
+        .atd-floater .act{background:${T.bg};color:${T.fg};border:0;padding:8px 14px;font-family:${F.mono};font-size:12px;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer}
 
         .atd-lb{position:fixed;inset:0;background:rgba(10,10,10,0.96);z-index:60;display:flex;align-items:center;justify-content:center}
         .atd-lb img{max-width:88vw;max-height:84vh;object-fit:contain;display:block}
         .atd-lb-top{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:20px 28px;background:linear-gradient(to bottom,rgba(0,0,0,0.5),transparent)}
-        .atd-lb-top button{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.7);font-family:${F.mono};font-size:10px;letter-spacing:0.2em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+        .atd-lb-top button{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.7);font-family:${F.mono};font-size:12px;letter-spacing:0.2em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
         .atd-lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s}
         .atd-lb-nav:hover{background:rgba(255,255,255,0.14)}
         .atd-lb-nav.prev{left:20px}.atd-lb-nav.next{right:20px}
         .atd-lb-bot{position:absolute;bottom:0;left:0;right:0;padding:20px 28px;background:linear-gradient(to top,rgba(0,0,0,0.5),transparent);display:flex;justify-content:space-between;align-items:flex-end}
         .atd-lb-bot .cap{font-family:${F.serif};font-style:italic;font-size:20px;color:rgba(250,250,248,0.9);font-weight:300}
-        .atd-lb-bot .num{font-family:${F.mono};font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
+        .atd-lb-bot .num{font-family:${F.mono};font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
       `}</style>
 
       {/* ── Gate ─────────────────────────────────────────────────── */}
@@ -158,7 +158,7 @@ export default function AtelierDeliveryPage() {
           color: "#fafaf8",
         }}>
           <div style={{ width: 400, maxWidth: "100%", background: "rgba(10,10,10,0.52)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", border: "1px solid rgba(255,255,255,0.08)", padding: "52px 44px", textAlign: "center" }}>
-            <p style={{ fontFamily: F.mono, fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginBottom: 24 }}>
+            <p style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginBottom: 24 }}>
               {STUDIO_NAME} · Private Gallery
             </p>
             <h1 style={{ fontFamily: F.serif, fontSize: 52, fontWeight: 300, letterSpacing: "-0.02em", lineHeight: 1, margin: "0 0 6px", color: "#fafaf8" }}>
@@ -182,16 +182,16 @@ export default function AtelierDeliveryPage() {
                 }}
               />
               {error && (
-                <p style={{ fontFamily: F.mono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "#f59e9e", margin: 0, textAlign: "left" }}>
+                <p style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: "#f59e9e", margin: 0, textAlign: "left" }}>
                   Incorrect — try again
                 </p>
               )}
-              <button type="submit" style={{ marginTop: 16, padding: "15px 24px", background: "#fafaf8", color: "#0a0a0a", border: "none", cursor: "pointer", fontFamily: F.mono, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+              <button type="submit" style={{ marginTop: 16, padding: "15px 24px", background: "#fafaf8", color: "#0a0a0a", border: "none", cursor: "pointer", fontFamily: F.mono, fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
                 Open gallery
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
             </form>
-            <p style={{ marginTop: 28, fontFamily: F.mono, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.28)" }}>
+            <p style={{ marginTop: 28, fontFamily: F.mono, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.28)" }}>
               Private · For recipient only
             </p>
           </div>
@@ -318,10 +318,10 @@ export default function AtelierDeliveryPage() {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
               Close
             </button>
-            <span style={{ fontFamily: F.mono, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)" }}>
+            <span style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)" }}>
               {String(lightbox.index + 1).padStart(2, "0")} / {String(lightbox.photos.length).padStart(2, "0")}
             </span>
-            <button style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", padding: "5px 12px", fontFamily: F.mono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", cursor: "pointer", color: "rgba(255,255,255,0.65)" }}>
+            <button style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", padding: "5px 12px", fontFamily: F.mono, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", cursor: "pointer", color: "rgba(255,255,255,0.65)" }}>
               ↓ Save
             </button>
           </div>

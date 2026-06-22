@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
@@ -56,7 +56,7 @@ function FieldError({ message }: { message: string }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
       transition={{ duration: 0.18 }}
-      className="text-red-400 font-mono text-[10px] mt-1.5"
+      className="text-red-400 font-mono text-[12px] mt-1.5"
     >
       {message}
     </motion.p>
@@ -77,7 +77,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block font-mono text-[11px] text-[var(--fg-muted)] tracking-widest uppercase mb-1.5">
+      <label className="block font-mono text-[13px] text-[var(--fg-muted)] tracking-widest uppercase mb-1.5">
         {label}
       </label>
       {children}
@@ -368,7 +368,7 @@ export default function RegisterPage() {
                       ))}
                     </div>
                     <p
-                      className="font-mono text-[10px] transition-colors duration-300"
+                      className="font-mono text-[12px] transition-colors duration-300"
                       style={{ color: strengthColor[strength] }}
                     >
                       {strengthLabel[strength]} password
@@ -418,7 +418,7 @@ export default function RegisterPage() {
             </AnimatePresence>
 
             {submitError && (
-              <p className="font-mono text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              <p className="font-mono text-[13px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                 {submitError}
               </p>
             )}
@@ -437,7 +437,7 @@ export default function RegisterPage() {
           {/* Divider */}
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-[var(--border)]" />
-            <span className="font-mono text-[10px] text-[var(--fg-muted)] tracking-widest uppercase">or</span>
+            <span className="font-mono text-[12px] text-[var(--fg-muted)] tracking-widest uppercase">or</span>
             <div className="flex-1 h-px bg-[var(--border)]" />
           </div>
 
@@ -464,7 +464,7 @@ export default function RegisterPage() {
             </Link>
           </p>
 
-          <p className="mt-4 text-center font-mono text-[10px] text-[var(--fg-muted)] leading-relaxed">
+          <p className="mt-4 text-center font-mono text-[12px] text-[var(--fg-muted)] leading-relaxed">
             By creating an account you agree to our{" "}
             <Link href="/terms" className="underline hover:text-[var(--fg)] transition-colors">Terms</Link>{" "}
             and{" "}

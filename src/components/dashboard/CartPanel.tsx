@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCart } from "~/lib/cart";
 
@@ -59,7 +59,7 @@ export function CartPanel() {
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
           <div>
             <h2 className="font-sans font-bold text-[var(--fg)] text-sm">Cart</h2>
-            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">
+            <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5">
               {items.length} item{items.length !== 1 ? "s" : ""}
             </p>
           </div>
@@ -93,12 +93,12 @@ export function CartPanel() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-[9px] uppercase tracking-wider text-[var(--fg-muted)]">
+                      <span className="font-mono text-[13px] uppercase tracking-wider text-[var(--fg-muted)]">
                         {item.type}
                       </span>
                     </div>
                     <p className="font-sans text-xs font-semibold text-[var(--fg)] truncate mt-0.5">{item.name}</p>
-                    <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">{item.detail}</p>
+                    <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5">{item.detail}</p>
                   </div>
 
                   {/* Price + remove */}
@@ -129,7 +129,7 @@ export function CartPanel() {
             </div>
 
             {hasPaid && (
-              <p className="font-mono text-[9px] text-[var(--fg-muted)] leading-relaxed">
+              <p className="font-mono text-[13px] text-[var(--fg-muted)] leading-relaxed">
                 Domain renewals billed annually. Templates are one-time purchases.
               </p>
             )}
@@ -145,7 +145,7 @@ export function CartPanel() {
             {/* Clear */}
             <button
               onClick={clearCart}
-              className="w-full py-1.5 font-mono text-[9px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors uppercase tracking-wider text-center"
+              className="w-full py-1.5 font-mono text-[13px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors uppercase tracking-wider text-center"
             >
               Clear cart
             </button>

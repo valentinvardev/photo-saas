@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * EditableTemplate — Minimal BW
@@ -706,7 +706,7 @@ function ContactForm() {
       </div>
       <input name="email" type="email" placeholder="Email address" style={fieldStyle} onFocus={focus} onBlur={blur} />
       <textarea name="message" placeholder="Tell me about your project..." rows={5} style={{ ...fieldStyle, resize: "vertical" }} onFocus={focus} onBlur={blur} />
-      {status === "error" && <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: 11, color: "#ef4444" }}>Couldn&apos;t send — please try again.</span>}
+      {status === "error" && <span style={{ fontFamily: "var(--tpl-mono,monospace)", fontSize: 13, color: "#ef4444" }}>Couldn&apos;t send — please try again.</span>}
       <button type="submit" disabled={status === "sending"}
         style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ed-btn-fg, var(--ed-bg, #fafafa))", background: "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))", border: "1px solid var(--ed-btn-bg, #0a0a0a)", borderRadius: "var(--ed-btn-radius, 0)", padding: "13px", cursor: "pointer", transition: "background 0.2s, color 0.2s", opacity: status === "sending" ? 0.6 : 1 }}
         onMouseEnter={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ed-btn-bg, var(--ed-fg, #0a0a0a))"; }}

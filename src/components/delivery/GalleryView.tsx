@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import type { CSSProperties } from "react";
@@ -135,7 +135,7 @@ function PasswordGate({
           imageHeight={isMobile ? 16 : 20}
           textStyle={{ fontFamily: fMono, fontSize: isMobile ? 9 : 10, letterSpacing: "0.2em", textTransform: "uppercase", color: theme.fg }}
         />
-        <span style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: theme.muted }}>Private</span>
+        <span style={{ fontFamily: fMono, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: theme.muted }}>Private</span>
       </header>
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: isMobile ? "32px 24px" : "64px 32px", textAlign: "center", gap: 18 }}>
@@ -172,7 +172,7 @@ function PasswordGate({
             onClick={attempt}
             disabled={isEditor}
             style={{
-              fontFamily: fMono, fontSize: 11, padding: "12px 18px",
+              fontFamily: fMono, fontSize: 13, padding: "12px 18px",
               background: theme.accent, color: theme.bg, border: "none",
               letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700,
               cursor: isEditor ? "default" : "pointer",
@@ -181,7 +181,7 @@ function PasswordGate({
             <EditableText
               fieldPath="passwordButtonLabel" value={page.passwordButtonLabel} onChange={set ? (v) => set("passwordButtonLabel", v) : undefined}
               as="span" fontSlot={3}
-              style={{ color: theme.bg, fontFamily: fMono, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700 }}
+              style={{ color: theme.bg, fontFamily: fMono, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700 }}
             />
           </button>
         </div>
@@ -189,11 +189,11 @@ function PasswordGate({
         <EditableText
           fieldPath="passwordHint" value={page.passwordHint} onChange={set ? (v) => set("passwordHint", v) : undefined}
           as="p" multiline fontSlot={3}
-          style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.14em", color: theme.muted, margin: 0, marginTop: 6 }}
+          style={{ fontFamily: fMono, fontSize: 12, letterSpacing: "0.14em", color: theme.muted, margin: 0, marginTop: 6 }}
         />
       </div>
 
-      <footer style={{ padding: isMobile ? "16px" : "20px 32px", borderTop: `1px solid ${theme.line}`, color: theme.muted, fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", textAlign: "center" }}>
+      <footer style={{ padding: isMobile ? "16px" : "20px 32px", borderTop: `1px solid ${theme.line}`, color: theme.muted, fontFamily: fMono, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", textAlign: "center" }}>
         Delivered with Portapic · © {new Date().getFullYear()}
       </footer>
     </div>
@@ -307,7 +307,7 @@ function HalcyonPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
 
       {/* Section label + photo grid */}
       <div style={{ padding: isMobile ? "18px 18px 32px" : "32px 32px 48px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, color: t.muted, marginBottom: 16, fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, color: t.muted, marginBottom: 16, fontFamily: fMono, fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase" }}>
           <span>The Day</span>
           <hr style={{ flex: 1, border: 0, borderTop: `1px solid ${t.line}` }} />
           <span>{photos.length} frames</span>
@@ -338,7 +338,7 @@ function HalcyonPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
       </div>
 
       {/* Footer */}
-      <div style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+      <div style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 12, letterSpacing: "0.16em", textTransform: "uppercase" }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: fDisplay, fontSize: 16, color: t.fg, textTransform: "none", letterSpacing: 0 }}>
           <LogoBlock
             page={page} set={set} fallback="Halcyon" fontSlot={1}
@@ -386,14 +386,14 @@ function MinimalPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
           />
           {page.logoMode !== "none" && <em style={{ fontStyle: "italic", color: t.muted }}> Minimal</em>}
         </span>
-        <span style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: t.muted }} data-font-slot={3}>
+        <span style={{ fontFamily: fMono, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: t.muted }} data-font-slot={3}>
           <EditableText fieldPath="client" value={page.client} onChange={set ? (v) => set("client", v) : undefined} as="span" fontSlot={3} />
         </span>
       </header>
 
       {/* Hero (text-only, paper) */}
       <section style={{ padding: isMobile ? "48px 24px 32px" : "72px 32px 48px", textAlign: "center", borderBottom: `1px solid ${t.line}` }}>
-        <div style={{ fontFamily: fMono, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: t.muted, marginBottom: 18 }} data-font-slot={3}>
+        <div style={{ fontFamily: fMono, fontSize: 13, letterSpacing: "0.3em", textTransform: "uppercase", color: t.muted, marginBottom: 18 }} data-font-slot={3}>
           For your eyes only · {page.photoCount || photos.length} photographs
         </div>
         <h1 style={{ fontFamily: fDisplay, fontSize: isMobile ? 44 : 80, lineHeight: 0.95, letterSpacing: "-0.02em", margin: 0, fontWeight: 400 }} data-font-slot={1}>
@@ -421,7 +421,7 @@ function MinimalPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
 
       <section style={{ padding: isMobile ? "32px 18px" : "48px 32px" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 24 }}>
-          <span style={{ fontFamily: fMono, fontSize: 10, letterSpacing: "0.18em", color: t.muted, textTransform: "uppercase" }} data-font-slot={3}>01</span>
+          <span style={{ fontFamily: fMono, fontSize: 12, letterSpacing: "0.18em", color: t.muted, textTransform: "uppercase" }} data-font-slot={3}>01</span>
           <h2 style={{ fontFamily: fDisplay, fontSize: isMobile ? 28 : 36, letterSpacing: "-0.02em", lineHeight: 1, margin: 0, fontWeight: 400 }} data-font-slot={1}>
             The <em style={{ fontStyle: "italic", color: t.muted }}>Day</em>
           </h2>
@@ -452,7 +452,7 @@ function MinimalPreview({ page, isMobile, set, view = "gallery", onRequestCoverC
         )}
       </section>
 
-      <footer style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+      <footer style={{ padding: isMobile ? "18px" : "28px 32px", borderTop: `1px solid ${t.line}`, color: t.muted, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, fontFamily: fMono, fontSize: 12, letterSpacing: "0.16em", textTransform: "uppercase" }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: fDisplay, fontSize: 16, color: t.fg, textTransform: "none", letterSpacing: 0 }}>
           <LogoBlock
             page={page} set={set} fallback="Studio" fontSlot={1}
@@ -551,7 +551,7 @@ function Watermark({ text, fontFamily, dark }: { text: string; fontFamily: strin
 }
 function PriceTag({ price, bg, fg, fontFamily }: { price: number; bg: string; fg: string; fontFamily: string }) {
   return (
-    <div style={{ position: "absolute", bottom: 6, left: 6, background: bg, color: fg, fontFamily, fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", padding: "3px 8px" }}>
+    <div style={{ position: "absolute", bottom: 6, left: 6, background: bg, color: fg, fontFamily, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", padding: "3px 8px" }}>
       ${price}
     </div>
   );
@@ -681,7 +681,7 @@ export function PreviewFrame({
                   <div className="w-3 h-3 rounded-full bg-yellow/70" />
                   <div className="w-3 h-3 rounded-full bg-green-400/70" />
                 </div>
-                <span className="font-mono text-[10px] text-[var(--fg-muted)] tracking-widest uppercase">Portapic</span>
+                <span className="font-mono text-[12px] text-[var(--fg-muted)] tracking-widest uppercase">Portapic</span>
                 <span className="w-12" />
               </div>
               <div style={{ height: 640 }}>
@@ -693,7 +693,7 @@ export function PreviewFrame({
               <div className="absolute inset-0 rounded-[40px] shadow-2xl" style={{ background: "linear-gradient(145deg,#2a2a2a,#1a1a1a)" }} />
               <div className="absolute inset-[5px] rounded-[36px] overflow-hidden bg-black">
                 <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-5 pt-3 pb-1 pointer-events-none">
-                  <span style={{ fontFamily: "monospace", fontSize: 9, fontWeight: "bold", color: "rgba(255,255,255,0.85)" }}>9:41</span>
+                  <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: "bold", color: "rgba(255,255,255,0.85)" }}>9:41</span>
                   <div style={{ width: 70, height: 18, background: "#000", borderRadius: 9999 }} />
                   <div className="flex items-center gap-0.5">
                     <svg width="11" height="8" viewBox="0 0 24 18" fill="none"><path d="M1 1c6.1-1.3 15.9-1.3 22 0M5 7c3.9-.9 10.1-.9 14 0M9 13c2-.5 6-.5 8 0" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity={0.85}/></svg>

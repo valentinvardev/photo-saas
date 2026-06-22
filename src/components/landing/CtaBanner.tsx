@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { useT } from "~/components/providers/LangProvider";
@@ -30,7 +30,7 @@ export function CtaBanner() {
               className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] px-3 py-1.5 mb-8"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-yellow animate-pulse" />
-              <span className="font-mono text-[11px] text-[var(--fg-muted)] tracking-wider uppercase">
+              <span className="font-mono text-[13px] text-[var(--fg-muted)] tracking-wider uppercase">
                 {t("landing.ctaBanner.tag")}
               </span>
             </motion.div>
@@ -95,7 +95,7 @@ export function CtaBanner() {
                   <div className="font-sans font-black text-[var(--fg)] text-xl">
                     {t(`landing.ctaBanner.stats.${i}.value`)}
                   </div>
-                  <div className="font-mono text-[10px] text-[var(--fg-muted)] tracking-wide mt-0.5">
+                  <div className="font-mono text-[12px] text-[var(--fg-muted)] tracking-wide mt-0.5">
                     {t(`landing.ctaBanner.stats.${i}.label`)}
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEditorStore } from "~/lib/editor/store";
 import { TextPanel } from "./TextPanel";
@@ -17,7 +17,7 @@ export function PanelTabs({ nodeId }: Props) {
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
       {/* Node label */}
       <div style={{ padding: "10px 14px 12px", borderBottom: "1px solid #1a1a1a" }}>
-        <p style={{ color: "#444", fontSize: 10, margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+        <p style={{ color: "#444", fontSize: 12, margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
           {isImage ? "Image" : "Text"} — <span style={{ color: "#666" }}>{node?.id ?? nodeId}</span>
         </p>
       </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
@@ -148,7 +148,7 @@ export function HowItWorks() {
                     </div>
                     {/* Step number badge */}
                     <div className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-[var(--bg-section)] border border-[var(--border)] flex items-center justify-center shadow-sm">
-                      <span className="font-mono font-black text-[var(--fg)] text-[10px]">
+                      <span className="font-mono font-black text-[var(--fg)] text-[12px]">
                         {i + 1}
                       </span>
                     </div>

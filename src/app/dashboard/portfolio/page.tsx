@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -48,7 +48,7 @@ function NewPortfolioTile({ onClick }: { onClick: () => void }) {
       {/* Body */}
       <div className="p-4 flex flex-col gap-1 flex-1 justify-center">
         <h3 className="font-sans font-bold text-[var(--fg)] text-sm">{t("portfolioPage.newTitle")}</h3>
-        <span className="font-mono text-[10px] text-[var(--fg-muted)] block">{t("portfolioPage.newSub")}</span>
+        <span className="font-mono text-[12px] text-[var(--fg-muted)] block">{t("portfolioPage.newSub")}</span>
       </div>
     </button>
   );
@@ -111,7 +111,7 @@ function PortfolioCard({ p }: { p: Portfolio }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
         {/* Status badge */}
-        <div className={`absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-mono backdrop-blur-sm ${
+        <div className={`absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded-full text-[12px] font-mono backdrop-blur-sm ${
           p.status === "published" ? "bg-black/40 text-green-400" : "bg-black/40 text-white/60"
         }`}>
           <span className={`w-1.5 h-1.5 rounded-full ${p.status === "published" ? "bg-green-400" : "bg-white/40"} animate-pulse`} />
@@ -119,7 +119,7 @@ function PortfolioCard({ p }: { p: Portfolio }) {
         </div>
 
         {/* Template badge */}
-        <div className="absolute bottom-3 left-3 px-2 py-1 rounded-md bg-black/40 backdrop-blur-sm text-[10px] font-mono text-white/70">
+        <div className="absolute bottom-3 left-3 px-2 py-1 rounded-md bg-black/40 backdrop-blur-sm text-[12px] font-mono text-white/70">
           {p.template}
         </div>
       </div>
@@ -129,7 +129,7 @@ function PortfolioCard({ p }: { p: Portfolio }) {
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="min-w-0">
             <h3 className="font-sans font-bold text-[var(--fg)] text-sm truncate">{p.name}</h3>
-            <span className="font-mono text-[10px] text-[var(--fg-muted)] truncate block mt-0.5">
+            <span className="font-mono text-[12px] text-[var(--fg-muted)] truncate block mt-0.5">
               {p.customDomain ?? portfolioPublicLabel(p.slug)}
             </span>
           </div>
@@ -143,20 +143,20 @@ function PortfolioCard({ p }: { p: Portfolio }) {
             <div className="flex items-center justify-between pt-2">
               {p.status === "published" ? (
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)]">
+                  <span className="flex items-center gap-1 font-mono text-[13px] text-[var(--fg-muted)]">
                     {trend === "up"   && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>}
                     {trend === "down" && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>}
                     {trend === "flat" && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14"/></svg>}
                     {weekTotal > 0 ? t("portfolioPage.thisWk", { n: weekTotal }) : t("portfolioPage.views", { n: p.visits.toLocaleString() })}
                   </span>
                   {p.uniqueVisitors > 0 && (
-                    <span className="font-mono text-[9px] text-[var(--fg-muted)]">{t("portfolioPage.unique", { n: p.uniqueVisitors })}</span>
+                    <span className="font-mono text-[13px] text-[var(--fg-muted)]">{t("portfolioPage.unique", { n: p.uniqueVisitors })}</span>
                   )}
                 </div>
               ) : (
-                <span className="font-mono text-[9px] text-yellow/70">{t("portfolioPage.unpublished")}</span>
+                <span className="font-mono text-[13px] text-yellow/70">{t("portfolioPage.unpublished")}</span>
               )}
-              <span className="font-mono text-[9px] text-[var(--fg-muted)]">{p.updatedAt}</span>
+              <span className="font-mono text-[13px] text-[var(--fg-muted)]">{p.updatedAt}</span>
             </div>
           );
         })()}

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /* ──────────────────────────────────────────────────────────────────────────
    Edit primitives for the delivery live editor.
@@ -210,7 +210,7 @@ export function EditableImage({
         style={{
           position: "absolute", top: 8, right: 8, zIndex: 5,
           background: "rgba(0,0,0,0.65)", color: "#fff",
-          fontFamily: "monospace", fontSize: 9, letterSpacing: "0.16em",
+          fontFamily: "monospace", fontSize: 13, letterSpacing: "0.16em",
           textTransform: "uppercase", padding: "4px 8px",
           opacity: isActive ? 1 : 0,
           transition: "opacity 0.15s ease", pointerEvents: "none",

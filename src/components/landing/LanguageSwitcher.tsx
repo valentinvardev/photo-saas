@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect } from "react";
 import { useT } from "~/components/providers/LangProvider";
@@ -32,7 +32,7 @@ export function LanguageSwitcher() {
         className="flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-all duration-200"
       >
         <GlobeIcon />
-        <span className="font-mono text-[11px] font-semibold uppercase tracking-wide">{locale}</span>
+        <span className="font-mono text-[13px] font-semibold uppercase tracking-wide">{locale}</span>
       </button>
 
       {open && (

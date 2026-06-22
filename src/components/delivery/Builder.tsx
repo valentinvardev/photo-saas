@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -37,7 +37,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
 }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)] mb-2">{children}</p>;
+  return <p className="font-mono text-[12px] font-semibold uppercase tracking-widest text-[var(--fg-muted)] mb-2">{children}</p>;
 }
 
 function ColorRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
@@ -56,7 +56,7 @@ function ColorRow({ label, value, onChange }: { label: string; value: string; on
             style={{ position: "absolute", top: 0, left: 0, width: 1, height: 1, opacity: 0, border: "none", padding: 0, cursor: "pointer" }}
           />
         </div>
-        <span className="font-mono text-[11px] text-[var(--fg)] w-14 select-none">{value}</span>
+        <span className="font-mono text-[13px] text-[var(--fg)] w-14 select-none">{value}</span>
       </div>
     </div>
   );
@@ -77,7 +77,7 @@ function Accordion({
       >
         <div className="flex items-center gap-2">
           <span className={`font-sans font-bold text-xs uppercase tracking-wider ${isActive ? "text-[var(--fg)]" : "text-[var(--fg)]"}`}>{title}</span>
-          {count && <span className="font-mono text-[10px] text-[var(--fg-muted)]">{count}</span>}
+          {count && <span className="font-mono text-[12px] text-[var(--fg-muted)]">{count}</span>}
         </div>
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
           className={`text-[var(--fg-muted)] transition-transform ${isOpen ? "rotate-90" : ""}`}>
@@ -254,7 +254,7 @@ function ImageButton({ value, onChange, placeholder = "Select from gallery" }: {
           <span className="truncate">{value ? "Change image" : placeholder}</span>
         </button>
         {value && (
-          <button onClick={() => onChange("")} className="font-mono text-[10px] text-[var(--fg-muted)] hover:text-red-400 transition-colors shrink-0">
+          <button onClick={() => onChange("")} className="font-mono text-[12px] text-[var(--fg-muted)] hover:text-red-400 transition-colors shrink-0">
             Clear
           </button>
         )}
@@ -299,10 +299,10 @@ function GalleryModal({ page, onSave, onClose }: { page: DeliveryPage; onSave: (
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
           <div>
             <h3 className="font-sans font-black text-[var(--fg)] text-sm">Deliverable Gallery</h3>
-            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">{page.client} · {page.title}</p>
+            <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5">{page.client} · {page.title}</p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[11px] text-[var(--fg-muted)]">{selected.size} selected</span>
+            <span className="font-mono text-[13px] text-[var(--fg-muted)]">{selected.size} selected</span>
             <button onClick={handleSave} className="px-4 py-1.5 rounded-lg bg-yellow text-[#111] font-sans font-bold text-xs hover:opacity-90 transition-opacity">Save</button>
             <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -312,7 +312,7 @@ function GalleryModal({ page, onSave, onClose }: { page: DeliveryPage; onSave: (
         <div className="flex flex-1 min-h-0">
           <div className="flex-1 flex flex-col border-r border-[var(--border)] min-w-0">
             <div className="px-4 py-2.5 border-b border-[var(--border)] shrink-0">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
+              <span className="font-mono text-[12px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
                 Your Gallery · {ALL_GALLERY_SEEDS.length} photos
               </span>
             </div>
@@ -342,7 +342,7 @@ function GalleryModal({ page, onSave, onClose }: { page: DeliveryPage; onSave: (
           </div>
           <div className="flex-1 flex flex-col min-w-0">
             <div className="px-4 py-2.5 border-b border-[var(--border)] shrink-0">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
+              <span className="font-mono text-[12px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
                 Client Gallery · {selected.size} photos
               </span>
             </div>
@@ -415,7 +415,7 @@ function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; 
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
           <div>
             <h3 className="font-sans font-black text-[var(--fg)] text-sm">Choose template</h3>
-            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">Visual style for your delivery page</p>
+            <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5">Visual style for your delivery page</p>
           </div>
           <div className="flex items-center gap-2">
             {/* Frame toggle */}
@@ -448,7 +448,7 @@ function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; 
                 <div className="w-8 h-8 rounded-lg shrink-0 border border-[var(--border)]" style={{ background: t.accent }} />
                 <div className="min-w-0">
                   <div className={`font-sans text-xs font-semibold truncate ${preview === t.id ? "text-[var(--fg)]" : "text-[var(--fg-muted)]"}`}>{t.label}</div>
-                  {preview === t.id && <div className="font-mono text-[9px] text-yellow mt-0.5">Previewing</div>}
+                  {preview === t.id && <div className="font-mono text-[13px] text-yellow mt-0.5">Previewing</div>}
                 </div>
               </button>
             ))}
@@ -465,7 +465,7 @@ function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; 
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80"/>
                     <span className="w-2.5 h-2.5 rounded-full bg-green-500/80"/>
                     <div className="flex-1 mx-3 bg-white/10 rounded px-3 py-0.5">
-                      <span className="font-mono text-[10px] text-white/40">portapic.app/d/preview</span>
+                      <span className="font-mono text-[12px] text-white/40">portapic.app/d/preview</span>
                     </div>
                   </div>
                   <iframe
@@ -504,7 +504,7 @@ function TemplateModal({ current, onSelect, onClose }: { current: TemplateName; 
             <div className="px-6 py-4 border-t border-[var(--border)] bg-[var(--bg)] flex items-center justify-between shrink-0">
               <div>
                 <div className="font-sans font-bold text-[var(--fg)] text-sm">{chosen.label}</div>
-                <div className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">{chosen.desc}</div>
+                <div className="font-sans text-[13px] text-[var(--fg-muted)] mt-0.5">{chosen.desc}</div>
               </div>
               <button onClick={() => { onSelect(preview); onClose(); }}
                 className="px-5 py-2 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:opacity-90 transition-opacity"
@@ -536,7 +536,7 @@ function TemplatePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
         <div className="w-8 h-8 rounded-lg shrink-0 border border-[var(--border)]" style={{ background: current.accent }} />
         <div className="flex-1 text-left min-w-0">
           <div className="font-sans text-sm font-semibold text-[var(--fg)]">{current.label}</div>
-          <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{current.desc}</div>
+          <div className="font-sans text-[13px] text-[var(--fg-muted)] truncate">{current.desc}</div>
         </div>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -571,7 +571,7 @@ function ContentPanel({ page, set, focusedField, fieldRefs }: {
           className={`w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border rounded-lg px-3 py-2.5 outline-none transition-colors resize-none ${focusedField === "welcomeMessage" ? "border-yellow" : "border-[var(--border)] focus:border-yellow"}`}
           placeholder="Write a personal message to your client…"
         />
-        <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1">Shown on the cover</p>
+        <p className="font-sans text-[13px] text-[var(--fg-muted)] mt-1">Shown on the cover</p>
       </div>
     </>
   );
@@ -594,7 +594,7 @@ function BrandingPanel({ page, set, focusedField, fieldRefs, onOpenCoverAdjust }
             { id: "image+text", label: "Both" },
           ] as { id: LogoMode; label: string }[]).map((opt) => (
             <button key={opt.id} onClick={() => set("logoMode", opt.id)}
-              className={`flex-1 py-1.5 rounded-lg font-sans text-[11px] transition-colors border ${
+              className={`flex-1 py-1.5 rounded-lg font-sans text-[13px] transition-colors border ${
                 page.logoMode === opt.id
                   ? "border-yellow bg-yellow/10 text-[var(--fg)]"
                   : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
@@ -615,7 +615,7 @@ function BrandingPanel({ page, set, focusedField, fieldRefs, onOpenCoverAdjust }
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <FieldLabel>Image width</FieldLabel>
-                  <span className="font-mono text-[10px] text-[var(--fg-muted)]">
+                  <span className="font-mono text-[12px] text-[var(--fg-muted)]">
                     {page.logoWidth > 0 ? `${page.logoWidth}px` : "Auto"}
                   </span>
                 </div>
@@ -625,7 +625,7 @@ function BrandingPanel({ page, set, focusedField, fieldRefs, onOpenCoverAdjust }
                   onChange={(e) => set("logoWidth", Number(e.target.value))}
                   className="w-full accent-yellow"
                 />
-                <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1">
+                <p className="font-sans text-[13px] text-[var(--fg-muted)] mt-1">
                   Slide to 0 to use the template&apos;s default sizing.
                 </p>
               </div>
@@ -648,7 +648,7 @@ function BrandingPanel({ page, set, focusedField, fieldRefs, onOpenCoverAdjust }
             </svg>
             Adjust crop
           </span>
-          <span className="font-mono text-[10px]">{page.coverPositionY}%</span>
+          <span className="font-mono text-[12px]">{page.coverPositionY}%</span>
         </button>
       </div>
       <div>
@@ -692,7 +692,7 @@ function ColorsPanel({ page, set }: { page: DeliveryPage; set: Setter }) {
       <div className="flex items-center justify-between">
         <div>
           <span className="font-sans text-sm font-medium text-[var(--fg)]">Custom colors</span>
-          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Override the template defaults</p>
+          <p className="font-sans text-[13px] text-[var(--fg-muted)] mt-0.5">Override the template defaults</p>
         </div>
         <Toggle checked={page.customColors} onChange={toggleCustomColors} />
       </div>
@@ -726,7 +726,7 @@ function FontSlotRow({
     >
       <div className="flex items-center justify-between mb-1.5">
         <FieldLabel>{label}</FieldLabel>
-        <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest">Slot {slot}</span>
+        <span className="font-mono text-[13px] text-[var(--fg-muted)] uppercase tracking-widest">Slot {slot}</span>
       </div>
       <select
         value={value}
@@ -741,7 +741,7 @@ function FontSlotRow({
           <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.label}</option>
         ))}
       </select>
-      <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-1">{description}</p>
+      <p className="font-sans text-[13px] text-[var(--fg-muted)] mt-1">{description}</p>
     </div>
   );
 }
@@ -811,7 +811,7 @@ function AccessPanel({ page, set }: { page: DeliveryPage; set: Setter }) {
       <div className="flex items-center justify-between">
         <div>
           <span className="font-sans text-sm font-medium text-[var(--fg)]">Password protection</span>
-          <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Require a password to view</p>
+          <p className="font-sans text-[13px] text-[var(--fg-muted)] mt-0.5">Require a password to view</p>
         </div>
         <Toggle checked={page.passwordEnabled} onChange={() => set("passwordEnabled", !page.passwordEnabled)} />
       </div>
@@ -837,7 +837,7 @@ function AccessPanel({ page, set }: { page: DeliveryPage; set: Setter }) {
         <div className="flex items-center justify-between">
           <div>
             <span className="font-sans text-sm font-medium text-[var(--fg)]">Client whitelist</span>
-            <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Restrict to specific emails</p>
+            <p className="font-sans text-[13px] text-[var(--fg-muted)] mt-0.5">Restrict to specific emails</p>
           </div>
           <Toggle checked={page.whitelistEnabled} onChange={() => set("whitelistEnabled", !page.whitelistEnabled)} />
         </div>
@@ -903,7 +903,7 @@ function CoverAdjustModal({ page, set, onClose }: { page: DeliveryPage; set: Set
         <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)]">
           <div>
             <h3 className="font-sans font-black text-[var(--fg)] text-sm">Adjust cover crop</h3>
-            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">Slide to choose what stays visible when the image is cropped</p>
+            <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5">Slide to choose what stays visible when the image is cropped</p>
           </div>
           <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -928,12 +928,12 @@ function CoverAdjustModal({ page, set, onClose }: { page: DeliveryPage; set: Set
               backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)",
               backgroundSize: "calc(100% / 3) calc(100% / 3)", backgroundPosition: "0 0",
             }} />
-            <div className="absolute top-2 left-2 px-2 py-1 rounded bg-black/55 backdrop-blur-sm font-mono text-[9px] text-white/80 tracking-widest uppercase">Preview</div>
+            <div className="absolute top-2 left-2 px-2 py-1 rounded bg-black/55 backdrop-blur-sm font-mono text-[13px] text-white/80 tracking-widest uppercase">Preview</div>
           </div>
 
           {/* Vertical slider */}
           <div className="flex flex-col items-center gap-3 py-2">
-            <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest">Top</span>
+            <span className="font-mono text-[13px] text-[var(--fg-muted)] uppercase tracking-widest">Top</span>
             <div
               className="relative h-[280px] flex items-center justify-center"
               style={{ width: 28 }}
@@ -954,14 +954,14 @@ function CoverAdjustModal({ page, set, onClose }: { page: DeliveryPage; set: Set
                 }}
               />
             </div>
-            <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest">Btm</span>
+            <span className="font-mono text-[13px] text-[var(--fg-muted)] uppercase tracking-widest">Btm</span>
             <span className="font-mono text-xs text-[var(--fg)] mt-1 font-bold">{y}%</span>
           </div>
         </div>
 
         <div className="px-5 py-3 border-t border-[var(--border)] flex items-center justify-between gap-2">
           <button onClick={reset}
-            className="font-mono text-[11px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+            className="font-mono text-[13px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
           >
             Reset to center
           </button>
@@ -1002,7 +1002,7 @@ function PasswordCopyPanel({
           </svg>
           <div className="min-w-0">
             <div className="font-sans text-xs font-semibold text-[var(--fg)]">Protection {page.passwordEnabled ? "on" : "off"}</div>
-            <div className="font-sans text-[11px] text-[var(--fg-muted)] truncate">{page.passwordEnabled ? "Clients see this page first" : "Anyone with the link gets straight in"}</div>
+            <div className="font-sans text-[13px] text-[var(--fg-muted)] truncate">{page.passwordEnabled ? "Clients see this page first" : "Anyone with the link gets straight in"}</div>
           </div>
         </div>
         <Toggle checked={page.passwordEnabled} onChange={() => set("passwordEnabled", !page.passwordEnabled)} />
@@ -1062,7 +1062,7 @@ function MonetizePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
               </span>
               <div>
                 <div className="font-sans text-sm font-medium text-[var(--fg)]">{opt.label}</div>
-                <div className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">{opt.desc}</div>
+                <div className="font-sans text-[13px] text-[var(--fg-muted)] mt-0.5">{opt.desc}</div>
               </div>
             </button>
           ))}
@@ -1084,7 +1084,7 @@ function MonetizePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
             <div className="flex items-center justify-between mb-1">
               <FieldLabel>Full gallery price</FieldLabel>
               {photoCount > 0 && page.pricePerPhoto > 0 && (
-                <button onClick={() => set("priceFullGallery", suggestedGalleryPrice)} className="font-mono text-[10px] text-yellow hover:underline">
+                <button onClick={() => set("priceFullGallery", suggestedGalleryPrice)} className="font-mono text-[12px] text-yellow hover:underline">
                   Suggest ${suggestedGalleryPrice} (40% off)
                 </button>
               )}
@@ -1095,12 +1095,12 @@ function MonetizePanel({ page, set }: { page: DeliveryPage; set: Setter }) {
                 onChange={(e) => set("priceFullGallery", Number(e.target.value))}
                 className="w-full pl-7 pr-3 py-2.5 font-mono text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-lg outline-none focus:border-yellow transition-colors" />
             </div>
-            {savings > 0 && <p className="font-sans text-[11px] text-green-400 mt-1">Clients save {savings}% vs buying individually</p>}
+            {savings > 0 && <p className="font-sans text-[13px] text-green-400 mt-1">Clients save {savings}% vs buying individually</p>}
           </div>
           <div className="flex items-center justify-between">
             <div>
               <span className="font-sans text-sm font-medium text-[var(--fg)]">Show upsell banner</span>
-              <p className="font-sans text-[11px] text-[var(--fg-muted)] mt-0.5">Highlight bundle deal at top</p>
+              <p className="font-sans text-[13px] text-[var(--fg-muted)] mt-0.5">Highlight bundle deal at top</p>
             </div>
             <Toggle checked={page.showUpsellBanner} onChange={() => set("showUpsellBanner", !page.showUpsellBanner)} />
           </div>
@@ -1233,10 +1233,10 @@ export function DeliveryBuilder({ pageId }: { pageId: string }) {
           <input value={page.title} onChange={(e) => set("title", e.target.value)}
             className="font-sans font-bold text-sm text-[var(--fg)] bg-transparent outline-none border-b border-transparent focus:border-[var(--fg-muted)] transition-colors max-w-xs"
           />
-          <span className="font-mono text-[11px] text-[var(--fg-muted)] truncate">· {page.client}</span>
+          <span className="font-mono text-[13px] text-[var(--fg-muted)] truncate">· {page.client}</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className={`inline-flex items-center gap-1 font-mono text-[10px] ${status.text}`}>
+          <span className={`inline-flex items-center gap-1 font-mono text-[12px] ${status.text}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
             {status.label}
           </span>

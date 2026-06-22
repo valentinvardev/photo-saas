@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -376,7 +376,7 @@ function CollectionPreviewModal({ c, initialPage = "portfolio", onClose }: {
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-sm" style={{ background: c.accentColor }} />
             <span className="font-sans font-black text-white text-sm">{c.name}</span>
-            <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">Preview</span>
+            <span className="font-mono text-[13px] uppercase tracking-widest text-white/40">Preview</span>
           </div>
         </div>
 
@@ -445,9 +445,9 @@ function CollectionPreviewModal({ c, initialPage = "portfolio", onClose }: {
 
       {/* Footer status */}
       <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center justify-between px-4 py-2 border-t border-white/10">
-        <span className="font-mono text-[10px] text-white/30 uppercase tracking-wider">{dims.label} · {device}</span>
+        <span className="font-mono text-[12px] text-white/30 uppercase tracking-wider">{dims.label} · {device}</span>
         {url && (
-          <a href={url} target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] text-white/40 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1.5">
+          <a href={url} target="_blank" rel="noopener noreferrer" className="font-mono text-[12px] text-white/40 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1.5">
             Open in new tab <ArrowIcon />
           </a>
         )}
@@ -519,8 +519,8 @@ function CollectionModal({ c, onClose, onPreview }: { c: TemplateCollection; onC
                   <span className="font-sans text-sm font-medium text-[var(--fg)]">{PAGE_LABELS[page.type]}</span>
                 </div>
                 {page.href
-                  ? <button onClick={() => onPreview(page.type as PageType)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg)] border border-[var(--border)] font-sans text-[11px] font-semibold text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Preview</button>
-                  : <span className="font-mono text-[9px] text-[var(--fg-muted)] opacity-40">Soon</span>
+                  ? <button onClick={() => onPreview(page.type as PageType)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg)] border border-[var(--border)] font-sans text-[13px] font-semibold text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Preview</button>
+                  : <span className="font-mono text-[13px] text-[var(--fg-muted)] opacity-40">Soon</span>
                 }
               </div>
             ))}
@@ -613,10 +613,10 @@ function BrandIdentity({ id, name }: { id: string; name: string }) {
 
       {/* edition / studio strip */}
       <div className="flex items-center justify-between px-5 pt-4" style={{ color: i.muted }}>
-        <span style={{ fontFamily: i.mono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        <span style={{ fontFamily: i.mono, fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase" }}>
           {name} · Identity
         </span>
-        <span style={{ fontFamily: i.mono, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        <span style={{ fontFamily: i.mono, fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase" }}>
           06 / Vol. 1
         </span>
       </div>
@@ -669,7 +669,7 @@ function BrandIdentity({ id, name }: { id: string; name: string }) {
             <span style={{ fontFamily: t.font, fontWeight: t.weight, fontStyle: t.italic ? "italic" : "normal", fontSize: 28, lineHeight: 1, color: i.fg }}>
               {t.sample}
             </span>
-            <span style={{ fontFamily: i.mono, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: i.muted }}>
+            <span style={{ fontFamily: i.mono, fontSize: 13, letterSpacing: "0.16em", textTransform: "uppercase", color: i.muted }}>
               {t.tag}
             </span>
           </div>
@@ -726,7 +726,7 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
         >
           <div className="flex-1 min-w-0">
             <h3 className="font-sans font-black text-[var(--fg)] text-base leading-none">{c.name}</h3>
-            <span className="font-mono text-[9px] uppercase tracking-wider text-[var(--fg-muted)] mt-1 inline-block">Collection</span>
+            <span className="font-mono text-[13px] uppercase tracking-wider text-[var(--fg-muted)] mt-1 inline-block">Collection</span>
           </div>
           {/* Identity preview — compact, readable at this size */}
           <div className="shrink-0 overflow-hidden border border-[var(--border)]" style={{ width: 80, height: 64 }}>
@@ -761,7 +761,7 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
           <div className="flex-1 min-w-0 py-6 px-6 flex flex-col gap-4 justify-between">
             <div>
               <h3 className="font-sans font-black text-[var(--fg)] text-2xl leading-none tracking-tight">{c.name}</h3>
-              <span className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mt-2 inline-block">Collection</span>
+              <span className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mt-2 inline-block">Collection</span>
             </div>
 
             <p className="font-sans text-xs text-[var(--fg-muted)] leading-relaxed max-w-sm">{c.description}</p>
@@ -771,14 +771,14 @@ function CollectionCard({ c, index }: { c: TemplateCollection; index: number }) 
               {c.pages.map((page) => (
                 page.href ? (
                   <button key={page.type} onClick={() => setPreviewOpen(page.type as PageType)}
-                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
+                    className="flex items-center gap-1.5 font-mono text-[13px] uppercase tracking-wide px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
                   >
                     <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="text-emerald-500"><path d="M20 6L9 17l-5-5"/></svg>
                     {PAGE_LABELS[page.type]}
                   </button>
                 ) : (
                   <span key={page.type}
-                    className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wide px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg-muted)] opacity-45"
+                    className="flex items-center gap-1.5 font-mono text-[13px] uppercase tracking-wide px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg-muted)] opacity-45"
                   >
                     <LockIcon /> {PAGE_LABELS[page.type]}
                   </span>
@@ -941,7 +941,7 @@ function TemplateBanner({ onDismiss, onBrowse }: { onDismiss: () => void; onBrow
         {/* Text */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <span className="font-mono text-[9px] text-white/30 uppercase tracking-wider">Collections</span>
+            <span className="font-mono text-[13px] text-white/30 uppercase tracking-wider">Collections</span>
           </div>
           <h2 className="font-sans font-black text-white text-base leading-tight mb-1">
             One style, three pages.
@@ -1004,8 +1004,8 @@ function StyleBanner({ onDismiss, onOpen }: { onDismiss: () => void; onOpen: () 
         {/* Text */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <span className="font-mono text-[9px] font-bold uppercase tracking-widest bg-[#111] text-yellow px-2 py-0.5 rounded-sm">Wizard</span>
-            <span className="font-mono text-[9px] text-[#111]/55 uppercase tracking-wider">Custom brand</span>
+            <span className="font-mono text-[13px] font-bold uppercase tracking-widest bg-[#111] text-yellow px-2 py-0.5 rounded-sm">Wizard</span>
+            <span className="font-mono text-[13px] text-[#111]/55 uppercase tracking-wider">Custom brand</span>
           </div>
           <h2 className="font-sans font-black text-[#111] text-base leading-tight mb-1">
             Create your own style.
@@ -1220,7 +1220,7 @@ function StyleWizardModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
           <div>
             <h2 className="font-sans font-black text-[var(--fg)] text-base leading-none">Style wizard</h2>
-            <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] mt-1">Pick brand, fonts, colors</p>
+            <p className="font-mono text-[12px] uppercase tracking-widest text-[var(--fg-muted)] mt-1">Pick brand, fonts, colors</p>
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -1284,7 +1284,7 @@ function StyleWizardModal({ onClose }: { onClose: () => void }) {
                   className="flex items-center justify-center gap-2 p-2 rounded-lg border border-dashed border-[var(--border)] text-[var(--fg-muted)] hover:border-yellow hover:text-yellow transition-colors"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  <span className="font-sans text-[11px] font-medium">Custom palette</span>
+                  <span className="font-sans text-[13px] font-medium">Custom palette</span>
                 </button>
               </div>
             </Field>
@@ -1293,8 +1293,8 @@ function StyleWizardModal({ onClose }: { onClose: () => void }) {
           {/* Right — wireframe preview */}
           <div className="overflow-y-auto p-6 bg-[var(--bg-subtle)] flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)]">Live wireframe</span>
-              <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] opacity-60">Preview</span>
+              <span className="font-mono text-[12px] uppercase tracking-widest text-[var(--fg-muted)]">Live wireframe</span>
+              <span className="font-mono text-[12px] uppercase tracking-widest text-[var(--fg-muted)] opacity-60">Preview</span>
             </div>
 
             <WireframePreview state={state} />
@@ -1330,7 +1330,7 @@ function StyleWizardModal({ onClose }: { onClose: () => void }) {
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-[var(--border)] shrink-0">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] hidden sm:block">Settings will pre-fill the editor</p>
+          <p className="font-mono text-[12px] uppercase tracking-widest text-[var(--fg-muted)] hidden sm:block">Settings will pre-fill the editor</p>
           <div className="flex gap-2 ml-auto">
             <button
               onClick={onClose}
@@ -1357,7 +1357,7 @@ function StyleWizardModal({ onClose }: { onClose: () => void }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)]">{label}</label>
+      <label className="font-mono text-[12px] uppercase tracking-widest text-[var(--fg-muted)]">{label}</label>
       {children}
     </div>
   );
@@ -1380,7 +1380,7 @@ function FontSlotButton({ label, value, onClick }: {
           <div style={{ fontFamily: value.stack }} className="text-2xl text-[var(--fg)] font-medium truncate leading-none">
             {value.label}
           </div>
-          <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mt-1.5">
+          <div className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mt-1.5">
             {value.cat} · click to change
           </div>
         </div>
@@ -1445,7 +1445,7 @@ function FontPickerModal({
               <button
                 key={c}
                 onClick={() => setCat(c)}
-                className={`px-3 py-1.5 rounded-lg font-mono text-[10px] uppercase tracking-widest transition-colors ${
+                className={`px-3 py-1.5 rounded-lg font-mono text-[12px] uppercase tracking-widest transition-colors ${
                   cat === c ? "bg-[var(--fg)] text-[var(--bg)]" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"
                 }`}
               >
@@ -1458,7 +1458,7 @@ function FontPickerModal({
         {/* Font list */}
         <div className="flex-1 min-h-0 overflow-y-auto p-3">
           {filtered.length === 0 ? (
-            <div className="py-16 text-center font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest">No fonts match</div>
+            <div className="py-16 text-center font-mono text-[12px] text-[var(--fg-muted)] uppercase tracking-widest">No fonts match</div>
           ) : (
             <div className="flex flex-col gap-1.5">
               {filtered.map((f) => {
@@ -1475,7 +1475,7 @@ function FontPickerModal({
                       <div style={{ fontFamily: f.stack }} className="text-2xl text-[var(--fg)] leading-none truncate">{f.label}</div>
                       <div style={{ fontFamily: f.stack }} className="text-sm text-[var(--fg-muted)] mt-1.5 truncate">The quick brown fox jumps over the lazy dog</div>
                     </div>
-                    <span className={`shrink-0 font-mono text-[9px] uppercase tracking-widest ${active ? "text-yellow" : "text-[var(--fg-muted)]"}`}>{f.cat}</span>
+                    <span className={`shrink-0 font-mono text-[13px] uppercase tracking-widest ${active ? "text-yellow" : "text-[var(--fg-muted)]"}`}>{f.cat}</span>
                   </button>
                 );
               })}
@@ -1505,7 +1505,7 @@ function PaletteSwatch({ p, active, onClick, custom, onDelete }: {
             <div key={i} className="w-2.5 h-6" style={{ background: c }} />
           ))}
         </div>
-        <span className="font-sans text-[11px] font-medium text-[var(--fg)] truncate flex-1 text-left">{p.label}</span>
+        <span className="font-sans text-[13px] font-medium text-[var(--fg)] truncate flex-1 text-left">{p.label}</span>
       </button>
       {custom && onDelete && (
         <button
@@ -1542,13 +1542,13 @@ function PaletteBuilderModal({ onClose, onSave }: { onClose: () => void; onSave:
     <div className="flex items-center gap-3">
       <div className="flex-1">
         <div className="font-sans text-xs font-semibold text-[var(--fg)]">{labelText}</div>
-        <div className="font-sans text-[11px] text-[var(--fg-muted)]">{hint}</div>
+        <div className="font-sans text-[13px] text-[var(--fg-muted)]">{hint}</div>
       </div>
       <label className="relative flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg border border-[var(--border)] hover:border-[var(--fg-muted)] transition-colors">
         <span className="w-5 h-5 rounded border border-black/10" style={{ background: draft[key] as string }} />
         <input type="color" value={draft[key] as string} onChange={(e) => update(key, e.target.value)}
           className="absolute inset-0 opacity-0 cursor-pointer" />
-        <span className="font-mono text-[10px] text-[var(--fg)] uppercase w-16">{draft[key] as string}</span>
+        <span className="font-mono text-[12px] text-[var(--fg)] uppercase w-16">{draft[key] as string}</span>
       </label>
     </div>
   );
@@ -1585,10 +1585,10 @@ function PaletteBuilderModal({ onClose, onSave }: { onClose: () => void; onSave:
           {/* Live preview strip */}
           <div className="rounded-lg overflow-hidden border border-[var(--border)]" style={{ background: draft.bg }}>
             <div className="px-4 py-5" style={{ color: draft.fg }}>
-              <div className="font-mono text-[9px] uppercase tracking-widest" style={{ color: draft.muted }}>Preview</div>
+              <div className="font-mono text-[13px] uppercase tracking-widest" style={{ color: draft.muted }}>Preview</div>
               <div className="font-sans font-bold text-lg mt-1">Your brand name</div>
               <div className="font-sans text-xs mt-1" style={{ color: draft.muted }}>Soft mornings, slow light.</div>
-              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded font-mono text-[10px] uppercase tracking-widest" style={{ background: draft.btnBg, color: draft.btnFg }}>
+              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded font-mono text-[12px] uppercase tracking-widest" style={{ background: draft.btnBg, color: draft.btnFg }}>
                 Download all
               </div>
             </div>
@@ -1655,18 +1655,18 @@ function WireframePreview({ state }: { state: WizardState }) {
         <h1 style={{ fontFamily: primary.stack, fontSize: 28, fontWeight: 400, lineHeight: 1, letterSpacing: "-0.02em", margin: 0 }}>
           Light, framed.
         </h1>
-        <p style={{ fontFamily: secondary.stack, fontSize: 11, fontWeight: 300, lineHeight: 1.55, opacity: 0.7, margin: 0 }}>
+        <p style={{ fontFamily: secondary.stack, fontSize: 13, fontWeight: 300, lineHeight: 1.55, opacity: 0.7, margin: 0 }}>
           Documentary, editorial, and portrait photography across cities, climates, and quiet evenings.
         </p>
 
         {/* CTA */}
         <div className="flex gap-2 mt-1">
           <span style={{
-            fontFamily: mono.stack, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
+            fontFamily: mono.stack, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase",
             background: palette.accent, color: palette.bg, padding: "5px 12px",
           }}>View work</span>
           <span style={{
-            fontFamily: mono.stack, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase",
+            fontFamily: mono.stack, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase",
             border: `1px solid ${palette.fg}50`, color: palette.fg, padding: "5px 12px", opacity: 0.85,
           }}>About</span>
         </div>
@@ -1681,7 +1681,7 @@ function WireframePreview({ state }: { state: WizardState }) {
 
       {/* Footer strip */}
       <div className="px-4 py-3 flex items-center justify-between border-t" style={{ borderColor: palette.fg + "12" }}>
-        <span style={{ fontFamily: primary.stack, fontStyle: "italic", fontWeight: 400, fontSize: 11, opacity: 0.7 }}>
+        <span style={{ fontFamily: primary.stack, fontStyle: "italic", fontWeight: 400, fontSize: 13, opacity: 0.7 }}>
           {brandName || "Brand"}
         </span>
         <span style={{ fontFamily: mono.stack, fontSize: 7, letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.4 }}>
@@ -1865,18 +1865,18 @@ function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: nu
           {t.href ? (
             <>
               <button onClick={() => setPreviewOpen(true)}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-white text-[#111] font-sans text-[11px] font-semibold rounded-md hover:bg-yellow transition-colors">
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-white text-[#111] font-sans text-[13px] font-semibold rounded-md hover:bg-yellow transition-colors">
                 <ArrowIcon /> Preview
               </button>
               {t.editorHref && (
                 <Link href={t.editorHref}
-                  className="flex items-center gap-1.5 px-3.5 py-2 bg-yellow text-[#111] font-sans text-[11px] font-bold rounded-md hover:bg-yellow/90 transition-colors">
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-yellow text-[#111] font-sans text-[13px] font-bold rounded-md hover:bg-yellow/90 transition-colors">
                   Use →
                 </Link>
               )}
             </>
           ) : (
-            <span className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 backdrop-blur-sm text-white font-mono text-[10px] rounded-md">
+            <span className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 backdrop-blur-sm text-white font-mono text-[12px] rounded-md">
               <LockIcon /> Soon
             </span>
           )}
@@ -1892,14 +1892,14 @@ function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: nu
         <div className="flex items-start justify-between gap-2">
           <div>
             <h3 className="font-sans font-bold text-[var(--fg)] text-sm">{t.name}</h3>
-            <span className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-wider">{t.category}</span>
+            <span className="font-mono text-[13px] text-[var(--fg-muted)] uppercase tracking-wider">{t.category}</span>
           </div>
           {featured
-            ? <span className="font-mono text-[9px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 shrink-0 rounded">In use</span>
-            : !t.href && <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0 rounded"><LockIcon /> Soon</span>
+            ? <span className="font-mono text-[13px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 shrink-0 rounded">In use</span>
+            : !t.href && <span className="flex items-center gap-1 font-mono text-[13px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0 rounded"><LockIcon /> Soon</span>
           }
         </div>
-        <p className="font-sans text-[11px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{t.description}</p>
+        <p className="font-sans text-[13px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{t.description}</p>
 
         {/* Tags + collection */}
         <div className="flex flex-wrap gap-1 pt-1 items-center">
@@ -1912,19 +1912,19 @@ function PortfolioCard({ t, index, featured }: { t: PortfolioTemplate; index: nu
           {t.href ? (
             <>
               <button onClick={() => setPreviewOpen(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[12px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
               >
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 Preview
               </button>
               <Link href={t.editorHref ?? "#"}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[12px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
               >
                 Use template →
               </Link>
             </>
           ) : (
-            <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-[9px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed border border-dashed border-[var(--border)]">
+            <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-[13px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed border border-dashed border-[var(--border)]">
               <LockIcon /> Coming soon
             </span>
           )}
@@ -1985,10 +1985,10 @@ function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
             <div className="relative flex flex-col items-center w-44 gap-3">
               <div style={{ width: 52, height: 52, borderRadius: "50%", background: t.fg, opacity: 0.15 }} />
               <div style={{ fontFamily: t.font, fontSize: 13, fontWeight: 700, color: t.fg, letterSpacing: "-0.01em" }}>Sofia Chen</div>
-              <div style={{ fontFamily: "monospace", fontSize: 9, color: t.sub, marginTop: -8, marginBottom: 4 }}>Photographer · NYC</div>
+              <div style={{ fontFamily: "monospace", fontSize: 13, color: t.sub, marginTop: -8, marginBottom: 4 }}>Photographer · NYC</div>
               {["Portfolio", "Book a session", "Instagram"].map((label) => (
                 <div key={label} style={{ width: "100%", padding: "9px 14px", borderRadius: r, background: t.btnBg, border: isOutline ? `1px solid ${t.fg}40` : "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontFamily: t.font, fontSize: 10, fontWeight: 600, color: t.btnFg }}>{label}</span>
+                  <span style={{ fontFamily: t.font, fontSize: 12, fontWeight: 600, color: t.btnFg }}>{label}</span>
                 </div>
               ))}
             </div>
@@ -1996,7 +1996,7 @@ function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
         )}
         {!t.available && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px] z-10">
-            <span className="flex items-center gap-1.5 font-mono text-[10px] text-white/80 bg-black/50 px-3 py-1.5 rounded-full">
+            <span className="flex items-center gap-1.5 font-mono text-[12px] text-white/80 bg-black/50 px-3 py-1.5 rounded-full">
               <LockIcon /> Coming soon
             </span>
           </div>
@@ -2007,9 +2007,9 @@ function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
       <div className="p-4 flex flex-col gap-2 flex-1">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-sans font-bold text-[var(--fg)] text-sm">{t.name}</h3>
-          {!t.available && <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0"><LockIcon /> Soon</span>}
+          {!t.available && <span className="flex items-center gap-1 font-mono text-[13px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0"><LockIcon /> Soon</span>}
         </div>
-        <p className="font-sans text-[11px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{t.description}</p>
+        <p className="font-sans text-[13px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{t.description}</p>
         <div className="flex flex-wrap gap-1 pt-1 items-center">
           {t.tags.map((tag) => <span key={tag} className="font-mono text-[8px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 rounded">{tag}</span>)}
           {t.collection && <CollectionTag name={t.collection} />}
@@ -2019,24 +2019,24 @@ function LinksCard({ t, index }: { t: LinksTemplate; index: number }) {
             <>
               {t.href ? (
                 <button onClick={() => setPreviewOpen(true)}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[12px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   Preview
                 </button>
               ) : (
-                <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-dashed border-[var(--border)] text-[var(--fg-muted)] opacity-50 cursor-not-allowed">
+                <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[12px] font-medium border border-dashed border-[var(--border)] text-[var(--fg-muted)] opacity-50 cursor-not-allowed">
                   No preview
                 </span>
               )}
               <Link href="/dashboard/links"
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[12px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
               >
                 Use template →
               </Link>
             </>
           ) : (
-            <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-[9px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed border border-dashed border-[var(--border)]">
+            <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-[13px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed border border-dashed border-[var(--border)]">
               <LockIcon /> Coming soon
             </span>
           )}
@@ -2091,17 +2091,17 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
             <>
               {t.href && (
                 <button onClick={() => setPreviewOpen(true)}
-                  className="flex items-center gap-1.5 px-3.5 py-2 bg-white text-[#111] font-sans text-[11px] font-semibold rounded-md hover:bg-yellow transition-colors">
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-white text-[#111] font-sans text-[13px] font-semibold rounded-md hover:bg-yellow transition-colors">
                   <ArrowIcon /> Preview
                 </button>
               )}
               <Link href="/dashboard/delivery"
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-yellow text-[#111] font-sans text-[11px] font-bold rounded-md hover:bg-yellow/90 transition-colors">
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-yellow text-[#111] font-sans text-[13px] font-bold rounded-md hover:bg-yellow/90 transition-colors">
                 Use →
               </Link>
             </>
           ) : (
-            <span className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 backdrop-blur-sm text-white font-mono text-[10px] rounded-md">
+            <span className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 backdrop-blur-sm text-white font-mono text-[12px] rounded-md">
               <LockIcon /> Coming soon
             </span>
           )}
@@ -2109,7 +2109,7 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
 
         {!t.available && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
-            <span className="flex items-center gap-1.5 font-mono text-[10px] text-white/80 bg-black/50 px-3 py-1.5 rounded-full">
+            <span className="flex items-center gap-1.5 font-mono text-[12px] text-white/80 bg-black/50 px-3 py-1.5 rounded-full">
               <LockIcon /> Coming soon
             </span>
           </div>
@@ -2126,9 +2126,9 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
               <div className="w-3 h-3 rounded-sm border border-[var(--border)]" style={{ background: t.fg }} />
             </div>
           </div>
-          {!t.available && <span className="flex items-center gap-1 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0 rounded"><LockIcon /> Soon</span>}
+          {!t.available && <span className="flex items-center gap-1 font-mono text-[13px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] px-1.5 py-0.5 shrink-0 rounded"><LockIcon /> Soon</span>}
         </div>
-        <p className="font-sans text-[11px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{t.description}</p>
+        <p className="font-sans text-[13px] font-light text-[var(--fg-muted)] leading-relaxed flex-1">{t.description}</p>
 
         {/* Tags + collection */}
         <div className="flex flex-wrap gap-1 pt-1 items-center">
@@ -2142,24 +2142,24 @@ function DeliveryTemplateCard({ t, index }: { t: DeliveryTemplate; index: number
             <>
               {t.href ? (
                 <button onClick={() => setPreviewOpen(true)}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[12px] font-medium border border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   Preview
                 </button>
               ) : (
-                <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-medium border border-dashed border-[var(--border)] text-[var(--fg-muted)] opacity-50 cursor-not-allowed">
+                <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[12px] font-medium border border-dashed border-[var(--border)] text-[var(--fg-muted)] opacity-50 cursor-not-allowed">
                   No preview
                 </span>
               )}
               <Link href="/dashboard/delivery"
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[10px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-sans text-[12px] font-bold bg-yellow text-[#111] hover:bg-yellow/90 transition-colors"
               >
                 Use template →
               </Link>
             </>
           ) : (
-            <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-[9px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed border border-dashed border-[var(--border)]">
+            <span className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md font-mono text-[13px] text-[var(--fg-muted)] opacity-50 cursor-not-allowed border border-dashed border-[var(--border)]">
               <LockIcon /> Coming soon
             </span>
           )}
@@ -2233,7 +2233,7 @@ export default function TemplatesPage() {
         <div className="flex items-end justify-between gap-4 flex-wrap mb-4">
           <div>
             <h1 className="font-sans font-black text-[var(--fg)] text-lg leading-none">Templates</h1>
-            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">
+            <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5">
               {PORTFOLIO_TEMPLATES.length + LINKS_TEMPLATES.length + DELIVERY_TEMPLATES.length} total · Choose a starting point
             </p>
           </div>
@@ -2255,7 +2255,7 @@ export default function TemplatesPage() {
             >
               <span className={productType === tab.id ? "text-yellow" : "text-[var(--fg-muted)]"}>{tab.icon}</span>
               {tab.label}
-              <span className={`font-mono text-[9px] px-1.5 py-0.5 rounded ${productType === tab.id ? "bg-yellow/15 text-yellow" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)]"}`}>
+              <span className={`font-mono text-[13px] px-1.5 py-0.5 rounded ${productType === tab.id ? "bg-yellow/15 text-yellow" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)]"}`}>
                 {tab.count}
               </span>
             </button>

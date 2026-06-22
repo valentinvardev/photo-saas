@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEditorStore } from "~/lib/editor/store";
 import { ColorSwatch } from "~/components/editor/shared/ColorSwatch";
@@ -17,7 +17,7 @@ export function ColorPalettePanel() {
 
   return (
     <div style={{ padding: "16px 12px" }}>
-      <p style={{ color: "var(--ec-sub)", fontSize: 11, margin: "0 0 12px", lineHeight: 1.4 }}>
+      <p style={{ color: "var(--ec-sub)", fontSize: 13, margin: "0 0 12px", lineHeight: 1.4 }}>
         {t("editor.colors.note")}
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -33,7 +33,7 @@ export function ColorPalettePanel() {
 
       {/* Preset palettes */}
       <div style={{ marginTop: 20, borderTop: "1px solid var(--ec-line)", paddingTop: 16 }}>
-        <p style={{ color: "var(--ec-sub)", fontSize: 11, margin: "0 0 10px" }}>{t("editor.colors.presets")}</p>
+        <p style={{ color: "var(--ec-sub)", fontSize: 13, margin: "0 0 10px" }}>{t("editor.colors.presets")}</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {[
             { label: "Classic BW",  palette: { bg: "#fafafa", fg: "var(--ec-bg)", accent: "var(--ec-bg)", muted: "#6b7280" } },
@@ -48,7 +48,7 @@ export function ColorPalettePanel() {
                 background: p.palette.bg,
                 border: `1px solid ${p.palette.fg}22`,
                 color: p.palette.fg,
-                fontSize: 10,
+                fontSize: 12,
                 padding: "4px 8px",
                 borderRadius: 3,
                 cursor: "pointer",

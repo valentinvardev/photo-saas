@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -111,7 +111,7 @@ export default function HalcyonPortfolioPage() {
         .hp-mark .wm{font-family:${HL_FONTS.serif};font-size:26px;letter-spacing:-0.02em;font-weight:400;display:flex;align-items:center;gap:8px}
         .hp-mark .wm em{font-style:italic;font-weight:400}
         .hp-mark .wm .glyph{width:6px;height:6px;border-radius:50%;border:1px solid ${t.fg};display:inline-block}
-        .hp-mark .sub{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.32em;text-transform:uppercase;opacity:0.85;margin-top:4px}
+        .hp-mark .sub{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.32em;text-transform:uppercase;opacity:0.85;margin-top:4px}
         .hp-burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:transparent;border:0;padding:8px;justify-self:end}
         .hp-burger span{display:block;width:22px;height:1px;background:${t.fg};transition:transform .3s ease}
         .hp-burger:hover span:first-child{transform:translateX(-3px)}
@@ -148,10 +148,10 @@ export default function HalcyonPortfolioPage() {
 
         .hp-index{padding:0 32px;border-top:1px solid ${t.line};position:relative}
         .hp-index-row{display:grid;grid-template-columns:60px 1fr 200px 120px 32px;gap:24px;align-items:center;padding:28px 0;border-bottom:1px solid ${t.line};cursor:pointer;position:relative;transition:padding .35s cubic-bezier(0.22,1,0.36,1)}
-        .hp-index-row .no{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;color:${t.muted}}
+        .hp-index-row .no{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.08em;color:${t.muted}}
         .hp-index-row .ti{font-family:${HL_FONTS.serif};font-size:54px;line-height:1;letter-spacing:-0.02em;font-weight:400;transition:transform .22s cubic-bezier(0.22,1,0.36,1),color .15s ease}
-        .hp-index-row .ta{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.1em;color:${t.muted};text-transform:uppercase}
-        .hp-index-row .yr{font-family:${HL_FONTS.mono};font-size:11px;color:${t.muted};text-align:right}
+        .hp-index-row .ta{font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.1em;color:${t.muted};text-transform:uppercase}
+        .hp-index-row .yr{font-family:${HL_FONTS.mono};font-size:13px;color:${t.muted};text-align:right}
         .hp-index-row .ar{justify-self:end;color:${t.muted};transition:transform .35s ease,color .35s ease}
         /* Hover-only flourishes: italic + slide kick in only on devices that
            actually have a cursor. On touch, none of this animates. */
@@ -177,11 +177,11 @@ export default function HalcyonPortfolioPage() {
         /* Hero feature: bold orange banner that really sells the gallery */
         .hp-allphotos{margin:96px 32px 0;padding:80px 64px;background:${t.accent};color:${t.fg};position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:48px;align-items:end}
         .hp-allphotos::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 120% at 100% 0%,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0) 55%);pointer-events:none}
-        .hp-allphotos .eyebrow{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:${t.fg};opacity:0.75;margin-bottom:24px}
+        .hp-allphotos .eyebrow{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:${t.fg};opacity:0.75;margin-bottom:24px}
         .hp-allphotos h2{font-family:${HL_FONTS.serif};font-size:120px;line-height:0.9;letter-spacing:-0.035em;font-weight:400;color:${t.fg}}
         .hp-allphotos h2 em{font-style:italic}
         .hp-allphotos .sub{font-family:${HL_FONTS.sans};font-size:15px;line-height:1.6;color:${t.fg};opacity:0.85;max-width:460px;margin-top:24px}
-        .hp-allphotos .meta{display:flex;gap:32px;margin-top:32px;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:${t.fg};opacity:0.7}
+        .hp-allphotos .meta{display:flex;gap:32px;margin-top:32px;font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:${t.fg};opacity:0.7}
         .hp-allphotos .meta b{display:block;font-family:${HL_FONTS.serif};font-style:italic;font-size:28px;letter-spacing:-0.01em;font-weight:400;color:${t.fg};opacity:1;margin-bottom:6px;text-transform:none}
         .hp-allphotos .cta{display:inline-flex;align-items:center;gap:16px;padding:22px 32px;background:${t.bg};color:${t.fg};border:0;cursor:pointer;font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.18em;text-transform:uppercase;transition:transform .3s cubic-bezier(0.22,1,0.36,1),background .3s ease}
         .hp-allphotos .cta:hover{transform:translateY(-3px);background:${t.fg};color:${t.bg}}
@@ -211,7 +211,7 @@ export default function HalcyonPortfolioPage() {
         .hp-about-stats > div:first-child{padding-left:0}
         .hp-about-stats > div:last-child{padding-right:0;border-right:0}
         .hp-about-stats .v{font-family:${HL_FONTS.serif};font-size:34px;line-height:1;font-weight:400}
-        .hp-about-stats .l{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase;margin-top:10px;white-space:nowrap}
+        .hp-about-stats .l{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase;margin-top:10px;white-space:nowrap}
 
         .hp-contact{padding:120px 32px;text-align:center;border-top:1px solid ${t.line}}
         .hp-contact h2{font-family:${HL_FONTS.serif};font-size:96px;line-height:1;letter-spacing:-0.03em;font-weight:400;margin-bottom:24px}
@@ -224,16 +224,16 @@ export default function HalcyonPortfolioPage() {
         .hp-contact-form textarea{resize:none;min-height:120px;font-family:${HL_FONTS.sans}}
         .hp-contact-actions{display:flex;justify-content:space-between;align-items:center;margin-top:32px;flex-wrap:wrap;gap:12px}
         .hp-contact-tabs{display:inline-flex;gap:0;margin:0 auto 32px;border:1px solid ${t.line};border-radius:999px;padding:4px;background:${t.raised}}
-        .hp-contact-tab{background:transparent;border:0;cursor:pointer;padding:10px 22px;border-radius:999px;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted};transition:all .25s ease;display:inline-flex;align-items:center;gap:8px}
+        .hp-contact-tab{background:transparent;border:0;cursor:pointer;padding:10px 22px;border-radius:999px;font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted};transition:all .25s ease;display:inline-flex;align-items:center;gap:8px}
         .hp-contact-tab.on{background:${t.fg};color:${t.bg}}
         .hp-contact-tab:not(.on):hover{color:${t.fg}}
         .hp-wa{max-width:520px;margin:0 auto;text-align:left;display:grid;gap:18px}
         .hp-wa textarea{background:transparent;border:1px solid ${t.line};color:${t.fg};font-family:${HL_FONTS.sans};font-size:14px;line-height:1.6;padding:18px;outline:none;resize:vertical;min-height:160px;transition:border-color .2s ease}
         .hp-wa textarea:focus{border-color:${t.accent}}
         .hp-wa-actions{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-        .hp-wa-num{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase}
+        .hp-wa-num{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase}
         .hp-wa-num b{color:${t.fg};font-weight:400;letter-spacing:0.04em}
-        .hp-wa-send{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;background:#25D366;color:#0E0D0B;border:0;cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:transform .25s ease,filter .25s ease;text-decoration:none}
+        .hp-wa-send{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;background:#25D366;color:#0E0D0B;border:0;cursor:pointer;font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.14em;text-transform:uppercase;font-weight:500;transition:transform .25s ease,filter .25s ease;text-decoration:none}
         .hp-wa-send:hover{transform:translateY(-2px);filter:brightness(1.05)}
         .hp-wa-send svg{width:16px;height:16px}
 
@@ -255,7 +255,7 @@ export default function HalcyonPortfolioPage() {
         .hp-drawer .col-l{flex:1;min-width:0;max-width:640px}
         .hp-drawer .col-r{flex-shrink:0;width:540px;aspect-ratio:3/4;max-height:84vh;position:relative;border:1px solid ${t.line};overflow:hidden;background:${t.raised}}
         .hp-drawer .col-r img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:hpDrawerImg .6s cubic-bezier(0.22,1,0.36,1) both}
-        .hp-drawer .col-r .label{position:absolute;left:0;right:0;bottom:0;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${t.fg};padding:14px 18px;background:rgba(14,13,11,0.85);backdrop-filter:blur(10px);border-top:1px solid rgba(239,234,224,0.08);display:flex;justify-content:space-between;align-items:center;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease}
+        .hp-drawer .col-r .label{position:absolute;left:0;right:0;bottom:0;font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:${t.fg};padding:14px 18px;background:rgba(14,13,11,0.85);backdrop-filter:blur(10px);border-top:1px solid rgba(239,234,224,0.08);display:flex;justify-content:space-between;align-items:center;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease}
         .hp-drawer .col-r.has-hover .label{opacity:1;transform:translateY(0)}
         .hp-drawer .col-r .label em{font-family:${HL_FONTS.serif};font-style:italic;font-size:14px;color:${t.fg};letter-spacing:0;text-transform:none}
         @keyframes hpDrawerImg{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
@@ -265,10 +265,10 @@ export default function HalcyonPortfolioPage() {
         @media(max-width:780px){.hp-drawer{padding:32px}.hp-drawer .col-l{flex:1;width:100%}.hp-drawer .col-r{display:none}}
         .hp-drawer ul{list-style:none}
         .hp-drawer li{padding:16px 0;border-bottom:1px solid ${t.line};font-family:${HL_FONTS.serif};font-size:36px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-        .hp-drawer li .n{font-family:${HL_FONTS.mono};font-size:11px;color:${t.muted};font-style:normal}
+        .hp-drawer li .n{font-family:${HL_FONTS.mono};font-size:13px;color:${t.muted};font-style:normal}
         .hp-drawer li .all-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid ${t.line};border-radius:50%;color:${t.fg};transition:all .25s ease}
         .hp-drawer li:hover .all-icon{border-color:${t.fg};background:${t.fg};color:${t.bg};transform:translateX(4px)}
-        .hp-drawer-close{position:absolute;top:24px;right:32px;background:transparent;border:0;color:${t.fg};cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase}
+        .hp-drawer-close{position:absolute;top:24px;right:32px;background:transparent;border:0;color:${t.fg};cursor:pointer;font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.1em;text-transform:uppercase}
 
         .hp-detail{position:fixed;inset:0;z-index:40;background:${t.bg};overflow-y:auto;animation:hpFade .6s cubic-bezier(0.22,1,0.36,1)}
         @keyframes hpFade{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -283,7 +283,7 @@ export default function HalcyonPortfolioPage() {
         .hp-detail-title{font-family:${HL_FONTS.serif};font-size:104px;line-height:0.95;letter-spacing:-0.03em;font-weight:400;color:#ffffff;text-shadow:0 2px 24px rgba(0,0,0,0.45)}
         @media(max-width:780px){.hp-detail-title{font-size:56px}}
         .hp-detail-title em{font-style:italic}
-        .hp-detail-info{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#ffffff;display:grid;gap:8px;text-align:right;min-width:220px}
+        .hp-detail-info{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#ffffff;display:grid;gap:8px;text-align:right;min-width:220px}
         .hp-detail-info .row{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(255,255,255,0.4);padding-bottom:6px}
         /* Masonry — preserves each photo's native aspect ratio (portrait,
            square, more vertical) without forced cropping. Column-based so
@@ -308,18 +308,18 @@ export default function HalcyonPortfolioPage() {
         @media(max-width:680px){.hp-mason{column-count:2;column-gap:8px}}
         .hp-mason .cell{break-inside:avoid;margin-bottom:18px;cursor:pointer;overflow:hidden;position:relative}
         .hp-mason .cell img{width:100%;display:block}
-        .hp-mason .cell .cap{position:absolute;left:12px;bottom:12px;font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:${t.fg};background:rgba(14,13,11,0.7);padding:4px 8px;opacity:0;transition:opacity .25s ease}
+        .hp-mason .cell .cap{position:absolute;left:12px;bottom:12px;font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:${t.fg};background:rgba(14,13,11,0.7);padding:4px 8px;opacity:0;transition:opacity .25s ease}
         .hp-mason .cell:hover .cap{opacity:1}
 
         .hp-lb{position:fixed;inset:0;z-index:60;background:rgba(8,8,7,0.96);display:flex;align-items:center;justify-content:center;animation:hpFade .35s ease}
         .hp-lb-img{max-width:78vw;max-height:78vh;object-fit:contain;box-shadow:0 30px 80px rgba(0,0,0,0.6)}
         .hp-lb-meta{position:fixed;bottom:32px;left:0;right:0;display:flex;justify-content:space-between;padding:0 48px;color:${t.fg};flex-wrap:wrap;gap:8px}
-        .hp-lb-counter{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase}
+        .hp-lb-counter{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.1em;text-transform:uppercase}
         .hp-lb-cap{font-family:${HL_FONTS.serif};font-style:italic;font-size:18px}
         .hp-lb-arrow{position:fixed;top:50%;transform:translateY(-50%);background:transparent;border:1px solid ${t.line};color:${t.fg};width:48px;height:48px;cursor:pointer;font-family:${HL_FONTS.mono};font-size:14px;transition:all .25s ease}
         .hp-lb-arrow:hover{background:${t.fg};color:${t.bg}}
         .hp-lb-arrow.l{left:32px}.hp-lb-arrow.r{right:32px}
-        .hp-lb-x{position:fixed;top:32px;right:32px;background:transparent;border:0;color:${t.fg};cursor:pointer;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.1em;text-transform:uppercase}
+        .hp-lb-x{position:fixed;top:32px;right:32px;background:transparent;border:0;color:${t.fg};cursor:pointer;font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.1em;text-transform:uppercase}
       `}</style>
 
       <div className="hp-nav">

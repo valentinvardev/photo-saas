@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useEditorStore } from "~/lib/editor/store";
@@ -124,7 +124,7 @@ export function LiveTemplatePreview({
         </div>
         <div className="flex-1 h-[20px] rounded bg-[#2a2a2a] flex items-center gap-1.5 px-2 ml-2 min-w-0">
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" className="shrink-0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <span className="font-mono text-[10px] text-[#777] truncate">portapic.com/p/{slug || "tu-portafolio"}</span>
+          <span className="font-mono text-[12px] text-[#777] truncate">portapic.com/p/{slug || "tu-portafolio"}</span>
         </div>
       </div>
 

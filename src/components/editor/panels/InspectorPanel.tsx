@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useEditorStore } from "~/lib/editor/store";
@@ -12,7 +12,7 @@ import { useIsMobile } from "~/lib/useIsMobile";
 ───────────────────────────────────────────────────────────────── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ color: "var(--ec-dim)", fontSize: 9, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 8px", fontWeight: 600 }}>
+    <p style={{ color: "var(--ec-dim)", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 8px", fontWeight: 600 }}>
       {children}
     </p>
   );
@@ -63,7 +63,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
         onClick={() => setGalleryOpen(true)}
         style={{
           width: "100%", background: "rgba(250,204,21,0.12)", border: "1px solid #facc15",
-          color: "#facc15", fontSize: 11, padding: "7px", borderRadius: 4,
+          color: "#facc15", fontSize: 13, padding: "7px", borderRadius: 4,
           cursor: "pointer", fontFamily: "inherit",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
         }}
@@ -97,12 +97,12 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
                 background: active ? "rgba(250,204,21,0.15)" : "var(--ec-bg)",
                 border: `1px solid ${active ? "#facc15" : "var(--ec-line)"}`,
                 color: active ? "#facc15" : "var(--ec-sub)",
-                fontSize: 11, padding: "6px 10px", borderRadius: 4, cursor: "pointer",
+                fontSize: 13, padding: "6px 10px", borderRadius: 4, cursor: "pointer",
                 fontFamily: "inherit", textAlign: "left",
               }}
             >
               <span style={{ fontWeight: active ? 600 : 400 }}>{t(`editor.inspector.${o.labelKey}`)}</span>
-              <span style={{ fontSize: 9, color: active ? "#facc15" : "#333" }}>{t(`editor.inspector.${o.descKey}`)}</span>
+              <span style={{ fontSize: 13, color: active ? "#facc15" : "#333" }}>{t(`editor.inspector.${o.descKey}`)}</span>
             </button>
           );
         })}
@@ -123,7 +123,7 @@ function ImageInspector({ node, update }: { node: EditorNode; update: (patch: Pa
                 background: active ? "#facc15" : "var(--ec-raised)",
                 border: `1px solid ${active ? "#facc15" : "var(--ec-lift)"}`,
                 color: active ? "#111" : "var(--ec-sub)",
-                fontSize: 10, padding: "4px 8px", borderRadius: 3, cursor: "pointer",
+                fontSize: 12, padding: "4px 8px", borderRadius: 3, cursor: "pointer",
                 fontFamily: "inherit",
               }}
             >
@@ -186,7 +186,7 @@ export function InspectorPanel() {
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#facc15" }} />
-          <span style={{ color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          <span style={{ color: "var(--ec-sub)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.1em" }}>
             {t("editor.inspector.image")}
           </span>
         </div>
@@ -200,7 +200,7 @@ export function InspectorPanel() {
 
       {/* Node ID */}
       <div style={{ padding: "6px 12px", borderBottom: "1px solid #111" }}>
-        <span style={{ fontFamily: "monospace", fontSize: 9, color: "var(--ec-border)" }}>{selectedId}</span>
+        <span style={{ fontFamily: "monospace", fontSize: 13, color: "var(--ec-border)" }}>{selectedId}</span>
       </div>
 
       {/* Controls */}
@@ -214,7 +214,7 @@ export function InspectorPanel() {
           onClick={() => { update({ hidden: true }); selectNode(null); }}
           style={{
             width: "100%", background: "none", border: "1px solid #2a1010",
-            color: "#f87171", fontSize: 11, padding: "6px", borderRadius: 4,
+            color: "#f87171", fontSize: 13, padding: "6px", borderRadius: 4,
             cursor: "pointer", display: "flex", alignItems: "center",
             justifyContent: "center", gap: 6, fontFamily: "inherit",
           }}

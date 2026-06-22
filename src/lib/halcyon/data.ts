@@ -1,4 +1,4 @@
-/* Halcyon — design tokens, fonts, motion, and seed content. */
+﻿/* Halcyon — design tokens, fonts, motion, and seed content. */
 
 export interface HalcyonTokens {
   accent: string;
@@ -149,16 +149,16 @@ export function hlBaseCss(t: HalcyonTokens) {
     .hl-root{background:${t.bg};color:${t.fg};font-family:${HL_FONTS.sans};-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv11"}
     .hl-serif{font-family:${HL_FONTS.serif};font-weight:400;letter-spacing:-0.01em}
     .hl-italic{font-family:${HL_FONTS.serif};font-style:italic;font-weight:400}
-    .hl-mono{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase}
+    .hl-mono{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.08em;text-transform:uppercase}
     .hl-rule{height:1px;background:${t.line};border:0}
     .hl-img{display:block;width:100%;height:100%;object-fit:cover;background:${t.raised}}
-    .hl-btn{font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:14px 18px;border:1px solid ${t.line};background:transparent;color:${t.fg};cursor:pointer;transition:all .25s ease;display:inline-flex;align-items:center;gap:10px}
+    .hl-btn{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.08em;text-transform:uppercase;padding:14px 18px;border:1px solid ${t.line};background:transparent;color:${t.fg};cursor:pointer;transition:all .25s ease;display:inline-flex;align-items:center;gap:10px}
     .hl-btn:hover{border-color:${t.fg};background:${t.fg};color:${t.bg}}
     .hl-btn-accent{background:${t.accent};border-color:${t.accent};color:${t.fg}}
     .hl-btn-accent:hover{background:${t.fg};color:${t.bg};border-color:${t.fg}}
     .hl-link{color:${t.muted};text-decoration:none;transition:color .2s ease}
     .hl-link:hover{color:${t.fg}}
-    .hl-eyebrow{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted}}
+    .hl-eyebrow{font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted}}
     .hl-accent{color:${t.accent}}
     ::selection{background:${t.accent};color:${t.fg}}
   `;

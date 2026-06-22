@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useEditorStore } from "~/lib/editor/store";
@@ -31,10 +31,10 @@ function FontPicker({
   return (
     <div style={{ marginBottom: 14 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-        <label style={{ color: "var(--ec-sub)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+        <label style={{ color: "var(--ec-sub)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.1em" }}>
           {label}
         </label>
-        <span style={{ fontFamily: "monospace", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "#facc15", background: "rgba(250,204,21,0.12)", border: "1px solid rgba(250,204,21,0.35)", padding: "2px 7px", borderRadius: 4 }}>
+        <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "#facc15", background: "rgba(250,204,21,0.12)", border: "1px solid rgba(250,204,21,0.35)", padding: "2px 7px", borderRadius: 4 }}>
           {category}
         </span>
       </div>
@@ -44,7 +44,7 @@ function FontPicker({
         <span style={{ fontFamily: active?.stack ?? value, fontSize: 18, color: "var(--ec-text)", lineHeight: 1 }}>
           {active?.label ?? "Font"}
         </span>
-        <span style={{ fontFamily: active?.stack ?? value, fontSize: 11, color: "var(--ec-sub)", marginLeft: 8 }}>
+        <span style={{ fontFamily: active?.stack ?? value, fontSize: 13, color: "var(--ec-sub)", marginLeft: 8 }}>
           Aa Bb Cc
         </span>
       </div>
@@ -94,7 +94,7 @@ function FontPicker({
         style={{
           width: "100%", marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between",
           gap: 6, background: "var(--ec-bg)", border: "1px solid var(--ec-line)", borderRadius: 4,
-          padding: "7px 10px", cursor: "pointer", color: "var(--ec-label)", fontFamily: "inherit", fontSize: 11,
+          padding: "7px 10px", cursor: "pointer", color: "var(--ec-label)", fontFamily: "inherit", fontSize: 13,
         }}
         onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#facc15"; }}
         onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--ec-line)"; }}
@@ -127,7 +127,7 @@ export function TypographyPanel() {
 
   return (
     <div style={{ padding: "14px 12px" }}>
-      <p style={{ color: "var(--ec-dim)", fontSize: 10, margin: "0 0 14px", lineHeight: 1.5 }}>
+      <p style={{ color: "var(--ec-dim)", fontSize: 12, margin: "0 0 14px", lineHeight: 1.5 }}>
         {t("editor.typography.note")}
       </p>
 

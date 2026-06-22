@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
@@ -26,7 +26,7 @@ function ChatShareCard({ body }: { body: string }) {
         </span>
         <div className="min-w-0 flex-1">
           <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{t("share.chatPortfolio")}</div>
-          <div className="font-mono text-[10px] text-yellow">{t("share.view")} →</div>
+          <div className="font-mono text-[12px] text-yellow">{t("share.view")} →</div>
         </div>
       </a>
     );
@@ -44,7 +44,7 @@ function ChatShareCard({ body }: { body: string }) {
       </span>
       <div className="min-w-0 flex-1">
         <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{title}</div>
-        <div className="font-mono text-[10px] text-yellow">{t("share.view")} →</div>
+        <div className="font-mono text-[12px] text-yellow">{t("share.view")} →</div>
       </div>
     </a>
   );
@@ -241,7 +241,7 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
         <div className="flex-1 flex flex-col">
           <span className="font-sans text-sm font-semibold text-[var(--fg)]">Community</span>
           {(connected || !gaveUp) && (
-            <span className="font-mono text-[10px] text-[var(--fg-muted)] flex items-center gap-1.5">
+            <span className="font-mono text-[12px] text-[var(--fg-muted)] flex items-center gap-1.5">
               <span className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-500" : "bg-[var(--fg-muted)]"}`} />
               {connected ? "Live" : "Connecting…"}
             </span>
@@ -278,7 +278,7 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
               </div>
               <div className={`flex flex-col gap-1 max-w-[calc(100%-44px)] ${own ? "items-end" : "items-start"}`}>
                 {showSender && (
-                  <span className={`font-sans text-[11px] font-semibold text-[var(--fg-muted)] ${own ? "mr-1" : "ml-1"}`}>
+                  <span className={`font-sans text-[13px] font-semibold text-[var(--fg-muted)] ${own ? "mr-1" : "ml-1"}`}>
                     {own ? timeOf(msg.createdAt) : `${msg.authorName} · ${timeOf(msg.createdAt)}`}
                   </span>
                 )}
@@ -297,7 +297,7 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
                   );
                 })()}
                 {msg.failed && (
-                  <span className="font-mono text-[9px] text-red-400 mr-1">Not sent</span>
+                  <span className="font-mono text-[13px] text-red-400 mr-1">Not sent</span>
                 )}
               </div>
             </div>

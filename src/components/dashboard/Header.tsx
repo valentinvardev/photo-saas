@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -41,7 +41,7 @@ function LangTester() {
       <button
         onClick={() => setOpen((o) => !o)}
         title="Language"
-        className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors font-mono text-[10px] font-bold uppercase tracking-widest ${open ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
+        className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors font-mono text-[12px] font-bold uppercase tracking-widest ${open ? "bg-yellow/10 text-yellow" : "text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]"}`}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10"/>
@@ -62,7 +62,7 @@ function LangTester() {
           >
             {/* Locale switcher */}
             <div className="px-3 py-2.5 border-b border-[var(--border)]">
-              <p className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-2">Language</p>
+              <p className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mb-2">Language</p>
               <div className="flex gap-1.5">
                 {LOCALES.map((l) => (
                   <button
@@ -74,8 +74,8 @@ function LangTester() {
                         : "border-[var(--border)] text-[var(--fg-muted)] hover:border-[var(--fg-muted)] hover:text-[var(--fg)]"
                     }`}
                   >
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest">{l.id}</span>
-                    <span className="font-sans text-[9px] leading-none">{l.native}</span>
+                    <span className="font-mono text-[12px] font-bold uppercase tracking-widest">{l.id}</span>
+                    <span className="font-sans text-[13px] leading-none">{l.native}</span>
                   </button>
                 ))}
               </div>
@@ -83,11 +83,11 @@ function LangTester() {
 
             {/* Live string preview */}
             <div className="px-3 py-2.5">
-              <p className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-2">Preview</p>
+              <p className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mb-2">Preview</p>
               <div className="space-y-1.5">
                 {PREVIEW_KEYS.map(({ key, section }) => (
                   <div key={key} className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-[9px] text-[var(--fg-muted)] shrink-0">{section}.{key.split(".")[1]}</span>
+                    <span className="font-mono text-[13px] text-[var(--fg-muted)] shrink-0">{section}.{key.split(".")[1]}</span>
                     <span className="font-sans text-xs text-[var(--fg)] font-medium truncate text-right">{t(key)}</span>
                   </div>
                 ))}
@@ -183,7 +183,7 @@ function ThemeTester() {
               <p className="font-sans text-xs font-semibold text-[var(--fg)]">CSS variables</p>
               <button
                 onClick={reset}
-                className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
               >
                 Reset
               </button>
@@ -209,7 +209,7 @@ function ThemeTester() {
                     {/* Label + var name */}
                     <div className="flex-1 min-w-0">
                       <p className="font-sans text-xs font-medium text-[var(--fg)] leading-none">{label}</p>
-                      <p className="font-mono text-[9px] text-[var(--fg-muted)] mt-0.5">{key}</p>
+                      <p className="font-mono text-[13px] text-[var(--fg-muted)] mt-0.5">{key}</p>
                     </div>
 
                     {/* Hex input */}
@@ -224,7 +224,7 @@ function ThemeTester() {
                         }
                       }}
                       maxLength={7}
-                      className="font-mono text-[11px] text-[var(--fg)] bg-[var(--bg-subtle)] border border-[var(--border)] rounded-md px-2 py-1 w-20 outline-none focus:border-yellow/60 transition-colors"
+                      className="font-mono text-[13px] text-[var(--fg)] bg-[var(--bg-subtle)] border border-[var(--border)] rounded-md px-2 py-1 w-20 outline-none focus:border-yellow/60 transition-colors"
                     />
                   </div>
                 );
@@ -411,7 +411,7 @@ function ProfileDropdown({ onClose }: { onClose: () => void }) {
       {/* User info */}
       <div className="px-4 py-3 border-b border-[var(--border)]">
         <div className="font-sans text-sm font-semibold text-[var(--fg)] truncate">{user?.name ?? "—"}</div>
-        <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 truncate">{user?.email ?? ""}</div>
+        <div className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5 truncate">{user?.email ?? ""}</div>
       </div>
 
       {/* Links */}
@@ -461,7 +461,7 @@ function ProfileDropdown({ onClose }: { onClose: () => void }) {
           <div className="flex gap-1">
             {(["en", "es", "pt"] as const).map((l) => (
               <button key={l} onClick={() => setLocale(l)}
-                className={`flex-1 py-1.5 rounded-md font-mono text-[10px] font-bold uppercase tracking-widest transition-colors ${locale === l ? "bg-yellow text-[#111]" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>
+                className={`flex-1 py-1.5 rounded-md font-mono text-[12px] font-bold uppercase tracking-widest transition-colors ${locale === l ? "bg-yellow text-[#111]" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}>
                 {l}
               </button>
             ))}
@@ -599,7 +599,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
           onChange={(e) => { setSearchQuery(e.target.value); if (!searchOpen) openSearch(); }}
           className="w-full pl-9 sm:pl-8 pr-3 py-2.5 sm:py-1.5 text-sm sm:text-xs font-sans bg-[var(--bg-subtle)] border border-[var(--border)] rounded-xl sm:rounded-lg text-[var(--fg)] placeholder:text-[var(--fg-muted)] outline-none focus:border-yellow/60 focus:ring-1 focus:ring-yellow/20 transition-all"
         />
-        <kbd className="hidden sm:block absolute right-2.5 top-1/2 -translate-y-1/2 font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-card)] border border-[var(--border)] px-1 py-0.5 rounded pointer-events-none">
+        <kbd className="hidden sm:block absolute right-2.5 top-1/2 -translate-y-1/2 font-mono text-[13px] text-[var(--fg-muted)] bg-[var(--bg-card)] border border-[var(--border)] px-1 py-0.5 rounded pointer-events-none">
           ⌘K
         </kbd>
 
@@ -650,9 +650,9 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                 className="flex-1 bg-transparent text-sm font-sans text-[var(--fg)] placeholder:text-[var(--fg-muted)] outline-none"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery("")} className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">Clear</button>
+                <button onClick={() => setSearchQuery("")} className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">Clear</button>
               )}
-              <kbd className="font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded">esc</kbd>
+              <kbd className="font-mono text-[13px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded">esc</kbd>
               <button
                 onClick={closeAll}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-colors"
@@ -675,7 +675,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                   >
                     <span className={active ? "text-yellow" : "text-[var(--fg-muted)]"}>{tab.icon}</span>
                     <span className="font-sans text-xs font-semibold">{tab.label}</span>
-                    <span className={`shrink-0 font-mono text-[9px] px-1.5 py-0.5 rounded ${active ? "bg-yellow/15 text-yellow" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)]"}`}>{count}</span>
+                    <span className={`shrink-0 font-mono text-[13px] px-1.5 py-0.5 rounded ${active ? "bg-yellow/15 text-yellow" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)]"}`}>{count}</span>
                   </button>
                 );
               })}
@@ -698,7 +698,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                       <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border-subtle)]">
                         <button
                           onClick={() => setTplDetail(null)}
-                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-[var(--border)] bg-[var(--bg-subtle)] hover:border-[var(--fg-muted)] hover:bg-[var(--bg-card)] transition-colors font-mono text-[10px] uppercase tracking-widest text-[var(--fg)]"
+                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-[var(--border)] bg-[var(--bg-subtle)] hover:border-[var(--fg-muted)] hover:bg-[var(--bg-card)] transition-colors font-mono text-[12px] uppercase tracking-widest text-[var(--fg)]"
                         >
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
                           Back to templates
@@ -710,7 +710,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                         style={{ background: tplDetail.bg, color: tplDetail.fg }}
                       >
                         <span
-                          className="absolute top-3 left-3 px-1.5 py-0.5 rounded font-mono text-[9px] uppercase tracking-widest"
+                          className="absolute top-3 left-3 px-1.5 py-0.5 rounded font-mono text-[13px] uppercase tracking-widest"
                           style={{ background: tplDetail.accent, color: "#fff" }}
                         >
                           {tplDetail.type}
@@ -729,7 +729,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                           {tplDetail.name}<span style={{ color: tplDetail.accent }}>.</span>
                         </span>
                         <span
-                          className="mt-3 font-mono text-[10px] uppercase tracking-widest"
+                          className="mt-3 font-mono text-[12px] uppercase tracking-widest"
                           style={{ color: tplDetail.fg, opacity: 0.6 }}
                         >
                           {tplDetail.subtitle}
@@ -745,21 +745,21 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                         </div>
                         <div className="flex flex-wrap gap-1.5">
                           {tplDetail.tags.map((tag) => (
-                            <span key={tag} className="font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--fg-muted)]">{tag}</span>
+                            <span key={tag} className="font-mono text-[13px] uppercase tracking-widest px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--fg-muted)]">{tag}</span>
                           ))}
                         </div>
                         <div className="grid grid-cols-3 gap-0 border border-[var(--border)] rounded-md overflow-hidden">
                           <div className="px-3 py-2 border-r border-[var(--border)]">
-                            <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">Display</div>
+                            <div className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)]">Display</div>
                             <div className="font-sans text-xs text-[var(--fg)] truncate" style={{ fontFamily: tplDetail.display }}>{tplDetail.display.replace(/['"]/g, "").split(",")[0]}</div>
                           </div>
                           <div className="px-3 py-2 border-r border-[var(--border)]">
-                            <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">Mono</div>
+                            <div className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)]">Mono</div>
                             <div className="font-sans text-xs text-[var(--fg)] truncate" style={{ fontFamily: tplDetail.mono }}>{tplDetail.mono.replace(/['"]/g, "").split(",")[0]}</div>
                           </div>
                           <div className="px-3 py-2 flex items-center gap-1.5">
                             <span className="w-3 h-3 rounded-sm" style={{ background: tplDetail.accent }} />
-                            <span className="font-mono text-[10px] text-[var(--fg-muted)]">{tplDetail.accent}</span>
+                            <span className="font-mono text-[12px] text-[var(--fg-muted)]">{tplDetail.accent}</span>
                           </div>
                         </div>
                         <div className="flex gap-2 pt-1">
@@ -790,7 +790,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                           <button
                             key={f}
                             onClick={() => setTplFilter(f)}
-                            className={`font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md transition-colors ${tplFilter === f ? "bg-[var(--fg)] text-[var(--bg)]" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}
+                            className={`font-mono text-[13px] uppercase tracking-widest px-2.5 py-1 rounded-md transition-colors ${tplFilter === f ? "bg-[var(--fg)] text-[var(--bg)]" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)] hover:text-[var(--fg)]"}`}
                           >
                             {f}
                           </button>
@@ -825,7 +825,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                                   {t.name}<span style={{ color: t.accent }}>.</span>
                                 </span>
                                 <span
-                                  className="absolute top-2 left-2 px-1.5 py-0.5 rounded font-mono text-[9px] uppercase tracking-widest"
+                                  className="absolute top-2 left-2 px-1.5 py-0.5 rounded font-mono text-[13px] uppercase tracking-widest"
                                   style={{ background: t.accent, color: "#fff" }}
                                 >
                                   {t.type}
@@ -833,7 +833,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                               </div>
                               <div className="px-3 py-2.5 bg-[var(--bg-card)]">
                                 <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{t.name} {t.type}</div>
-                                <div className="font-mono text-[10px] text-[var(--fg-muted)] truncate mt-0.5">{t.subtitle}</div>
+                                <div className="font-mono text-[12px] text-[var(--fg-muted)] truncate mt-0.5">{t.subtitle}</div>
                               </div>
                             </button>
                           ))}
@@ -864,14 +864,14 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                           </span>
                           <div className="flex-1 min-w-0">
                             <div className="font-sans text-xs font-semibold text-[var(--fg)] truncate">{p.name}</div>
-                            <div className="font-mono text-[10px] text-[var(--fg-muted)] truncate">{p.role}</div>
-                            <div className="flex items-center gap-2 mt-1 font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">
+                            <div className="font-mono text-[12px] text-[var(--fg-muted)] truncate">{p.role}</div>
+                            <div className="flex items-center gap-2 mt-1 font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)]">
                               <span>{p.location}</span>
                               {p.mutual && p.mutual > 0 ? <><span>·</span><span>{p.mutual} mutual</span></> : null}
                             </div>
                           </div>
                           <span className="flex flex-col gap-1.5 shrink-0">
-                            <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md bg-yellow text-[#111]">
+                            <span className="inline-flex items-center gap-1.5 font-mono text-[13px] uppercase tracking-widest px-2.5 py-1 rounded-md bg-yellow text-[#111]">
                               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                                 <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/>
                                 <circle cx="9" cy="7" r="4"/>
@@ -880,7 +880,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                               </svg>
                               Connect
                             </span>
-                            <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md border border-[var(--border)] text-[var(--fg-muted)]">
+                            <span className="inline-flex items-center gap-1.5 font-mono text-[13px] uppercase tracking-widest px-2.5 py-1 rounded-md border border-[var(--border)] text-[var(--fg-muted)]">
                               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                               Message
                             </span>
@@ -901,7 +901,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                       if (items.length === 0) return null;
                       return (
                         <div key={g} className="py-1.5">
-                          <div className="px-3 pt-2 pb-1 font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">{g}</div>
+                          <div className="px-3 pt-2 pb-1 font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)]">{g}</div>
                           {items.map((a) => (
                             <Link
                               key={a.id}
@@ -916,12 +916,12 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
                               </span>
                               <span className="flex-1 min-w-0">
                                 <span className="block font-sans text-xs font-semibold text-[var(--fg)] truncate">{a.label}</span>
-                                <span className="block font-mono text-[10px] text-[var(--fg-muted)] truncate">{a.sub}</span>
+                                <span className="block font-mono text-[12px] text-[var(--fg-muted)] truncate">{a.sub}</span>
                               </span>
                               {a.kbd && (
                                 <span className="shrink-0 flex gap-1">
                                   {a.kbd.split(" ").map((k, i) => (
-                                    <kbd key={i} className="font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded">{k}</kbd>
+                                    <kbd key={i} className="font-mono text-[13px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded">{k}</kbd>
                                   ))}
                                 </span>
                               )}
@@ -937,7 +937,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
             </div>
 
             {/* Foot strip */}
-            <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-t border-[var(--border-subtle)] font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">
+            <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-t border-[var(--border-subtle)] font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)]">
               <span className="flex items-center gap-2">
                 <kbd className="bg-[var(--bg-subtle)] border border-[var(--border)] px-1 py-0.5 rounded">↵</kbd> open
                 <span className="opacity-50">·</span>
@@ -1013,7 +1013,7 @@ export function DashboardHeader({ onMenuClick, onChatClick, chatOpen }: { onMenu
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
             ) : (
-              <span className="font-sans font-black text-[#111] text-[10px]">{user?.initial ?? "?"}</span>
+              <span className="font-sans font-black text-[#111] text-[12px]">{user?.initial ?? "?"}</span>
             )}
           </div>
           <span className="hidden md:block font-sans text-xs font-semibold text-[var(--fg)]">{user?.name?.split(" ")[0] ?? ""}</span>

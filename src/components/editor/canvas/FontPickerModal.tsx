@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -56,7 +56,7 @@ export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, o
           <span style={{ fontFamily: f.stack, fontSize: 19, color: active ? "#facc15" : "var(--ec-label)", lineHeight: 1.1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 420 }}>
             {sample}
           </span>
-          <span style={{ fontSize: 10.5, color: "var(--ec-dim)" }}>{f.label}</span>
+          <span style={{ fontSize: 12.5, color: "var(--ec-dim)" }}>{f.label}</span>
         </span>
         {active && <Check />}
       </button>
@@ -139,7 +139,7 @@ export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, o
                   style={{
                     flex: 1, background: active ? "rgba(250,204,21,0.14)" : "var(--ec-raised)",
                     border: `1px solid ${active ? "#facc15" : "var(--ec-lift)"}`,
-                    color: active ? "#facc15" : "var(--ec-sub)", fontSize: 11, fontWeight: active ? 600 : 500,
+                    color: active ? "#facc15" : "var(--ec-sub)", fontSize: 13, fontWeight: active ? 600 : 500,
                     padding: "6px 4px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit",
                   }}
                 >
@@ -174,7 +174,7 @@ export function FontPickerModal({ value, fallbackSample, initialTab, onSelect, o
                 if (fonts.length === 0) return null;
                 return (
                   <div key={cat} style={{ marginTop: 8 }}>
-                    <p style={{ margin: "8px 10px 4px", fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--ec-dim)", fontWeight: 600 }}>
+                    <p style={{ margin: "8px 10px 4px", fontSize: 13.5, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--ec-dim)", fontWeight: 600 }}>
                       {t(`editor.fontModal.${CATEGORY_LABEL_KEY[cat]}`)}
                     </p>
                     {fonts.map(fontRow)}

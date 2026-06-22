@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -130,7 +130,7 @@ export function Pricing() {
               }`}
             >
               {t("landing.pricing.annual")}
-              <span className="bg-yellow text-[#111] font-mono text-[10px] font-black px-1.5 py-0.5 rounded">
+              <span className="bg-yellow text-[#111] font-mono text-[12px] font-black px-1.5 py-0.5 rounded">
                 -20%
               </span>
             </button>
@@ -159,7 +159,7 @@ export function Pricing() {
               {/* Popular badge */}
               {plan.tag && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                  <div className="bg-yellow text-[#111] font-mono font-black text-[10px] tracking-wider uppercase px-3 py-1 rounded-full">
+                  <div className="bg-yellow text-[#111] font-mono font-black text-[12px] tracking-wider uppercase px-3 py-1 rounded-full">
                     {t("landing.pricing.mostPopular")}
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
@@ -36,7 +36,7 @@ function Lightbox({ photos, index, onIndex, onClose }: { photos: Photo[]; index:
       )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={photo.full} alt={photo.filename} className="max-w-full max-h-full object-contain rounded" />
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[11px] text-white/50">{index + 1} / {photos.length}</div>
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[13px] text-white/50">{index + 1} / {photos.length}</div>
     </motion.div>
   );
 }
@@ -74,7 +74,7 @@ export function ShareViewer({ id }: { id: string }) {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
           <div className="mb-5">
             <h1 className="font-sans font-black text-[var(--fg)] text-xl sm:text-2xl">{data.title || (data.kind === "folder" ? "Shared folder" : "Shared photos")}</h1>
-            <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1 uppercase tracking-widest">{data.photos.length} {data.photos.length === 1 ? "photo" : "photos"}</p>
+            <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-1 uppercase tracking-widest">{data.photos.length} {data.photos.length === 1 ? "photo" : "photos"}</p>
           </div>
           {data.photos.length === 0 ? (
             <p className="font-serif text-sm text-[var(--fg-muted)] py-16 text-center">Nothing to show here.</p>

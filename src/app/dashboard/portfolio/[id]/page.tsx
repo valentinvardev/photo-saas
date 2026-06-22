@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
@@ -48,7 +48,7 @@ function CopyLink({ href, label, copyText }: { href: string; label: string; copy
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="font-mono text-[11px] text-[var(--fg-muted)] hover:text-[var(--fg)] truncate transition-colors"
+        className="font-mono text-[13px] text-[var(--fg-muted)] hover:text-[var(--fg)] truncate transition-colors"
         title={t("pm.openPublic")}
       >
         {label}
@@ -57,7 +57,7 @@ function CopyLink({ href, label, copyText }: { href: string; label: string; copy
         onClick={copy}
         title={t("pm.copyLink")}
         aria-live="polite"
-        className={`shrink-0 inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest transition-colors ${
+        className={`shrink-0 inline-flex items-center gap-1 font-mono text-[13px] uppercase tracking-widest transition-colors ${
           copied ? "text-green-400" : "text-[var(--fg-muted)] hover:text-[var(--fg)]"
         }`}
       >
@@ -113,7 +113,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
     return (
       <div className="p-12 text-center">
         <p className="font-sans text-sm text-[var(--fg-muted)]">{t("pm.notFound")}</p>
-        <Link href="/dashboard/portfolio" className="font-mono text-[10px] text-yellow uppercase tracking-widest mt-4 inline-block hover:underline">
+        <Link href="/dashboard/portfolio" className="font-mono text-[12px] text-yellow uppercase tracking-widest mt-4 inline-block hover:underline">
           {t("pm.backAll")}
         </Link>
       </div>
@@ -134,7 +134,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
         <div className="px-5 py-3 flex items-center gap-3 flex-wrap">
           <Link
             href="/dashboard/portfolio"
-            className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+            className="flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             All portfolios
@@ -142,14 +142,14 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
 
           <span className="text-[var(--border)]">/</span>
 
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest ${
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-mono text-[13px] uppercase tracking-widest ${
             published ? "bg-green-500/10 text-green-400" : "bg-[var(--bg-subtle)] text-[var(--fg-muted)]"
           }`}>
             <span className={`w-1.5 h-1.5 rounded-full ${published ? "bg-green-400" : "bg-[var(--fg-muted)]"}`} />
             {published ? t("pm.published") : t("pm.draft")}
           </span>
 
-          <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)]">
+          <span className="flex items-center gap-1.5 font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)]">
             {saving ? (
               <>
                 <span className="w-1.5 h-1.5 rounded-full bg-yellow animate-pulse" />
@@ -216,11 +216,11 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
             <div className="flex items-center gap-2 mt-1 min-w-0">
               <CopyLink href={publicUrl} label={displayUrl} copyText={copyUrl} />
               <button onClick={() => setShareOpen(true)} title={t("share.title")}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--bg-subtle)] font-mono text-[9px] text-[var(--fg-muted)] hover:text-[var(--fg)] uppercase tracking-widest shrink-0 transition-colors">
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--bg-subtle)] font-mono text-[13px] text-[var(--fg-muted)] hover:text-[var(--fg)] uppercase tracking-widest shrink-0 transition-colors">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
                 {t("share.title")}
               </button>
-              <span className="px-1.5 py-0.5 rounded-full bg-[var(--bg-subtle)] font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest shrink-0">
+              <span className="px-1.5 py-0.5 rounded-full bg-[var(--bg-subtle)] font-mono text-[13px] text-[var(--fg-muted)] uppercase tracking-widest shrink-0">
                 {portfolio.template}
               </span>
             </div>
@@ -234,7 +234,7 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
             >
               <LivePreviewThumbnail url={previewUrl} baseWidth={1280} className="w-full h-full" />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-[#111] font-sans text-[11px] font-bold px-3 py-1.5 rounded-md flex items-center gap-1.5">
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-[#111] font-sans text-[13px] font-bold px-3 py-1.5 rounded-md flex items-center gap-1.5">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   {t("pm.openPreview")}
                 </span>
@@ -346,7 +346,7 @@ function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: 
     <div className="max-w-4xl space-y-6">
       <div>
         <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.template.title")}</h2>
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
+        <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
           {t("pm.template.subtitle")}
         </p>
       </div>
@@ -370,11 +370,11 @@ function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: 
               <div className="p-3 flex items-center justify-between gap-2">
                 <span className="font-sans font-bold text-[var(--fg)] text-sm capitalize">{tpl}</span>
                 {inUse ? (
-                  <span className="font-mono text-[9px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 rounded shrink-0">
+                  <span className="font-mono text-[13px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 rounded shrink-0">
                     {t("pm.template.inUse")}
                   </span>
                 ) : active ? (
-                  <span className="font-mono text-[9px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded shrink-0">
+                  <span className="font-mono text-[13px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded shrink-0">
                     {t("pm.template.selected")}
                   </span>
                 ) : null}
@@ -435,14 +435,14 @@ function DomainTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
     <div className="max-w-2xl space-y-5">
       <div>
         <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.domain.title")}</h2>
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
+        <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
           {t("pm.domain.subtitle")}
         </p>
       </div>
 
       {/* Live address */}
       <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-        <div className="font-mono text-[9px] text-[var(--fg-muted)] uppercase tracking-widest mb-2">{t("pm.domain.liveAddress")}</div>
+        <div className="font-mono text-[13px] text-[var(--fg-muted)] uppercase tracking-widest mb-2">{t("pm.domain.liveAddress")}</div>
         <div className="flex items-center gap-2 flex-wrap">
           <code className="font-mono text-sm text-[var(--fg)] bg-[var(--bg-subtle)] px-2 py-1 rounded truncate flex-1 min-w-0">{liveUrl}</code>
           <button
@@ -455,7 +455,7 @@ function DomainTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
 
       {/* Custom domain */}
       <div>
-        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.domain.custom")}</label>
+        <label className="block font-mono text-[12px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.domain.custom")}</label>
         <div className="flex gap-2">
           <input
             value={domain}
@@ -469,7 +469,7 @@ function DomainTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
             className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
           >{t("pm.domain.saveDomain")}</button>
         </div>
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1.5">{t("pm.domain.emptyHint")}</p>
+        <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-1.5">{t("pm.domain.emptyHint")}</p>
       </div>
 
       {/* DNS instructions when a custom domain is set */}
@@ -477,8 +477,8 @@ function DomainTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
         <div className="rounded-xl border border-yellow/30 bg-yellow/5 p-4 space-y-2">
           <p className="font-sans text-sm font-semibold text-[var(--fg)]">{t("pm.domain.pointDns")}</p>
           <p className="font-sans text-xs text-[var(--fg-muted)]">{t("pm.domain.cnameHint")}</p>
-          <code className="block font-mono text-[11px] bg-[var(--bg-subtle)] px-3 py-2 rounded text-[var(--fg)]">CNAME&nbsp;&nbsp;@&nbsp;→&nbsp;cname.vercel-dns.com</code>
-          <p className="font-mono text-[10px] text-yellow/80">{t("pm.domain.dnsNote")}</p>
+          <code className="block font-mono text-[13px] bg-[var(--bg-subtle)] px-3 py-2 rounded text-[var(--fg)]">CNAME&nbsp;&nbsp;@&nbsp;→&nbsp;cname.vercel-dns.com</code>
+          <p className="font-mono text-[12px] text-yellow/80">{t("pm.domain.dnsNote")}</p>
         </div>
       )}
     </div>
@@ -506,42 +506,42 @@ function SeoTab({ dbP, save }: { dbP: DbPortfolio; save: SaveFn }) {
     <div className="max-w-2xl space-y-5">
       <div>
         <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.seo.title")}</h2>
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
+        <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
           {t("pm.seo.subtitle")}
         </p>
       </div>
 
       <div>
-        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.seo.metaTitle")}</label>
+        <label className="block font-mono text-[12px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.seo.metaTitle")}</label>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={dbP.title}
           className="w-full rounded-lg px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] focus:outline-none focus:border-yellow transition-colors"
         />
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">{t("pm.seo.metaTitleHint", { n: title.length })}</p>
+        <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-1">{t("pm.seo.metaTitleHint", { n: title.length })}</p>
       </div>
 
       <div>
-        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.seo.metaDesc")}</label>
+        <label className="block font-mono text-[12px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.seo.metaDesc")}</label>
         <textarea
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
           rows={3}
           className="w-full rounded-lg px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] focus:outline-none focus:border-yellow transition-colors resize-none"
         />
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-1">{t("pm.seo.metaDescHint", { n: desc.length })}</p>
+        <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-1">{t("pm.seo.metaDescHint", { n: desc.length })}</p>
       </div>
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mb-3 uppercase tracking-widest">{t("pm.seo.searchPreview")}</p>
+        <p className="font-mono text-[12px] text-[var(--fg-muted)] mb-3 uppercase tracking-widest">{t("pm.seo.searchPreview")}</p>
         <div className="font-sans text-base text-blue-400 hover:underline cursor-default truncate">{title || dbP.title}</div>
-        <div className="font-mono text-[11px] text-green-600 truncate">{liveUrl}</div>
+        <div className="font-mono text-[13px] text-green-600 truncate">{liveUrl}</div>
         <div className="font-sans text-xs text-[var(--fg-muted)] mt-1 line-clamp-2">{desc || t("pm.seo.noDesc")}</div>
       </div>
 
       <div>
-        <label className="block font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.seo.ogImage")}</label>
+        <label className="block font-mono text-[12px] text-[var(--fg-muted)] uppercase tracking-widest mb-1.5">{t("pm.seo.ogImage")}</label>
         {og ? (
           <div className="rounded-lg border border-[var(--border)] overflow-hidden relative group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -581,22 +581,22 @@ function AnalyticsTab({ dbP }: { dbP: DbPortfolio }) {
     <div className="space-y-5 max-w-4xl">
       <div>
         <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.analytics.title")}</h2>
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
+        <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
           {t("pm.analytics.subtitle")}
         </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
-          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{t("pm.analytics.totalViews")}</div>
+          <div className="font-mono text-[13px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{t("pm.analytics.totalViews")}</div>
           <div className="font-sans font-black text-2xl text-[var(--fg)]">{dbP.views.toLocaleString()}</div>
         </div>
         <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
-          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{t("pm.analytics.status")}</div>
+          <div className="font-mono text-[13px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{t("pm.analytics.status")}</div>
           <div className={`font-sans font-black text-2xl ${published ? "text-green-400" : "text-[var(--fg-muted)]"}`}>{published ? t("pm.analytics.live") : t("pm.analytics.draft")}</div>
         </div>
         <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border)] p-4">
-          <div className="font-mono text-[9px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{t("pm.analytics.lastUpdated")}</div>
+          <div className="font-mono text-[13px] text-[var(--fg-muted)] mb-2 uppercase tracking-widest">{t("pm.analytics.lastUpdated")}</div>
           <div className="font-sans font-bold text-base text-[var(--fg)]">{new Date(dbP.updatedAt).toLocaleDateString()}</div>
         </div>
       </div>
@@ -637,7 +637,7 @@ function SettingsTab({ dbP, save, onDelete }: { dbP: DbPortfolio; save: SaveFn; 
     <div className="max-w-2xl space-y-5">
       <div>
         <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.settings.title")}</h2>
-        <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
+        <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
           {t("pm.settings.subtitle")}
         </p>
       </div>
@@ -674,7 +674,7 @@ function SettingsTab({ dbP, save, onDelete }: { dbP: DbPortfolio; save: SaveFn; 
           </div>
         )}
         {pwOn && dbP.passwordEnabled && dbP.password && pw === dbP.password && (
-          <p className="font-mono text-[10px] text-green-400">{t("pm.settings.passwordActive")}</p>
+          <p className="font-mono text-[12px] text-green-400">{t("pm.settings.passwordActive")}</p>
         )}
       </div>
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /* ─── Halcyon Links — canonical component ────────────────────────────
    Same visual language as the Halcyon portfolio: dark editorial,
@@ -52,7 +52,7 @@ export function HalcyonLinks({ page }: HalcyonLinksProps) {
       <style>{`
         .hk-stripe{height:3px;background:${t.accent}}
         .hk-marquee{overflow:hidden;border-bottom:1px solid ${t.line};padding:10px 0}
-        .hk-marquee-track{display:flex;gap:48px;white-space:nowrap;animation:hkMarq 42s linear infinite;font-family:${HL_FONTS.mono};font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted}}
+        .hk-marquee-track{display:flex;gap:48px;white-space:nowrap;animation:hkMarq 42s linear infinite;font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:${t.muted}}
         .hk-marquee-track span b{color:${t.fg};font-weight:400}
         .hk-marquee-track span em{color:${t.accent};font-style:normal}
         @keyframes hkMarq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -62,7 +62,7 @@ export function HalcyonLinks({ page }: HalcyonLinksProps) {
         .hk-avatar::after{content:"";position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:${t.accent};border:3px solid ${t.bg}}
         .hk-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
         .hk-avatar-init{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:${HL_FONTS.serif};font-size:36px;font-style:italic}
-        .hk-eyebrow{font-family:${HL_FONTS.mono};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:${t.accent}}
+        .hk-eyebrow{font-family:${HL_FONTS.mono};font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:${t.accent}}
         .hk-name{font-family:${HL_FONTS.serif};font-size:48px;line-height:1;letter-spacing:-0.02em;color:${t.fg}}
         .hk-name em{font-style:italic}
         .hk-bio{color:${t.muted};max-width:340px;line-height:1.55;font-size:14px}
@@ -74,7 +74,7 @@ export function HalcyonLinks({ page }: HalcyonLinksProps) {
         .hk-link.accent:hover{background:${t.fg};color:${t.bg};border-color:${t.fg}}
         .hk-link .l{font-family:${HL_FONTS.serif};font-size:18px;text-align:left}
         .hk-link.accent .l{font-style:italic}
-        .hk-link .s{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:${t.muted};display:block;margin-top:3px;text-align:left}
+        .hk-link .s{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:${t.muted};display:block;margin-top:3px;text-align:left}
         .hk-link.accent .s{color:${t.fg};opacity:0.85}
         .hk-link .ar{font-family:${HL_FONTS.mono};font-size:14px;color:${t.muted};transition:transform .3s ease,color .3s ease}
         .hk-link:hover .ar,.hk-link.accent .ar{color:${t.fg}}
@@ -84,9 +84,9 @@ export function HalcyonLinks({ page }: HalcyonLinksProps) {
         .hk-stats > div{padding:14px 0;border-right:1px solid ${t.line}}
         .hk-stats > div:last-child{border-right:0}
         .hk-stats .v{font-family:${HL_FONTS.serif};font-size:26px;line-height:1;color:${t.fg}}
-        .hk-stats .l{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase;margin-top:5px}
+        .hk-stats .l{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.12em;color:${t.muted};text-transform:uppercase;margin-top:5px}
 
-        .hk-foot{font-family:${HL_FONTS.mono};font-size:9px;letter-spacing:0.14em;color:${t.muted};text-transform:uppercase;margin-top:12px}
+        .hk-foot{font-family:${HL_FONTS.mono};font-size:13px;letter-spacing:0.14em;color:${t.muted};text-transform:uppercase;margin-top:12px}
         .hk-foot em{font-style:normal;color:${t.accent}}
       `}</style>
 

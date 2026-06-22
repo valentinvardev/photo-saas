@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -57,11 +57,11 @@ function PickerGrid({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <p className="font-mono text-[10px] text-[var(--fg-muted)]">
+        <p className="font-mono text-[12px] text-[var(--fg-muted)]">
           {selectedPhotos.size > 0 ? t("nw.picker.selected", { n: selectedPhotos.size }) : t("nw.picker.tap")}
         </p>
         <button onClick={onUploadClick} disabled={uploading}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow text-[#111] font-sans text-[11px] font-bold hover:bg-yellow/90 disabled:opacity-50 transition-colors">
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow text-[#111] font-sans text-[13px] font-bold hover:bg-yellow/90 disabled:opacity-50 transition-colors">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           {uploading ? `${progress.done}/${progress.total}…` : t("nw.picker.upload")}
         </button>
@@ -119,7 +119,7 @@ function StructurePreview({ photos }: { photos: LibPhoto[] }) {
         <div className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-subtle)] border-b border-[var(--border)]">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           <span className="font-sans text-xs font-semibold text-[var(--fg)]">{t("nw.preview.gallery")}</span>
-          <span className="font-mono text-[9px] text-[var(--fg-muted)] ml-auto">{photos.length === 1 ? t("nw.preview.photoOne") : t("nw.preview.photos", { n: photos.length })}</span>
+          <span className="font-mono text-[13px] text-[var(--fg-muted)] ml-auto">{photos.length === 1 ? t("nw.preview.photoOne") : t("nw.preview.photos", { n: photos.length })}</span>
         </div>
         <div className="grid grid-cols-6 gap-px bg-[var(--border)] p-px">
           {photos.map((ph) => (
@@ -264,7 +264,7 @@ export default function NewPortfolioPage() {
           <div className="flex-1 overflow-hidden border border-[var(--border)] min-h-[360px]">
             <div className="flex items-center gap-1.5 px-3 py-2 border-b border-[var(--border)] bg-[var(--bg-card)]">
               <span className="w-2 h-2 rounded-full bg-red-400/60"/><span className="w-2 h-2 rounded-full bg-yellow/60"/><span className="w-2 h-2 rounded-full bg-green-400/60"/>
-              <span className="font-mono text-[10px] text-[var(--fg-muted)] ml-2 truncate">{domainStr}</span>
+              <span className="font-mono text-[12px] text-[var(--fg-muted)] ml-2 truncate">{domainStr}</span>
             </div>
             <LivePreviewThumbnail url={previewUrl} baseWidth={1280} className="w-full h-full" />
           </div>
@@ -287,7 +287,7 @@ export default function NewPortfolioPage() {
             <span className="w-2 h-2 rounded-full bg-red-400/60"/><span className="w-2 h-2 rounded-full bg-yellow/60"/><span className="w-2 h-2 rounded-full bg-green-400/60"/>
             <div className="flex-1 flex items-center gap-1.5 bg-[var(--bg)] border border-[var(--border)] rounded px-2 py-1 ml-1">
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-400 shrink-0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <span className="font-mono text-[10px] text-[var(--fg)] truncate">{domainStr}</span>
+              <span className="font-mono text-[12px] text-[var(--fg)] truncate">{domainStr}</span>
             </div>
           </div>
           <div className="p-6 bg-[var(--bg-subtle)] flex flex-col gap-3">
@@ -300,7 +300,7 @@ export default function NewPortfolioPage() {
         </div>
         <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-green-500/5 border border-green-500/20">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <span className="font-mono text-[10px] text-green-400">{t("nw.right.ssl")}</span>
+          <span className="font-mono text-[12px] text-green-400">{t("nw.right.ssl")}</span>
         </div>
       </div>
     );
@@ -317,7 +317,7 @@ export default function NewPortfolioPage() {
           {step === 0 ? t("nw.topBack") : t("nw.back")}
         </button>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest hidden sm:block">
+          <span className="font-mono text-[12px] text-[var(--fg-muted)] uppercase tracking-widest hidden sm:block">
             {t(`nw.steps.s${Math.min(step, STEP_COUNT - 1)}`)}
           </span>
           <StepDots current={step} total={STEP_COUNT} />
@@ -396,7 +396,7 @@ export default function NewPortfolioPage() {
                   transition={{ duration: 0.18 }}
                   className="px-6 py-6 min-h-[280px]"
                 >
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-[var(--fg-muted)] mb-4">{t(`nw.steps.s${step}`)}</p>
+                  <p className="font-mono text-[13px] uppercase tracking-widest text-[var(--fg-muted)] mb-4">{t(`nw.steps.s${step}`)}</p>
 
                   {step === 0 && (
                     <div className="space-y-4">
@@ -408,7 +408,7 @@ export default function NewPortfolioPage() {
                         className="w-full font-sans text-sm text-[var(--fg)] bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 outline-none focus:border-yellow transition-colors"
                       />
                       {totalSel > 0 && (
-                        <p className="font-mono text-[10px] text-yellow">
+                        <p className="font-mono text-[12px] text-yellow">
                           {selectedPhotos.size === 1 ? t("nw.step0.selectedArrowOne") : t("nw.step0.selectedArrow", { n: selectedPhotos.size })}
                         </p>
                       )}
@@ -424,7 +424,7 @@ export default function NewPortfolioPage() {
                       <div className="rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] px-4 py-3">
                         <div className="flex items-center gap-2">
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                          <span className="font-mono text-[10px] text-[var(--fg-muted)] uppercase tracking-widest">
+                          <span className="font-mono text-[12px] text-[var(--fg-muted)] uppercase tracking-widest">
                             {selectedPhotos.size === 1 ? t("nw.step1.selectedOne") : t("nw.step1.selected", { n: selectedPhotos.size })}
                           </span>
                         </div>
@@ -488,9 +488,9 @@ export default function NewPortfolioPage() {
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <span className="font-sans text-sm font-semibold text-[var(--fg)]">{opt.label}</span>
-                                {opt.badge && <span className="font-mono text-[9px] bg-yellow/10 text-yellow border border-yellow/20 px-1.5 py-0.5 rounded uppercase tracking-wider">{opt.badge}</span>}
+                                {opt.badge && <span className="font-mono text-[13px] bg-yellow/10 text-yellow border border-yellow/20 px-1.5 py-0.5 rounded uppercase tracking-wider">{opt.badge}</span>}
                               </div>
-                              <div className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5">{opt.sub}</div>
+                              <div className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5">{opt.sub}</div>
                               {opt.id === "custom" && domain === "custom" && (
                                 <input value={customDomain} onChange={(e) => setCustomDomain(e.target.value)}
                                   placeholder={t("nw.step3.customPlaceholder")}
@@ -517,7 +517,7 @@ export default function NewPortfolioPage() {
                     </button>
                   )}
                   {createError && (
-                    <span className="font-mono text-[10px] text-red-400 max-w-[180px] truncate" title={createError}>{createError}</span>
+                    <span className="font-mono text-[12px] text-red-400 max-w-[180px] truncate" title={createError}>{createError}</span>
                   )}
                   <button
                     disabled={!canNext || creating}

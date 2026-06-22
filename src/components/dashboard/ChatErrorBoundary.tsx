@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Component, type ReactNode } from "react";
 
@@ -32,7 +32,7 @@ export class ChatErrorBoundary extends Component<
           </div>
           <div className="flex-1 overflow-y-auto p-4">
             <p className="font-sans text-sm font-semibold text-[var(--fg)] mb-2">Chat failed to load</p>
-            <pre className="font-mono text-[10px] text-red-400 whitespace-pre-wrap break-words bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+            <pre className="font-mono text-[12px] text-red-400 whitespace-pre-wrap break-words bg-red-500/10 border border-red-500/20 rounded-lg p-3">
               {this.state.error.message}
             </pre>
           </div>

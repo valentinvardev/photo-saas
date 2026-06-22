@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -46,7 +46,7 @@ export function ImageGalleryModal({
       >
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0 }}>
-          <span style={{ color: "var(--ec-muted)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em" }}>{title}</span>
+          <span style={{ color: "var(--ec-muted)", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em" }}>{title}</span>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--ec-dim)", cursor: "pointer", padding: 2, display: "flex" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
@@ -57,7 +57,7 @@ export function ImageGalleryModal({
           {/* Left: gallery */}
           <div style={{ width: 360, borderRight: "1px solid var(--ec-raised)", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", alignItems: "center", borderBottom: "1px solid var(--ec-raised)", flexShrink: 0, padding: "8px 12px" }}>
-              <span style={{ color: "var(--ec-muted)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em" }}>Library</span>
+              <span style={{ color: "var(--ec-muted)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em" }}>Library</span>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: 10 }}>
               <>
@@ -67,7 +67,7 @@ export function ImageGalleryModal({
                     disabled={uploading}
                     style={{
                       width: "100%", marginBottom: 8, background: "none",
-                      border: "1px dashed var(--ec-border)", color: "var(--ec-sub)", fontSize: 11,
+                      border: "1px dashed var(--ec-border)", color: "var(--ec-sub)", fontSize: 13,
                       padding: "7px", borderRadius: 4, cursor: uploading ? "default" : "pointer",
                       fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, opacity: uploading ? 0.6 : 1,
                     }}
@@ -81,7 +81,7 @@ export function ImageGalleryModal({
                       {Array.from({ length: 12 }).map((_, i) => <div key={i} style={{ aspectRatio: "1/1", borderRadius: 3, background: "var(--ec-raised)" }} />)}
                     </div>
                   ) : photos.length === 0 ? (
-                    <p style={{ color: "var(--ec-dim)", fontSize: 11, textAlign: "center", padding: "24px 8px" }}>Your library is empty — upload a photo to use it here.</p>
+                    <p style={{ color: "var(--ec-dim)", fontSize: 13, textAlign: "center", padding: "24px 8px" }}>Your library is empty — upload a photo to use it here.</p>
                   ) : (
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
                       {photos.map((photo) => {
@@ -120,7 +120,7 @@ export function ImageGalleryModal({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={selected} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", display: "block" }} />
               ) : (
-                <span style={{ color: "var(--ec-border)", fontSize: 11 }}>No image selected</span>
+                <span style={{ color: "var(--ec-border)", fontSize: 13 }}>No image selected</span>
               )}
             </div>
             <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
@@ -131,7 +131,7 @@ export function ImageGalleryModal({
                   flex: 1, background: selected ? "rgba(250,204,21,0.12)" : "var(--ec-bg)",
                   border: `1px solid ${selected ? "#facc15" : "var(--ec-line)"}`,
                   color: selected ? "#facc15" : "var(--ec-ghost)",
-                  fontSize: 11, padding: "8px", borderRadius: 4,
+                  fontSize: 13, padding: "8px", borderRadius: 4,
                   cursor: selected ? "pointer" : "default", fontFamily: "inherit", fontWeight: 600,
                 }}
               >
@@ -170,7 +170,7 @@ export function ImagePickerButton({
           onClick={() => setOpen(true)}
           style={{
             flex: 1, background: "var(--ec-raised)", border: "1px solid var(--ec-border)",
-            color: "var(--ec-sub)", fontSize: 11, padding: "6px 10px", borderRadius: 4,
+            color: "var(--ec-sub)", fontSize: 13, padding: "6px 10px", borderRadius: 4,
             cursor: "pointer", fontFamily: "inherit", textAlign: "left",
             display: "flex", alignItems: "center", gap: 6,
           }}

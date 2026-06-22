@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -112,7 +112,7 @@ function PhotoLightbox({ items, index, onIndex, onClose, onDelete }: {
       )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={item.src} alt="" className="max-w-full max-h-full object-contain rounded" draggable={false} />
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[11px] text-white/50">{index + 1} / {items.length}</div>
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[13px] text-white/50">{index + 1} / {items.length}</div>
     </motion.div>
   );
 }
@@ -411,11 +411,11 @@ export function ContentTree({ portfolioId }: { portfolioId: string }) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-sans font-bold text-[var(--fg)] text-base">Content</h2>
-          <p className="font-mono text-[10px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
+          <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
             {summary.folders} folder{summary.folders !== 1 ? "s" : ""} · {summary.photos} photo{summary.photos !== 1 ? "s" : ""}
           </p>
           {summary.photos > 0 && (
-            <p className="font-mono text-[10px] text-[var(--fg-muted)]/70 mt-1 flex items-center gap-1.5">
+            <p className="font-mono text-[12px] text-[var(--fg-muted)]/70 mt-1 flex items-center gap-1.5">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
               Hold &amp; drag to reorder or move · click to preview
             </p>
@@ -423,7 +423,7 @@ export function ContentTree({ portfolioId }: { portfolioId: string }) {
         </div>
         <button
           onClick={addFolder}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] font-mono text-[10px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-yellow hover:border-yellow transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] font-mono text-[12px] uppercase tracking-widest text-[var(--fg-muted)] hover:text-yellow hover:border-yellow transition-colors"
         >
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           New folder
@@ -480,11 +480,11 @@ export function ContentTree({ portfolioId }: { portfolioId: string }) {
                       className="font-sans text-sm font-semibold text-[var(--fg)] flex-1 min-w-0"
                     />
                     {isCrossTarget && (
-                      <span className="font-mono text-[9px] text-yellow uppercase tracking-widest shrink-0">
+                      <span className="font-mono text-[13px] text-yellow uppercase tracking-widest shrink-0">
                         Drop here
                       </span>
                     )}
-                    <span className="font-mono text-[9px] text-[var(--fg-muted)] shrink-0">
+                    <span className="font-mono text-[13px] text-[var(--fg-muted)] shrink-0">
                       {fol.photoIds.length} photo{fol.photoIds.length !== 1 ? "s" : ""}
                     </span>
                     <VisibilityToggle v={fol.visibility} onChange={(next) => store.setFolderVis(portfolioId, folId, next)} />
