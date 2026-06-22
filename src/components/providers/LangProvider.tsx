@@ -19,7 +19,12 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");
 
   useEffect(() => {
-    // 1. User manually chose a language → highest priority.
+    // 0. URL param ?lang=es — used when template pages are loaded inside preview iframes.
+    //    Highest priority so the preview always matches the parent page's locale.
+    const urlLang = new URLSearchParams(window.location.search).get("lang") as Locale | null;
+    if (urlLang && ["en", "es", "pt"].includes(urlLang)) { setLocaleState(urlLang); return; }
+
+    // 1. User manually chose a language → persistent preference.
     const stored = (localStorage.getItem("lang-user") ?? localStorage.getItem("lang")) as Locale | null;
     if (stored && ["en", "es", "pt"].includes(stored)) { setLocaleState(stored); return; }
 

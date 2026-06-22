@@ -7,18 +7,17 @@ const ES_COUNTRIES = new Set(["AR","MX","CO","CL","PE","VE","EC","GT","CU","BO",
 const PT_COUNTRIES = new Set(["BR","PT","MZ","AO","CV","GW","ST","TL"]);
 
 function detectLocale(request: NextRequest): Locale | null {
-  // Vercel geo (populated automatically in Vercel deployments)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const country = (request as any).geo?.country as string | undefined;
+  // Vercel injects x-vercel-ip-country on every edge request (Next.js 15+).
+  const country = request.headers.get("x-vercel-ip-country") ?? undefined;
   if (country) {
     if (ES_COUNTRIES.has(country)) return "es";
     if (PT_COUNTRIES.has(country)) return "pt";
     return "en";
   }
-  // Fallback: Accept-Language header
+  // Fallback: Accept-Language header (works in all environments).
   const al = (request.headers.get("accept-language") ?? "").toLowerCase();
-  if (al.startsWith("es") || al.includes(",es")) return "es";
-  if (al.startsWith("pt") || al.includes(",pt")) return "pt";
+  if (al.startsWith("es") || al.includes(",es") || al.includes("es-")) return "es";
+  if (al.startsWith("pt") || al.includes(",pt") || al.includes("pt-")) return "pt";
   return null; // unknown — let the client decide
 }
 

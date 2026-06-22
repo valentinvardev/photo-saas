@@ -144,7 +144,7 @@ function StructurePreview({ photos }: { photos: LibPhoto[] }) {
 /* ── Main page ───────────────────────────────────────────────── */
 export default function NewPortfolioPage() {
   const router = useRouter();
-  const { t } = useT();
+  const { t, locale } = useT();
   const [step,            setStep]            = useState(0);
   const [name,            setName]            = useState("");
   const [selectedPhotos,  setSelectedPhotos]  = useState<Set<string>>(new Set());
@@ -209,7 +209,7 @@ export default function NewPortfolioPage() {
 
   const canNext   = step === 0 ? !!name.trim() : true;
   const isDone    = step === 4;
-  const previewUrl = TEMPLATE_URL[template];
+  const previewUrl = TEMPLATE_URL[template] ? `${TEMPLATE_URL[template]}?lang=${locale}` : undefined;
 
   function togglePhoto(id: string) {
     setSelectedPhotos((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -451,7 +451,7 @@ export default function NewPortfolioPage() {
                             className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${template === tpl ? "border-yellow bg-yellow/5" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}
                           >
                             <div className="w-16 h-10 overflow-hidden bg-[var(--bg-subtle)] shrink-0 border border-[var(--border)] rounded-sm">
-                              {TEMPLATE_URL[tpl] && <LivePreviewThumbnail url={TEMPLATE_URL[tpl]!} baseWidth={1280} className="w-full h-full" />}
+                              {TEMPLATE_URL[tpl] && <LivePreviewThumbnail url={`${TEMPLATE_URL[tpl]}?lang=${locale}`} baseWidth={1280} className="w-full h-full" />}
                             </div>
                             <span className="font-sans text-sm font-semibold text-[var(--fg)] flex-1">{tpl}</span>
                             {template === tpl && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>}
