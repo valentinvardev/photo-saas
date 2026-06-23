@@ -110,13 +110,12 @@ export function buildMinimalNodes(locale: string, id: Identity, logoText?: strin
     put(n("stat-1-label", "paragraph", "Años"));
     put(n("stat-2-label", "paragraph", "Proyectos"));
     put(n("stat-3-label", "paragraph", "Ciudades"));
-    /* Demo content — only applied when identity is empty (preview mode) */
-    if (!id.first && !id.last) {
-      put(n("hero-eyebrow", "paragraph", "Documental y Retrato · Nueva York"));
-      put(n("hero-sub", "paragraph", "Documentando la tensión silenciosa entre la presencia y la ausencia. Trabajo exhibido en América del Norte y Europa."));
-      put(n("about-body-1", "paragraph", "Documentando la tensión silenciosa entre la presencia y la ausencia. Trabajo exhibido en América del Norte y Europa."));
-      put(n("contact-d1-label", "paragraph", "General"));
-    }
+    /* Demo bio — shown when the user hasn't entered their bio yet.
+       The if(id.bio) block further below will override these with the real bio. */
+    put(n("hero-sub",    "paragraph", "Documentando la tensión silenciosa entre la presencia y la ausencia. Trabajo exhibido en América del Norte y Europa."));
+    put(n("about-body-1","paragraph", "James Hollis es un fotógrafo documental y de retrato radicado en Nueva York, con más de una década de trabajo en encargos editoriales, proyectos personales y fotografía de exposición."));
+    put(n("about-body-2","paragraph", "Sus proyectos de largo plazo exploran la intersección entre la memoria, la geografía y la identidad — a menudo a través de colaboraciones con comunidades en transición."));
+    put(n("quote-text",  "paragraph", "“La cámara es un instrumento que enseña a las personas a ver sin una cámara.”"));
   }
 
   /* Identity overrides (only when provided) */
