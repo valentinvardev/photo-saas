@@ -101,16 +101,18 @@ export function GridPanel() {
   const fixedCells  = grid.layout === "mosaic"  || grid.layout === "uniform";
   const canPaginate = grid.layout === "uniform" || grid.layout === "masonry";
   const layoutDesc: Record<string, string> = {
-    mosaic:  t("editor.grid.descMosaic"),
-    uniform: t("editor.grid.descUniform"),
-    masonry: t("editor.grid.descMasonry"),
-    index:   t("editor.grid.descIndex"),
+    mosaic:   t("editor.grid.descMosaic"),
+    uniform:  t("editor.grid.descUniform"),
+    masonry:  t("editor.grid.descMasonry"),
+    index:    t("editor.grid.descIndex"),
+    corridor: t("editor.grid.descCorridor"),
   };
   const labelFor: Record<string, string> = {
-    mosaic:  t("editor.grid.mosaic"),
-    uniform: t("editor.grid.uniform"),
-    masonry: t("editor.grid.masonry"),
-    index:   t("editor.grid.index"),
+    mosaic:   t("editor.grid.mosaic"),
+    uniform:  t("editor.grid.uniform"),
+    masonry:  t("editor.grid.masonry"),
+    index:    t("editor.grid.index"),
+    corridor: t("editor.grid.corridor"),
   };
   // Layouts this template offers (Halcyon adds "index"); default to photo grids.
   const available = TEMPLATES[templateId]?.layouts ?? ["mosaic", "uniform", "masonry"];

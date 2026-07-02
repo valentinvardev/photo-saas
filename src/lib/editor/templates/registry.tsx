@@ -5,6 +5,7 @@ import { MINIMAL_BW_NODES, MINIMAL_BW_SECTIONS } from "./minimal-bw";
 import { ATELIER_NODES, ATELIER_SECTIONS } from "./atelier";
 import { HALCYON_NODES, HALCYON_SECTIONS } from "./halcyon";
 import { MERIDIAN_NODES, MERIDIAN_SECTIONS } from "./meridian";
+import { VERNISSAGE_NODES, VERNISSAGE_SECTIONS } from "./vernissage";
 import { DEFAULT_LOGO, DEFAULT_GRID } from "../types";
 
 /* Lazy-loaded canvas components — kept out of the registry's import graph
@@ -23,6 +24,10 @@ const HalcyonComponent = dynamic<{ viewport: Viewport }>(
 );
 const MeridianComponent = dynamic<{ viewport: Viewport }>(
   () => import("~/components/editor/canvas/MeridianTemplate").then((m) => m.MeridianTemplate),
+  { ssr: false }
+);
+const VernissageComponent = dynamic<{ viewport: Viewport }>(
+  () => import("~/components/editor/canvas/VernissageTemplate").then((m) => m.VernissageTemplate),
   { ssr: false }
 );
 
@@ -80,6 +85,24 @@ export const TEMPLATES: Record<string, TemplateDef> = {
     /* Gallery hang: an even grid with generous spacing is the signature. */
     defaultGrid: { ...DEFAULT_GRID, layout: "uniform", columns: 3, gap: 14 },
     layouts: ["uniform", "mosaic", "masonry"],
+  },
+  "vernissage": {
+    id: "vernissage",
+    name: "Vernissage",
+    initialNodes: VERNISSAGE_NODES,
+    sections: VERNISSAGE_SECTIONS,
+    Component: VernissageComponent,
+    /* Vernissage is the white-cube 3D gallery — the walkable room is its
+       signature layout. See docs/templates/vernissage.md. */
+    defaultPalette: { bg: "#F6F5F1", fg: "#131518", accent: "#A63A22", muted: "#90928F" },
+    defaultTypography: {
+      serif: "'Fraunces', Georgia, serif",
+      sans:  "'Space Grotesk', system-ui, sans-serif",
+      mono:  "'Space Mono', monospace",
+    },
+    defaultLogo: { ...DEFAULT_LOGO, text: "VERNISSAGE" },
+    defaultGrid: { ...DEFAULT_GRID, layout: "corridor", columns: 3, gap: 12 },
+    layouts: ["corridor", "uniform", "masonry"],
   },
 };
 

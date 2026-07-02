@@ -374,6 +374,7 @@ const BRAND_NODES: Record<string, string[]> = {
   "atelier":    ["atl-nav-brand", "atl-footer-brand"],
   "halcyon":    ["hl-mark-name", "hl-footer-mark"],
   "meridian":   ["mrd-nav-brand", "mrd-footer-brand"],
+  "vernissage": ["vrn-nav-brand", "vrn-footer-brand"],
 };
 
 const LOGO_WIDTH_MIN  = 16;

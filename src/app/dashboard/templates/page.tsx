@@ -97,6 +97,21 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     style: { bg: "#F4F2ED", fg: "#16181B", accent: "#2E4E6B", muted: "#8B8E93" },
     collection: "meridian",
   },
+  {
+    id: "vernissage",
+    name: "Vernissage",
+    description: "A walkable 3D white-cube gallery — photographs hang framed on the walls of a virtual room you stroll through, museum labels included. Pure CSS 3D.",
+    category: "Story",
+    tags: ["3D", "Gallery", "Immersive"],
+    href: "/templates/vernissage",
+    editorHref: "/editor/vernissage",
+    seed: 1041,
+    new: true,
+    featured: true,
+    fonts: { serif: "Fraunces", sans: "Space Grotesk", mono: "Space Mono" },
+    style: { bg: "#F6F5F1", fg: "#131518", accent: "#A63A22", muted: "#90928F" },
+    collection: "vernissage",
+  },
 ];
 
 

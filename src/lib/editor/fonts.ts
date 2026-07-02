@@ -41,6 +41,13 @@ import "@fontsource/geist/600.css";
 import "@fontsource/geist-mono/400.css";
 import "@fontsource/geist-mono/500.css";
 
+/* ── Vernissage template fonts (Fraunces display weights + italics) ──── */
+import "@fontsource/fraunces/400-italic.css";
+import "@fontsource/fraunces/500.css";
+import "@fontsource/fraunces/500-italic.css";
+import "@fontsource/fraunces/600.css";
+import "@fontsource/space-grotesk/600.css";
+
 /* ── Meridian template fonts ─────────────────────────────────────────── */
 import "@fontsource/playfair-display/400-italic.css";
 import "@fontsource/playfair-display/500.css";

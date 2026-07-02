@@ -48,9 +48,10 @@ export interface Typography {
    `loadMore` (uniform + masonry) paginates every photo behind a "Load more"
    button instead of the "All projects" link. */
 export interface GridSettings {
-  /* "index" is a typographic project list (Halcyon); the rest are photo grids.
-     Which layouts a template offers is declared per-template (TemplateDef.layouts). */
-  layout:   "mosaic" | "uniform" | "masonry" | "index";
+  /* "index" is a typographic project list (Halcyon); "corridor" is a walkable
+     3D white-cube room (Vernissage); the rest are photo grids. Which layouts a
+     template offers is declared per-template (TemplateDef.layouts). */
+  layout:   "mosaic" | "uniform" | "masonry" | "index" | "corridor";
   columns:  number;            // 2..5 — uniform + masonry
   gap:      number;            // px between cells
   fit:      "cover" | "contain"; // how photos fill fixed cells (mosaic + uniform)

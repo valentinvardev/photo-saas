@@ -1,0 +1,595 @@
+"use client";
+
+/**
+ * VernissageTemplate — a walkable white-cube 3D gallery for the FRAME builder.
+ * Concept: the classic gallery "white cube" — photographs hang framed on the
+ * side walls of a 3D room and the visitor walks down it (drag / wheel /
+ * arrows) to an end wall with a commission CTA. Pure CSS 3D (perspective +
+ * preserve-3d): no WebGL, no new dependencies, works inside the editor's
+ * device frame. See docs/templates/vernissage.md.
+ *
+ * Compliance with docs/template-adapter-guide.md (pitfalls 1–11):
+ *  - No injected CSS — all inline styles on the editor variables.
+ *  - Responsive from the `viewport` prop (room geometry scales per device).
+ *  - Artworks come from store.galleryPhotos (demo seeds as fallback); the
+ *    portrait is an EditableImage node.
+ *  - Buttons/labels editable via the Clickable pattern; contact follows
+ *    store.contact; lightbox and wheel-capture only on the live site.
+ *  - The end-wall text faces the camera (no rotation) so inline editing works;
+ *    selecting an end-wall node in the editor auto-walks the room to it.
+ */
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useEditorStore } from "~/lib/editor/store";
+import { api } from "~/trpc/react";
+import { fillWaTemplate } from "~/lib/editor/wa";
+import type { Viewport } from "~/lib/editor/types";
+import { EditableNode, EditableText, EditableImage, LogoImage } from "./primitives";
+
+/* ── Design tokens — resolve the Design-panel variables ── */
+const C = {
+  bg:     "var(--ed-bg, #F6F5F1)",
+  fg:     "var(--ed-fg, #131518)",
+  accent: "var(--ed-accent, #A63A22)",
+  muted:  "var(--ed-muted, #90928F)",
+  line:   "color-mix(in srgb, var(--ed-fg, #131518) 14%, transparent)",
+  raised: "color-mix(in srgb, var(--ed-fg, #131518) 5%, var(--ed-bg, #F6F5F1))",
+};
+const SERIF = "var(--tpl-serif, 'Fraunces', Georgia, serif)";
+const SANS  = "var(--tpl-sans, 'Space Grotesk', system-ui, sans-serif)";
+const MONO  = "var(--tpl-mono, 'Space Mono', ui-monospace, monospace)";
+
+const mono = (size: number, extra?: React.CSSProperties): React.CSSProperties => ({
+  fontFamily: MONO, fontSize: size, letterSpacing: "0.16em", textTransform: "uppercase", ...extra,
+});
+
+const DEMO = [1041, 452, 358, 1039, 331, 1067, 403, 447, 1024, 320, 436, 219].map((seed, i) => ({
+  id: `d${i}`, src: `https://picsum.photos/seed/${seed}/900/1100`, title: "",
+}));
+
+type Work = { id: string; src: string; title?: string };
+
+function useWorks(): Work[] {
+  const galleryPhotos = useEditorStore((s) => s.galleryPhotos);
+  return useMemo(() => {
+    if (galleryPhotos.length === 0) return DEMO;
+    return galleryPhotos.map((p, i) => ({ id: `g${i}`, src: p.src, title: p.title }));
+  }, [galleryPhotos]);
+}
+
+/* ── Clickable — real control on the live site, plain span in the editor ── */
+function Clickable({ kind = "button", href, onActivate, style, children }: {
+  kind?: "button" | "a";
+  href?: string;
+  onActivate?: () => void;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
+}) {
+  const readOnly = useEditorStore((s) => s.readOnly);
+  const base: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 10, ...style };
+  if (!readOnly) return <span style={{ ...base, cursor: "default" }}>{children}</span>;
+  if (kind === "a") return <a href={href} style={{ ...base, textDecoration: "none" }}>{children}</a>;
+  return <button onClick={onActivate} style={{ ...base, cursor: "pointer" }}>{children}</button>;
+}
+
+const btnSolid: React.CSSProperties = {
+  fontFamily: SANS, fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
+  color: "var(--ed-btn-fg, var(--ed-bg, #F6F5F1))", background: "var(--ed-btn-bg, var(--ed-fg, #131518))",
+  border: "1px solid var(--ed-btn-bg, var(--ed-fg, #131518))", borderRadius: "var(--ed-btn-radius, 0)",
+  padding: "13px 26px",
+};
+const btnGhost: React.CSSProperties = {
+  fontFamily: SANS, fontSize: 12, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase",
+  color: C.fg, background: "transparent", border: `1px solid ${C.line}`,
+  borderRadius: "var(--ed-btn-radius, 0)", padding: "13px 26px",
+};
+
+function Label({ index, nodeId, isMobile }: { index: string; nodeId: string; isMobile: boolean }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: isMobile ? 26 : 40 }}>
+      <span style={{ ...mono(10), color: C.accent, fontWeight: 700 }}>{index}</span>
+      <div style={{ flex: 1, height: 1, background: C.line }} />
+      <EditableNode id={nodeId} tag="span" style={{ ...mono(10), color: C.muted }}>
+        <EditableText id={nodeId} display="inline" />
+      </EditableNode>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   THE 3D ROOM
+═══════════════════════════════════════════ */
+function Room({ works, viewport, onOpen }: { works: Work[]; viewport: Viewport; onOpen: (i: number) => void }) {
+  const readOnly   = useEditorStore((s) => s.readOnly);
+  const selectedId = useEditorStore((s) => s.selectedId);
+  const isMobile = viewport === "mobile";
+  const isTablet = viewport === "tablet";
+
+  /* Room geometry (3D px) */
+  const H     = isMobile ? 440 : isTablet ? 540 : 620;   // room height / viewport height
+  const HALF  = isMobile ? 240 : isTablet ? 340 : 420;   // half corridor width
+  const START = isMobile ? 340 : 430;                    // z of the first artwork
+  const GAP   = isMobile ? 215 : 275;                    // z between consecutive artworks
+  const N     = works.length;
+  const endZ   = START + N * GAP + (isMobile ? 340 : 500); // end wall position
+  const DEPTH  = endZ + 380;                               // wall/floor plane length
+  const maxCam = endZ - (isMobile ? 400 : 660);            // stop with the end wall framed
+
+  const [cam, setCam] = useState(0);
+  const [smooth, setSmooth] = useState(true);   // animate button steps, not drags
+  const clamp = (v: number) => Math.max(0, Math.min(v, maxCam));
+  const walk = (d: number) => { setSmooth(true); setCam((c) => clamp(c + d)); };
+
+  /* Editor nicety: selecting an end-wall node walks the room to it. */
+  useEffect(() => {
+    if (!readOnly && (selectedId === "vrn-endwall-title" || selectedId === "vrn-endwall-cta")) {
+      setSmooth(true); setCam(maxCam);
+    }
+  }, [readOnly, selectedId, maxCam]);
+
+  /* Drag to walk (horizontal; vertical stays free for page scroll). */
+  const drag = useRef<{ x: number; cam: number; moved: boolean } | null>(null);
+  const draggedRef = useRef(false);
+  const onPointerDown = (e: React.PointerEvent) => { drag.current = { x: e.clientX, cam, moved: false }; };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!drag.current) return;
+    const dx = e.clientX - drag.current.x;
+    if (Math.abs(dx) > 6) { drag.current.moved = true; draggedRef.current = true; }
+    if (drag.current.moved) { setSmooth(false); setCam(clamp(drag.current.cam - dx * 2.4)); }
+  };
+  const onPointerUp = () => { drag.current = null; setTimeout(() => { draggedRef.current = false; }, 0); };
+
+  /* Wheel to walk — live site only, so the editor canvas scroll is never hijacked. */
+  const vpRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!readOnly) return;
+    const el = vpRef.current;
+    if (!el) return;
+    const fn = (e: WheelEvent) => {
+      e.preventDefault();
+      setSmooth(false);
+      setCam((c) => Math.max(0, Math.min(c + e.deltaY * 1.15, maxCam)));
+    };
+    el.addEventListener("wheel", fn, { passive: false });
+    return () => el.removeEventListener("wheel", fn);
+  }, [readOnly, maxCam]);
+
+  /* Artwork plate — frame + mat + museum label */
+  function Artwork({ w, i }: { w: Work; i: number }) {
+    const left = i % 2 === 0;
+    const portrait = i % 3 !== 1; // vary orientation down the wall
+    const aw = portrait ? (isMobile ? 175 : 255) : (isMobile ? 260 : 375);
+    const ah = portrait ? (isMobile ? 225 : 330) : (isMobile ? 180 : 262);
+    const z = START + i * GAP;
+    const x = (HALF - 4) * (left ? -1 : 1);
+    return (
+      <div
+        onClick={() => { if (!draggedRef.current) onOpen(i); }}
+        style={{
+          position: "absolute", left: "50%", top: "50%", width: aw, height: ah,
+          transform: `translate(-50%, -50%) translate3d(${x}px, -14px, ${-z}px) rotateY(${left ? 90 : -90}deg)`,
+          transformStyle: "preserve-3d", backfaceVisibility: "hidden",
+          cursor: readOnly ? "pointer" : "default",
+        }}
+      >
+        <div style={{
+          position: "absolute", inset: 0, background: "#FCFBF8",
+          border: "9px solid color-mix(in srgb, var(--ed-fg, #131518) 90%, transparent)",
+          boxShadow: "0 22px 44px -18px rgba(0,0,0,0.38)", padding: isMobile ? 8 : 13, boxSizing: "border-box",
+        }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={w.src} alt={w.title ?? ""} loading="lazy"
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        </div>
+        {/* Museum label */}
+        <div style={{
+          position: "absolute", top: "100%", left: 0, marginTop: 16,
+          background: "#FCFBF8", border: `1px solid ${C.line}`, padding: "5px 9px",
+          display: "flex", alignItems: "center", gap: 7, whiteSpace: "nowrap",
+        }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent, flexShrink: 0 }} />
+          <span style={{ ...mono(8), color: "#131518", letterSpacing: "0.12em" }}>
+            {String(i + 1).padStart(2, "0")} — {w.title?.trim() || "Untitled"}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  /* Big flat planes: walls, floor, ceiling */
+  const plane = (t: string, w: number, h: number, bg: string, extra?: React.CSSProperties): React.CSSProperties => ({
+    position: "absolute", left: "50%", top: "50%", width: w, height: h,
+    transform: t, backfaceVisibility: "hidden", background: bg, ...extra,
+  });
+
+  const roomNo = Math.min(N, Math.max(1, Math.round(cam / GAP) + 1));
+
+  return (
+    <div
+      ref={vpRef}
+      onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp}
+      style={{
+        position: "relative", height: H, overflow: "hidden", background: C.bg,
+        perspective: isMobile ? 700 : 1050, perspectiveOrigin: "50% 46%",
+        touchAction: "pan-y", userSelect: "none", borderTop: `1px solid ${C.line}`, borderBottom: `1px solid ${C.line}`,
+      }}
+    >
+      {/* World — moves toward the viewer as you walk */}
+      <div style={{
+        position: "absolute", inset: 0, transformStyle: "preserve-3d",
+        transform: `translateZ(${cam}px)`,
+        transition: smooth ? "transform 0.6s cubic-bezier(0.22,1,0.36,1)" : "none",
+        willChange: "transform",
+      }}>
+        {/* Left / right walls */}
+        <div style={plane(`translate(-50%,-50%) translate3d(${-HALF}px, 0, ${-DEPTH / 2}px) rotateY(90deg)`, DEPTH, H,
+          `linear-gradient(180deg, color-mix(in srgb, var(--ed-fg, #131518) 4%, ${"var(--ed-bg, #F6F5F1)"}) 0%, var(--ed-bg, #F6F5F1) 26%)`,
+          { borderBottom: `12px solid color-mix(in srgb, var(--ed-fg, #131518) 10%, var(--ed-bg, #F6F5F1))` })} />
+        <div style={plane(`translate(-50%,-50%) translate3d(${HALF}px, 0, ${-DEPTH / 2}px) rotateY(-90deg)`, DEPTH, H,
+          `linear-gradient(180deg, color-mix(in srgb, var(--ed-fg, #131518) 4%, ${"var(--ed-bg, #F6F5F1)"}) 0%, var(--ed-bg, #F6F5F1) 26%)`,
+          { borderBottom: `12px solid color-mix(in srgb, var(--ed-fg, #131518) 10%, var(--ed-bg, #F6F5F1))` })} />
+        {/* Floor + ceiling */}
+        <div style={plane(`translate(-50%,-50%) translate3d(0, ${H / 2}px, ${-DEPTH / 2}px) rotateX(90deg)`, HALF * 2, DEPTH,
+          `linear-gradient(180deg, color-mix(in srgb, var(--ed-fg, #131518) 9%, var(--ed-bg, #F6F5F1)), color-mix(in srgb, var(--ed-fg, #131518) 15%, var(--ed-bg, #F6F5F1)))`)} />
+        <div style={plane(`translate(-50%,-50%) translate3d(0, ${-H / 2}px, ${-DEPTH / 2}px) rotateX(-90deg)`, HALF * 2, DEPTH,
+          "color-mix(in srgb, var(--ed-fg, #131518) 3%, var(--ed-bg, #F6F5F1))")} />
+
+        {/* End wall — faces the camera, so its text edits normally */}
+        <div style={plane(`translate(-50%,-50%) translate3d(0, 0, ${-endZ}px)`, HALF * 2, H, "var(--ed-bg, #F6F5F1)",
+          { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 22, padding: "0 8%", boxSizing: "border-box", textAlign: "center" })}>
+          <span style={{ width: 10, height: 10, borderRadius: "50%", background: C.accent }} />
+          <EditableNode id="vrn-endwall-title" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? 30 : 46, lineHeight: 1.08, letterSpacing: "-0.015em", color: C.fg, margin: 0 }}>
+            <EditableText id="vrn-endwall-title" />
+          </EditableNode>
+          <Clickable onActivate={() => document.getElementById("vrn-contact")?.scrollIntoView({ behavior: "smooth" })} style={btnSolid}>
+            <EditableNode id="vrn-endwall-cta" tag="span"><EditableText id="vrn-endwall-cta" display="inline" /></EditableNode>
+          </Clickable>
+        </div>
+
+        {/* Hung artworks */}
+        {works.map((w, i) => <Artwork key={w.id} w={w} i={i} />)}
+      </div>
+
+      {/* Museum lighting vignette */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
+        background: "radial-gradient(120% 90% at 50% 38%, transparent 55%, rgba(0,0,0,0.14) 100%)" }} />
+
+      {/* Walk hint — fades once you move */}
+      <div style={{
+        position: "absolute", top: 18, left: "50%", transform: "translateX(-50%)",
+        ...mono(9), color: C.muted, background: "color-mix(in srgb, var(--ed-bg, #F6F5F1) 82%, transparent)",
+        border: `1px solid ${C.line}`, padding: "6px 12px", pointerEvents: "none",
+        opacity: cam > 30 ? 0 : 1, transition: "opacity 0.5s ease",
+      }}>
+        Drag or use the arrows to walk →
+      </div>
+
+      {/* HUD — room counter, progress, walk buttons */}
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", gap: 14, padding: isMobile ? "10px 14px" : "12px 22px", background: "color-mix(in srgb, var(--ed-bg, #F6F5F1) 88%, transparent)", borderTop: `1px solid ${C.line}`, backdropFilter: "blur(6px)" }}>
+        <span style={{ ...mono(9), color: C.fg, fontWeight: 700, flexShrink: 0 }}>
+          Room 1 · {String(roomNo).padStart(2, "0")}/{String(N).padStart(2, "0")}
+        </span>
+        <div style={{ flex: 1, height: 2, background: C.line, position: "relative" }}>
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${(cam / maxCam) * 100}%`, background: C.accent, transition: smooth ? "width 0.6s cubic-bezier(0.22,1,0.36,1)" : "none" }} />
+        </div>
+        {[{ d: -GAP * 2, g: "‹" }, { d: GAP * 2, g: "›" }].map((b) => (
+          <button key={b.g} onClick={(e) => { e.stopPropagation(); walk(b.d); }}
+            style={{ width: 36, height: 36, borderRadius: "50%", border: `1px solid ${C.line}`, background: "transparent", color: C.fg, fontSize: 17, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontFamily: SANS }}>
+            {b.g}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Lightbox (live site only) ── */
+function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: number; onClose: () => void }) {
+  const [index, setIndex] = useState(startIndex);
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight") setIndex((i) => Math.min(i + 1, works.length - 1));
+      if (e.key === "ArrowLeft")  setIndex((i) => Math.max(i - 1, 0));
+    };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, [onClose, works.length]);
+  const w = works[index]!;
+  const arrow: React.CSSProperties = {
+    position: "absolute", top: "50%", transform: "translateY(-50%)", width: 44, height: 44,
+    display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+    background: "rgba(246,245,241,0.06)", border: "1px solid rgba(246,245,241,0.18)",
+    color: "rgba(246,245,241,0.85)", borderRadius: "50%",
+  };
+  return (
+    <div onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(10,11,12,0.96)", display: "flex", alignItems: "center", justifyContent: "center", padding: "56px 64px" }}>
+      <button onClick={onClose} style={{ position: "absolute", top: 20, right: 24, background: "none", border: "none", cursor: "pointer", color: "rgba(246,245,241,0.7)", ...mono(11) }}>Close ✕</button>
+      {index > 0 && <button onClick={() => setIndex((i) => i - 1)} style={{ ...arrow, left: 16 }}>←</button>}
+      {index < works.length - 1 && <button onClick={() => setIndex((i) => i + 1)} style={{ ...arrow, right: 16 }}>→</button>}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={w.src} alt={w.title ?? ""} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+      <div style={{ position: "absolute", bottom: 20, left: 0, right: 0, display: "flex", justifyContent: "space-between", padding: "0 32px", color: "rgba(246,245,241,0.6)" }}>
+        <span style={mono(10)}>{String(index + 1).padStart(2, "0")} / {String(works.length).padStart(2, "0")}</span>
+        {w.title && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(246,245,241,0.85)" }}>{w.title}</span>}
+        <span />
+      </div>
+    </div>
+  );
+}
+
+/* ── Contact form — follows store.contact (inbox vs WhatsApp) ── */
+function VernissageContactForm() {
+  const contact  = useEditorStore((s) => s.contact);
+  const siteSlug = useEditorStore((s) => s.siteSlug);
+  const readOnly = useEditorStore((s) => s.readOnly);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const submit = api.contact.submit.useMutation();
+
+  const field: React.CSSProperties = {
+    fontFamily: SANS, fontSize: 13, padding: "12px 14px", width: "100%", boxSizing: "border-box",
+    background: "transparent", border: `1px solid ${C.line}`, color: C.fg, outline: "none",
+  };
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!readOnly) return;
+    const fd = new FormData(e.currentTarget);
+    const name    = String(fd.get("name") ?? "").trim();
+    const email   = String(fd.get("email") ?? "").trim();
+    const message = String(fd.get("message") ?? "").trim();
+
+    if (contact.mode === "whatsapp") {
+      const digits = contact.whatsapp.replace(/[^\d]/g, "");
+      const text   = fillWaTemplate(contact.waTemplate, { name, email, message });
+      window.open(digits ? `https://wa.me/${digits}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+      setStatus("sent");
+      return;
+    }
+    if (!siteSlug) { setStatus("sent"); return; }
+    try {
+      setStatus("sending");
+      await submit.mutateAsync({ slug: siteSlug, name: name || "—", email: email || "hello@example.com", message: message || "—" });
+      setStatus("sent");
+    } catch { setStatus("error"); }
+  }
+
+  if (status === "sent") {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "flex-start", padding: "16px 0" }}>
+        <div style={{ width: 42, height: 42, borderRadius: "50%", border: `1px solid ${C.line}`, display: "flex", alignItems: "center", justifyContent: "center", color: C.accent }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 20, color: C.fg }}>
+          {contact.mode === "whatsapp" ? "Opening WhatsApp…" : "Message sent — thank you."}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <input name="name" placeholder="Your name" style={field} />
+      <input name="email" type="email" placeholder="Email" style={field} />
+      <textarea name="message" rows={5} placeholder="The walls you have in mind…" style={{ ...field, resize: "vertical" }} />
+      {status === "error" && <span style={{ ...mono(10), color: "#dc2626", textTransform: "none", letterSpacing: 0 }}>Couldn&apos;t send — please try again.</span>}
+      <button type="submit" disabled={status === "sending"} style={{ ...btnSolid, cursor: "pointer", opacity: status === "sending" ? 0.6 : 1 }}>
+        {contact.mode === "whatsapp" ? "Send via WhatsApp" : status === "sending" ? "Sending…" : "Request the visit"}
+      </button>
+    </form>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   TEMPLATE
+═══════════════════════════════════════════ */
+export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
+  const { selectNode, logo, grid, readOnly } = useEditorStore();
+  const isMobile = viewport === "mobile";
+  const isTablet = viewport === "tablet";
+  const px = isMobile ? "1.35rem" : isTablet ? "4vw" : "6vw";
+
+  const works = useWorks();
+  const roomWorks = works.slice(0, 12);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const openLightbox = (i: number) => { if (readOnly) setLightboxIdx(i); };
+
+  /* Flat fallback layouts (Design > Grid) */
+  const cols = isMobile ? Math.min(grid.columns, 2) : isTablet ? Math.min(grid.columns, 3) : grid.columns;
+  const [visibleCount, setVisibleCount] = useState(grid.pageSize);
+  useEffect(() => { setVisibleCount(grid.pageSize); }, [grid.pageSize, grid.loadMore, grid.layout, works.length]);
+  const pagedWorks  = grid.loadMore ? works.slice(0, visibleCount) : works.slice(0, 9);
+  const canLoadMore = grid.loadMore && visibleCount < works.length;
+
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
+  function Brand({ nodeId, size = 14 }: { nodeId: string; size?: number }) {
+    const textEl = (
+      <EditableNode id={nodeId} tag="span" style={{ ...mono(size), color: C.fg, fontWeight: 700, letterSpacing: "0.3em" }}>
+        <EditableText id={nodeId} display="inline" />
+      </EditableNode>
+    );
+    if (logo.mode === "image" && logo.imageUrl) return <LogoImage src={logo.imageUrl} alt={logo.text} width={logo.width} crop={logo.imageCrop} />;
+    if (logo.mode === "image+text" && logo.imageUrl) {
+      return (
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <LogoImage src={logo.imageUrl} width={logo.width} crop={logo.imageCrop} />
+          {textEl}
+        </span>
+      );
+    }
+    return textEl;
+  }
+
+  const navItems = [
+    { id: "vrn-nav-item-1", fn: () => scrollTo("vrn-gallery") },
+    { id: "vrn-nav-item-2", fn: () => scrollTo("vrn-about") },
+    { id: "vrn-nav-item-3", fn: () => scrollTo("vrn-contact") },
+  ];
+
+  return (
+    <div onClick={() => selectNode(null)}
+      style={{ background: C.bg, color: C.fg, minHeight: "100%", fontFamily: SANS }}>
+
+      {/* ── NAV ── */}
+      <nav id="section-nav" style={{ position: "relative", zIndex: 50, display: "flex", alignItems: "center", height: isMobile ? 58 : 72, padding: `0 ${px}`, borderBottom: `1px solid ${C.line}`, background: C.bg }}>
+        <Brand nodeId="vrn-nav-brand" size={isMobile ? 11 : 12} />
+        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 14 : 28, marginLeft: "auto" }}>
+          {!isMobile && navItems.map((item) => (
+            <Clickable key={item.id} onActivate={item.fn}
+              style={{ background: "none", border: "none", padding: 0, fontFamily: SANS, fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", color: C.fg, opacity: 0.65 }}>
+              <EditableNode id={item.id} tag="span"><EditableText id={item.id} display="inline" /></EditableNode>
+            </Clickable>
+          ))}
+          <Clickable onActivate={() => scrollTo("vrn-contact")} style={{ ...btnSolid, padding: isMobile ? "9px 16px" : "10px 18px", fontSize: 11 }}>
+            <EditableNode id="vrn-nav-cta" tag="span"><EditableText id="vrn-nav-cta" display="inline" /></EditableNode>
+          </Clickable>
+        </div>
+      </nav>
+
+      {/* ── POSTER (hero) ── */}
+      <section id="vrn-hero" style={{ padding: `${isMobile ? "3.5rem" : "6rem"} ${px} ${isMobile ? "3rem" : "5rem"}`, textAlign: "center", maxWidth: 1000, margin: "0 auto" }}>
+        <EditableNode id="vrn-hero-eyebrow" tag="span" style={{ ...mono(10), color: C.accent, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 8, marginBottom: isMobile ? 22 : 32 }}>
+          <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.accent, display: "inline-block" }} />
+          <EditableText id="vrn-hero-eyebrow" display="inline" />
+        </EditableNode>
+
+        <EditableNode id="vrn-hero-title" tag="h1" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? "clamp(46px,13vw,68px)" : "clamp(64px,7vw,120px)", lineHeight: 0.98, letterSpacing: "-0.025em", color: C.fg, margin: `0 0 ${isMobile ? "1.2rem" : "1.8rem"}` }}>
+          <EditableText id="vrn-hero-title" />
+        </EditableNode>
+
+        <EditableNode id="vrn-hero-dates" tag="div" style={{ ...mono(10), color: C.muted, marginBottom: isMobile ? "1.4rem" : "2rem" }}>
+          <EditableText id="vrn-hero-dates" display="inline" />
+        </EditableNode>
+
+        <EditableNode id="vrn-hero-sub" style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.75, color: C.muted, maxWidth: 520, margin: "0 auto", marginBottom: isMobile ? "1.8rem" : "2.4rem" }}>
+          <EditableText id="vrn-hero-sub" />
+        </EditableNode>
+
+        <Clickable onActivate={() => scrollTo("vrn-gallery")} style={btnSolid}>
+          <EditableNode id="vrn-hero-cta" tag="span"><EditableText id="vrn-hero-cta" display="inline" /></EditableNode>
+          <span aria-hidden>↓</span>
+        </Clickable>
+      </section>
+
+      {/* ── 3D GALLERY ── */}
+      <section id="vrn-gallery" style={{ paddingTop: isMobile ? "1.5rem" : "2.5rem" }}>
+        <div style={{ padding: `0 ${px}` }}>
+          <Label index="01" nodeId="vrn-gallery-label" isMobile={isMobile} />
+          <EditableNode id="vrn-gallery-note" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: isMobile ? 16 : 19, color: C.muted, maxWidth: 560, marginBottom: isMobile ? "1.6rem" : "2.4rem" }}>
+            <EditableText id="vrn-gallery-note" />
+          </EditableNode>
+        </div>
+
+        {grid.layout === "corridor" ? (
+          <Room works={roomWorks} viewport={viewport} onOpen={openLightbox} />
+        ) : (
+          /* Flat fallbacks so the Grid panel choice is honoured */
+          <div style={{ padding: `0 ${px} ${isMobile ? "1rem" : "2rem"}` }}>
+            {grid.layout === "masonry" ? (
+              <div style={{ columnCount: cols, columnGap: grid.gap }}>
+                {pagedWorks.map((w, i) => (
+                  <div key={w.id} style={{ breakInside: "avoid", marginBottom: grid.gap, cursor: "pointer", background: C.raised }} onClick={() => openLightbox(i)}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={w.src} alt={w.title ?? ""} loading="lazy" style={{ width: "100%", height: "auto", display: "block" }} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: grid.gap }}>
+                {pagedWorks.map((w, i) => (
+                  <div key={w.id} style={{ position: "relative", aspectRatio: isMobile ? "1 / 1" : "4 / 5", overflow: "hidden", cursor: "pointer", background: C.raised }} onClick={() => openLightbox(i)}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={w.src} alt={w.title ?? ""} loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: grid.fit, display: "block" }} />
+                  </div>
+                ))}
+              </div>
+            )}
+            {canLoadMore && (
+              <div style={{ marginTop: "2rem", display: "flex", justifyContent: "center" }}>
+                <button onClick={() => setVisibleCount((c) => c + grid.pageSize)} style={{ ...btnGhost, cursor: "pointer" }}>Load more ↓</button>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* ── ARTIST ── */}
+      <section id="vrn-about" style={{ padding: `${isMobile ? "3.5rem" : "6rem"} ${px}` }}>
+        <Label index="02" nodeId="vrn-about-label" isMobile={isMobile} />
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(240px, 340px) 1fr", gap: isMobile ? "2.2rem" : "4.5rem", alignItems: "start" }}>
+          <EditableNode id="vrn-about-image" style={{ position: "relative", width: "100%", maxWidth: isMobile ? 300 : undefined, aspectRatio: "4 / 5", overflow: "hidden", background: "#FCFBF8", border: "9px solid color-mix(in srgb, var(--ed-fg, #131518) 90%, transparent)", padding: 10, boxSizing: "border-box", boxShadow: "0 22px 44px -20px rgba(0,0,0,0.3)" }}>
+            <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+              <EditableImage id="vrn-about-image" imgStyle={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            </div>
+          </EditableNode>
+          <div>
+            <EditableNode id="vrn-about-heading" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? "clamp(28px,8.5vw,40px)" : "clamp(34px,3.4vw,52px)", lineHeight: 1.08, letterSpacing: "-0.015em", color: C.fg, margin: "0 0 1.3rem" }}>
+              <EditableText id="vrn-about-heading" />
+            </EditableNode>
+            <EditableNode id="vrn-about-body" style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.8, color: C.muted, maxWidth: 560, marginBottom: "2rem" }}>
+              <EditableText id="vrn-about-body" />
+            </EditableNode>
+            <div style={{ display: "flex", gap: isMobile ? "1.8rem" : "3rem", paddingTop: "1.6rem", borderTop: `1px solid ${C.line}` }}>
+              {([["vrn-stat-1-value","vrn-stat-1-label"],["vrn-stat-2-value","vrn-stat-2-label"],["vrn-stat-3-value","vrn-stat-3-label"]] as const).map(([vId, lId]) => (
+                <div key={vId}>
+                  <EditableNode id={vId} style={{ fontFamily: SERIF, fontSize: isMobile ? 26 : 32, fontWeight: 500, color: C.accent, lineHeight: 1 }}>
+                    <EditableText id={vId} />
+                  </EditableNode>
+                  <EditableNode id={lId} style={{ ...mono(9), color: C.muted, marginTop: 6 }}>
+                    <EditableText id={lId} />
+                  </EditableNode>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CONTACT ── */}
+      <section id="vrn-contact" style={{ padding: `${isMobile ? "3.5rem" : "6rem"} ${px} ${isMobile ? "4rem" : "6.5rem"}`, borderTop: `1px solid ${C.line}`, background: C.raised }}>
+        <Label index="03" nodeId="vrn-contact-label" isMobile={isMobile} />
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "2.5rem" : "5rem", alignItems: "start" }}>
+          <div>
+            <EditableNode id="vrn-contact-heading" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? "clamp(32px,9.5vw,44px)" : "clamp(38px,4vw,60px)", lineHeight: 1.05, letterSpacing: "-0.015em", color: C.fg, margin: "0 0 1.3rem" }}>
+              <EditableText id="vrn-contact-heading" />
+            </EditableNode>
+            <EditableNode id="vrn-contact-body" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.75, color: C.muted, maxWidth: 420, marginBottom: "2rem" }}>
+              <EditableText id="vrn-contact-body" />
+            </EditableNode>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {([["vrn-contact-d1-label","vrn-contact-d1-value"],["vrn-contact-d2-label","vrn-contact-d2-value"],["vrn-contact-d3-label","vrn-contact-d3-value"]] as const).map(([lId, vId]) => (
+                <div key={lId} style={{ display: "flex", gap: "1.2rem", alignItems: "baseline" }}>
+                  <EditableNode id={lId} tag="span" style={{ ...mono(9), color: C.accent, minWidth: 56, fontWeight: 700 }}>
+                    <EditableText id={lId} display="inline" />
+                  </EditableNode>
+                  <EditableNode id={vId} tag="span" style={{ fontFamily: SANS, fontSize: 13.5, color: C.fg }}>
+                    <EditableText id={vId} display="inline" />
+                  </EditableNode>
+                </div>
+              ))}
+            </div>
+          </div>
+          <VernissageContactForm />
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer id="section-footer" style={{ padding: `1.8rem ${px}`, borderTop: `1px solid ${C.line}`, display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: "0.9rem" }}>
+        <Brand nodeId="vrn-footer-brand" size={10} />
+        <EditableNode id="vrn-footer-copy" tag="span" style={{ ...mono(9), color: C.muted }}>
+          <EditableText id="vrn-footer-copy" display="inline" />
+        </EditableNode>
+        <span style={{ ...mono(9), color: C.muted, display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent, display: "inline-block" }} />
+          White cube · Room 1
+        </span>
+      </footer>
+
+      {readOnly && lightboxIdx !== null && (
+        <Lightbox works={grid.layout === "corridor" ? roomWorks : pagedWorks} startIndex={lightboxIdx} onClose={() => setLightboxIdx(null)} />
+      )}
+    </div>
+  );
+}
