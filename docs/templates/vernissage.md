@@ -1,21 +1,30 @@
 # Vernissage — template design & integration notes
 
-The platform's first **3D template**: a walkable **white-cube gallery**.
-Photographs hang framed on the side walls of a virtual room — with museum
-labels — and the visitor walks down the room (drag / wheel / arrow buttons)
-to an end wall carrying a commission CTA. Built **builder-first** like
-Meridian: one component serves the editor canvas, the `/templates/vernissage`
-demo and the published site.
+The platform's first **3D template**: a white-cube exhibition rendered as a
+**3D coverflow showcase**. The active photograph takes the wall **facing the
+visitor** — framed, matted, with a museum label — while neighbouring works
+recede at an angle to either side. Built **builder-first** like Meridian: one
+component serves the editor canvas, the `/templates/vernissage` demo and the
+published site.
+
+> **History**: v1 was a walkable corridor with works hung at ±90° on the side
+> walls. It was replaced — edge-on photos can't be appreciated. The coverflow
+> keeps the 3D room feeling while every photo is viewed head-on. The layout
+> key remains `"corridor"` for saved-design compatibility; only the labels
+> changed ("3D slider" / "Slider 3D").
 
 ---
 
 ## Concept & design rationale
 
 The "white cube" is the canonical professional gallery format: white walls,
-concrete floor, framed works at eye level, small label plates, a red dot for
-sold pieces. Vernissage (the opening night of an exhibition) translates that
-into a portfolio: the site *is* an exhibition — poster (hero), room
-(3D gallery), artist, private-view contact.
+framed works at eye level, small label plates, a red dot for sold pieces.
+Vernissage (the opening night of an exhibition) translates that into a
+portfolio: the site *is* an exhibition — poster (hero), showcase (3D),
+artist, private-view contact. The 3D interaction is the familiar
+**coverflow**: click a side piece, swipe, wheel or use the arrows and the
+next work swings to the front. The final "slide" is a closing card with a
+commission CTA.
 
 | Token | Value | Why |
 |---|---|---|
@@ -27,45 +36,47 @@ into a portfolio: the site *is* an exhibition — poster (hero), room
 **Typography** (bundled): **Fraunces** (exhibition-title serif, italics),
 **Space Grotesk** (signage sans), **Space Mono** (label plates / HUD).
 
-## The 3D room — how it works (no WebGL, no new deps)
+## The 3D showcase — how it works (no WebGL, no new deps)
 
-Pure CSS 3D: a viewport `div` with `perspective` contains a "world" `div`
-with `transform-style: preserve-3d`. Walls, floor, ceiling and the end wall
-are flat planes positioned with `translate3d` + `rotateX/rotateY`; artworks
-are planes rotated ±90° hung along the Z axis, alternating walls, with a
-frame, a mat and a museum label. Walking = animating the world's
-`translateZ(cam)`; `cam` is React state clamped to `[0, maxCam]`.
+Pure CSS 3D: a stage `div` with `perspective` contains slides positioned
+absolutely at the center. Each slide's transform derives from its offset
+`d = i - active`:
 
-Movement inputs:
-- **Drag** horizontally (pointer events; `touchAction: pan-y` keeps vertical
-  page scroll free on touch).
-- **Wheel** — attached with `passive: false` **only when `readOnly`**, so the
+- `d === 0` → frontal: `translateX(0) translateZ(0) rotateY(0)`, strongest
+  shadow, museum label fades in.
+- `|d| ≥ 1` → recedes: `translateX(d · spread) translateZ(-170 − |d|·80)
+  rotateY(∓42°)`, opacity falls off; hidden beyond `|d| > 3`.
+
+Changing `active` animates every slide (0.6 s spring-ish cubic-bezier).
+
+Inputs:
+- **Arrows** + progress bar + `04/12` counter in a HUD strip (work in the
+  editor too).
+- **Swipe/drag** horizontally (pointer events; `touchAction: pan-y` keeps
+  vertical page scroll free; the stage nudges with the finger, then snaps).
+- **Wheel** — attached `passive: false` **only when `readOnly`**, so the
   editor canvas scroll is never hijacked.
-- **Arrow buttons** + progress bar + room counter in a HUD strip (work in the
-  editor too, so the designer can walk the room while editing).
-- Clicking an artwork opens the lightbox (live site only).
+- **Click** a side piece → brings it to the front; click the frontal piece →
+  lightbox (live site only).
 
-Room geometry scales with the `viewport` prop (height/width/spacing per
-device), so the editor's device toggle works and no `vh` units are needed
-inside the device frame.
+Stage geometry (height, plate size, spread) scales with the `viewport` prop —
+no `vh` units, so the editor's device toggle works inside the device frame.
 
-**Editing inside 3D**: side-wall artworks are images (no text editing on
-skewed planes). The end wall **faces the camera** (translation only, no
-rotation), so its title/CTA are ordinary editable nodes; selecting either in
-the Pages tree auto-walks the room to the end so the node is on screen.
+**Editing inside 3D**: side slides are images only. The closing card is
+frontal when active, so its title/CTA edit normally; selecting either node in
+the Pages tree auto-navigates the showcase to it.
 
 ## Layout system
 
-`"corridor"` was added to `GridSettings.layout` (like Halcyon's `"index"`).
-Vernissage declares `layouts: ["corridor", "uniform", "masonry"]` with
-corridor as default — the Design > Grid panel lets the user fall back to flat
-grids (driven by the same columns/gap/fit/load-more controls).
+`"corridor"` in `GridSettings.layout` (labels: "3D slider" / "Slider 3D") is
+Vernissage's default; `layouts: ["corridor", "uniform", "masonry"]` lets the
+Design > Grid panel switch to flat grids (columns/gap/fit/load-more).
 
 ## File map
 
 | File | Role |
 |---|---|
-| `src/components/editor/canvas/VernissageTemplate.tsx` | Template + 3D room |
+| `src/components/editor/canvas/VernissageTemplate.tsx` | Template + 3D showcase |
 | `src/lib/editor/templates/vernissage.tsx` | Node defaults + sections |
 | `src/lib/editor/templates/registry.tsx` | Registration + design defaults |
 | `src/app/editor/vernissage/{layout,page}.tsx` | Editor route |
@@ -78,36 +89,38 @@ grids (driven by the same columns/gap/fit/load-more controls).
 - **Nav**: `vrn-nav-brand`, `vrn-nav-item-1..3`, `vrn-nav-cta`
 - **Poster**: `vrn-hero-eyebrow/title/dates/sub/cta`
 - **3D Gallery**: `vrn-gallery-label`, `vrn-gallery-note` (wall text, flat),
-  `vrn-endwall-title`, `vrn-endwall-cta` (on the frontal end wall)
+  `vrn-endwall-title`, `vrn-endwall-cta` (the closing card)
 - **Artist**: `vrn-about-label`, `vrn-about-image` (image),
   `vrn-about-heading/body`, `vrn-stat-{1..3}-value/label`
 - **Contact**: `vrn-contact-label/heading/body`, `vrn-contact-d{1..3}-label/value`
 - **Footer**: `vrn-footer-brand`, `vrn-footer-copy`
 
-Artwork labels in the room are array-driven (photo title or "Untitled") —
+Museum labels on the slides are array-driven (photo title or "Untitled") —
 not editable nodes, per the adapter guide.
 
 ## Compliance (pitfalls 1–11)
 
 Zero injected CSS (all inline on `--ed-*`/`--tpl-*`); responsive from the
-`viewport` prop; grids/room read `store.galleryPhotos` (demo seeds fallback);
-portrait is an `EditableImage`; every button/label editable via the
-`Clickable` pattern; contact follows `store.contact` (shared
+`viewport` prop; showcase/grids read `store.galleryPhotos` (demo seeds
+fallback); portrait is an `EditableImage`; every button/label editable via
+the `Clickable` pattern; contact follows `store.contact` (shared
 `fillWaTemplate`); lightbox + wheel-capture gated on `readOnly`.
 
 ## How to verify (manual)
 
-1. `/templates/vernissage` → walk the room with drag, wheel and the arrows;
-   labels show; end wall CTA scrolls to contact; artwork click opens lightbox.
-2. `/editor/vernissage` → arrows/drag walk the room; selecting "End wall"
-   nodes in the Pages tree auto-walks there; texts edit by tap; device toggle
-   reshapes the room; Grid panel switches 3D room ↔ flat grids.
-3. Upload photos in a portfolio → the room hangs the user's photos.
+1. `/templates/vernissage` → the frontal photo is fully face-on and large;
+   arrows/swipe/wheel rotate the next piece to the front; clicking a side
+   piece brings it forward; clicking the frontal one opens the lightbox; the
+   last slide is the closing card and its CTA scrolls to contact.
+2. `/editor/vernissage` → arrows/swipe work; selecting "Closing" nodes in the
+   Pages tree navigates to the card; texts edit by tap; the device toggle
+   reshapes the stage; Grid panel switches 3D slider ↔ flat grids.
+3. Upload photos in a portfolio → the showcase hangs the user's photos.
 4. Contact honours the inbox/WhatsApp setting.
 
 ## Known limits
 
-- The room shows the first 12 photos (a real exhibition hang, not a dump);
-  the flat layouts + lightbox cover the rest via Load more.
-- CSS 3D is rasterised per-plane: very large wall planes can soften slightly
-  on low-DPI screens; frames/labels stay crisp.
+- The showcase shows the first 12 photos (a curated hang); flat layouts +
+  Load more cover the rest.
+- Side pieces are intentionally dimmed/tilted context — every photo is fully
+  appreciable when frontal.

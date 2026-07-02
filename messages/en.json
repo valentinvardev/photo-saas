@@ -434,12 +434,12 @@
       "uniform": "Grid",
       "masonry": "Masonry",
       "index": "Index",
-      "corridor": "3D room",
+      "corridor": "3D slider",
       "descMosaic": "An editorial layout with mixed, art-directed cell sizes.",
       "descUniform": "An even grid of equal cells.",
       "descMasonry": "Keeps each photo's aspect ratio — boxes vary in height (VSCO-style).",
       "descIndex": "A typographic list of projects with a hover preview.",
-      "descCorridor": "A walkable white-cube gallery — photos hang framed on 3D walls.",
+      "descCorridor": "A 3D coverflow — each photo takes the wall facing you, framed with a museum label.",
       "columns": "Columns",
       "spacing": "Spacing",
       "fit": "Photo fit",
@@ -1104,7 +1104,7 @@
       "atelierName": "Atelier", "atelierDesc": "Centred, editorial, lots of whitespace.",
       "halcyonName": "Halcyon", "halcyonDesc": "Warm-dark editorial, italic serif, typographic project index.",
       "meridianName": "Meridian", "meridianDesc": "Cool gallery aesthetic — split hero, museum-hang grid, steel-blue accent.",
-      "vernissageName": "Vernissage", "vernissageDesc": "A walkable 3D white-cube gallery — your photos hang framed on virtual walls."
+      "vernissageName": "Vernissage", "vernissageDesc": "A 3D white-cube exhibition — each photo takes the wall facing the visitor, framed with a museum label."
     },
     "done": {
       "title": "Your studio is live",

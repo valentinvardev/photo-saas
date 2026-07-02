@@ -100,7 +100,7 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
   {
     id: "vernissage",
     name: "Vernissage",
-    description: "A walkable 3D white-cube gallery — photographs hang framed on the walls of a virtual room you stroll through, museum labels included. Pure CSS 3D.",
+    description: "A 3D white-cube exhibition — each photograph takes the wall facing the visitor, framed and hung with a museum label; the rest recede at an angle. Pure CSS 3D.",
     category: "Story",
     tags: ["3D", "Gallery", "Immersive"],
     href: "/templates/vernissage",

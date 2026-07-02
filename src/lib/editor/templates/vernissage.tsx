@@ -24,10 +24,10 @@ export const VERNISSAGE_NODES: Record<string, EditorNode> = {
   "vrn-hero-sub":      { id: "vrn-hero-sub",      type: "paragraph", content: "Twelve photographs about light that refuses to hurry. Walk the room — every piece hangs at eye level, the way it was meant to be seen." },
   "vrn-hero-cta":      { id: "vrn-hero-cta",      type: "paragraph", content: "Enter the gallery" },
 
-  /* Gallery (3D room) */
+  /* Gallery (3D showcase) */
   "vrn-gallery-label": { id: "vrn-gallery-label", type: "paragraph", content: "The exhibition" },
-  "vrn-gallery-note":  { id: "vrn-gallery-note",  type: "paragraph", content: "Wall text — drag, scroll or use the arrows to walk the room. Each photograph is hung with a museum label; click any piece to view it up close." },
-  "vrn-endwall-title": { id: "vrn-endwall-title", type: "heading",   content: "End of the room.<br/><em>Thank you for walking.</em>" },
+  "vrn-gallery-note":  { id: "vrn-gallery-note",  type: "paragraph", content: "Wall text — swipe or use the arrows. Each photograph takes the wall in front of you, framed and hung with its museum label; click the frontal piece to view it up close." },
+  "vrn-endwall-title": { id: "vrn-endwall-title", type: "heading",   content: "End of the exhibition.<br/><em>Thank you for visiting.</em>" },
   "vrn-endwall-cta":   { id: "vrn-endwall-cta",   type: "paragraph", content: "Commission the artist" },
 
   /* About */
@@ -77,10 +77,10 @@ export const VERNISSAGE_SECTIONS: SectionDef[] = [
     ] },
   { id: "vrn-gallery", label: "3D Gallery", icon: <CubeIcon />, locked: false,
     elements: [
-      { nodeId: "vrn-gallery-label", label: "Section label", type: "text" },
-      { nodeId: "vrn-gallery-note",  label: "Wall text",     type: "text" },
-      { nodeId: "vrn-endwall-title", label: "End wall — ttl", type: "text" },
-      { nodeId: "vrn-endwall-cta",   label: "End wall — btn", type: "text" },
+      { nodeId: "vrn-gallery-label", label: "Section label",   type: "text" },
+      { nodeId: "vrn-gallery-note",  label: "Wall text",       type: "text" },
+      { nodeId: "vrn-endwall-title", label: "Closing — title", type: "text" },
+      { nodeId: "vrn-endwall-cta",   label: "Closing — button", type: "text" },
     ] },
   { id: "vrn-about", label: "Artist", icon: <UserIcon />, locked: false,
     elements: [

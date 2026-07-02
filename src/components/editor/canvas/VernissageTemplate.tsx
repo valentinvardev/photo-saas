@@ -1,22 +1,24 @@
 "use client";
 
 /**
- * VernissageTemplate — a walkable white-cube 3D gallery for the FRAME builder.
- * Concept: the classic gallery "white cube" — photographs hang framed on the
- * side walls of a 3D room and the visitor walks down it (drag / wheel /
- * arrows) to an end wall with a commission CTA. Pure CSS 3D (perspective +
- * preserve-3d): no WebGL, no new dependencies, works inside the editor's
- * device frame. See docs/templates/vernissage.md.
+ * VernissageTemplate — a white-cube 3D exhibition for the FRAME builder.
+ * Concept: a 3D coverflow. The active photograph takes the wall FACING the
+ * visitor — framed, matted, with a museum label — while neighbouring works
+ * recede at an angle to either side. Arrows / drag / wheel (or clicking a
+ * side piece) bring the next work to the front; the last "slide" is a
+ * closing card with a commission CTA. Pure CSS 3D (perspective +
+ * preserve-3d): no WebGL, no new dependencies. See
+ * docs/templates/vernissage.md.
  *
  * Compliance with docs/template-adapter-guide.md (pitfalls 1–11):
  *  - No injected CSS — all inline styles on the editor variables.
- *  - Responsive from the `viewport` prop (room geometry scales per device).
+ *  - Responsive from the `viewport` prop (stage geometry scales per device).
  *  - Artworks come from store.galleryPhotos (demo seeds as fallback); the
  *    portrait is an EditableImage node.
  *  - Buttons/labels editable via the Clickable pattern; contact follows
  *    store.contact; lightbox and wheel-capture only on the live site.
- *  - The end-wall text faces the camera (no rotation) so inline editing works;
- *    selecting an end-wall node in the editor auto-walks the room to it.
+ *  - The closing card is frontal when active so its text edits normally;
+ *    selecting one of its nodes in the editor auto-navigates to it.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -97,112 +99,98 @@ function Label({ index, nodeId, isMobile }: { index: string; nodeId: string; isM
 }
 
 /* ═══════════════════════════════════════════
-   THE 3D ROOM
+   THE 3D SHOWCASE (coverflow)
+   Active work faces the visitor; neighbours recede at an angle.
 ═══════════════════════════════════════════ */
-function Room({ works, viewport, onOpen }: { works: Work[]; viewport: Viewport; onOpen: (i: number) => void }) {
+function Showcase({ works, viewport, onOpen }: { works: Work[]; viewport: Viewport; onOpen: (i: number) => void }) {
   const readOnly   = useEditorStore((s) => s.readOnly);
   const selectedId = useEditorStore((s) => s.selectedId);
   const isMobile = viewport === "mobile";
   const isTablet = viewport === "tablet";
 
-  /* Room geometry (3D px) */
-  const H     = isMobile ? 440 : isTablet ? 540 : 620;   // room height / viewport height
-  const HALF  = isMobile ? 240 : isTablet ? 340 : 420;   // half corridor width
-  const START = isMobile ? 340 : 430;                    // z of the first artwork
-  const GAP   = isMobile ? 215 : 275;                    // z between consecutive artworks
-  const N     = works.length;
-  const endZ   = START + N * GAP + (isMobile ? 340 : 500); // end wall position
-  const DEPTH  = endZ + 380;                               // wall/floor plane length
-  const maxCam = endZ - (isMobile ? 400 : 660);            // stop with the end wall framed
+  const N = works.length;           // artworks
+  const LAST = N;                   // index of the closing card
+  const [active, setActive] = useState(0);
+  const clampTo = (i: number) => Math.max(0, Math.min(i, LAST));
+  const go = (d: number) => setActive((a) => clampTo(a + d));
 
-  const [cam, setCam] = useState(0);
-  const [smooth, setSmooth] = useState(true);   // animate button steps, not drags
-  const clamp = (v: number) => Math.max(0, Math.min(v, maxCam));
-  const walk = (d: number) => { setSmooth(true); setCam((c) => clamp(c + d)); };
+  /* Stage geometry */
+  const H      = isMobile ? 470 : isTablet ? 560 : 640;  // stage height
+  const AW     = isMobile ? 220 : isTablet ? 290 : 340;  // artwork plate width
+  const AH     = isMobile ? 285 : isTablet ? 375 : 440;  // artwork plate height
+  const SPREAD = isMobile ? 120 : isTablet ? 170 : 210;  // x-shift per step
+  const ANGLE  = 42;                                     // side tilt (deg)
 
-  /* Editor nicety: selecting an end-wall node walks the room to it. */
+  /* Editor nicety: selecting a closing-card node navigates the showcase to it. */
   useEffect(() => {
     if (!readOnly && (selectedId === "vrn-endwall-title" || selectedId === "vrn-endwall-cta")) {
-      setSmooth(true); setCam(maxCam);
+      setActive(LAST);
     }
-  }, [readOnly, selectedId, maxCam]);
+  }, [readOnly, selectedId, LAST]);
 
-  /* Drag to walk (horizontal; vertical stays free for page scroll). */
-  const drag = useRef<{ x: number; cam: number; moved: boolean } | null>(null);
+  /* Drag / swipe — horizontal; vertical stays free for page scroll. */
+  const drag = useRef<{ x: number; moved: boolean } | null>(null);
   const draggedRef = useRef(false);
-  const onPointerDown = (e: React.PointerEvent) => { drag.current = { x: e.clientX, cam, moved: false }; };
+  const [dragDx, setDragDx] = useState(0);
+  const onPointerDown = (e: React.PointerEvent) => { drag.current = { x: e.clientX, moved: false }; };
   const onPointerMove = (e: React.PointerEvent) => {
     if (!drag.current) return;
     const dx = e.clientX - drag.current.x;
     if (Math.abs(dx) > 6) { drag.current.moved = true; draggedRef.current = true; }
-    if (drag.current.moved) { setSmooth(false); setCam(clamp(drag.current.cam - dx * 2.4)); }
+    if (drag.current.moved) setDragDx(dx);
   };
-  const onPointerUp = () => { drag.current = null; setTimeout(() => { draggedRef.current = false; }, 0); };
+  const onPointerUp = () => {
+    if (drag.current?.moved) {
+      const dx = dragDx;
+      if (dx < -55) go(1);
+      else if (dx > 55) go(-1);
+    }
+    drag.current = null;
+    setDragDx(0);
+    setTimeout(() => { draggedRef.current = false; }, 0);
+  };
 
-  /* Wheel to walk — live site only, so the editor canvas scroll is never hijacked. */
+  /* Wheel — live site only, so the editor canvas scroll is never hijacked. */
   const vpRef = useRef<HTMLDivElement>(null);
+  const wheelAcc = useRef(0);
   useEffect(() => {
     if (!readOnly) return;
     const el = vpRef.current;
     if (!el) return;
     const fn = (e: WheelEvent) => {
       e.preventDefault();
-      setSmooth(false);
-      setCam((c) => Math.max(0, Math.min(c + e.deltaY * 1.15, maxCam)));
+      wheelAcc.current += e.deltaY + e.deltaX;
+      if (Math.abs(wheelAcc.current) > 90) {
+        go(wheelAcc.current > 0 ? 1 : -1);
+        wheelAcc.current = 0;
+      }
     };
     el.addEventListener("wheel", fn, { passive: false });
     return () => el.removeEventListener("wheel", fn);
-  }, [readOnly, maxCam]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [readOnly, LAST]);
 
-  /* Artwork plate — frame + mat + museum label */
-  function Artwork({ w, i }: { w: Work; i: number }) {
-    const left = i % 2 === 0;
-    const portrait = i % 3 !== 1; // vary orientation down the wall
-    const aw = portrait ? (isMobile ? 175 : 255) : (isMobile ? 260 : 375);
-    const ah = portrait ? (isMobile ? 225 : 330) : (isMobile ? 180 : 262);
-    const z = START + i * GAP;
-    const x = (HALF - 4) * (left ? -1 : 1);
-    return (
-      <div
-        onClick={() => { if (!draggedRef.current) onOpen(i); }}
-        style={{
-          position: "absolute", left: "50%", top: "50%", width: aw, height: ah,
-          transform: `translate(-50%, -50%) translate3d(${x}px, -14px, ${-z}px) rotateY(${left ? 90 : -90}deg)`,
-          transformStyle: "preserve-3d", backfaceVisibility: "hidden",
-          cursor: readOnly ? "pointer" : "default",
-        }}
-      >
-        <div style={{
-          position: "absolute", inset: 0, background: "#FCFBF8",
-          border: "9px solid color-mix(in srgb, var(--ed-fg, #131518) 90%, transparent)",
-          boxShadow: "0 22px 44px -18px rgba(0,0,0,0.38)", padding: isMobile ? 8 : 13, boxSizing: "border-box",
-        }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={w.src} alt={w.title ?? ""} loading="lazy"
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-        </div>
-        {/* Museum label */}
-        <div style={{
-          position: "absolute", top: "100%", left: 0, marginTop: 16,
-          background: "#FCFBF8", border: `1px solid ${C.line}`, padding: "5px 9px",
-          display: "flex", alignItems: "center", gap: 7, whiteSpace: "nowrap",
-        }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent, flexShrink: 0 }} />
-          <span style={{ ...mono(8), color: "#131518", letterSpacing: "0.12em" }}>
-            {String(i + 1).padStart(2, "0")} — {w.title?.trim() || "Untitled"}
-          </span>
-        </div>
-      </div>
-    );
+  /* Slide transform from its offset to the active index */
+  function slideStyle(i: number): React.CSSProperties {
+    const d = i - active;
+    const abs = Math.abs(d);
+    const front = d === 0;
+    const x = d * SPREAD;
+    const z = front ? 0 : -(170 + Math.min(abs, 3) * 80);
+    const r = front ? 0 : d < 0 ? ANGLE : -ANGLE;
+    return {
+      position: "absolute", left: "50%", top: "46%", width: AW, height: AH,
+      transform: `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px) rotateY(${r}deg)`,
+      transition: drag.current?.moved ? "transform 0.2s ease, opacity 0.2s ease" : "transform 0.6s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease",
+      opacity: abs > 3 ? 0 : 1 - abs * 0.1,
+      pointerEvents: abs > 3 ? "none" : "auto",
+      zIndex: 100 - abs,
+      transformStyle: "preserve-3d",
+      cursor: front ? (readOnly ? "zoom-in" : "default") : "pointer",
+    };
   }
 
-  /* Big flat planes: walls, floor, ceiling */
-  const plane = (t: string, w: number, h: number, bg: string, extra?: React.CSSProperties): React.CSSProperties => ({
-    position: "absolute", left: "50%", top: "50%", width: w, height: h,
-    transform: t, backfaceVisibility: "hidden", background: bg, ...extra,
-  });
-
-  const roomNo = Math.min(N, Math.max(1, Math.round(cam / GAP) + 1));
+  const counterNo = Math.min(active + 1, N);
 
   return (
     <div
@@ -210,70 +198,99 @@ function Room({ works, viewport, onOpen }: { works: Work[]; viewport: Viewport; 
       onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp}
       style={{
         position: "relative", height: H, overflow: "hidden", background: C.bg,
-        perspective: isMobile ? 700 : 1050, perspectiveOrigin: "50% 46%",
-        touchAction: "pan-y", userSelect: "none", borderTop: `1px solid ${C.line}`, borderBottom: `1px solid ${C.line}`,
+        borderTop: `1px solid ${C.line}`, borderBottom: `1px solid ${C.line}`,
+        touchAction: "pan-y", userSelect: "none",
       }}
     >
-      {/* World — moves toward the viewer as you walk */}
-      <div style={{
-        position: "absolute", inset: 0, transformStyle: "preserve-3d",
-        transform: `translateZ(${cam}px)`,
-        transition: smooth ? "transform 0.6s cubic-bezier(0.22,1,0.36,1)" : "none",
-        willChange: "transform",
-      }}>
-        {/* Left / right walls */}
-        <div style={plane(`translate(-50%,-50%) translate3d(${-HALF}px, 0, ${-DEPTH / 2}px) rotateY(90deg)`, DEPTH, H,
-          `linear-gradient(180deg, color-mix(in srgb, var(--ed-fg, #131518) 4%, ${"var(--ed-bg, #F6F5F1)"}) 0%, var(--ed-bg, #F6F5F1) 26%)`,
-          { borderBottom: `12px solid color-mix(in srgb, var(--ed-fg, #131518) 10%, var(--ed-bg, #F6F5F1))` })} />
-        <div style={plane(`translate(-50%,-50%) translate3d(${HALF}px, 0, ${-DEPTH / 2}px) rotateY(-90deg)`, DEPTH, H,
-          `linear-gradient(180deg, color-mix(in srgb, var(--ed-fg, #131518) 4%, ${"var(--ed-bg, #F6F5F1)"}) 0%, var(--ed-bg, #F6F5F1) 26%)`,
-          { borderBottom: `12px solid color-mix(in srgb, var(--ed-fg, #131518) 10%, var(--ed-bg, #F6F5F1))` })} />
-        {/* Floor + ceiling */}
-        <div style={plane(`translate(-50%,-50%) translate3d(0, ${H / 2}px, ${-DEPTH / 2}px) rotateX(90deg)`, HALF * 2, DEPTH,
-          `linear-gradient(180deg, color-mix(in srgb, var(--ed-fg, #131518) 9%, var(--ed-bg, #F6F5F1)), color-mix(in srgb, var(--ed-fg, #131518) 15%, var(--ed-bg, #F6F5F1)))`)} />
-        <div style={plane(`translate(-50%,-50%) translate3d(0, ${-H / 2}px, ${-DEPTH / 2}px) rotateX(-90deg)`, HALF * 2, DEPTH,
-          "color-mix(in srgb, var(--ed-fg, #131518) 3%, var(--ed-bg, #F6F5F1))")} />
+      {/* Back-wall wash + floor line for the white-cube feel */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
+        background: `linear-gradient(180deg, color-mix(in srgb, var(--ed-fg, #131518) 4%, var(--ed-bg, #F6F5F1)) 0%, var(--ed-bg, #F6F5F1) 22%, var(--ed-bg, #F6F5F1) 74%, color-mix(in srgb, var(--ed-fg, #131518) 8%, var(--ed-bg, #F6F5F1)) 100%)` }} />
 
-        {/* End wall — faces the camera, so its text edits normally */}
-        <div style={plane(`translate(-50%,-50%) translate3d(0, 0, ${-endZ}px)`, HALF * 2, H, "var(--ed-bg, #F6F5F1)",
-          { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 22, padding: "0 8%", boxSizing: "border-box", textAlign: "center" })}>
-          <span style={{ width: 10, height: 10, borderRadius: "50%", background: C.accent }} />
-          <EditableNode id="vrn-endwall-title" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? 30 : 46, lineHeight: 1.08, letterSpacing: "-0.015em", color: C.fg, margin: 0 }}>
-            <EditableText id="vrn-endwall-title" />
-          </EditableNode>
-          <Clickable onActivate={() => document.getElementById("vrn-contact")?.scrollIntoView({ behavior: "smooth" })} style={btnSolid}>
-            <EditableNode id="vrn-endwall-cta" tag="span"><EditableText id="vrn-endwall-cta" display="inline" /></EditableNode>
-          </Clickable>
+      {/* Stage — nudge follows the finger while dragging */}
+      <div style={{ position: "absolute", inset: 0, perspective: isMobile ? 850 : 1200, perspectiveOrigin: "50% 44%",
+        transform: `translateX(${dragDx / 4}px)`, transition: drag.current?.moved ? "none" : "transform 0.4s ease" }}>
+        <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
+
+          {/* Artwork slides */}
+          {works.map((w, i) => {
+            const front = i === active;
+            return (
+              <div key={w.id} style={slideStyle(i)}
+                onClick={() => {
+                  if (draggedRef.current) return;
+                  if (front) onOpen(i);
+                  else setActive(i);
+                }}>
+                {/* Frame + mat */}
+                <div style={{
+                  position: "absolute", inset: 0, background: "#FCFBF8",
+                  border: "10px solid color-mix(in srgb, var(--ed-fg, #131518) 90%, transparent)",
+                  boxShadow: front ? "0 34px 60px -24px rgba(0,0,0,0.42)" : "0 22px 40px -20px rgba(0,0,0,0.3)",
+                  padding: isMobile ? 10 : 15, boxSizing: "border-box",
+                }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={w.src} alt={w.title ?? ""} loading="lazy"
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block",
+                      filter: front ? "none" : "brightness(0.94)" }} />
+                </div>
+                {/* Museum label — only readable on the frontal piece */}
+                <div style={{
+                  position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", marginTop: 18,
+                  background: "#FCFBF8", border: `1px solid ${C.line}`, padding: "6px 11px",
+                  display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap",
+                  opacity: front ? 1 : 0, transition: "opacity 0.4s ease",
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent, flexShrink: 0 }} />
+                  <span style={{ ...mono(9), color: "#131518", letterSpacing: "0.12em" }}>
+                    {String(i + 1).padStart(2, "0")} — {w.title?.trim() || "Untitled"}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Closing card — frontal when active, so its text edits normally */}
+          <div style={{ ...slideStyle(LAST), background: C.bg, border: `1px solid ${C.line}`,
+            boxShadow: active === LAST ? "0 34px 60px -24px rgba(0,0,0,0.32)" : "0 22px 40px -20px rgba(0,0,0,0.24)",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            gap: 18, padding: "8%", boxSizing: "border-box", textAlign: "center", cursor: active === LAST ? "default" : "pointer" }}
+            onClick={() => { if (!draggedRef.current && active !== LAST) setActive(LAST); }}>
+            <span style={{ width: 9, height: 9, borderRadius: "50%", background: C.accent }} />
+            <EditableNode id="vrn-endwall-title" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? 20 : 27, lineHeight: 1.15, letterSpacing: "-0.01em", color: C.fg, margin: 0 }}>
+              <EditableText id="vrn-endwall-title" />
+            </EditableNode>
+            <Clickable onActivate={() => document.getElementById("vrn-contact")?.scrollIntoView({ behavior: "smooth" })} style={{ ...btnSolid, padding: "11px 20px", fontSize: 11 }}>
+              <EditableNode id="vrn-endwall-cta" tag="span"><EditableText id="vrn-endwall-cta" display="inline" /></EditableNode>
+            </Clickable>
+          </div>
         </div>
-
-        {/* Hung artworks */}
-        {works.map((w, i) => <Artwork key={w.id} w={w} i={i} />)}
       </div>
 
-      {/* Museum lighting vignette */}
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
-        background: "radial-gradient(120% 90% at 50% 38%, transparent 55%, rgba(0,0,0,0.14) 100%)" }} />
+      {/* Soft floor shadow under the frontal piece */}
+      <div style={{ position: "absolute", left: "50%", bottom: isMobile ? 54 : 62, transform: "translateX(-50%)",
+        width: AW * 1.3, height: 26, borderRadius: "50%", pointerEvents: "none",
+        background: "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.16), transparent 70%)" }} />
 
-      {/* Walk hint — fades once you move */}
+      {/* Swipe hint — fades after the first move */}
       <div style={{
-        position: "absolute", top: 18, left: "50%", transform: "translateX(-50%)",
+        position: "absolute", top: 16, left: "50%", transform: "translateX(-50%)",
         ...mono(9), color: C.muted, background: "color-mix(in srgb, var(--ed-bg, #F6F5F1) 82%, transparent)",
         border: `1px solid ${C.line}`, padding: "6px 12px", pointerEvents: "none",
-        opacity: cam > 30 ? 0 : 1, transition: "opacity 0.5s ease",
+        opacity: active > 0 ? 0 : 1, transition: "opacity 0.5s ease",
       }}>
-        Drag or use the arrows to walk →
+        Swipe or use the arrows →
       </div>
 
-      {/* HUD — room counter, progress, walk buttons */}
+      {/* HUD — counter, progress, arrows */}
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", gap: 14, padding: isMobile ? "10px 14px" : "12px 22px", background: "color-mix(in srgb, var(--ed-bg, #F6F5F1) 88%, transparent)", borderTop: `1px solid ${C.line}`, backdropFilter: "blur(6px)" }}>
         <span style={{ ...mono(9), color: C.fg, fontWeight: 700, flexShrink: 0 }}>
-          Room 1 · {String(roomNo).padStart(2, "0")}/{String(N).padStart(2, "0")}
+          {active === LAST ? "Fin" : `${String(counterNo).padStart(2, "0")}/${String(N).padStart(2, "0")}`}
         </span>
         <div style={{ flex: 1, height: 2, background: C.line, position: "relative" }}>
-          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${(cam / maxCam) * 100}%`, background: C.accent, transition: smooth ? "width 0.6s cubic-bezier(0.22,1,0.36,1)" : "none" }} />
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${(active / LAST) * 100}%`, background: C.accent, transition: "width 0.5s cubic-bezier(0.22,1,0.36,1)" }} />
         </div>
-        {[{ d: -GAP * 2, g: "‹" }, { d: GAP * 2, g: "›" }].map((b) => (
-          <button key={b.g} onClick={(e) => { e.stopPropagation(); walk(b.d); }}
+        {[{ d: -1, g: "‹" }, { d: 1, g: "›" }].map((b) => (
+          <button key={b.g} onClick={(e) => { e.stopPropagation(); go(b.d); }}
             style={{ width: 36, height: 36, borderRadius: "50%", border: `1px solid ${C.line}`, background: "transparent", color: C.fg, fontSize: 17, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontFamily: SANS }}>
             {b.g}
           </button>
@@ -473,7 +490,7 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
         </Clickable>
       </section>
 
-      {/* ── 3D GALLERY ── */}
+      {/* ── 3D SHOWCASE ── */}
       <section id="vrn-gallery" style={{ paddingTop: isMobile ? "1.5rem" : "2.5rem" }}>
         <div style={{ padding: `0 ${px}` }}>
           <Label index="01" nodeId="vrn-gallery-label" isMobile={isMobile} />
@@ -483,7 +500,7 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
         </div>
 
         {grid.layout === "corridor" ? (
-          <Room works={roomWorks} viewport={viewport} onOpen={openLightbox} />
+          <Showcase works={roomWorks} viewport={viewport} onOpen={openLightbox} />
         ) : (
           /* Flat fallbacks so the Grid panel choice is honoured */
           <div style={{ padding: `0 ${px} ${isMobile ? "1rem" : "2rem"}` }}>
