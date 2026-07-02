@@ -41,6 +41,14 @@ import "@fontsource/geist/600.css";
 import "@fontsource/geist-mono/400.css";
 import "@fontsource/geist-mono/500.css";
 
+/* ── Meridian template fonts ─────────────────────────────────────────── */
+import "@fontsource/playfair-display/400-italic.css";
+import "@fontsource/playfair-display/500.css";
+import "@fontsource/playfair-display/500-italic.css";
+import "@fontsource/playfair-display/600.css";
+import "@fontsource/manrope/500.css";
+import "@fontsource/manrope/700.css";
+
 /* ── Extended serif library ──────────────────────────────────────────── */
 import "@fontsource/playfair-display/400.css";
 import "@fontsource/playfair-display/700.css";

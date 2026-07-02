@@ -1100,7 +1100,8 @@
       "body": "Las dos se adaptan a tu marca. Podés cambiarla después.",
       "minimalName": "Minimal", "minimalDesc": "Limpia, alineada a la izquierda, centrada en la galería.",
       "atelierName": "Atelier", "atelierDesc": "Centrada, editorial, con mucho espacio en blanco.",
-      "halcyonName": "Halcyon", "halcyonDesc": "Editorial cálida y oscura, serif itálica, índice tipográfico de proyectos."
+      "halcyonName": "Halcyon", "halcyonDesc": "Editorial cálida y oscura, serif itálica, índice tipográfico de proyectos.",
+      "meridianName": "Meridian", "meridianDesc": "Estética de galería fría — hero partido, grilla de museo, acento azul acero."
     },
     "done": {
       "title": "Tu estudio está publicado",

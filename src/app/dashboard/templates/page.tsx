@@ -83,6 +83,20 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     style: { bg: "#0E0D0B", fg: "#EFEAE0", accent: "#C2410C", muted: "#8A8378" },
     collection: "halcyon",
   },
+  {
+    id: "meridian",
+    name: "Meridian",
+    description: "A cool gallery aesthetic — plaster background, ink typography and a deep steel-blue accent. Split hero, numbered services and a museum-hang photo grid.",
+    category: "Grid",
+    tags: ["Gallery", "Light", "Structured"],
+    href: "/templates/meridian",
+    editorHref: "/editor/meridian",
+    seed: 411,
+    new: true,
+    fonts: { serif: "Playfair Display", sans: "Manrope", mono: "IBM Plex Mono" },
+    style: { bg: "#F4F2ED", fg: "#16181B", accent: "#2E4E6B", muted: "#8B8E93" },
+    collection: "meridian",
+  },
 ];
 
 

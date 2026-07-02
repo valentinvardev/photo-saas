@@ -1100,7 +1100,8 @@
       "body": "Both adapt to your brand. You can switch later.",
       "minimalName": "Minimal", "minimalDesc": "Clean, left-aligned, gallery-forward.",
       "atelierName": "Atelier", "atelierDesc": "Centred, editorial, lots of whitespace.",
-      "halcyonName": "Halcyon", "halcyonDesc": "Warm-dark editorial, italic serif, typographic project index."
+      "halcyonName": "Halcyon", "halcyonDesc": "Warm-dark editorial, italic serif, typographic project index.",
+      "meridianName": "Meridian", "meridianDesc": "Cool gallery aesthetic — split hero, museum-hang grid, steel-blue accent."
     },
     "done": {
       "title": "Your studio is live",
