@@ -59,7 +59,7 @@ export const TEMPLATE_CATALOG: CatalogTemplate[] = [
     name: "Vernissage",
     i18nKey: "vernissage",
     demoUrl: "/templates/vernissage",
-    palette: { bg: "#F6F5F1", fg: "#131518", accent: "#A63A22", muted: "#90928F" },
+    palette: { bg: "#14171D", fg: "#EDEBE4", accent: "#C2A15E", muted: "#8A8E96" },
     serif: "'Fraunces', Georgia, serif",
   },
   {

@@ -1,37 +1,47 @@
 # Vernissage — template design & integration notes
 
-The platform's first **3D template**: a white-cube exhibition rendered as a
-**3D coverflow showcase**. The active photograph takes the wall **facing the
-visitor** — framed, matted, with a museum label — while neighbouring works
-recede at an angle to either side. Built **builder-first** like Meridian: one
-component serves the editor canvas, the `/templates/vernissage` demo and the
-published site.
+The platform's first **3D template**: the **opening night** of an exhibition
+rendered as a **3D coverflow showcase** in a night gallery. Ink-dark walls, a
+cone of light on the frontal work, walnut frames with a brass fillet,
+engraved brass plaques and the gallery's crimson "sold" dot. The active
+photograph takes the spotlit wall **facing the visitor** while neighbouring
+works recede into the dark to either side. Built **builder-first** like
+Meridian: one component serves the editor canvas, the
+`/templates/vernissage` demo and the published site.
 
 > **History**: v1 was a walkable corridor with works hung at ±90° on the side
 > walls. It was replaced — edge-on photos can't be appreciated. The coverflow
 > keeps the 3D room feeling while every photo is viewed head-on. The layout
 > key remains `"corridor"` for saved-design compatibility; only the labels
 > changed ("3D slider" / "Slider 3D").
+> **v3 (2026-07)**: restyled from a daylight white cube to the night gallery
+> — the light palette read too close to Minimal BW in catalog thumbnails.
+> The palette flipped dark (ink/brass), frames became walnut+brass physical
+> constants, and the spotlight cone + floor light pool were added. Node ids,
+> sections and layout keys are unchanged.
 
 ---
 
 ## Concept & design rationale
 
-The "white cube" is the canonical professional gallery format: white walls,
-framed works at eye level, small label plates, a red dot for sold pieces.
-Vernissage (the opening night of an exhibition) translates that into a
-portfolio: the site *is* an exhibition — poster (hero), showcase (3D),
-artist, private-view contact. The 3D interaction is the familiar
-**coverflow**: click a side piece, swipe, wheel or use the arrows and the
-next work swings to the front. The final "slide" is a closing card with a
-commission CTA.
+A vernissage is the **opening night** of an exhibition: the room is dim, the
+works are lit, the plaques are brass and a crimson dot means sold. The site
+*is* that evening — poster (hero, under a soft spot), showcase (3D, under
+the cone of light), artist, private-view contact. The 3D interaction is the
+familiar **coverflow**: click a side piece, swipe, wheel or use the arrows
+and the next work swings to the front. The final "slide" is a closing card
+with a commission CTA.
 
 | Token | Value | Why |
 |---|---|---|
-| Background | `#F6F5F1` | White-cube wall |
-| Text | `#131518` | Ink |
-| Accent | `#A63A22` | The gallery "red dot" (labels, HUD, wayfinding) |
-| Muted | `#90928F` | Concrete grey |
+| Background | `#14171D` | Gallery wall at night (cool ink — vs Halcyon's warm dark) |
+| Text | `#EDEBE4` | Gallery paper |
+| Accent | `#C2A15E` | Brass — plaques, frame fillet, wayfinding |
+| Muted | `#8A8E96` | Concrete grey |
+
+**Physical constants** (not palette-driven, in `VernissageTemplate.tsx`):
+mat `#FAF8F2`, walnut frame `#2B261F`, crimson sold-dot `#C43D2B`. They keep
+the hang reading as real objects whatever wall colour the user picks.
 
 **Typography** (bundled): **Fraunces** (exhibition-title serif, italics),
 **Space Grotesk** (signage sans), **Space Mono** (label plates / HUD).

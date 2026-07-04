@@ -97,9 +97,10 @@ export const TEMPLATES: Record<string, TemplateDef> = {
     initialNodes: VERNISSAGE_NODES,
     sections: VERNISSAGE_SECTIONS,
     Component: VernissageComponent,
-    /* Vernissage is the white-cube 3D exhibition — a coverflow showcase where
-       the active photo faces the visitor. See docs/templates/vernissage.md. */
-    defaultPalette: { bg: "#F6F5F1", fg: "#131518", accent: "#A63A22", muted: "#90928F" },
+    /* Vernissage is the opening-night 3D exhibition — ink-dark walls, brass
+       plaques, a spotlit coverflow where the active photo faces the visitor.
+       See docs/templates/vernissage.md. */
+    defaultPalette: { bg: "#14171D", fg: "#EDEBE4", accent: "#C2A15E", muted: "#8A8E96" },
     defaultTypography: {
       serif: "'Fraunces', Georgia, serif",
       sans:  "'Space Grotesk', system-ui, sans-serif",

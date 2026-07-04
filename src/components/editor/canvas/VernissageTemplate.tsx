@@ -1,14 +1,15 @@
 "use client";
 
 /**
- * VernissageTemplate — a white-cube 3D exhibition for the FRAME builder.
- * Concept: a 3D coverflow. The active photograph takes the wall FACING the
- * visitor — framed, matted, with a museum label — while neighbouring works
- * recede at an angle to either side. Arrows / drag / wheel (or clicking a
- * side piece) bring the next work to the front; the last "slide" is a
- * closing card with a commission CTA. Pure CSS 3D (perspective +
- * preserve-3d): no WebGL, no new dependencies. See
- * docs/templates/vernissage.md.
+ * VernissageTemplate — the opening night of an exhibition, for the FRAME
+ * builder. Concept: a night gallery. Ink-dark walls, a cone of light on the
+ * frontal work, walnut frames with a brass fillet, engraved brass plaques and
+ * the gallery's crimson "sold" dot. The 3D coverflow remains: the active
+ * photograph takes the spotlit wall FACING the visitor while neighbours
+ * recede into the dark. Arrows / drag / wheel (or clicking a side piece)
+ * bring the next work to the front; the last "slide" is a closing card with
+ * a commission CTA. Pure CSS 3D (perspective + preserve-3d): no WebGL, no
+ * new dependencies. See docs/templates/vernissage.md.
  *
  * Compliance with docs/template-adapter-guide.md (pitfalls 1–11):
  *  - No injected CSS — all inline styles on the editor variables.
@@ -30,13 +31,18 @@ import { EditableNode, EditableText, EditableImage, LogoImage } from "./primitiv
 
 /* ── Design tokens — resolve the Design-panel variables ── */
 const C = {
-  bg:     "var(--ed-bg, #F6F5F1)",
-  fg:     "var(--ed-fg, #131518)",
-  accent: "var(--ed-accent, #A63A22)",
-  muted:  "var(--ed-muted, #90928F)",
-  line:   "color-mix(in srgb, var(--ed-fg, #131518) 14%, transparent)",
-  raised: "color-mix(in srgb, var(--ed-fg, #131518) 5%, var(--ed-bg, #F6F5F1))",
+  bg:     "var(--ed-bg, #14171D)",
+  fg:     "var(--ed-fg, #EDEBE4)",
+  accent: "var(--ed-accent, #C2A15E)",
+  muted:  "var(--ed-muted, #8A8E96)",
+  line:   "color-mix(in srgb, var(--ed-fg, #EDEBE4) 14%, transparent)",
+  raised: "color-mix(in srgb, var(--ed-fg, #EDEBE4) 5%, var(--ed-bg, #14171D))",
 };
+/* Physical materials — deliberately NOT palette-driven, so the hang reads as
+   real objects on any wall colour: warm mat, walnut frame, crimson sold-dot. */
+const MAT    = "#FAF8F2";
+const WALNUT = "#2B261F";
+const SOLD   = "#C43D2B";
 const SERIF = "var(--tpl-serif, 'Fraunces', Georgia, serif)";
 const SANS  = "var(--tpl-sans, 'Space Grotesk', system-ui, sans-serif)";
 const MONO  = "var(--tpl-mono, 'Space Mono', ui-monospace, monospace)";
@@ -76,8 +82,8 @@ function Clickable({ kind = "button", href, onActivate, style, children }: {
 
 const btnSolid: React.CSSProperties = {
   fontFamily: SANS, fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
-  color: "var(--ed-btn-fg, var(--ed-bg, #F6F5F1))", background: "var(--ed-btn-bg, var(--ed-fg, #131518))",
-  border: "1px solid var(--ed-btn-bg, var(--ed-fg, #131518))", borderRadius: "var(--ed-btn-radius, 0)",
+  color: "var(--ed-btn-fg, var(--ed-bg, #14171D))", background: "var(--ed-btn-bg, var(--ed-fg, #EDEBE4))",
+  border: "1px solid var(--ed-btn-bg, var(--ed-fg, #EDEBE4))", borderRadius: "var(--ed-btn-radius, 0)",
   padding: "13px 26px",
 };
 const btnGhost: React.CSSProperties = {
@@ -202,9 +208,15 @@ function Showcase({ works, viewport, onOpen }: { works: Work[]; viewport: Viewpo
         touchAction: "pan-y", userSelect: "none",
       }}
     >
-      {/* Back-wall wash + floor line for the white-cube feel */}
+      {/* Night-wall vignette — the room falls into shadow at the edges */}
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
-        background: `linear-gradient(180deg, color-mix(in srgb, var(--ed-fg, #131518) 4%, var(--ed-bg, #F6F5F1)) 0%, var(--ed-bg, #F6F5F1) 22%, var(--ed-bg, #F6F5F1) 74%, color-mix(in srgb, var(--ed-fg, #131518) 8%, var(--ed-bg, #F6F5F1)) 100%)` }} />
+        background: `radial-gradient(120% 95% at 50% 32%, color-mix(in srgb, var(--ed-fg, #EDEBE4) 5%, var(--ed-bg, #14171D)) 0%, var(--ed-bg, #14171D) 52%, color-mix(in srgb, #000 32%, var(--ed-bg, #14171D)) 100%)` }} />
+
+      {/* Spotlight — the cone of light that puts the frontal work on stage */}
+      <div style={{ position: "absolute", left: "50%", top: 0, transform: "translateX(-50%)",
+        width: AW * 2.2, height: "56%", pointerEvents: "none",
+        clipPath: "polygon(41% 0, 59% 0, 100% 100%, 0 100%)",
+        background: `linear-gradient(180deg, color-mix(in srgb, var(--ed-fg, #EDEBE4) 15%, transparent) 0%, color-mix(in srgb, var(--ed-fg, #EDEBE4) 5%, transparent) 62%, transparent 100%)` }} />
 
       {/* Stage — nudge follows the finger while dragging */}
       <div style={{ position: "absolute", inset: 0, perspective: isMobile ? 850 : 1200, perspectiveOrigin: "50% 44%",
@@ -221,27 +233,33 @@ function Showcase({ works, viewport, onOpen }: { works: Work[]; viewport: Viewpo
                   if (front) onOpen(i);
                   else setActive(i);
                 }}>
-                {/* Frame + mat */}
+                {/* Walnut frame + brass fillet + warm mat — spotlit when frontal */}
                 <div style={{
-                  position: "absolute", inset: 0, background: "#FCFBF8",
-                  border: "10px solid color-mix(in srgb, var(--ed-fg, #131518) 90%, transparent)",
-                  boxShadow: front ? "0 34px 60px -24px rgba(0,0,0,0.42)" : "0 22px 40px -20px rgba(0,0,0,0.3)",
+                  position: "absolute", inset: 0, background: MAT,
+                  border: `10px solid ${WALNUT}`,
+                  boxShadow: front
+                    ? `inset 0 0 0 1px var(--ed-accent, #C2A15E), 0 42px 74px -22px rgba(0,0,0,0.7)`
+                    : `inset 0 0 0 1px color-mix(in srgb, var(--ed-accent, #C2A15E) 45%, transparent), 0 24px 44px -20px rgba(0,0,0,0.55)`,
                   padding: isMobile ? 10 : 15, boxSizing: "border-box",
                 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={w.src} alt={w.title ?? ""} loading="lazy"
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block",
-                      filter: front ? "none" : "brightness(0.94)" }} />
+                      filter: front ? "none" : "brightness(0.55) saturate(0.9)",
+                      transition: "filter 0.6s ease" }} />
                 </div>
-                {/* Museum label — only readable on the frontal piece */}
+                {/* Brass plaque — engraved, with the gallery's crimson sold-dot */}
                 <div style={{
                   position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", marginTop: 18,
-                  background: "#FCFBF8", border: `1px solid ${C.line}`, padding: "6px 11px",
+                  background: "var(--ed-accent, #C2A15E)",
+                  border: "1px solid color-mix(in srgb, #000 30%, var(--ed-accent, #C2A15E))",
+                  boxShadow: "0 10px 18px -8px rgba(0,0,0,0.5)",
+                  padding: "6px 11px",
                   display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap",
                   opacity: front ? 1 : 0, transition: "opacity 0.4s ease",
                 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent, flexShrink: 0 }} />
-                  <span style={{ ...mono(9), color: "#131518", letterSpacing: "0.12em" }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: SOLD, flexShrink: 0 }} />
+                  <span style={{ ...mono(9), color: "#1C1710", letterSpacing: "0.12em" }}>
                     {String(i + 1).padStart(2, "0")} — {w.title?.trim() || "Untitled"}
                   </span>
                 </div>
@@ -250,8 +268,8 @@ function Showcase({ works, viewport, onOpen }: { works: Work[]; viewport: Viewpo
           })}
 
           {/* Closing card — frontal when active, so its text edits normally */}
-          <div style={{ ...slideStyle(LAST), background: C.bg, border: `1px solid ${C.line}`,
-            boxShadow: active === LAST ? "0 34px 60px -24px rgba(0,0,0,0.32)" : "0 22px 40px -20px rgba(0,0,0,0.24)",
+          <div style={{ ...slideStyle(LAST), background: C.raised, border: `1px solid ${C.line}`,
+            boxShadow: active === LAST ? "0 42px 74px -22px rgba(0,0,0,0.6)" : "0 24px 44px -20px rgba(0,0,0,0.45)",
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
             gap: 18, padding: "8%", boxSizing: "border-box", textAlign: "center", cursor: active === LAST ? "default" : "pointer" }}
             onClick={() => { if (!draggedRef.current && active !== LAST) setActive(LAST); }}>
@@ -266,15 +284,15 @@ function Showcase({ works, viewport, onOpen }: { works: Work[]; viewport: Viewpo
         </div>
       </div>
 
-      {/* Soft floor shadow under the frontal piece */}
-      <div style={{ position: "absolute", left: "50%", bottom: isMobile ? 54 : 62, transform: "translateX(-50%)",
-        width: AW * 1.3, height: 26, borderRadius: "50%", pointerEvents: "none",
-        background: "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.16), transparent 70%)" }} />
+      {/* Pool of light where the spotlight meets the floor */}
+      <div style={{ position: "absolute", left: "50%", bottom: isMobile ? 46 : 52, transform: "translateX(-50%)",
+        width: AW * 1.8, height: 34, borderRadius: "50%", pointerEvents: "none",
+        background: "radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--ed-fg, #EDEBE4) 14%, transparent), transparent 70%)" }} />
 
       {/* Swipe hint — fades after the first move */}
       <div style={{
         position: "absolute", top: 16, left: "50%", transform: "translateX(-50%)",
-        ...mono(9), color: C.muted, background: "color-mix(in srgb, var(--ed-bg, #F6F5F1) 82%, transparent)",
+        ...mono(9), color: C.muted, background: "color-mix(in srgb, var(--ed-bg, #14171D) 82%, transparent)",
         border: `1px solid ${C.line}`, padding: "6px 12px", pointerEvents: "none",
         opacity: active > 0 ? 0 : 1, transition: "opacity 0.5s ease",
       }}>
@@ -282,7 +300,7 @@ function Showcase({ works, viewport, onOpen }: { works: Work[]; viewport: Viewpo
       </div>
 
       {/* HUD — counter, progress, arrows */}
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", gap: 14, padding: isMobile ? "10px 14px" : "12px 22px", background: "color-mix(in srgb, var(--ed-bg, #F6F5F1) 88%, transparent)", borderTop: `1px solid ${C.line}`, backdropFilter: "blur(6px)" }}>
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", gap: 14, padding: isMobile ? "10px 14px" : "12px 22px", background: "color-mix(in srgb, var(--ed-bg, #14171D) 88%, transparent)", borderTop: `1px solid ${C.line}`, backdropFilter: "blur(6px)" }}>
         <span style={{ ...mono(9), color: C.fg, fontWeight: 700, flexShrink: 0 }}>
           {active === LAST ? "Fin" : `${String(counterNo).padStart(2, "0")}/${String(N).padStart(2, "0")}`}
         </span>
@@ -316,20 +334,20 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
   const arrow: React.CSSProperties = {
     position: "absolute", top: "50%", transform: "translateY(-50%)", width: 44, height: 44,
     display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
-    background: "rgba(246,245,241,0.06)", border: "1px solid rgba(246,245,241,0.18)",
-    color: "rgba(246,245,241,0.85)", borderRadius: "50%",
+    background: "rgba(237,235,228,0.06)", border: "1px solid rgba(237,235,228,0.18)",
+    color: "rgba(237,235,228,0.85)", borderRadius: "50%",
   };
   return (
     <div onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(10,11,12,0.96)", display: "flex", alignItems: "center", justifyContent: "center", padding: "56px 64px" }}>
-      <button onClick={onClose} style={{ position: "absolute", top: 20, right: 24, background: "none", border: "none", cursor: "pointer", color: "rgba(246,245,241,0.7)", ...mono(11) }}>Close ✕</button>
+      <button onClick={onClose} style={{ position: "absolute", top: 20, right: 24, background: "none", border: "none", cursor: "pointer", color: "rgba(237,235,228,0.7)", ...mono(11) }}>Close ✕</button>
       {index > 0 && <button onClick={() => setIndex((i) => i - 1)} style={{ ...arrow, left: 16 }}>←</button>}
       {index < works.length - 1 && <button onClick={() => setIndex((i) => i + 1)} style={{ ...arrow, right: 16 }}>→</button>}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={w.src} alt={w.title ?? ""} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
-      <div style={{ position: "absolute", bottom: 20, left: 0, right: 0, display: "flex", justifyContent: "space-between", padding: "0 32px", color: "rgba(246,245,241,0.6)" }}>
+      <div style={{ position: "absolute", bottom: 20, left: 0, right: 0, display: "flex", justifyContent: "space-between", padding: "0 32px", color: "rgba(237,235,228,0.6)" }}>
         <span style={mono(10)}>{String(index + 1).padStart(2, "0")} / {String(works.length).padStart(2, "0")}</span>
-        {w.title && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(246,245,241,0.85)" }}>{w.title}</span>}
+        {w.title && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(237,235,228,0.85)" }}>{w.title}</span>}
         <span />
       </div>
     </div>
@@ -465,8 +483,10 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
         </div>
       </nav>
 
-      {/* ── POSTER (hero) ── */}
-      <section id="vrn-hero" style={{ padding: `${isMobile ? "3.5rem" : "6rem"} ${px} ${isMobile ? "3rem" : "5rem"}`, textAlign: "center", maxWidth: 1000, margin: "0 auto" }}>
+      {/* ── POSTER (hero) — a soft spot warms the title out of the dark ── */}
+      <section id="vrn-hero" style={{ position: "relative", padding: `${isMobile ? "3.5rem" : "6rem"} ${px} ${isMobile ? "3rem" : "5rem"}`, textAlign: "center", maxWidth: 1000, margin: "0 auto" }}>
+        <div aria-hidden style={{ position: "absolute", left: "50%", top: 0, transform: "translateX(-50%)", width: 780, maxWidth: "100%", height: "78%", pointerEvents: "none",
+          background: "radial-gradient(50% 58% at 50% 40%, color-mix(in srgb, var(--ed-fg, #EDEBE4) 7%, transparent), transparent 72%)" }} />
         <EditableNode id="vrn-hero-eyebrow" tag="span" style={{ ...mono(10), color: C.accent, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 8, marginBottom: isMobile ? 22 : 32 }}>
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.accent, display: "inline-block" }} />
           <EditableText id="vrn-hero-eyebrow" display="inline" />
@@ -536,7 +556,7 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
       <section id="vrn-about" style={{ padding: `${isMobile ? "3.5rem" : "6rem"} ${px}` }}>
         <Label index="02" nodeId="vrn-about-label" isMobile={isMobile} />
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(240px, 340px) 1fr", gap: isMobile ? "2.2rem" : "4.5rem", alignItems: "start" }}>
-          <EditableNode id="vrn-about-image" style={{ position: "relative", width: "100%", maxWidth: isMobile ? 300 : undefined, aspectRatio: "4 / 5", overflow: "hidden", background: "#FCFBF8", border: "9px solid color-mix(in srgb, var(--ed-fg, #131518) 90%, transparent)", padding: 10, boxSizing: "border-box", boxShadow: "0 22px 44px -20px rgba(0,0,0,0.3)" }}>
+          <EditableNode id="vrn-about-image" style={{ position: "relative", width: "100%", maxWidth: isMobile ? 300 : undefined, aspectRatio: "4 / 5", overflow: "hidden", background: MAT, border: `9px solid ${WALNUT}`, padding: 10, boxSizing: "border-box", boxShadow: "inset 0 0 0 1px var(--ed-accent, #C2A15E), 0 26px 50px -20px rgba(0,0,0,0.6)" }}>
             <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
               <EditableImage id="vrn-about-image" imgStyle={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             </div>
@@ -599,8 +619,8 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
           <EditableText id="vrn-footer-copy" display="inline" />
         </EditableNode>
         <span style={{ ...mono(9), color: C.muted, display: "inline-flex", alignItems: "center", gap: 6 }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent, display: "inline-block" }} />
-          White cube · Room 1
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: SOLD, display: "inline-block" }} />
+          Opening night · Room 1
         </span>
       </footer>
 

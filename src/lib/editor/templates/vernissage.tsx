@@ -19,9 +19,9 @@ export const VERNISSAGE_NODES: Record<string, EditorNode> = {
 
   /* Hero — exhibition poster */
   "vrn-hero-eyebrow":  { id: "vrn-hero-eyebrow",  type: "paragraph", content: "Solo exhibition · Room 1" },
-  "vrn-hero-title":    { id: "vrn-hero-title",    type: "heading",   content: "The Long<br/><em>Afternoon</em>" },
-  "vrn-hero-dates":    { id: "vrn-hero-dates",    type: "paragraph", content: "12 Sep — 30 Nov · Open daily" },
-  "vrn-hero-sub":      { id: "vrn-hero-sub",      type: "paragraph", content: "Twelve photographs about light that refuses to hurry. Walk the room — every piece hangs at eye level, the way it was meant to be seen." },
+  "vrn-hero-title":    { id: "vrn-hero-title",    type: "heading",   content: "Opening<br/><em>Night</em>" },
+  "vrn-hero-dates":    { id: "vrn-hero-dates",    type: "paragraph", content: "12 Sep · Doors 19:00 — late" },
+  "vrn-hero-sub":      { id: "vrn-hero-sub",      type: "paragraph", content: "Twelve photographs, hung for one night. The room is dark, the works are lit — walk through and let each piece take the wall in front of you." },
   "vrn-hero-cta":      { id: "vrn-hero-cta",      type: "paragraph", content: "Enter the gallery" },
 
   /* Gallery (3D showcase) */
