@@ -12,7 +12,7 @@ export type CatalogTemplate = {
   /** Display name; also persisted as Portfolio.template. */
   name: string;
   /** i18n stem: name/desc resolve via `onb.template.${i18nKey}Name|Desc`. */
-  i18nKey: "minimal" | "atelier" | "halcyon";
+  i18nKey: "minimal" | "atelier" | "halcyon" | "meridian" | "vernissage";
   /** Static demo page rendered inside preview iframes (`?lang=` aware). */
   demoUrl: string;
   /** Brand palette shown as swatches on the catalog cards. */
@@ -45,6 +45,22 @@ export const TEMPLATE_CATALOG: CatalogTemplate[] = [
     demoUrl: "/template/halcyon",
     palette: { bg: "#0E0D0B", fg: "#EFEAE0", accent: "#C2410C", muted: "#8A8378" },
     serif: "'Instrument Serif', Georgia, serif",
+  },
+  {
+    id: "meridian",
+    name: "Meridian",
+    i18nKey: "meridian",
+    demoUrl: "/templates/meridian",
+    palette: { bg: "#F4F2ED", fg: "#16181B", accent: "#2E4E6B", muted: "#8B8E93" },
+    serif: "'Playfair Display', Georgia, serif",
+  },
+  {
+    id: "vernissage",
+    name: "Vernissage",
+    i18nKey: "vernissage",
+    demoUrl: "/templates/vernissage",
+    palette: { bg: "#F6F5F1", fg: "#131518", accent: "#A63A22", muted: "#90928F" },
+    serif: "'Fraunces', Georgia, serif",
   },
 ];
 
