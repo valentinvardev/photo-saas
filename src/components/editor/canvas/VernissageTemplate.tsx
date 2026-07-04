@@ -109,7 +109,7 @@ function Label({ index, nodeId, isMobile }: { index: string; nodeId: string; isM
    THE 3D SHOWCASE (coverflow)
    Active work faces the visitor; neighbours recede at an angle.
 ═══════════════════════════════════════════ */
-function Showcase({ works, viewport, onOpen }: { works: Work[]; viewport: Viewport; onOpen: (i: number) => void }) {
+function Showcase({ works, viewport, onOpen, onViewAll }: { works: Work[]; viewport: Viewport; onOpen: (i: number) => void; onViewAll: () => void }) {
   const readOnly   = useEditorStore((s) => s.readOnly);
   const selectedId = useEditorStore((s) => s.selectedId);
   const isMobile = viewport === "mobile";
@@ -249,36 +249,30 @@ function Showcase({ works, viewport, onOpen }: { works: Work[]; viewport: Viewpo
                       filter: front ? "none" : "brightness(0.55) saturate(0.9)",
                       transition: "filter 0.6s ease" }} />
                 </div>
-                {/* Brass plaque — engraved, with the gallery's crimson sold-dot */}
-                <div style={{
-                  position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", marginTop: 18,
-                  background: "var(--ed-accent, #C2A15E)",
-                  border: "1px solid color-mix(in srgb, #000 30%, var(--ed-accent, #C2A15E))",
-                  boxShadow: "0 10px 18px -8px rgba(0,0,0,0.5)",
-                  padding: "6px 11px",
-                  display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap",
-                  opacity: front ? 1 : 0, transition: "opacity 0.4s ease",
-                }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: SOLD, flexShrink: 0 }} />
-                  <span style={{ ...mono(9), color: "#1C1710", letterSpacing: "0.12em" }}>
-                    {String(i + 1).padStart(2, "0")} — {w.title?.trim() || "Untitled"}
-                  </span>
-                </div>
               </div>
             );
           })}
 
-          {/* Closing card — frontal when active, so its text edits normally */}
+          {/* Closing card — "view all work": a mosaic teaser that opens the
+              full gallery. Frontal when active, so its text edits normally. */}
           <div style={{ ...slideStyle(LAST), background: C.raised, border: `1px solid ${C.line}`,
             boxShadow: active === LAST ? "0 42px 74px -22px rgba(0,0,0,0.6)" : "0 24px 44px -20px rgba(0,0,0,0.45)",
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-            gap: 18, padding: "8%", boxSizing: "border-box", textAlign: "center", cursor: active === LAST ? "default" : "pointer" }}
+            gap: isMobile ? 12 : 16, padding: "8%", boxSizing: "border-box", textAlign: "center", cursor: active === LAST ? "default" : "pointer" }}
             onClick={() => { if (!draggedRef.current && active !== LAST) setActive(LAST); }}>
-            <span style={{ width: 9, height: 9, borderRadius: "50%", background: C.accent }} />
-            <EditableNode id="vrn-endwall-title" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? 20 : 27, lineHeight: 1.15, letterSpacing: "-0.01em", color: C.fg, margin: 0 }}>
+            {/* Mosaic teaser — a glimpse of the full collection */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 4, width: "72%" }}>
+              {works.slice(0, 6).map((w) => (
+                <div key={w.id} style={{ position: "relative", aspectRatio: "1 / 1", overflow: "hidden", border: `1px solid ${C.line}` }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={w.src} alt="" loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.8)" }} />
+                </div>
+              ))}
+            </div>
+            <EditableNode id="vrn-endwall-title" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? 17 : 23, lineHeight: 1.15, letterSpacing: "-0.01em", color: C.fg, margin: 0 }}>
               <EditableText id="vrn-endwall-title" />
             </EditableNode>
-            <Clickable onActivate={() => document.getElementById("vrn-contact")?.scrollIntoView({ behavior: "smooth" })} style={{ ...btnSolid, padding: "11px 20px", fontSize: 11 }}>
+            <Clickable onActivate={onViewAll} style={{ ...btnSolid, padding: "11px 20px", fontSize: 11 }}>
               <EditableNode id="vrn-endwall-cta" tag="span"><EditableText id="vrn-endwall-cta" display="inline" /></EditableNode>
             </Clickable>
           </div>
@@ -350,6 +344,44 @@ function Lightbox({ works, startIndex, onClose }: { works: Work[]; startIndex: n
         <span style={mono(10)}>{String(index + 1).padStart(2, "0")} / {String(works.length).padStart(2, "0")}</span>
         {w.title && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(237,235,228,0.85)" }}>{w.title}</span>}
         <span />
+      </div>
+    </div>
+  );
+}
+
+/* ── Gallery modal — every work in the collection (live site only) ── */
+function GalleryModal({ works, onOpen, onClose }: { works: Work[]; onOpen: (i: number) => void; onClose: () => void }) {
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, [onClose]);
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 1900, background: "rgba(10,11,12,0.97)", display: "flex", flexDirection: "column" }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 28px", borderBottom: "1px solid rgba(237,235,228,0.12)", flexShrink: 0 }}>
+        <span style={{ ...mono(10), color: "rgba(237,235,228,0.85)", display: "inline-flex", alignItems: "center", gap: 10 }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--ed-accent, #C2A15E)", display: "inline-block" }} />
+          All work
+        </span>
+        <span style={{ ...mono(10), color: "rgba(237,235,228,0.45)" }}>{String(works.length).padStart(2, "0")} pieces</span>
+        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(237,235,228,0.7)", ...mono(11) }}>Close ✕</button>
+      </div>
+      {/* Grid */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "28px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16, maxWidth: 1280, margin: "0 auto" }}>
+          {works.map((w, i) => (
+            <div key={w.id} onClick={() => onOpen(i)}
+              style={{ position: "relative", aspectRatio: "4 / 5", overflow: "hidden", cursor: "zoom-in", background: "#0e1013", border: "1px solid rgba(237,235,228,0.1)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={w.src} alt={w.title ?? ""} loading="lazy"
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.92)", transition: "filter 0.25s ease, transform 0.35s ease" }}
+                onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(1)"; e.currentTarget.style.transform = "scale(1.03)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.filter = "brightness(0.92)"; e.currentTarget.style.transform = "scale(1)"; }} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -429,6 +461,7 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
   const works = useWorks();
   const roomWorks = works.slice(0, 12);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const openLightbox = (i: number) => { if (readOnly) setLightboxIdx(i); };
 
   /* Flat fallback layouts (Design > Grid) */
@@ -521,7 +554,7 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
         </div>
 
         {grid.layout === "corridor" ? (
-          <Showcase works={roomWorks} viewport={viewport} onOpen={openLightbox} />
+          <Showcase works={roomWorks} viewport={viewport} onOpen={openLightbox} onViewAll={() => { if (readOnly) setGalleryOpen(true); }} />
         ) : (
           /* Flat fallbacks so the Grid panel choice is honoured */
           <div style={{ padding: `0 ${px} ${isMobile ? "1rem" : "2rem"}` }}>
@@ -625,8 +658,11 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
         </span>
       </footer>
 
+      {readOnly && galleryOpen && (
+        <GalleryModal works={works} onOpen={(i) => setLightboxIdx(i)} onClose={() => setGalleryOpen(false)} />
+      )}
       {readOnly && lightboxIdx !== null && (
-        <Lightbox works={grid.layout === "corridor" ? roomWorks : pagedWorks} startIndex={lightboxIdx} onClose={() => setLightboxIdx(null)} />
+        <Lightbox works={galleryOpen ? works : grid.layout === "corridor" ? roomWorks : pagedWorks} startIndex={lightboxIdx} onClose={() => setLightboxIdx(null)} />
       )}
     </div>
   );

@@ -56,6 +56,8 @@ absolutely at the center. Each slide's transform derives from its offset
   shadow, museum label fades in.
 - `|d| ≥ 1` → recedes: `translateX(d · spread) translateZ(-170 − |d|·80)
   rotateY(∓42°)`, opacity falls off; hidden beyond `|d| > 3`.
+- The final "slide" is the View-all-work card; its CTA opens the gallery
+  modal with every photo (not just the 12 hung in the showcase).
 
 Changing `active` animates every slide (0.6 s spring-ish cubic-bezier).
 
@@ -105,8 +107,10 @@ Design > Grid panel switch to flat grids (columns/gap/fit/load-more).
 - **Contact**: `vrn-contact-label/heading/body`, `vrn-contact-d{1..3}-label/value`
 - **Footer**: `vrn-footer-brand`, `vrn-footer-copy`
 
-Museum labels on the slides are array-driven (photo title or "Untitled") —
-not editable nodes, per the adapter guide.
+The slides carry no labels — the works hang clean (plaques were removed by
+request). The closing card is a **View-all-work** teaser: a 3×2 mosaic +
+title + CTA that opens a full-collection gallery modal (live site only);
+clicking a piece there opens the lightbox over it.
 
 ## Compliance (pitfalls 1–11)
 

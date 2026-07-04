@@ -8,7 +8,11 @@ import { DevicePreviewModal, LivePreviewThumbnail } from "~/components/dashboard
 import { ContentTree } from "~/components/portfolio/ContentTree";
 import { PhotoPickerModal } from "~/components/portfolio/PhotoPickerModal";
 import { ShareModal } from "~/components/share/ShareModal";
-import { TEMPLATE_URL, TEMPLATES, type Portfolio } from "~/lib/portfolio/mock";
+import { type Portfolio } from "~/lib/portfolio/mock";
+import { TemplateCatalogList, TemplateCatalogPreview } from "~/components/templates/TemplateCatalog";
+import { catalogTemplate } from "~/lib/templates/catalog";
+import { buildMinimalNodes, buildAtelierNodes, buildHalcyonNodes, type Identity } from "~/components/onboarding/brandData";
+import type { TemplateId } from "~/lib/editor/templates/registry";
 import { dbToView } from "~/lib/portfolio/adapt";
 import { portfolioPublicUrl, portfolioPublicLabel } from "~/lib/portfolio/url";
 import { usePortfolioContentSync } from "~/lib/portfolio/useContentSync";
@@ -274,9 +278,9 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
             </motion.div>
           )}
 
-          {tab === "template" && (
+          {tab === "template" && dbP && (
             <motion.div key="template" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <TemplateTab portfolio={portfolio} save={save} saving={publishMut.isPending} />
+              <TemplateTab portfolio={portfolio} dbP={dbP} save={save} />
             </motion.div>
           )}
 
@@ -334,16 +338,46 @@ export default function PortfolioManagePage({ params }: { params: Promise<{ id: 
 
 /* ─── Tabs ─────────────────────────────────────────────────── */
 
-function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: SaveFn; saving: boolean }) {
-  const { t } = useT();
-  const [selected, setSelected] = useState(portfolio.template);
-  /* Keep the local pick in sync if the applied template changes elsewhere. */
-  useEffect(() => { setSelected(portfolio.template); }, [portfolio.template]);
+function TemplateTab({ portfolio, dbP, save }: { portfolio: Portfolio; dbP: DbPortfolio; save: SaveFn }) {
+  const { t, locale } = useT();
+  const saveDesignMut = api.portfolio.saveDesign.useMutation();
 
-  const dirty = selected !== portfolio.template;
+  /* What's actually applied lives in editorState.templateId (the cosmetic
+     Portfolio.template string is legacy — old rows may say "Brooklyn"). */
+  const appliedId = ((dbP.editorState as { templateId?: string } | null)?.templateId ?? "minimal-bw") as TemplateId;
+  const [selected, setSelected] = useState<TemplateId>(appliedId);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [applying, setApplying] = useState(false);
+  useEffect(() => { setSelected(appliedId); }, [appliedId]);
+
+  const dirty = selected !== appliedId;
+  const selectedTpl = catalogTemplate(selected);
+  const selectedName = t(`onb.template.${selectedTpl.i18nKey}Name`);
+
+  /* Applying a template resets the design: fresh nodes (Spanish demo copy
+     when the locale is Spanish), palette/typography from the new template's
+     defaults. Photos and content are untouched — only editor design is lost. */
+  async function applyTemplate() {
+    if (applying) return;
+    setApplying(true);
+    try {
+      const emptyIdentity: Identity = { first: "", last: "", location: "", bio: "" };
+      const nodes = locale === "es"
+        ? selected === "minimal-bw" ? buildMinimalNodes(locale, emptyIdentity)
+        : selected === "atelier"    ? buildAtelierNodes(locale, emptyIdentity)
+        : selected === "halcyon"    ? buildHalcyonNodes(locale, emptyIdentity)
+        : undefined
+        : undefined;
+      await saveDesignMut.mutateAsync({ id: portfolio.id, editorState: { templateId: selected, ...(nodes ? { nodes } : {}) } });
+      save({ template: selectedTpl.name });
+      setConfirmOpen(false);
+    } finally {
+      setApplying(false);
+    }
+  }
 
   return (
-    <div className="max-w-4xl space-y-6">
+    <div className="max-w-5xl space-y-6">
       <div>
         <h2 className="font-sans font-bold text-[var(--fg)] text-base">{t("pm.template.title")}</h2>
         <p className="font-mono text-[12px] text-[var(--fg-muted)] mt-0.5 uppercase tracking-widest">
@@ -351,74 +385,66 @@ function TemplateTab({ portfolio, save, saving }: { portfolio: Portfolio; save: 
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {TEMPLATES.map((tpl) => {
-          const url     = TEMPLATE_URL[tpl];
-          const active  = selected === tpl;            // the user's current pick (highlight)
-          const inUse   = portfolio.template === tpl;  // what's actually applied
-          return (
-            <button
-              key={tpl}
-              onClick={() => setSelected(tpl)}
-              className={`text-left rounded-xl overflow-hidden border transition-all ${
-                active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"
-              }`}
+      <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6 items-start">
+        <TemplateCatalogList selectedId={selected} onSelect={setSelected} />
+        <div className="space-y-3">
+          <TemplateCatalogPreview
+            template={selectedTpl}
+            slug={portfolio.slug}
+            onUse={dirty ? () => setConfirmOpen(true) : undefined}
+          />
+          {!dirty && (
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)]">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+              <span className="font-mono text-[12px] text-[var(--fg-muted)] uppercase tracking-widest">{t("pm.template.inUse")}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Confirmation — switching template erases the current design */}
+      <AnimatePresence>
+        {confirmOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => !applying && setConfirmOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              transition={{ duration: 0.18 }}
+              className="w-full max-w-md rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] shadow-2xl p-6"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="aspect-[16/10] bg-[var(--bg-subtle)] overflow-hidden">
-                {url && <LivePreviewThumbnail url={url} baseWidth={1280} className="w-full h-full" />}
+              <div className="w-10 h-10 rounded-full bg-yellow/10 border border-yellow/30 flex items-center justify-center mb-4">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
               </div>
-              <div className="p-3 flex items-center justify-between gap-2">
-                <span className="font-sans font-bold text-[var(--fg)] text-sm capitalize">{tpl}</span>
-                {inUse ? (
-                  <span className="font-mono text-[13px] text-yellow bg-yellow/10 border border-yellow/30 px-1.5 py-0.5 rounded shrink-0">
-                    {t("pm.template.inUse")}
-                  </span>
-                ) : active ? (
-                  <span className="font-mono text-[13px] text-[var(--fg-muted)] bg-[var(--bg-subtle)] border border-[var(--border)] px-1.5 py-0.5 rounded shrink-0">
-                    {t("pm.template.selected")}
-                  </span>
-                ) : null}
+              <h3 className="font-sans font-black text-[var(--fg)] text-lg mb-2">{t("pm.template.confirmTitle")}</h3>
+              <p className="font-sans text-sm text-[var(--fg-muted)] leading-relaxed mb-5">
+                {t("pm.template.confirmBody", { template: selectedName })}
+              </p>
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  onClick={() => setConfirmOpen(false)}
+                  disabled={applying}
+                  className="px-4 py-2 rounded-xl border border-[var(--border)] font-sans text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] disabled:opacity-40 transition-colors"
+                >
+                  {t("pm.template.confirmCancel")}
+                </button>
+                <button
+                  onClick={() => void applyTemplate()}
+                  disabled={applying}
+                  className="px-5 py-2 rounded-xl bg-yellow text-[#111] font-sans font-bold text-sm hover:bg-yellow/90 disabled:opacity-60 transition-colors"
+                >
+                  {applying ? t("pm.template.applying") : t("pm.template.confirmApply")}
+                </button>
               </div>
-            </button>
-          );
-        })}
-
-        {/* Browse all */}
-        <Link
-          href="/dashboard/templates"
-          target="_blank"
-          className="group text-left rounded-xl overflow-hidden border border-dashed border-[var(--border)] hover:border-yellow transition-all flex flex-col"
-        >
-          <div className="aspect-[16/10] bg-[var(--bg-subtle)] group-hover:bg-yellow/5 transition-colors flex items-center justify-center text-[var(--fg-muted)] group-hover:text-yellow">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-            </svg>
-          </div>
-          <div className="p-3 flex items-center justify-between">
-            <span className="font-sans font-bold text-[var(--fg-muted)] group-hover:text-[var(--fg)] text-sm transition-colors">{t("pm.template.browseAll")}</span>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] group-hover:text-yellow transition-colors">
-              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
-          </div>
-        </Link>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => { if (dirty) save({ template: selected }); }}
-          disabled={!dirty || saving}
-          className="px-4 py-2 rounded-lg bg-yellow text-[#111] font-sans text-xs font-bold hover:bg-yellow/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          {saving ? t("pm.template.applying") : dirty ? t("pm.template.apply") : t("pm.template.applied")}
-        </button>
-        <Link
-          href="/dashboard/templates"
-          className="px-4 py-2 rounded-lg border border-[var(--border)] font-sans text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
-        >
-          {t("pm.template.browseAllArrow")}
-        </Link>
-      </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

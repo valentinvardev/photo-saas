@@ -26,9 +26,9 @@ export const VERNISSAGE_NODES: Record<string, EditorNode> = {
 
   /* Gallery (3D showcase) */
   "vrn-gallery-label": { id: "vrn-gallery-label", type: "paragraph", content: "The exhibition" },
-  "vrn-gallery-note":  { id: "vrn-gallery-note",  type: "paragraph", content: "Wall text — swipe or use the arrows. Each photograph takes the wall in front of you, framed and hung with its museum label; click the frontal piece to view it up close." },
-  "vrn-endwall-title": { id: "vrn-endwall-title", type: "heading",   content: "End of the exhibition.<br/><em>Thank you for visiting.</em>" },
-  "vrn-endwall-cta":   { id: "vrn-endwall-cta",   type: "paragraph", content: "Commission the artist" },
+  "vrn-gallery-note":  { id: "vrn-gallery-note",  type: "paragraph", content: "Wall text — swipe or use the arrows. Each photograph takes the wall in front of you; click the frontal piece to view it up close." },
+  "vrn-endwall-title": { id: "vrn-endwall-title", type: "heading",   content: "The collection<br/><em>continues.</em>" },
+  "vrn-endwall-cta":   { id: "vrn-endwall-cta",   type: "paragraph", content: "View all work" },
 
   /* About */
   "vrn-about-label":   { id: "vrn-about-label",   type: "paragraph", content: "The artist" },
