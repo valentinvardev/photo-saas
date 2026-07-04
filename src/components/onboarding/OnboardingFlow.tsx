@@ -17,7 +17,9 @@ import { LiveTemplatePreview } from "./LiveTemplatePreview";
 import { TemplateCatalogList } from "~/components/templates/TemplateCatalog";
 import {
   PALETTES, PAIRINGS, pairingTypography, TEMPLATE_OPTIONS,
-  buildMinimalNodes, buildAtelierNodes, buildHalcyonNodes, buildOnboardingContent, fullName, initials,
+  buildMinimalNodes, buildAtelierNodes, buildHalcyonNodes,
+  buildMeridianNodes, buildVernissageNodes, buildSerenataNodes,
+  buildOnboardingContent, fullName, initials,
   type Identity, type OnbFolder, type OnbPhoto,
 } from "./brandData";
 
@@ -115,6 +117,9 @@ export function OnboardingFlow() {
     template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact, avatarUrl) :
     template.id === "atelier"    ? buildAtelierNodes(locale, identity) :
     template.id === "halcyon"    ? buildHalcyonNodes(locale, identity) :
+    template.id === "meridian"   ? buildMeridianNodes(locale, identity, contact) :
+    template.id === "vernissage" ? buildVernissageNodes(locale, identity, contact) :
+    template.id === "serenata"   ? buildSerenataNodes(locale, identity, contact) :
     undefined;
 
   const logoSettings: LogoSettings | undefined = hasLogo
@@ -198,6 +203,9 @@ export function OnboardingFlow() {
         template.id === "minimal-bw" ? buildMinimalNodes(locale, identity, navLogoText, contact, avatarUrl) :
         template.id === "atelier"    ? buildAtelierNodes(locale, identity) :
         template.id === "halcyon"    ? buildHalcyonNodes(locale, identity) :
+        template.id === "meridian"   ? buildMeridianNodes(locale, identity, contact) :
+        template.id === "vernissage" ? buildVernissageNodes(locale, identity, contact) :
+        template.id === "serenata"   ? buildSerenataNodes(locale, identity, contact) :
         undefined;
       const content = contentPhotos.length > 0 ? buildOnboardingContent(locale, folders, contentPhotos) : undefined;
       const editorState = { templateId: template.id, palette, typography: typo, nodes, logo: logoSettings, contact: contactSettings };

@@ -229,3 +229,171 @@ export function buildHalcyonNodes(locale: string, id: Identity): Record<string, 
 
   return out;
 }
+
+/* Meridian — Spanish demo copy + identity overrides. */
+export function buildMeridianNodes(locale: string, id: Identity, contact?: { email?: string; phone?: string }): Record<string, EditorNode> {
+  const es = locale === "es";
+  const out: Record<string, EditorNode> = {};
+  const n = (nid: string, type: EditorNode["type"], content: string): void => { out[nid] = { id: nid, type, content }; };
+
+  if (es) {
+    n("mrd-nav-item-1",    "paragraph", "Trabajos");
+    n("mrd-nav-item-2",    "paragraph", "Sobre mí");
+    n("mrd-nav-item-3",    "paragraph", "Contacto");
+    n("mrd-nav-cta",       "paragraph", "Reservar sesión");
+    n("mrd-hero-eyebrow",  "paragraph", "Fotografía editorial y de autor");
+    n("mrd-hero-title",    "heading",   "Cada cuadro,<br/><em>medido.</em>");
+    n("mrd-hero-sub",      "paragraph", "Retratos, espacios y paisajes silenciosos — fotografiados con la paciencia de una sala de galería.");
+    n("mrd-hero-meta",     "paragraph", "Desde 2014");
+    n("mrd-hero-cta-1",    "paragraph", "Ver el trabajo");
+    n("mrd-hero-cta-2",    "paragraph", "Sobre el estudio");
+    n("mrd-hero-caption",  "paragraph", "Sala I — mañana");
+    n("mrd-work-label",    "paragraph", "Trabajo seleccionado");
+    n("mrd-work-intro",    "paragraph", "Una selección rotativa de encargos recientes y series personales.");
+    n("mrd-serv-label",    "paragraph", "Servicios");
+    n("mrd-serv-1-title",  "heading",   "Sesiones de retrato");
+    n("mrd-serv-1-desc",   "paragraph", "En estudio o exteriores. De una hora a un día completo — con dirección incluida, sin apuros.");
+    n("mrd-serv-2-title",  "heading",   "Editorial y marcas");
+    n("mrd-serv-2-desc",   "paragraph", "Campañas, lookbooks e interiores para publicaciones y estudios que valoran la contención.");
+    n("mrd-serv-3-title",  "heading",   "Bodas, en silencio");
+    n("mrd-serv-3-desc",   "paragraph", "Un enfoque documental para ceremonias íntimas — sin listas de poses, sin interrupciones.");
+    n("mrd-about-label",   "paragraph", "Sobre mí");
+    n("mrd-about-heading", "heading",   "Luz, geometría<br/>y <em>tiempo suficiente.</em>");
+    n("mrd-about-body",    "paragraph", "Fotografío como un curador cuelga una sala: despacio, y con un argumento. Diez años entre editorial, arquitectura y retrato me enseñaron que las imágenes más fuertes son las que dejás de recortar.");
+    n("mrd-stat-1-label",  "paragraph", "Años");
+    n("mrd-stat-2-label",  "paragraph", "Encargos");
+    n("mrd-stat-3-label",  "paragraph", "Exposiciones");
+    n("mrd-contact-label",   "paragraph", "Contacto");
+    n("mrd-contact-heading", "heading",   "Encargá<br/><em>una serie.</em>");
+    n("mrd-contact-body",    "paragraph", "Contame del proyecto — el lugar, las personas, la fecha límite. Respondo cada mensaje en menos de dos días.");
+    n("mrd-contact-d1-label", "paragraph", "Estudio");
+    n("mrd-contact-d2-label", "paragraph", "Teléfono");
+    n("mrd-contact-d3-label", "paragraph", "Visitas");
+  }
+
+  if (id.first || id.last) {
+    const year = new Date().getFullYear();
+    const name = fullName(id);
+    n("mrd-nav-brand",    "logo",      esc(name));
+    n("mrd-footer-brand", "logo",      esc(name));
+    n("mrd-footer-copy",  "paragraph", `© ${year} ${esc(name)}`);
+  }
+  if (id.location) n("mrd-hero-meta", "paragraph", (es ? "Desde 2014 · " : "Est. 2014 · ") + esc(id.location));
+  if (id.bio) {
+    n("mrd-hero-sub",   "paragraph", esc(id.bio));
+    n("mrd-about-body", "paragraph", esc(id.bio));
+  }
+  if (contact?.email) n("mrd-contact-d1-value", "paragraph", esc(contact.email));
+  if (contact?.phone) n("mrd-contact-d2-value", "paragraph", esc(contact.phone));
+  if (id.location)    n("mrd-contact-d3-value", "paragraph", esc(id.location) + (es ? " — con cita previa" : " — by appointment"));
+
+  return out;
+}
+
+/* Vernissage — Spanish demo copy + identity overrides. */
+export function buildVernissageNodes(locale: string, id: Identity, contact?: { email?: string; phone?: string }): Record<string, EditorNode> {
+  const es = locale === "es";
+  const out: Record<string, EditorNode> = {};
+  const n = (nid: string, type: EditorNode["type"], content: string): void => { out[nid] = { id: nid, type, content }; };
+
+  if (es) {
+    n("vrn-nav-item-1",    "paragraph", "Exposición");
+    n("vrn-nav-item-2",    "paragraph", "Artista");
+    n("vrn-nav-item-3",    "paragraph", "Contacto");
+    n("vrn-nav-cta",       "paragraph", "Visita privada");
+    n("vrn-hero-eyebrow",  "paragraph", "Exposición individual · Sala 1");
+    n("vrn-hero-title",    "heading",   "Noche de<br/><em>inauguración</em>");
+    n("vrn-hero-dates",    "paragraph", "12 sep · Puertas 19:00 — hasta tarde");
+    n("vrn-hero-sub",      "paragraph", "Doce fotografías, colgadas por una noche. La sala está a oscuras, las obras iluminadas — recorrela y dejá que cada pieza tome la pared frente a vos.");
+    n("vrn-hero-cta",      "paragraph", "Entrar a la galería");
+    n("vrn-gallery-label", "paragraph", "La exposición");
+    n("vrn-gallery-note",  "paragraph", "Texto de sala — deslizá o usá las flechas. Cada fotografía pasa al frente enmarcada, con su placa de museo; hacé clic en la pieza frontal para verla de cerca.");
+    n("vrn-endwall-title", "heading",   "Fin de la exposición.<br/><em>Gracias por la visita.</em>");
+    n("vrn-endwall-cta",   "paragraph", "Encargar al artista");
+    n("vrn-about-label",   "paragraph", "El artista");
+    n("vrn-about-heading", "heading",   "Colgar una sala es<br/><em>un argumento.</em>");
+    n("vrn-about-body",    "paragraph", "Construyo exposiciones, no feeds. Cada serie se ordena como una sala — una pieza de apertura, una larga pared central, una imagen de cierre que te llevás a casa.");
+    n("vrn-stat-1-label",  "paragraph", "Exposiciones");
+    n("vrn-stat-2-label",  "paragraph", "Ciudades");
+    n("vrn-stat-3-label",  "paragraph", "Obras colocadas");
+    n("vrn-contact-label",   "paragraph", "Contacto");
+    n("vrn-contact-heading", "heading",   "Solicitá una<br/><em>visita privada.</em>");
+    n("vrn-contact-body",    "paragraph", "Para encargos, venta de copias y préstamos de exposición. Contame qué paredes tenés en mente.");
+    n("vrn-contact-d1-label", "paragraph", "Estudio");
+    n("vrn-contact-d2-label", "paragraph", "Teléfono");
+    n("vrn-contact-d3-label", "paragraph", "Galería");
+  }
+
+  if (id.first || id.last) {
+    const year = new Date().getFullYear();
+    const name = fullName(id);
+    n("vrn-nav-brand",    "logo",      esc(name.toUpperCase()));
+    n("vrn-footer-brand", "logo",      esc(name.toUpperCase()));
+    n("vrn-footer-copy",  "paragraph", `© ${year} ${esc(name)}${es ? " — todas las obras" : " — all works"}`);
+  }
+  if (id.bio) n("vrn-about-body", "paragraph", esc(id.bio));
+  if (contact?.email) n("vrn-contact-d1-value", "paragraph", esc(contact.email));
+  if (contact?.phone) n("vrn-contact-d2-value", "paragraph", esc(contact.phone));
+  if (id.location)    n("vrn-contact-d3-value", "paragraph", esc(id.location) + (es ? " — con cita previa" : " — by appointment"));
+
+  return out;
+}
+
+/* Serenata — Spanish demo copy + identity overrides. */
+export function buildSerenataNodes(locale: string, id: Identity, contact?: { email?: string; phone?: string }): Record<string, EditorNode> {
+  const es = locale === "es";
+  const out: Record<string, EditorNode> = {};
+  const n = (nid: string, type: EditorNode["type"], content: string): void => { out[nid] = { id: nid, type, content }; };
+
+  if (es) {
+    n("ser-nav-item-1",   "paragraph", "El álbum");
+    n("ser-nav-item-2",   "paragraph", "Sobre mí");
+    n("ser-nav-item-3",   "paragraph", "Contacto");
+    n("ser-nav-cta",      "paragraph", "Consultá tu fecha");
+    n("ser-hero-eyebrow", "paragraph", "Fotografía de bodas · a donde el amor vaya");
+    n("ser-hero-title",   "heading",   "Tu día,<br/><em>contado despacio.</em>");
+    n("ser-hero-sub",     "paragraph", "Sin poses rígidas ni listas de fotos gritadas por el jardín. Fotografío lo de en medio — las manos, la risa, la abuela que bailó primero.");
+    n("ser-hero-cta-1",   "paragraph", "Abrir el álbum");
+    n("ser-hero-cta-2",   "paragraph", "Consultá tu fecha");
+    n("ser-album-label",  "paragraph", "El álbum");
+    n("ser-album-note",   "paragraph", "Una boda real, de principio a fin — pasá las páginas como las pasarán sus familias, un domingo, dentro de muchos años.");
+    n("ser-album-dedication", "paragraph", "Para los que lloraron primero,<br/>y los que se quedaron hasta que se encendieron las luces.");
+    n("ser-mom-label",    "paragraph", "El día");
+    n("ser-mom-1-title",  "heading",   "Los preparativos");
+    n("ser-mom-1-desc",   "paragraph", "Las horas tranquilas — botones, cartas, respiraciones profundas. Llego temprano y desaparezco entre ustedes.");
+    n("ser-mom-2-title",  "heading",   "La ceremonia");
+    n("ser-mom-2-desc",   "paragraph", "Trabajo desde los bordes, en silencio. No vas a recordar que estuve; vas a recordar todo lo demás.");
+    n("ser-mom-3-title",  "heading",   "La fiesta");
+    n("ser-mom-3-desc",   "paragraph", "Flash encendido, zapatos fuera. Acá el álbum se gana sus últimas y más ruidosas páginas.");
+    n("ser-quote-label",  "paragraph", "Palabras bonitas");
+    n("ser-quote-text",   "paragraph", "“Nos olvidamos de que estaba — y de alguna manera estaba en todas partes. Nuestro álbum termina con mi papá riéndose hasta llorar. Esa foto vale toda la boda.”");
+    n("ser-quote-author", "paragraph", "— Carla y Julián, casados en Mendoza");
+    n("ser-about-label",  "paragraph", "La fotógrafa");
+    n("ser-about-heading","heading",   "Fotografío bodas<br/>como <em>cartas de amor.</em>");
+    n("ser-about-body",   "paragraph", "Nueve años, ciento cuarenta bodas, y todavía lloro en los votos. Mis parejas quieren fotos honestas — color suave de película, luz real, y un álbum que se lea como se sintió el día.");
+    n("ser-stat-1-label", "paragraph", "Bodas");
+    n("ser-stat-2-label", "paragraph", "Años");
+    n("ser-stat-3-label", "paragraph", "Países");
+    n("ser-contact-label",   "paragraph", "Tu fecha");
+    n("ser-contact-heading", "heading",   "Contame sobre<br/><em>tu día.</em>");
+    n("ser-contact-body",    "paragraph", "La fecha, el lugar, cómo se conocieron — lo que sientan importante. Tomo pocas bodas por año, así que escribí temprano.");
+    n("ser-contact-d1-label", "paragraph", "Email");
+    n("ser-contact-d2-label", "paragraph", "Teléfono");
+    n("ser-contact-d3-label", "paragraph", "Base en");
+    n("ser-footer-copy",  "paragraph", "© 2025 — con amor");
+  }
+
+  if (id.first || id.last) {
+    const year = new Date().getFullYear();
+    const name = fullName(id);
+    n("ser-nav-brand",    "logo",      esc(name));
+    n("ser-footer-brand", "logo",      esc(name));
+    n("ser-footer-copy",  "paragraph", `© ${year} ${esc(name)}${es ? " — con amor" : " — with love"}`);
+  }
+  if (id.bio) n("ser-about-body", "paragraph", esc(id.bio));
+  if (contact?.email) n("ser-contact-d1-value", "paragraph", esc(contact.email));
+  if (contact?.phone) n("ser-contact-d2-value", "paragraph", esc(contact.phone));
+  if (id.location)    n("ser-contact-d3-value", "paragraph", esc(id.location) + (es ? " — viajo a donde haga falta" : " — travelling worldwide"));
+
+  return out;
+}

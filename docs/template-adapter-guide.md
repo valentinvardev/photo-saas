@@ -465,6 +465,9 @@ appears in the Pages tree.
 - [ ] Template injects no un-scoped global CSS; editor panels still open
 - [ ] Responsive driven by the `viewport` prop, not media queries
 - [ ] Preview tab shows zero editor affordances; actions work
+- [ ] `build<Name>Nodes` in brandData.ts with Spanish demo copy + identity overrides (pitfall 12)
+- [ ] Wired in BOTH OnboardingFlow ternaries (previewNodes + finish)
+- [ ] Registered in `TEMPLATE_CATALOG` + `onb.template.*` strings in en **and** es
 
 ### 9. Don't let template element selectors hit Tiptap's `<p>`
 
@@ -490,3 +493,25 @@ The Design panel scrolls/clips, so an absolutely-positioned popover inside it is
 unreachable on the phone editor. Render popovers in a `createPortal` to
 `document.body` with `position: fixed`, positioned from the trigger's rect and
 clamped to the viewport (see `ColorSwatch`).
+
+### 12. Every template MUST ship its Spanish version + onboarding adaptation
+
+A template is not done when it renders — it must be creatable from onboarding
+with localized demo copy. **Required for every new template, no exceptions:**
+
+1. **Locale-aware node builder** in `src/components/onboarding/brandData.ts`:
+   `build<Name>Nodes(locale, identity, contact?)` following the existing ones
+   (`buildMinimalNodes` … `buildSerenataNodes`). It must provide:
+   - **Spanish demo copy** (`locale === "es"`) for every user-facing default
+     text node — nav links/CTAs, hero, section labels, service/moment items,
+     contact headings and detail labels, footer. The template then *reads in
+     Spanish* for Spanish-locale users before they type anything.
+   - **Identity overrides**: name → brand/logo + footer © nodes; bio → the
+     hero/about copy nodes; location and the contact email/phone → the contact
+     detail values.
+2. **Wire it in `OnboardingFlow.tsx`** in BOTH ternaries: `previewNodes` (live
+   preview) and the `nodes` built inside `finish()` (what gets saved).
+3. **Register the template in `src/lib/templates/catalog.ts`**
+   (`TEMPLATE_CATALOG`) — the canonical list behind the onboarding template
+   step and the portfolio wizard — plus the `onb.template.<key>Name/Desc`
+   strings in `messages/en.json` **and** `messages/es.json`.
