@@ -27,13 +27,18 @@ ivory paper, rosewood linen, typewriter captions (love letters).
 | Accent | `#B07C70` | Rosewood / dusty rose (cover linen, corners, numerals) |
 | Muted | `#A5988E` | Faded sepia |
 
-**Typography** (bundled): **Cormorant Garamond** (romantic serif, italics do
-the heavy lifting), **Raleway** (airy sans), **Courier Prime** (typewriter —
-dates, labels, HUD; the love-letter voice).
+**Typography** (bundled): **Cormorant Garamond** (romantic serif display),
+**Raleway** (airy sans; also the widely-tracked *invitation smallcaps* used
+for every eyebrow/label), **Courier Prime** (typewriter — only inside the
+album: folio numbers and the colophon line), and **Great Vibes** — a fourth,
+calligraphic voice (template constant, not user-swappable) for the brand,
+section numerals, the cover names, the dedication and the footer flourish.
+Serenata deliberately breaks the platform's mono/sans/serif eyebrow habit so
+templates read differently from one another.
 
-Signature moves: lowercase-roman section numerals (`i. ii. iii.`) in serif
-italic; the **chapel-arch portrait** in the about section; champagne text on
-the album cover; `~ hasta el último baile ~` in the footer.
+Signature moves: script section numerals (`i. ii. iii.`); the **chapel-arch
+portrait** in the about section; champagne script names on the album cover;
+`hasta el último baile` in script in the footer.
 
 ## The 3D album — how it works (no WebGL, no new deps)
 
@@ -46,9 +51,15 @@ the left side — net rotation 0, which is why the **dedication page is safely
 editable** in place.
 
 - Sheet 0 = the cover: linen gradient front (editable names + date), paper
-  dedication back (editable).
-- Sheet *k* ≥ 1: front = photo `2(k−1)`, back = photo `2(k−1)+1`; an odd
-  count ends on a "fin." colophon face.
+  dedication back (editable, in script).
+- Sheet *k*, 1 ≤ *k* ≤ photoSheets: front = photo `2(k−1)`, back = photo
+  `2(k−1)+1`; an odd count fills the last verso with a blank end-paper.
+- Last sheet = the **back cover**: recto is the "fin." colophon page, verso
+  is plain linen — so the album *closes* onto a real back cover instead of
+  ending on a photograph.
+- The **ribbon bookmark** hangs out the *bottom* of the book (rendered
+  before the sheets, so it sits under every page — it never overlays a
+  spread); it fades once the album is fully closed at the back.
 - `flipped ∈ [0..S]` drives everything. Z-order: `i < flipped ? i : S − i`,
   with the animating sheet z-boosted for ~1.1 s so mid-flip stacking is
   correct.

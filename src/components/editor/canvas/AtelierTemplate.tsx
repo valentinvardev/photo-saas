@@ -295,7 +295,7 @@ export function AtelierTemplate({ viewport }: { viewport: Viewport }) {
             </EditableNode>
 
             <EditableNode id="atl-close-body" tag="p" style={{
-              fontSize: 15, lineHeight: 1.7, color: "var(--ed-muted, #3a3a3a)", maxWidth: 460, marginBottom: 28, margin: 0,
+              fontSize: 15, lineHeight: 1.7, color: "color-mix(in srgb, var(--ed-fg, #2a2520) 84%, var(--ed-bg, #f3eee2))", maxWidth: 460, marginBottom: 28, margin: 0,
             }}>
               <EditableText id="atl-close-body" />
             </EditableNode>

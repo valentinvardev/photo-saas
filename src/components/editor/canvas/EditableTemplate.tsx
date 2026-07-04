@@ -842,7 +842,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
 
           <div style={{ width: "40px", height: "1px", background: "var(--ed-fg, #0a0a0a)", margin: "0 0 2rem" }} />
 
-          <EditableNode id="hero-sub" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.7, color: "var(--ed-muted, #9ca3af)", maxWidth: "380px" }}>
+          <EditableNode id="hero-sub" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 400, fontSize: "15px", lineHeight: 1.7, color: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 82%, var(--ed-bg, #fafafa))", maxWidth: "380px" }}>
             <EditableText id="hero-sub" />
           </EditableNode>
 
@@ -972,10 +972,10 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           <EditableNode id="about-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 400, fontSize: isMobile ? "clamp(32px,10vw,48px)" : "clamp(36px,4vw,56px)", lineHeight: 1.1, color: "var(--ed-fg, #0a0a0a)", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
             <EditableText id="about-heading" />
           </EditableNode>
-          <EditableNode id="about-body-1" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.8, color: "var(--ed-muted, #9ca3af)", marginBottom: "1.25rem" }}>
+          <EditableNode id="about-body-1" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 400, fontSize: "15px", lineHeight: 1.8, color: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 82%, var(--ed-bg, #fafafa))", marginBottom: "1.25rem" }}>
             <EditableText id="about-body-1" />
           </EditableNode>
-          <EditableNode id="about-body-2" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "15px", lineHeight: 1.8, color: "var(--ed-muted, #9ca3af)", marginBottom: "2rem" }}>
+          <EditableNode id="about-body-2" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 400, fontSize: "15px", lineHeight: 1.8, color: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 82%, var(--ed-bg, #fafafa))", marginBottom: "2rem" }}>
             <EditableText id="about-body-2" />
           </EditableNode>
           <div style={{ display: "flex", gap: isMobile ? "2rem" : "3rem", paddingTop: "2rem", borderTop: "1px solid color-mix(in srgb, var(--ed-fg, #0a0a0a) 12%, transparent)" }}>
@@ -1036,7 +1036,7 @@ export function EditableTemplate({ viewport }: { viewport: Viewport }) {
           <EditableNode id="contact-heading" tag="h2" style={{ fontFamily: "var(--tpl-serif,serif)", fontWeight: 300, fontSize: isMobile ? "clamp(36px,11vw,56px)" : "clamp(40px,5vw,72px)", lineHeight: 1.05, color: "var(--ed-fg, #0a0a0a)", margin: "0 0 1.5rem", letterSpacing: "-0.02em" }}>
             <EditableText id="contact-heading" />
           </EditableNode>
-          <EditableNode id="contact-body" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 300, fontSize: "14px", lineHeight: 1.7, color: "var(--ed-muted, #9ca3af)", marginBottom: "2rem" }}>
+          <EditableNode id="contact-body" style={{ fontFamily: "var(--tpl-sans,sans-serif)", fontWeight: 400, fontSize: "14px", lineHeight: 1.7, color: "color-mix(in srgb, var(--ed-fg, #0a0a0a) 82%, var(--ed-bg, #fafafa))", marginBottom: "2rem" }}>
             <EditableText id="contact-body" />
           </EditableNode>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>

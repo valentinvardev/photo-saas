@@ -29,6 +29,7 @@ const C = {
   accent: "var(--ed-accent, #2E4E6B)",
   muted:  "var(--ed-muted, #8B8E93)",
   line:   "color-mix(in srgb, var(--ed-fg, #16181B) 14%, transparent)",
+  body:   "color-mix(in srgb, var(--ed-fg, #16181B) 82%, var(--ed-bg, #F4F2ED))",
   raised: "color-mix(in srgb, var(--ed-fg, #16181B) 5%, var(--ed-bg, #F4F2ED))",
 };
 const SERIF = "var(--tpl-serif, 'Playfair Display', Georgia, serif)";
@@ -311,7 +312,7 @@ export function MeridianTemplate({ viewport }: { viewport: Viewport }) {
             <EditableText id="mrd-hero-title" />
           </EditableNode>
 
-          <EditableNode id="mrd-hero-sub" style={{ fontFamily: SANS, fontWeight: 400, fontSize: 15, lineHeight: 1.75, color: C.muted, maxWidth: 420, marginBottom: isMobile ? "1.8rem" : "2.4rem" }}>
+          <EditableNode id="mrd-hero-sub" style={{ fontFamily: SANS, fontWeight: 400, fontSize: 15, lineHeight: 1.75, color: C.body, maxWidth: 420, marginBottom: isMobile ? "1.8rem" : "2.4rem" }}>
             <EditableText id="mrd-hero-sub" />
           </EditableNode>
 
@@ -343,7 +344,7 @@ export function MeridianTemplate({ viewport }: { viewport: Viewport }) {
       {/* ── WORK — grid driven by Design > Grid ── */}
       <section id="mrd-work" style={{ padding: `${isMobile ? "3.5rem" : "6rem"} ${px}` }}>
         <Label index="01" nodeId="mrd-work-label" isMobile={isMobile} />
-        <EditableNode id="mrd-work-intro" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: isMobile ? 17 : 20, color: C.muted, maxWidth: 520, marginBottom: isMobile ? "1.8rem" : "2.6rem" }}>
+        <EditableNode id="mrd-work-intro" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: isMobile ? 17 : 20, color: C.body, maxWidth: 520, marginBottom: isMobile ? "1.8rem" : "2.6rem" }}>
           <EditableText id="mrd-work-intro" />
         </EditableNode>
 
@@ -403,7 +404,7 @@ export function MeridianTemplate({ viewport }: { viewport: Viewport }) {
               <EditableNode id={tId} tag="h3" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? 22 : 26, lineHeight: 1.15, color: C.fg, margin: "0 0 0.7rem", letterSpacing: "-0.01em" }}>
                 <EditableText id={tId} />
               </EditableNode>
-              <EditableNode id={dId} style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.7, color: C.muted }}>
+              <EditableNode id={dId} style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.7, color: C.body }}>
                 <EditableText id={dId} />
               </EditableNode>
             </div>
@@ -424,7 +425,7 @@ export function MeridianTemplate({ viewport }: { viewport: Viewport }) {
             <EditableNode id="mrd-about-heading" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? "clamp(30px,9vw,42px)" : "clamp(36px,3.6vw,56px)", lineHeight: 1.08, letterSpacing: "-0.015em", color: C.fg, margin: "0 0 1.4rem" }}>
               <EditableText id="mrd-about-heading" />
             </EditableNode>
-            <EditableNode id="mrd-about-body" style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.8, color: C.muted, maxWidth: 560, marginBottom: "2.2rem" }}>
+            <EditableNode id="mrd-about-body" style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.8, color: C.body, maxWidth: 560, marginBottom: "2.2rem" }}>
               <EditableText id="mrd-about-body" />
             </EditableNode>
             <div style={{ display: "flex", gap: isMobile ? "1.8rem" : "3rem", paddingTop: "1.8rem", borderTop: `1px solid ${C.line}` }}>
@@ -451,7 +452,7 @@ export function MeridianTemplate({ viewport }: { viewport: Viewport }) {
             <EditableNode id="mrd-contact-heading" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? "clamp(34px,10vw,48px)" : "clamp(40px,4.2vw,64px)", lineHeight: 1.05, letterSpacing: "-0.015em", color: C.fg, margin: "0 0 1.3rem" }}>
               <EditableText id="mrd-contact-heading" />
             </EditableNode>
-            <EditableNode id="mrd-contact-body" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.75, color: C.muted, maxWidth: 420, marginBottom: "2rem" }}>
+            <EditableNode id="mrd-contact-body" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.75, color: C.body, maxWidth: 420, marginBottom: "2rem" }}>
               <EditableText id="mrd-contact-body" />
             </EditableNode>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

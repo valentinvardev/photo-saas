@@ -36,13 +36,24 @@ const C = {
   muted:  "var(--ed-muted, #A5988E)",
   line:   "color-mix(in srgb, var(--ed-fg, #40342F) 13%, transparent)",
   raised: "color-mix(in srgb, var(--ed-accent, #B07C70) 7%, var(--ed-bg, #FBF7F2))",
+  body:   "color-mix(in srgb, var(--ed-fg, #40342F) 84%, var(--ed-bg, #FBF7F2))",
 };
 const SERIF = "var(--tpl-serif, 'Cormorant Garamond', Georgia, serif)";
 const SANS  = "var(--tpl-sans, 'Raleway', system-ui, sans-serif)";
 const MONO  = "var(--tpl-mono, 'Courier Prime', ui-monospace, monospace)";
+/* Serenata breaks the platform's mono/sans/serif habit with a fourth voice:
+   a calligraphic script for the brand, numerals and dedications — the hand
+   that addresses wedding envelopes. Template constant, not user-swappable. */
+const SCRIPT = "'Great Vibes', 'Segoe Script', cursive";
 const PAPER = "#FFFDFA";
 const CHAMPAGNE = "#F8F1E7";
 
+/* Invitation smallcaps — widely tracked Raleway, the register of a wedding
+   invitation. Replaces the uppercase-mono eyebrow treatment used elsewhere;
+   Courier survives only inside the album (folio numbers), as typed captions. */
+const caps = (size: number, extra?: React.CSSProperties): React.CSSProperties => ({
+  fontFamily: SANS, fontWeight: 600, fontSize: size, letterSpacing: "0.3em", textTransform: "uppercase", ...extra,
+});
 const mono = (size: number, extra?: React.CSSProperties): React.CSSProperties => ({
   fontFamily: MONO, fontSize: size, letterSpacing: "0.14em", textTransform: "uppercase", ...extra,
 });
@@ -91,9 +102,9 @@ const btnGhost: React.CSSProperties = {
 function Label({ index, nodeId, isMobile }: { index: string; nodeId: string; isMobile: boolean }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: isMobile ? 26 : 40 }}>
-      <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: C.accent }}>{index}</span>
+      <span style={{ fontFamily: SCRIPT, fontSize: 21, lineHeight: 1, color: C.accent }}>{index}</span>
       <div style={{ flex: 1, height: 1, background: C.line }} />
-      <EditableNode id={nodeId} tag="span" style={{ ...mono(10), color: C.muted }}>
+      <EditableNode id={nodeId} tag="span" style={{ ...caps(9), color: C.muted }}>
         <EditableText id={nodeId} display="inline" />
       </EditableNode>
     </div>
@@ -128,7 +139,7 @@ function Album({ works, viewport, onOpen }: { works: Work[]; viewport: Viewport;
   const PH = isMobile ? 200 : isTablet ? 330 : 430;   // page height
   const photos = works.slice(0, 16);
   const photoSheets = Math.ceil(photos.length / 2);
-  const S = 1 + photoSheets;                          // sheets incl. cover
+  const S = 1 + photoSheets + 1;                      // cover + photos + back cover
   const [flipped, setFlipped] = useState(0);          // sheets turned, 0..S
   const [boost, setBoost] = useState<number | null>(null); // sheet on top mid-flip
   const boostTimer = useRef<number | null>(null);
@@ -206,11 +217,10 @@ function Album({ works, viewport, onOpen }: { works: Work[]; viewport: Viewport;
     const w = photos[idx];
     const pad = isMobile ? 10 : 20;
     if (!w) {
-      /* Colophon — closes an odd-numbered album */
+      /* Blank end-paper — fills the last verso of an odd-numbered album */
       return (
-        <div style={{ position: "absolute", inset: 0, background: PAPER, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-          <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: isMobile ? 15 : 21, color: C.accent }}>fin.</span>
-          <span style={{ ...mono(8), color: C.muted }}>— every album ends dancing —</span>
+        <div style={{ position: "absolute", inset: 0, background: PAPER, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ width: 5, height: 5, borderRadius: "50%", background: C.accent, opacity: 0.45 }} />
         </div>
       );
     }
@@ -258,12 +268,13 @@ function Album({ works, viewport, onOpen }: { works: Work[]; viewport: Viewport;
             background: "color-mix(in srgb, var(--ed-accent, #B07C70) 76%, #241b18)", borderRadius: "0 6px 6px 0",
             opacity: flipped < S ? 1 : 0, transition: "opacity 0.4s ease 0.3s", boxShadow: "0 18px 40px -16px rgba(64,52,47,0.45)" }} />
 
-          {/* Ribbon bookmark */}
-          <div style={{ position: "absolute", right: PW * 0.28, top: -6, width: 14, height: PH * 0.42, zIndex: S + 4,
+          {/* Ribbon bookmark — its tail hangs out below the pages (it lives
+              INSIDE the book, so it renders under every sheet, never on top) */}
+          <div style={{ position: "absolute", left: `calc(50% + ${PW * 0.3}px)`, top: PH - 30, width: 13, height: isMobile ? 52 : 66,
             background: "color-mix(in srgb, var(--ed-accent, #B07C70) 88%, #241b18)",
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 88%, 0 100%)",
-            opacity: flipped === 0 || flipped === S ? 0 : 1, transition: "opacity 0.4s ease", pointerEvents: "none",
-            boxShadow: "0 4px 10px rgba(64,52,47,0.25)" }} />
+            clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%)",
+            opacity: flipped === S ? 0 : 1, transition: "opacity 0.4s ease", pointerEvents: "none",
+            boxShadow: "0 4px 10px rgba(64,52,47,0.3)" }} />
 
           {/* Sheets — right half, hinged on the spine */}
           {Array.from({ length: S }, (_, i) => {
@@ -281,27 +292,40 @@ function Album({ works, viewport, onOpen }: { works: Work[]; viewport: Viewport;
                 }}>
                 {i === 0 ? (
                   <>
-                    {/* Cover — linen, blind-embossed names */}
+                    {/* Cover — linen, the couple's names in the calligrapher's hand */}
                     <div style={{ ...face(false), background: "linear-gradient(140deg, color-mix(in srgb, var(--ed-accent, #B07C70) 88%, #2c211d) 0%, color-mix(in srgb, var(--ed-accent, #B07C70) 66%, #1d1512) 100%)", borderRadius: "0 6px 6px 0", boxShadow: "inset 0 0 40px rgba(0,0,0,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <div style={{ position: "absolute", inset: isMobile ? 8 : 14, border: `1px solid ${CHAMPAGNE}55`, borderRadius: 2, pointerEvents: "none" }} />
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: isMobile ? 8 : 14, padding: "0 12%", textAlign: "center" }}>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: isMobile ? 8 : 14, padding: "0 10%", textAlign: "center" }}>
                         <span style={{ width: 5, height: 5, borderRadius: "50%", background: CHAMPAGNE, opacity: 0.75 }} />
-                        <EditableNode id="ser-album-title" tag="h3" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? 19 : isTablet ? 30 : 38, lineHeight: 1.12, color: CHAMPAGNE, margin: 0, textShadow: "0 1px 1px rgba(0,0,0,0.35)" }}>
+                        <EditableNode id="ser-album-title" tag="h3" style={{ fontFamily: SCRIPT, fontWeight: 400, fontSize: isMobile ? 24 : isTablet ? 37 : 46, lineHeight: 1.25, color: CHAMPAGNE, margin: 0, textShadow: "0 1px 1px rgba(0,0,0,0.35)" }}>
                           <EditableText id="ser-album-title" />
                         </EditableNode>
                         <div style={{ width: isMobile ? 28 : 44, height: 1, background: `${CHAMPAGNE}66` }} />
-                        <EditableNode id="ser-album-date" tag="div" style={{ ...mono(isMobile ? 7 : 9), color: CHAMPAGNE, opacity: 0.85 }}>
+                        <EditableNode id="ser-album-date" tag="div" style={{ ...caps(isMobile ? 7 : 8.5), color: CHAMPAGNE, opacity: 0.85 }}>
                           <EditableText id="ser-album-date" display="inline" />
                         </EditableNode>
                       </div>
                     </div>
-                    {/* Inside cover — dedication page */}
-                    <div style={{ ...face(true), background: PAPER, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: isMobile ? 10 : 16, padding: "0 11%", textAlign: "center" }}>
-                      <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: isMobile ? 13 : 17, color: C.accent }}>~</span>
-                      <EditableNode id="ser-album-dedication" tag="p" style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 500, fontSize: isMobile ? 12 : isTablet ? 16 : 19, lineHeight: 1.6, color: "#40342F", margin: 0 }}>
+                    {/* Inside cover — handwritten dedication page */}
+                    <div style={{ ...face(true), background: PAPER, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: isMobile ? 8 : 12, padding: "0 10%", textAlign: "center" }}>
+                      <EditableNode id="ser-album-dedication" tag="p" style={{ fontFamily: SCRIPT, fontWeight: 400, fontSize: isMobile ? 15 : isTablet ? 20 : 25, lineHeight: 1.55, color: "#40342F", margin: 0 }}>
                         <EditableText id="ser-album-dedication" />
                       </EditableNode>
                       <div style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: isMobile ? 10 : 18, background: "linear-gradient(270deg, rgba(64,52,47,0.14), transparent)", pointerEvents: "none" }} />
+                    </div>
+                  </>
+                ) : i === S - 1 ? (
+                  <>
+                    {/* Colophon — the album's last page */}
+                    <div style={{ ...face(false), background: PAPER, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: isMobile ? 8 : 12 }}>
+                      <span style={{ fontFamily: SCRIPT, fontSize: isMobile ? 22 : 30, lineHeight: 1, color: C.accent }}>fin.</span>
+                      <span style={{ ...mono(7.5), color: C.muted }}>— every album ends dancing —</span>
+                      <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: isMobile ? 10 : 18, background: "linear-gradient(90deg, rgba(64,52,47,0.14), transparent)", pointerEvents: "none" }} />
+                    </div>
+                    {/* Back cover — plain linen, so the album closes like a real one */}
+                    <div style={{ ...face(true), background: "linear-gradient(220deg, color-mix(in srgb, var(--ed-accent, #B07C70) 88%, #2c211d) 0%, color-mix(in srgb, var(--ed-accent, #B07C70) 66%, #1d1512) 100%)", borderRadius: "6px 0 0 6px", boxShadow: "inset 0 0 40px rgba(0,0,0,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <div style={{ position: "absolute", inset: isMobile ? 8 : 14, border: `1px solid ${CHAMPAGNE}44`, borderRadius: 2, pointerEvents: "none" }} />
+                      <span style={{ fontFamily: SCRIPT, fontSize: isMobile ? 15 : 20, color: CHAMPAGNE, opacity: 0.6 }}>s.</span>
                     </div>
                   </>
                 ) : (
@@ -318,22 +342,22 @@ function Album({ works, viewport, onOpen }: { works: Work[]; viewport: Viewport;
 
       {/* Hint — fades once opened */}
       <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)",
-        ...mono(9), color: C.muted, background: "color-mix(in srgb, var(--ed-bg, #FBF7F2) 84%, transparent)",
-        border: `1px solid ${C.line}`, padding: "6px 12px", pointerEvents: "none",
+        ...caps(7.5), color: C.muted, background: "color-mix(in srgb, var(--ed-bg, #FBF7F2) 84%, transparent)",
+        border: `1px solid ${C.line}`, padding: "7px 13px", pointerEvents: "none",
         opacity: flipped > 0 ? 0 : 1, transition: "opacity 0.5s ease" }}>
         Open the album — tap the cover or swipe
       </div>
 
       {/* HUD */}
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", gap: 14, padding: isMobile ? "10px 14px" : "12px 22px", background: "color-mix(in srgb, var(--ed-bg, #FBF7F2) 88%, transparent)", borderTop: `1px solid ${C.line}`, backdropFilter: "blur(6px)" }}>
-        <span style={{ ...mono(9), color: C.fg, fontWeight: 700, flexShrink: 0, minWidth: 74 }}>
-          {flipped === 0 ? "Cover" : flipped === S ? "Fin" : `Pages ${flipped}/${photoSheets}`}
+        <span style={{ ...caps(8), color: C.fg, flexShrink: 0, minWidth: 74 }}>
+          {flipped === 0 ? "Cover" : flipped === S ? "Closed" : flipped === S - 1 ? "Fin" : `Pages ${flipped}/${photoSheets}`}
         </span>
         <div style={{ flex: 1, height: 2, background: C.line, position: "relative" }}>
           <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${(flipped / S) * 100}%`, background: C.accent, transition: "width 0.6s cubic-bezier(0.22,1,0.36,1)" }} />
         </div>
-        {readOnly && flipped > 0 && flipped < S && (
-          <button onClick={(e) => { e.stopPropagation(); onOpen(Math.max(0, (flipped - 1) * 2)); }}
+        {readOnly && flipped > 0 && flipped <= photoSheets && (
+          <button onClick={(e) => { e.stopPropagation(); onOpen(Math.min(photos.length - 1, Math.max(0, (flipped - 1) * 2))); }}
             title="View this spread"
             style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid ${C.line}`, background: "transparent", color: C.fg, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
@@ -478,7 +502,7 @@ export function SerenataTemplate({ viewport }: { viewport: Viewport }) {
 
   function Brand({ nodeId, size = 21, color }: { nodeId: string; size?: number; color?: string }) {
     const textEl = (
-      <EditableNode id={nodeId} tag="span" style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 500, fontSize: size, letterSpacing: "0.02em", color: color ?? C.fg }}>
+      <EditableNode id={nodeId} tag="span" style={{ fontFamily: SCRIPT, fontWeight: 400, fontSize: size * 1.3, lineHeight: 1, letterSpacing: "0.01em", color: color ?? C.fg }}>
         <EditableText id={nodeId} display="inline" />
       </EditableNode>
     );
@@ -530,7 +554,7 @@ export function SerenataTemplate({ viewport }: { viewport: Viewport }) {
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
           background: "linear-gradient(180deg, rgba(24,18,16,0.42) 0%, rgba(24,18,16,0.12) 32%, rgba(24,18,16,0.14) 62%, rgba(24,18,16,0.6) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: `0 ${px}`, zIndex: 2 }}>
-          <EditableNode id="ser-hero-eyebrow" tag="span" style={{ ...mono(10), color: CHAMPAGNE, opacity: 0.92, display: "inline-flex", alignItems: "center", gap: 8, marginBottom: isMobile ? 18 : 26 }}>
+          <EditableNode id="ser-hero-eyebrow" tag="span" style={{ ...caps(9), color: CHAMPAGNE, opacity: 0.92, display: "inline-flex", alignItems: "center", gap: 10, marginBottom: isMobile ? 18 : 26 }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: CHAMPAGNE, display: "inline-block" }} />
             <EditableText id="ser-hero-eyebrow" display="inline" />
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: CHAMPAGNE, display: "inline-block" }} />
@@ -556,7 +580,7 @@ export function SerenataTemplate({ viewport }: { viewport: Viewport }) {
       <section id="ser-gallery" style={{ paddingTop: isMobile ? "2.5rem" : "4rem" }}>
         <div style={{ padding: `0 ${px}` }}>
           <Label index="i." nodeId="ser-album-label" isMobile={isMobile} />
-          <EditableNode id="ser-album-note" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: isMobile ? 17 : 21, color: C.muted, maxWidth: 560, marginBottom: isMobile ? "1.6rem" : "2.4rem" }}>
+          <EditableNode id="ser-album-note" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: isMobile ? 17 : 21, color: C.body, maxWidth: 560, marginBottom: isMobile ? "1.6rem" : "2.4rem" }}>
             <EditableText id="ser-album-note" />
           </EditableNode>
         </div>
@@ -599,11 +623,11 @@ export function SerenataTemplate({ viewport }: { viewport: Viewport }) {
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: isMobile ? "2.2rem" : "3.5rem" }}>
           {([["ser-mom-1-title","ser-mom-1-desc","i."],["ser-mom-2-title","ser-mom-2-desc","ii."],["ser-mom-3-title","ser-mom-3-desc","iii."]] as const).map(([tId, dId, num]) => (
             <div key={tId}>
-              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 24, color: C.accent, display: "block", marginBottom: 12 }}>{num}</span>
+              <span style={{ fontFamily: SCRIPT, fontSize: 30, lineHeight: 1, color: C.accent, display: "block", marginBottom: 12 }}>{num}</span>
               <EditableNode id={tId} tag="h3" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? 24 : 28, lineHeight: 1.12, color: C.fg, margin: "0 0 0.7rem", letterSpacing: "-0.005em" }}>
                 <EditableText id={tId} />
               </EditableNode>
-              <EditableNode id={dId} style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.75, color: C.muted }}>
+              <EditableNode id={dId} style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.75, color: C.body }}>
                 <EditableText id={dId} />
               </EditableNode>
             </div>
@@ -618,7 +642,7 @@ export function SerenataTemplate({ viewport }: { viewport: Viewport }) {
         <EditableNode id="ser-quote-text" tag="blockquote" style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 500, fontSize: isMobile ? "clamp(19px,5.5vw,26px)" : "clamp(24px,2.6vw,34px)", lineHeight: 1.45, color: C.fg, maxWidth: 800, margin: "0 auto 1.4rem", letterSpacing: "-0.005em" }}>
           <EditableText id="ser-quote-text" />
         </EditableNode>
-        <EditableNode id="ser-quote-author" tag="div" style={{ ...mono(10), color: C.muted }}>
+        <EditableNode id="ser-quote-author" tag="div" style={{ ...caps(8.5), color: C.muted }}>
           <EditableText id="ser-quote-author" display="inline" />
         </EditableNode>
       </section>
@@ -637,7 +661,7 @@ export function SerenataTemplate({ viewport }: { viewport: Viewport }) {
             <EditableNode id="ser-about-heading" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? "clamp(30px,9vw,42px)" : "clamp(38px,3.8vw,58px)", lineHeight: 1.08, letterSpacing: "-0.012em", color: C.fg, margin: "0 0 1.3rem" }}>
               <EditableText id="ser-about-heading" />
             </EditableNode>
-            <EditableNode id="ser-about-body" style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.85, color: C.muted, maxWidth: 560, marginBottom: "2.1rem" }}>
+            <EditableNode id="ser-about-body" style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.85, color: C.body, maxWidth: 560, marginBottom: "2.1rem" }}>
               <EditableText id="ser-about-body" />
             </EditableNode>
             <div style={{ display: "flex", gap: isMobile ? "1.8rem" : "3rem", paddingTop: "1.7rem", borderTop: `1px solid ${C.line}` }}>
@@ -646,7 +670,7 @@ export function SerenataTemplate({ viewport }: { viewport: Viewport }) {
                   <EditableNode id={vId} style={{ fontFamily: SERIF, fontSize: isMobile ? 28 : 36, fontWeight: 500, color: C.accent, lineHeight: 1 }}>
                     <EditableText id={vId} />
                   </EditableNode>
-                  <EditableNode id={lId} style={{ ...mono(9), color: C.muted, marginTop: 6 }}>
+                  <EditableNode id={lId} style={{ ...caps(8), color: C.muted, marginTop: 7 }}>
                     <EditableText id={lId} />
                   </EditableNode>
                 </div>
@@ -664,13 +688,13 @@ export function SerenataTemplate({ viewport }: { viewport: Viewport }) {
             <EditableNode id="ser-contact-heading" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? "clamp(34px,10vw,46px)" : "clamp(40px,4.2vw,64px)", lineHeight: 1.05, letterSpacing: "-0.012em", color: C.fg, margin: "0 0 1.3rem" }}>
               <EditableText id="ser-contact-heading" />
             </EditableNode>
-            <EditableNode id="ser-contact-body" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.8, color: C.muted, maxWidth: 420, marginBottom: "2rem" }}>
+            <EditableNode id="ser-contact-body" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.8, color: C.body, maxWidth: 420, marginBottom: "2rem" }}>
               <EditableText id="ser-contact-body" />
             </EditableNode>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {([["ser-contact-d1-label","ser-contact-d1-value"],["ser-contact-d2-label","ser-contact-d2-value"],["ser-contact-d3-label","ser-contact-d3-value"]] as const).map(([lId, vId]) => (
                 <div key={lId} style={{ display: "flex", gap: "1.2rem", alignItems: "baseline" }}>
-                  <EditableNode id={lId} tag="span" style={{ ...mono(9), color: C.accent, minWidth: 62, fontWeight: 700 }}>
+                  <EditableNode id={lId} tag="span" style={{ ...caps(8), color: C.accent, minWidth: 66 }}>
                     <EditableText id={lId} display="inline" />
                   </EditableNode>
                   <EditableNode id={vId} tag="span" style={{ fontFamily: SANS, fontSize: 13.5, color: C.fg }}>
@@ -687,10 +711,10 @@ export function SerenataTemplate({ viewport }: { viewport: Viewport }) {
       {/* ── FOOTER ── */}
       <footer id="section-footer" style={{ padding: `1.9rem ${px}`, borderTop: `1px solid ${C.line}`, display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: "0.9rem" }}>
         <Brand nodeId="ser-footer-brand" size={18} />
-        <EditableNode id="ser-footer-copy" tag="span" style={{ ...mono(9), color: C.muted }}>
+        <EditableNode id="ser-footer-copy" tag="span" style={{ ...caps(7.5), color: C.muted }}>
           <EditableText id="ser-footer-copy" display="inline" />
         </EditableNode>
-        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: C.accent }}>~ hasta el último baile ~</span>
+        <span style={{ fontFamily: SCRIPT, fontSize: 19, lineHeight: 1, color: C.accent }}>hasta el último baile</span>
       </footer>
 
       {readOnly && lightboxIdx !== null && (

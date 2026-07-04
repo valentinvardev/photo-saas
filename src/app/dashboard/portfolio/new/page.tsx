@@ -265,9 +265,7 @@ export default function NewPortfolioPage() {
     );
 
     if (step === 2) return (
-      <div className="h-full min-h-[480px]">
-        <TemplateCatalogPreview template={template} domainLabel={domainStr} onUse={() => setStep(3)} />
-      </div>
+      <TemplateCatalogPreview template={template} slug={slug} onUse={() => setStep(3)} />
     );
 
     if (step === 3) return (

@@ -36,6 +36,7 @@ const C = {
   accent: "var(--ed-accent, #C2A15E)",
   muted:  "var(--ed-muted, #8A8E96)",
   line:   "color-mix(in srgb, var(--ed-fg, #EDEBE4) 14%, transparent)",
+  body:   "color-mix(in srgb, var(--ed-fg, #EDEBE4) 84%, var(--ed-bg, #14171D))",
   raised: "color-mix(in srgb, var(--ed-fg, #EDEBE4) 5%, var(--ed-bg, #14171D))",
 };
 /* Physical materials — deliberately NOT palette-driven, so the hang reads as
@@ -500,7 +501,7 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
           <EditableText id="vrn-hero-dates" display="inline" />
         </EditableNode>
 
-        <EditableNode id="vrn-hero-sub" style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.75, color: C.muted, maxWidth: 520, margin: "0 auto", marginBottom: isMobile ? "1.8rem" : "2.4rem" }}>
+        <EditableNode id="vrn-hero-sub" style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.75, color: C.body, maxWidth: 520, margin: "0 auto", marginBottom: isMobile ? "1.8rem" : "2.4rem" }}>
           <EditableText id="vrn-hero-sub" />
         </EditableNode>
 
@@ -514,7 +515,7 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
       <section id="vrn-gallery" style={{ paddingTop: isMobile ? "1.5rem" : "2.5rem" }}>
         <div style={{ padding: `0 ${px}` }}>
           <Label index="01" nodeId="vrn-gallery-label" isMobile={isMobile} />
-          <EditableNode id="vrn-gallery-note" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: isMobile ? 16 : 19, color: C.muted, maxWidth: 560, marginBottom: isMobile ? "1.6rem" : "2.4rem" }}>
+          <EditableNode id="vrn-gallery-note" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: isMobile ? 16 : 19, color: C.body, maxWidth: 560, marginBottom: isMobile ? "1.6rem" : "2.4rem" }}>
             <EditableText id="vrn-gallery-note" />
           </EditableNode>
         </div>
@@ -565,7 +566,7 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
             <EditableNode id="vrn-about-heading" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? "clamp(28px,8.5vw,40px)" : "clamp(34px,3.4vw,52px)", lineHeight: 1.08, letterSpacing: "-0.015em", color: C.fg, margin: "0 0 1.3rem" }}>
               <EditableText id="vrn-about-heading" />
             </EditableNode>
-            <EditableNode id="vrn-about-body" style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.8, color: C.muted, maxWidth: 560, marginBottom: "2rem" }}>
+            <EditableNode id="vrn-about-body" style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.8, color: C.body, maxWidth: 560, marginBottom: "2rem" }}>
               <EditableText id="vrn-about-body" />
             </EditableNode>
             <div style={{ display: "flex", gap: isMobile ? "1.8rem" : "3rem", paddingTop: "1.6rem", borderTop: `1px solid ${C.line}` }}>
@@ -592,7 +593,7 @@ export function VernissageTemplate({ viewport }: { viewport: Viewport }) {
             <EditableNode id="vrn-contact-heading" tag="h2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: isMobile ? "clamp(32px,9.5vw,44px)" : "clamp(38px,4vw,60px)", lineHeight: 1.05, letterSpacing: "-0.015em", color: C.fg, margin: "0 0 1.3rem" }}>
               <EditableText id="vrn-contact-heading" />
             </EditableNode>
-            <EditableNode id="vrn-contact-body" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.75, color: C.muted, maxWidth: 420, marginBottom: "2rem" }}>
+            <EditableNode id="vrn-contact-body" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.75, color: C.body, maxWidth: 420, marginBottom: "2rem" }}>
               <EditableText id="vrn-contact-body" />
             </EditableNode>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

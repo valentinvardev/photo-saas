@@ -311,7 +311,7 @@ export function HalcyonTemplate({ viewport }: { viewport: Viewport }) {
         .hp-contact h2{font-family:${HL_FONTS.serif};font-size:96px;line-height:1;letter-spacing:-0.03em;font-weight:400;margin-bottom:24px}
         @media(max-width:780px){.hp-contact h2{font-size:56px}}
         .hp-contact h2 em{font-style:italic;color:${t.accent}}
-        .hp-contact .tag{max-width:480px;margin:0 auto 40px;color:${t.muted};line-height:1.6}
+        .hp-contact .tag{max-width:480px;margin:0 auto 40px;color:${t.fg};opacity:0.82;line-height:1.6}
         .hp-contact-form{max-width:520px;margin:0 auto;display:grid;gap:0}
         .hp-contact-form input,.hp-contact-form textarea{background:transparent;border:0;border-bottom:1px solid ${t.line};color:${t.fg};font-family:${HL_FONTS.sans};font-size:14px;padding:18px 0;outline:none;transition:border-color .2s ease}
         .hp-contact-form input:focus,.hp-contact-form textarea:focus{border-color:${t.accent}}

@@ -4,8 +4,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useT } from "~/components/providers/LangProvider";
 import { TEMPLATE_CATALOG, type CatalogTemplate } from "~/lib/templates/catalog";
-import { LivePreviewThumbnail, DevicePreviewModal } from "~/components/dashboard/DevicePreviewModal";
-import type { TemplateId } from "~/lib/editor/templates/registry";
+import { DevicePreviewModal } from "~/components/dashboard/DevicePreviewModal";
+import { LiveTemplatePreview } from "~/components/onboarding/LiveTemplatePreview";
+import { buildMinimalNodes, buildAtelierNodes, buildHalcyonNodes, type Identity } from "~/components/onboarding/brandData";
+import { TEMPLATES as EDITOR_TEMPLATES, type TemplateId } from "~/lib/editor/templates/registry";
+import { DEFAULT_TYPOGRAPHY } from "~/lib/editor/types";
 
 /* ══════════════════════════════════════════════════════════════════════════
    Shared template catalog — the selectable list of real portfolio templates
@@ -38,8 +41,27 @@ function EyeIcon() {
   );
 }
 
+/* ── Brand swatch — a template's identity at a glance ───────────────────
+   Deliberately NOT an iframe: rendering every demo page just for a card
+   thumbnail is wasteful. The palette, headline face and accent tell the
+   story; the single live preview pane shows the real thing on selection. */
+function BrandSwatch({ tpl }: { tpl: CatalogTemplate }) {
+  return (
+    <div className="relative w-full h-full flex items-center justify-center" style={{ background: tpl.palette.bg }}>
+      <span style={{ fontFamily: tpl.serif, fontSize: 24, lineHeight: 1, letterSpacing: "-0.02em", color: tpl.palette.fg }}>
+        {tpl.name.charAt(0)}<span style={{ color: tpl.palette.accent }}>.</span>
+      </span>
+      <div className="absolute left-0 right-0 bottom-0 flex h-1">
+        <div className="flex-1" style={{ background: tpl.palette.accent }} />
+        <div className="flex-1" style={{ background: tpl.palette.fg }} />
+        <div className="flex-1" style={{ background: tpl.palette.muted }} />
+      </div>
+    </div>
+  );
+}
+
 /* ── Card list ──────────────────────────────────────────────────────────
-   One card per template: live mini-thumbnail, translated name/description,
+   One card per template: brand swatch, translated name/description,
    palette swatches, and — when selected — the "Use this template" CTA. */
 export function TemplateCatalogList({
   selectedId,
@@ -51,7 +73,7 @@ export function TemplateCatalogList({
   /** When provided, the selected card shows the primary CTA. */
   onUse?: (id: TemplateId) => void;
 }) {
-  const { t, locale } = useT();
+  const { t } = useT();
 
   return (
     <div className="flex flex-col gap-2">
@@ -65,9 +87,8 @@ export function TemplateCatalogList({
             }`}
           >
             <button onClick={() => onSelect(tpl.id)} className="w-full flex items-center gap-3 p-3 text-left">
-              {/* Live mini-thumbnail of the demo page */}
-              <div className="w-20 h-14 overflow-hidden shrink-0 border border-[var(--border)] rounded-sm" style={{ background: tpl.palette.bg }}>
-                <LivePreviewThumbnail url={`${tpl.demoUrl}?lang=${locale}`} baseWidth={1280} className="w-full h-full" />
+              <div className="w-20 h-14 overflow-hidden shrink-0 border border-[var(--border)] rounded-sm">
+                <BrandSwatch tpl={tpl} />
               </div>
 
               <div className="flex-1 min-w-0">
@@ -119,16 +140,17 @@ export function TemplateCatalogList({
 }
 
 /* ── Preview pane ───────────────────────────────────────────────────────
-   Browser-chrome frame with the selected template's live demo, a full
-   device preview modal, and the primary CTA underneath. */
+   Renders the REAL editor template component (same approach as the
+   onboarding preview) — scaled, scrollable, locale-aware — with a full
+   device preview modal and the primary CTA underneath. */
 export function TemplateCatalogPreview({
   template,
-  domainLabel,
+  slug,
   onUse,
 }: {
   template: CatalogTemplate;
-  /** Address shown in the fake browser bar (e.g. the future portfolio URL). */
-  domainLabel?: string;
+  /** Slug shown in the preview's browser bar (portapic.com/p/{slug}). */
+  slug?: string;
   onUse?: (id: TemplateId) => void;
 }) {
   const { t, locale } = useT();
@@ -136,8 +158,19 @@ export function TemplateCatalogPreview({
   const url = `${template.demoUrl}?lang=${locale}`;
   const name = t(`onb.template.${template.i18nKey}Name`);
 
+  // Same design the created portfolio will get: registry defaults plus
+  // Spanish demo copy when the locale is Spanish.
+  const tpl = EDITOR_TEMPLATES[template.id];
+  const emptyIdentity: Identity = { first: "", last: "", location: "", bio: "" };
+  const nodes = locale === "es"
+    ? template.id === "minimal-bw" ? buildMinimalNodes(locale, emptyIdentity)
+    : template.id === "atelier"    ? buildAtelierNodes(locale, emptyIdentity)
+    : template.id === "halcyon"    ? buildHalcyonNodes(locale, emptyIdentity)
+    : undefined
+    : undefined;
+
   return (
-    <div className="flex flex-col gap-3 h-full">
+    <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-sans font-bold text-[var(--fg)] text-lg">{t("tplcat.previewTitle")}</h2>
@@ -152,14 +185,15 @@ export function TemplateCatalogPreview({
         </button>
       </div>
 
-      <div className="flex-1 overflow-hidden border border-[var(--border)] min-h-[360px]">
-        <div className="flex items-center gap-1.5 px-3 py-2 border-b border-[var(--border)] bg-[var(--bg-card)]">
-          <span className="w-2 h-2 rounded-full bg-red-400/60" />
-          <span className="w-2 h-2 rounded-full bg-yellow/60" />
-          <span className="w-2 h-2 rounded-full bg-green-400/60" />
-          <span className="font-mono text-[12px] text-[var(--fg-muted)] ml-2 truncate">{domainLabel ?? "portapic.com"}</span>
-        </div>
-        <LivePreviewThumbnail url={url} baseWidth={1280} className="w-full h-full" />
+      <div className="overflow-hidden border border-[var(--border)] rounded-lg h-[420px] lg:h-[560px]">
+        <LiveTemplatePreview
+          templateId={template.id}
+          palette={tpl?.defaultPalette ?? { bg: "#fafafa", fg: "#0a0a0a", accent: "#0a0a0a", muted: "#6b7280" }}
+          typography={tpl?.defaultTypography ?? DEFAULT_TYPOGRAPHY}
+          nodes={nodes}
+          slug={slug ?? ""}
+          scrollable
+        />
       </div>
 
       {onUse && (
