@@ -112,6 +112,21 @@ const PORTFOLIO_TEMPLATES: PortfolioTemplate[] = [
     style: { bg: "#F6F5F1", fg: "#131518", accent: "#A63A22", muted: "#90928F" },
     collection: "vernissage",
   },
+  {
+    id: "serenata",
+    name: "Serenata",
+    description: "For wedding photographers — ivory, rosewood and Cormorant italics, with a real 3D wedding album that opens and turns its pages: linen cover, dedication, photo corners.",
+    category: "Story",
+    tags: ["Wedding", "Album", "3D", "Romantic"],
+    href: "/templates/serenata",
+    editorHref: "/editor/serenata",
+    seed: 1059,
+    new: true,
+    featured: true,
+    fonts: { serif: "Cormorant Garamond", sans: "Raleway", mono: "Courier Prime" },
+    style: { bg: "#FBF7F2", fg: "#40342F", accent: "#B07C70", muted: "#A5988E" },
+    collection: "serenata",
+  },
 ];
 
 

@@ -434,12 +434,12 @@
       "uniform": "Grilla",
       "masonry": "Masonry",
       "index": "Índice",
-      "corridor": "Slider 3D",
+      "corridor": "3D",
       "descMosaic": "Un diseño editorial con celdas de tamaños variados.",
       "descUniform": "Una grilla pareja de celdas iguales.",
       "descMasonry": "Mantiene el aspecto de cada foto — las cajas varían en altura (estilo VSCO).",
       "descIndex": "Una lista tipográfica de proyectos con vista previa al pasar el cursor.",
-      "descCorridor": "Un coverflow 3D — cada foto pasa al frente enmarcada, con placa de museo.",
+      "descCorridor": "El showcase 3D característico de la plantilla — las fotos siempre de frente.",
       "columns": "Columnas",
       "spacing": "Espaciado",
       "fit": "Ajuste de foto",
@@ -1104,7 +1104,8 @@
       "atelierName": "Atelier", "atelierDesc": "Centrada, editorial, con mucho espacio en blanco.",
       "halcyonName": "Halcyon", "halcyonDesc": "Editorial cálida y oscura, serif itálica, índice tipográfico de proyectos.",
       "meridianName": "Meridian", "meridianDesc": "Estética de galería fría — hero partido, grilla de museo, acento azul acero.",
-      "vernissageName": "Vernissage", "vernissageDesc": "Una exposición 3D white-cube — cada foto pasa al frente enmarcada, con placa de museo."
+      "vernissageName": "Vernissage", "vernissageDesc": "Una exposición 3D white-cube — cada foto pasa al frente enmarcada, con placa de museo.",
+      "serenataName": "Serenata", "serenataDesc": "Para bodas — marfil y palo de rosa, con un álbum 3D que pasa sus páginas."
     },
     "done": {
       "title": "Tu estudio está publicado",

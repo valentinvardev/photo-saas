@@ -6,6 +6,7 @@ import { ATELIER_NODES, ATELIER_SECTIONS } from "./atelier";
 import { HALCYON_NODES, HALCYON_SECTIONS } from "./halcyon";
 import { MERIDIAN_NODES, MERIDIAN_SECTIONS } from "./meridian";
 import { VERNISSAGE_NODES, VERNISSAGE_SECTIONS } from "./vernissage";
+import { SERENATA_NODES, SERENATA_SECTIONS } from "./serenata";
 import { DEFAULT_LOGO, DEFAULT_GRID } from "../types";
 
 /* Lazy-loaded canvas components — kept out of the registry's import graph
@@ -28,6 +29,10 @@ const MeridianComponent = dynamic<{ viewport: Viewport }>(
 );
 const VernissageComponent = dynamic<{ viewport: Viewport }>(
   () => import("~/components/editor/canvas/VernissageTemplate").then((m) => m.VernissageTemplate),
+  { ssr: false }
+);
+const SerenataComponent = dynamic<{ viewport: Viewport }>(
+  () => import("~/components/editor/canvas/SerenataTemplate").then((m) => m.SerenataTemplate),
   { ssr: false }
 );
 
@@ -101,6 +106,24 @@ export const TEMPLATES: Record<string, TemplateDef> = {
       mono:  "'Space Mono', monospace",
     },
     defaultLogo: { ...DEFAULT_LOGO, text: "VERNISSAGE" },
+    defaultGrid: { ...DEFAULT_GRID, layout: "corridor", columns: 3, gap: 12 },
+    layouts: ["corridor", "uniform", "masonry"],
+  },
+  "serenata": {
+    id: "serenata",
+    name: "Serenata",
+    initialNodes: SERENATA_NODES,
+    sections: SERENATA_SECTIONS,
+    Component: SerenataComponent,
+    /* Serenata is the wedding template — ivory, rosewood and a 3D wedding
+       album that turns its pages. See docs/templates/serenata.md. */
+    defaultPalette: { bg: "#FBF7F2", fg: "#40342F", accent: "#B07C70", muted: "#A5988E" },
+    defaultTypography: {
+      serif: "'Cormorant Garamond', Georgia, serif",
+      sans:  "'Raleway', system-ui, sans-serif",
+      mono:  "'Courier Prime', monospace",
+    },
+    defaultLogo: { ...DEFAULT_LOGO, text: "Serenata" },
     defaultGrid: { ...DEFAULT_GRID, layout: "corridor", columns: 3, gap: 12 },
     layouts: ["corridor", "uniform", "masonry"],
   },

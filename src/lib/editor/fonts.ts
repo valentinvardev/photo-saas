@@ -41,6 +41,12 @@ import "@fontsource/geist/600.css";
 import "@fontsource/geist-mono/400.css";
 import "@fontsource/geist-mono/500.css";
 
+/* ── Serenata template fonts (Cormorant italics + Raleway/Courier weights) ── */
+import "@fontsource/cormorant-garamond/500-italic.css";
+import "@fontsource/cormorant-garamond/600-italic.css";
+import "@fontsource/raleway/500.css";
+import "@fontsource/courier-prime/700.css";
+
 /* ── Vernissage template fonts (Fraunces display weights + italics) ──── */
 import "@fontsource/fraunces/400-italic.css";
 import "@fontsource/fraunces/500.css";

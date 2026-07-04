@@ -12,7 +12,7 @@ export type CatalogTemplate = {
   /** Display name; also persisted as Portfolio.template. */
   name: string;
   /** i18n stem: name/desc resolve via `onb.template.${i18nKey}Name|Desc`. */
-  i18nKey: "minimal" | "atelier" | "halcyon" | "meridian" | "vernissage";
+  i18nKey: "minimal" | "atelier" | "halcyon" | "meridian" | "vernissage" | "serenata";
   /** Static demo page rendered inside preview iframes (`?lang=` aware). */
   demoUrl: string;
   /** Brand palette shown as swatches on the catalog cards. */
@@ -61,6 +61,14 @@ export const TEMPLATE_CATALOG: CatalogTemplate[] = [
     demoUrl: "/templates/vernissage",
     palette: { bg: "#F6F5F1", fg: "#131518", accent: "#A63A22", muted: "#90928F" },
     serif: "'Fraunces', Georgia, serif",
+  },
+  {
+    id: "serenata",
+    name: "Serenata",
+    i18nKey: "serenata",
+    demoUrl: "/templates/serenata",
+    palette: { bg: "#FBF7F2", fg: "#40342F", accent: "#B07C70", muted: "#A5988E" },
+    serif: "'Cormorant Garamond', Georgia, serif",
   },
 ];
 

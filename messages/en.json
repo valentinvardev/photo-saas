@@ -434,12 +434,12 @@
       "uniform": "Grid",
       "masonry": "Masonry",
       "index": "Index",
-      "corridor": "3D slider",
+      "corridor": "3D",
       "descMosaic": "An editorial layout with mixed, art-directed cell sizes.",
       "descUniform": "An even grid of equal cells.",
       "descMasonry": "Keeps each photo's aspect ratio — boxes vary in height (VSCO-style).",
       "descIndex": "A typographic list of projects with a hover preview.",
-      "descCorridor": "A 3D coverflow — each photo takes the wall facing you, framed with a museum label.",
+      "descCorridor": "The template's signature 3D showcase — photos always face the viewer.",
       "columns": "Columns",
       "spacing": "Spacing",
       "fit": "Photo fit",
@@ -1104,7 +1104,8 @@
       "atelierName": "Atelier", "atelierDesc": "Centred, editorial, lots of whitespace.",
       "halcyonName": "Halcyon", "halcyonDesc": "Warm-dark editorial, italic serif, typographic project index.",
       "meridianName": "Meridian", "meridianDesc": "Cool gallery aesthetic — split hero, museum-hang grid, steel-blue accent.",
-      "vernissageName": "Vernissage", "vernissageDesc": "A 3D white-cube exhibition — each photo takes the wall facing the visitor, framed with a museum label."
+      "vernissageName": "Vernissage", "vernissageDesc": "A 3D white-cube exhibition — each photo takes the wall facing the visitor, framed with a museum label.",
+      "serenataName": "Serenata", "serenataDesc": "For weddings — ivory and rosewood, with a 3D wedding album that turns its pages."
     },
     "done": {
       "title": "Your studio is live",

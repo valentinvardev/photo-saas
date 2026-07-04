@@ -31,7 +31,7 @@ export function pairingTypography(p: PairingOption): Typography {
 }
 
 /* ── Template options (real editor templates that render with branding) ── */
-export type TemplateOption = { id: "minimal-bw" | "atelier" | "halcyon" | "meridian" | "vernissage"; variant: "minimal" | "atelier" | "halcyon" | "meridian" | "vernissage" };
+export type TemplateOption = { id: "minimal-bw" | "atelier" | "halcyon" | "meridian" | "vernissage" | "serenata"; variant: "minimal" | "atelier" | "halcyon" | "meridian" | "vernissage" | "serenata" };
 
 export const TEMPLATE_OPTIONS: TemplateOption[] = [
   { id: "minimal-bw", variant: "minimal" },
@@ -39,6 +39,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
   { id: "halcyon",    variant: "halcyon" },
   { id: "meridian",   variant: "meridian" },
   { id: "vernissage", variant: "vernissage" },
+  { id: "serenata",   variant: "serenata" },
 ];
 
 /* ── Identity collected in onboarding ── */
