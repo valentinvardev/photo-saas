@@ -406,5 +406,12 @@
     "tiff": "TIFF",
     "jpeg": "JPEG",
     "other": "Outro"
+  },
+
+  "tplcat": {
+    "use": "Usar este modelo",
+    "previewTitle": "Pré-visualização do modelo",
+    "showing": "Mostrando {template}.",
+    "fullPreview": "Visualização completa"
   }
 }

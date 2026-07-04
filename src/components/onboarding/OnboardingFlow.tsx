@@ -14,6 +14,7 @@ import { FontPickerModal } from "~/components/editor/canvas/FontPickerModal";
 import { ImageCropModal } from "~/components/editor/panels/ImageCropModal";
 import { useUploadPhotos } from "~/lib/photo/upload";
 import { LiveTemplatePreview } from "./LiveTemplatePreview";
+import { TemplateCatalogList } from "~/components/templates/TemplateCatalog";
 import {
   PALETTES, PAIRINGS, pairingTypography, TEMPLATE_OPTIONS,
   buildMinimalNodes, buildAtelierNodes, buildHalcyonNodes, buildOnboardingContent, fullName, initials,
@@ -402,24 +403,11 @@ export function OnboardingFlow() {
                   {stepKey === "template" && (
                     <div className="flex flex-col gap-4">
                       <StepHead title={t("onb.template.title")} body={t("onb.template.body")} />
-                      <div className="flex flex-col gap-3">
-                        {TEMPLATE_OPTIONS.map((opt, i) => {
-                          const active = i === templateIdx;
-                          const key = opt.id === "minimal-bw" ? "minimal" : opt.id; // i18n key prefix
-                          return (
-                            <button key={opt.id} onClick={() => selectTemplate(i)}
-                              className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${active ? "border-yellow ring-2 ring-yellow/30" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}>
-                              <div className={`mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${active ? "border-yellow" : "border-[var(--fg-muted)]"}`}>
-                                {active && <div className="w-2 h-2 rounded-full bg-yellow" />}
-                              </div>
-                              <div>
-                                <div className="font-sans text-sm font-semibold text-[var(--fg)]">{t(`onb.template.${key}Name`)}</div>
-                                <div className="font-sans text-xs text-[var(--fg-muted)] mt-0.5">{t(`onb.template.${key}Desc`)}</div>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <TemplateCatalogList
+                        selectedId={template.id}
+                        onSelect={(id) => { const i = TEMPLATE_OPTIONS.findIndex((o) => o.id === id); if (i >= 0) selectTemplate(i); }}
+                        onUse={() => next()}
+                      />
                     </div>
                   )}
 

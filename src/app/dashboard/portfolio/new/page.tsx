@@ -3,8 +3,9 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { LivePreviewThumbnail, DevicePreviewModal } from "~/components/dashboard/DevicePreviewModal";
-import { TEMPLATE_URL, TEMPLATES } from "~/lib/portfolio/mock";
+import { TemplateCatalogList, TemplateCatalogPreview } from "~/components/templates/TemplateCatalog";
+import { DEFAULT_CATALOG_TEMPLATE, catalogTemplate } from "~/lib/templates/catalog";
+import { buildMinimalNodes, buildAtelierNodes, buildHalcyonNodes, type Identity } from "~/components/onboarding/brandData";
 import { useUploadPhotos } from "~/lib/photo/upload";
 import { api } from "~/trpc/react";
 import { useT } from "~/components/providers/LangProvider";
@@ -148,16 +149,16 @@ export default function NewPortfolioPage() {
   const [step,            setStep]            = useState(0);
   const [name,            setName]            = useState("");
   const [selectedPhotos,  setSelectedPhotos]  = useState<Set<string>>(new Set());
-  const [template,        setTemplate]        = useState(TEMPLATES[0]!);
+  const [template,        setTemplate]        = useState(DEFAULT_CATALOG_TEMPLATE);
   const [domain,          setDomain]          = useState<"free" | "custom">("free");
   const [customDomain,    setCustomDomain]    = useState("");
-  const [previewOpen,     setPreviewOpen]     = useState(false);
   const [newId,           setNewId]           = useState<string | null>(null);
   const [creating,        setCreating]        = useState(false);
   const [createError,     setCreateError]     = useState<string | null>(null);
 
   const utils = api.useUtils();
   const createMut = api.portfolio.create.useMutation();
+  const saveDesignMut = api.portfolio.saveDesign.useMutation();
 
   /* Real photo library */
   const { data: libData, isLoading: libLoading } = api.photo.list.useQuery({ limit: 200 });
@@ -184,7 +185,7 @@ export default function NewPortfolioPage() {
     setCreating(true);
     setCreateError(null);
     const content = pickedPhotos.length > 0 ? buildContent(pickedPhotos, name.trim()) : undefined;
-    const payload = { title: name.trim(), template, content };
+    const payload = { title: name.trim(), template: template.name, content };
     try {
       let made;
       try {
@@ -197,6 +198,18 @@ export default function NewPortfolioPage() {
           throw err;
         }
       }
+      // Persist the chosen template so the editor + public site render it —
+      // with Spanish default copy when the user's locale is Spanish.
+      const emptyIdentity: Identity = { first: "", last: "", location: "", bio: "" };
+      const nodes = locale === "es"
+        ? template.id === "minimal-bw" ? buildMinimalNodes(locale, emptyIdentity)
+        : template.id === "atelier"    ? buildAtelierNodes(locale, emptyIdentity)
+        : template.id === "halcyon"    ? buildHalcyonNodes(locale, emptyIdentity)
+        : undefined
+        : undefined;
+      try {
+        await saveDesignMut.mutateAsync({ id: made.id, editorState: { templateId: template.id, ...(nodes ? { nodes } : {}) } });
+      } catch { /* portfolio exists; the editor falls back to the default template */ }
       setNewId(made.id);
       void utils.portfolio.list.invalidate();
       setStep(4);
@@ -209,7 +222,6 @@ export default function NewPortfolioPage() {
 
   const canNext   = step === 0 ? !!name.trim() : true;
   const isDone    = step === 4;
-  const previewUrl = TEMPLATE_URL[template] ? `${TEMPLATE_URL[template]}?lang=${locale}` : undefined;
 
   function togglePhoto(id: string) {
     setSelectedPhotos((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -253,35 +265,8 @@ export default function NewPortfolioPage() {
     );
 
     if (step === 2) return (
-      <div className="flex flex-col gap-3 h-full">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-sans font-bold text-[var(--fg)] text-lg">{t("nw.right.previewTitle")}</h2>
-            <p className="font-sans text-sm text-[var(--fg-muted)] mt-0.5">{t("nw.right.showing", { template })}</p>
-          </div>
-          {previewUrl && (
-            <button
-              onClick={() => setPreviewOpen(true)}
-              className="flex items-center gap-1.5 font-sans text-xs font-medium px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)] transition-colors"
-            >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              {t("nw.right.fullPreview")}
-            </button>
-          )}
-        </div>
-        {previewUrl ? (
-          <div className="flex-1 overflow-hidden border border-[var(--border)] min-h-[360px]">
-            <div className="flex items-center gap-1.5 px-3 py-2 border-b border-[var(--border)] bg-[var(--bg-card)]">
-              <span className="w-2 h-2 rounded-full bg-red-400/60"/><span className="w-2 h-2 rounded-full bg-yellow/60"/><span className="w-2 h-2 rounded-full bg-green-400/60"/>
-              <span className="font-mono text-[12px] text-[var(--fg-muted)] ml-2 truncate">{domainStr}</span>
-            </div>
-            <LivePreviewThumbnail url={previewUrl} baseWidth={1280} className="w-full h-full" />
-          </div>
-        ) : (
-          <div className="flex-1 rounded-xl border border-dashed border-[var(--border)] flex items-center justify-center">
-            <p className="font-sans text-sm text-[var(--fg-muted)]">{t("nw.right.noPreview")}</p>
-          </div>
-        )}
+      <div className="h-full min-h-[480px]">
+        <TemplateCatalogPreview template={template} domainLabel={domainStr} onUse={() => setStep(3)} />
       </div>
     );
 
@@ -374,7 +359,7 @@ export default function NewPortfolioPage() {
             >
               <h1 className="font-sans font-black text-[var(--fg)] text-3xl mb-2">{t("nw.done.title")}</h1>
               <p className="font-sans text-sm text-[var(--fg-muted)] leading-relaxed max-w-sm mx-auto">
-                {t("nw.done.body", { name, template })}
+                {t("nw.done.body", { name, template: template.name })}
                 {totalSel > 0 && (selectedPhotos.size === 1 ? t("nw.done.photosSuffixOne") : t("nw.done.photosSuffix", { n: selectedPhotos.size }))}
               </p>
             </motion.div>
@@ -445,37 +430,11 @@ export default function NewPortfolioPage() {
                     <div className="space-y-3">
                       <h1 className="font-sans font-black text-[var(--fg)] text-2xl">{t("nw.step2.title")}</h1>
                       <p className="font-sans text-sm text-[var(--fg-muted)]">{t("nw.step2.body")}</p>
-                      <div className="flex flex-col gap-2">
-                        {TEMPLATES.map((tpl) => (
-                          <button key={tpl} onClick={() => setTemplate(tpl)}
-                            className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${template === tpl ? "border-yellow bg-yellow/5" : "border-[var(--border)] hover:border-[var(--fg-muted)]"}`}
-                          >
-                            <div className="w-16 h-10 overflow-hidden bg-[var(--bg-subtle)] shrink-0 border border-[var(--border)] rounded-sm">
-                              {TEMPLATE_URL[tpl] && <LivePreviewThumbnail url={`${TEMPLATE_URL[tpl]}?lang=${locale}`} baseWidth={1280} className="w-full h-full" />}
-                            </div>
-                            <span className="font-sans text-sm font-semibold text-[var(--fg)] flex-1">{tpl}</span>
-                            {template === tpl && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fad502" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>}
-                          </button>
-                        ))}
-
-                        {/* Browse all templates */}
-                        <a
-                          href="/dashboard/templates"
-                          target="_blank"
-                          className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-[var(--border)] text-left transition-all hover:border-yellow hover:bg-yellow/5 group"
-                        >
-                          <div className="w-16 h-10 bg-[var(--bg-subtle)] shrink-0 border border-[var(--border)] rounded-sm flex items-center justify-center text-[var(--fg-muted)] group-hover:text-yellow transition-colors">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-                            </svg>
-                          </div>
-                          <span className="font-sans text-sm font-semibold text-[var(--fg-muted)] group-hover:text-[var(--fg)] flex-1 transition-colors">{t("nw.step2.browseAll")}</span>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--fg-muted)] group-hover:text-yellow transition-colors shrink-0">
-                            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                          </svg>
-                        </a>
-                      </div>
+                      <TemplateCatalogList
+                        selectedId={template.id}
+                        onSelect={(id) => setTemplate(catalogTemplate(id))}
+                        onUse={() => setStep(3)}
+                      />
                     </div>
                   )}
 
@@ -553,12 +512,6 @@ export default function NewPortfolioPage() {
         )}
       </div>
 
-      {/* Template device preview */}
-      <AnimatePresence>
-        {previewOpen && previewUrl && (
-          <DevicePreviewModal url={previewUrl} title={template} subtitle={t("nw.previewSubtitle", { template })} onClose={() => setPreviewOpen(false)} />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
