@@ -1177,5 +1177,87 @@
     "previewTitle": "Template preview",
     "showing": "Previewing {template}.",
     "fullPreview": "Full preview"
+  },
+
+  "lp": {
+    "nav": {
+      "login": "Log in",
+      "start": "Start free"
+    },
+    "hero": {
+      "eyebrow": "For photographers",
+      "title": "Your professional portfolio,<br/>online <em>today.</em>",
+      "sub": "Pick a signature template, upload your photos and share your work with a link — or your own domain. No code, no designer, no friction.",
+      "ctaPrimary": "Create my free portfolio",
+      "ctaSecondary": "See the templates",
+      "trust": "Free to start · No card required"
+    },
+    "templates": {
+      "label": "Templates",
+      "title": "Signature designs, not generic pages.",
+      "sub": "Six templates designed like author sites: a night gallery in 3D, a wedding album that turns its pages, editorials that breathe. Your work never looks like everyone else's."
+    },
+    "features": {
+      "label": "What it solves",
+      "title": "Everything you need to show your work and win clients.",
+      "f1t": "Visual editor, live",
+      "f1b": "Change texts, colors and typography by touching the site. What you see while editing is exactly what your client sees.",
+      "f2t": "Your gallery, organized",
+      "f2b": "Upload whole folders and the site builds itself with your real photos. No mockups: your portfolio is always current.",
+      "f3t": "In your language — and your clients'",
+      "f3b": "Your portfolio speaks Spanish, English or Portuguese depending on who visits. One site, three markets.",
+      "f4t": "Your brand, your domain",
+      "f4b": "Start free with portapic.com/p/your-name. When you're ready to grow, connect your own .com and own your brand."
+    },
+    "how": {
+      "label": "How it works",
+      "title": "From zero to published in three steps.",
+      "s1t": "Create your account",
+      "s1b": "Sign up free with your email. No card, no lock-in.",
+      "s2t": "Pick a template and upload photos",
+      "s2b": "The wizard builds your site with your name, your bio and your gallery in minutes.",
+      "s3t": "Publish and share",
+      "s3b": "Your portfolio goes live instantly — ready to send to that client who asked to see your work."
+    },
+    "pricing": {
+      "label": "Pricing",
+      "title": "Start free. Upgrade when it pays for itself.",
+      "sub": "One paid plan, in Argentine pesos, no surprises.",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "save": "2 months free",
+      "freeName": "Free",
+      "freePrice": "$0",
+      "freeTag": "Publish your first portfolio today.",
+      "freeB1": "1 published portfolio",
+      "freeB2": "All templates and the visual editor",
+      "freeB3": "Gallery with folders (2 GB)",
+      "freeB4": "Your portapic.com/p/your-name link",
+      "freeCta": "Start free",
+      "proName": "Pro",
+      "proTag": "For making a living from photography.",
+      "perMonth": "ARS / month",
+      "perYear": "ARS / year",
+      "proB1": "Unlimited portfolios",
+      "proB2": "50 GB for your photos",
+      "proB3": "Connect your own domain",
+      "proB4": "Visit analytics",
+      "proB5": "Priority support",
+      "proDomainYearly": "Free .com domain for the first year",
+      "proDomainMonthly": "Custom domain billed separately",
+      "proCta": "Go Pro"
+    },
+    "cta": {
+      "title": "Your next client wants to see your work.",
+      "sub": "Show it well. Your portfolio can be online tonight.",
+      "button": "Create my free portfolio"
+    },
+    "footer": {
+      "tagline": "Portfolios for photographers.",
+      "login": "Log in",
+      "register": "Create account",
+      "language": "Language",
+      "rights": "All rights reserved."
+    }
   }
 }

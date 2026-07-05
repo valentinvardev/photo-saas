@@ -413,5 +413,87 @@
     "previewTitle": "Pré-visualização do modelo",
     "showing": "Mostrando {template}.",
     "fullPreview": "Visualização completa"
+  },
+
+  "lp": {
+    "nav": {
+      "login": "Entrar",
+      "start": "Começar grátis"
+    },
+    "hero": {
+      "eyebrow": "Para fotógrafos",
+      "title": "Seu portfólio profissional,<br/>online <em>hoje.</em>",
+      "sub": "Escolha um template de autor, envie suas fotos e compartilhe seu trabalho com um link — ou com seu próprio domínio. Sem código, sem designer, sem complicação.",
+      "ctaPrimary": "Criar meu portfólio grátis",
+      "ctaSecondary": "Ver os templates",
+      "trust": "Grátis para começar · Sem cartão"
+    },
+    "templates": {
+      "label": "Templates",
+      "title": "Design de autor, nada de páginas genéricas.",
+      "sub": "Seis templates desenhados como sites autorais: uma galeria noturna em 3D, um álbum de casamento que vira as páginas, editoriais que respiram. Seu trabalho nunca parece igual ao dos outros."
+    },
+    "features": {
+      "label": "O que resolve",
+      "title": "Tudo o que você precisa para mostrar seu trabalho e conquistar clientes.",
+      "f1t": "Editor visual, ao vivo",
+      "f1b": "Mude textos, cores e tipografia tocando no site. O que você vê ao editar é exatamente o que seu cliente vê.",
+      "f2t": "Sua galeria, organizada",
+      "f2b": "Envie pastas inteiras e o site se monta com suas fotos reais. Nada de maquetes: seu portfólio está sempre em dia.",
+      "f3t": "No seu idioma — e no dos seus clientes",
+      "f3b": "Seu portfólio fala espanhol, inglês ou português conforme quem visita. Um site, três mercados.",
+      "f4t": "Sua marca, seu domínio",
+      "f4b": "Comece grátis com portapic.com/p/seu-nome. Quando quiser crescer, conecte seu próprio .com e fique com toda a sua marca."
+    },
+    "how": {
+      "label": "Como funciona",
+      "title": "Do zero ao publicado em três passos.",
+      "s1t": "Crie sua conta",
+      "s1b": "Cadastre-se grátis com seu e-mail. Sem cartão, sem fidelidade.",
+      "s2t": "Escolha o template e envie as fotos",
+      "s2b": "O assistente monta seu site com seu nome, sua bio e sua galeria em minutos.",
+      "s3t": "Publique e compartilhe",
+      "s3b": "Seu portfólio fica online na hora — pronto para enviar àquele cliente que pediu para ver seu trabalho."
+    },
+    "pricing": {
+      "label": "Preços",
+      "title": "Comece grátis. Cresça quando fizer sentido.",
+      "sub": "Um único plano pago, em pesos argentinos, sem surpresas.",
+      "monthly": "Mensal",
+      "yearly": "Anual",
+      "save": "2 meses grátis",
+      "freeName": "Grátis",
+      "freePrice": "$0",
+      "freeTag": "Para publicar seu primeiro portfólio hoje.",
+      "freeB1": "1 portfólio publicado",
+      "freeB2": "Todos os templates e o editor visual",
+      "freeB3": "Galeria com pastas (2 GB)",
+      "freeB4": "Seu link portapic.com/p/seu-nome",
+      "freeCta": "Começar grátis",
+      "proName": "Pro",
+      "proTag": "Para viver de fotografia.",
+      "perMonth": "ARS / mês",
+      "perYear": "ARS / ano",
+      "proB1": "Portfólios ilimitados",
+      "proB2": "50 GB para suas fotos",
+      "proB3": "Conecte seu próprio domínio",
+      "proB4": "Estatísticas de visitas",
+      "proB5": "Suporte prioritário",
+      "proDomainYearly": "Domínio .com grátis no primeiro ano",
+      "proDomainMonthly": "Domínio próprio: contratado à parte",
+      "proCta": "Escolher Pro"
+    },
+    "cta": {
+      "title": "Seu próximo cliente quer ver seu trabalho.",
+      "sub": "Mostre bem. Seu portfólio pode estar online ainda hoje.",
+      "button": "Criar meu portfólio grátis"
+    },
+    "footer": {
+      "tagline": "Portfólios para fotógrafos.",
+      "login": "Entrar",
+      "register": "Criar conta",
+      "language": "Idioma",
+      "rights": "Todos os direitos reservados."
+    }
   }
 }

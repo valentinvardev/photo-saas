@@ -1177,5 +1177,87 @@
     "previewTitle": "Vista previa de la plantilla",
     "showing": "Mostrando {template}.",
     "fullPreview": "Vista completa"
+  },
+
+  "lp": {
+    "nav": {
+      "login": "Iniciar sesión",
+      "start": "Empezar gratis"
+    },
+    "hero": {
+      "eyebrow": "Para fotógrafos",
+      "title": "Tu portfolio profesional,<br/>online <em>hoy.</em>",
+      "sub": "Elegí una plantilla de autor, subí tus fotos y compartí tu trabajo con un link — o con tu propio dominio. Sin código, sin diseñador, sin vueltas.",
+      "ctaPrimary": "Crear mi portfolio gratis",
+      "ctaSecondary": "Ver las plantillas",
+      "trust": "Gratis para empezar · No pedimos tarjeta"
+    },
+    "templates": {
+      "label": "Plantillas",
+      "title": "Diseños con firma, no páginas genéricas.",
+      "sub": "Seis plantillas diseñadas como sitios de autor: una galería nocturna en 3D, un álbum de boda que pasa sus páginas, editoriales que respiran. Tu trabajo nunca se ve igual al del resto."
+    },
+    "features": {
+      "label": "Lo que resuelve",
+      "title": "Todo lo que necesitás para mostrar tu trabajo y conseguir clientes.",
+      "f1t": "Editor visual, en vivo",
+      "f1b": "Cambiá textos, colores y tipografías tocando el sitio. Lo que ves mientras editás es exactamente lo que ve tu cliente.",
+      "f2t": "Tu galería, organizada",
+      "f2b": "Subí carpetas enteras y el sitio se arma con tus fotos reales. Nada de maquetas: tu portfolio siempre está al día.",
+      "f3t": "En tu idioma y el de tus clientes",
+      "f3b": "Tu portfolio habla español, inglés o portugués según quién lo visite. Un solo sitio, tres mercados.",
+      "f4t": "Tu marca, tu dominio",
+      "f4b": "Empezá con portapic.com/p/tu-nombre gratis. Cuando quieras crecer, conectá tu propio .com y quedate con toda tu marca."
+    },
+    "how": {
+      "label": "Cómo funciona",
+      "title": "De cero a publicado en tres pasos.",
+      "s1t": "Creá tu cuenta",
+      "s1b": "Registrate gratis con tu email. Sin tarjeta, sin permanencia.",
+      "s2t": "Elegí plantilla y subí tus fotos",
+      "s2b": "El asistente arma tu sitio con tu nombre, tu bio y tu galería en minutos.",
+      "s3t": "Publicá y compartí",
+      "s3b": "Tu portfolio queda online al instante, listo para mandar a ese cliente que te pidió ver tu trabajo."
+    },
+    "pricing": {
+      "label": "Precios",
+      "title": "Empezá gratis. Crecé cuando te sirva.",
+      "sub": "Un solo plan pago, en pesos y sin sorpresas.",
+      "monthly": "Mensual",
+      "yearly": "Anual",
+      "save": "2 meses gratis",
+      "freeName": "Gratis",
+      "freePrice": "$0",
+      "freeTag": "Para publicar tu primer portfolio hoy.",
+      "freeB1": "1 portfolio publicado",
+      "freeB2": "Todas las plantillas y el editor visual",
+      "freeB3": "Galería con carpetas (2 GB)",
+      "freeB4": "Tu link portapic.com/p/tu-nombre",
+      "freeCta": "Empezar gratis",
+      "proName": "Pro",
+      "proTag": "Para vivir de la fotografía.",
+      "perMonth": "ARS / mes",
+      "perYear": "ARS / año",
+      "proB1": "Portfolios ilimitados",
+      "proB2": "50 GB para tus fotos",
+      "proB3": "Conectá tu propio dominio",
+      "proB4": "Estadísticas de visitas",
+      "proB5": "Soporte prioritario",
+      "proDomainYearly": "Dominio .com gratis el primer año",
+      "proDomainMonthly": "Dominio propio: se contrata aparte",
+      "proCta": "Elegir Pro"
+    },
+    "cta": {
+      "title": "Tu próximo cliente quiere ver tu trabajo.",
+      "sub": "Mostráselo bien. Tu portfolio puede estar online esta misma noche.",
+      "button": "Crear mi portfolio gratis"
+    },
+    "footer": {
+      "tagline": "Portfolios para fotógrafos.",
+      "login": "Iniciar sesión",
+      "register": "Crear cuenta",
+      "language": "Idioma",
+      "rights": "Todos los derechos reservados."
+    }
   }
 }
