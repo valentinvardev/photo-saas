@@ -110,7 +110,7 @@ function ImagePanel() {
       />
       <div className="relative z-10 flex flex-col justify-between h-full p-10">
         <Link href="/" className="inline-flex items-center" aria-label="Portapic home">
-          <Logo priority />
+          <Logo height={30} darkHeight={44} priority />
         </Link>
         <div className="max-w-sm">
           <div className="text-yellow/50 mb-4">
@@ -227,7 +227,7 @@ export default function RegisterPage() {
           {/* Logo — mobile only */}
           <div className="lg:hidden mb-10">
             <Link href="/" className="inline-flex items-center" aria-label="Portapic home">
-              <Logo priority />
+              <Logo height={26} darkHeight={36} priority />
             </Link>
           </div>
 

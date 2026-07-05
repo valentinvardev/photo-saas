@@ -64,7 +64,9 @@ export function Navbar() {
       <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Logo */}
         <Link href="/" className="flex items-center group" aria-label="Portapic home">
-          <Logo priority />
+          {/* The light asset (logoblack.png) reads visually larger at equal
+              height — render it smaller, same as the dashboard sidebar. */}
+          <Logo height={30} darkHeight={44} priority />
         </Link>
 
         {/* Center nav */}

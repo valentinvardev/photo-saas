@@ -23,7 +23,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2">
             <div className="flex items-center mb-4">
-              <Logo />
+              <Logo height={26} darkHeight={36} />
             </div>
             <p className="font-serif text-sm text-[var(--fg-muted)] leading-relaxed mb-6 max-w-xs">
               {t("landing.footer.tagline")}

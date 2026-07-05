@@ -28,7 +28,7 @@ const quote = quotes[0]!;
 function FrameLogo() {
   return (
     <Link href="/" className="inline-flex items-center group" aria-label="Portapic home">
-      <Logo priority />
+      <Logo height={30} darkHeight={44} priority />
     </Link>
   );
 }
