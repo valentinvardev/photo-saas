@@ -1259,5 +1259,59 @@
       "language": "Language",
       "rights": "All rights reserved."
     }
+  },
+
+  "authp": {
+    "login": {
+      "quote": "Photography is the story I fail to put into words.",
+      "title": "Welcome back.",
+      "sub": "Sign in to your Portapic account.",
+      "email": "Email",
+      "emailPh": "you@example.com",
+      "password": "Password",
+      "forgot": "Forgot?",
+      "signIn": "Sign in",
+      "signingIn": "Signing in…",
+      "or": "or",
+      "google": "Continue with Google",
+      "noAccount": "No account?",
+      "createOne": "Create one"
+    },
+    "reg": {
+      "quote": "Your work deserves a home that grows with you.",
+      "title": "Create your account.",
+      "sub": "Join 12,000+ photographers on Portapic.",
+      "checkTitle": "Check your inbox",
+      "checkBefore": "We sent a confirmation link to",
+      "checkAfter": "Click it to activate your account, then sign in.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "username": "Username",
+      "email": "Email",
+      "emailPh": "sofia@example.com",
+      "password": "Password",
+      "confirm": "Confirm password",
+      "errName": "At least 2 characters",
+      "errUserMin": "At least 3 characters",
+      "errUserMax": "Max 20 characters",
+      "errUserChars": "Only lowercase letters, numbers, . _ -",
+      "errUserHint": "3–20 characters, no spaces",
+      "errEmail": "Enter a valid email address",
+      "errPass": "Minimum 8 characters",
+      "errMatch": "Passwords don't match",
+      "strength1": "Weak password",
+      "strength2": "Fair password",
+      "strength3": "Strong password",
+      "creating": "Creating account…",
+      "create": "Create account",
+      "or": "or",
+      "google": "Continue with Google",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "agree": "By creating an account you agree to our",
+      "terms": "Terms",
+      "and": "and",
+      "privacy": "Privacy Policy"
+    }
   }
 }

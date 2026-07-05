@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import { useT } from "~/components/providers/LangProvider";
 import { LOCALES, type Locale } from "~/lib/i18n";
 import { TEMPLATE_CATALOG } from "~/lib/templates/catalog";
+import { Logo } from "~/components/ui/Logo";
 
 // Template display faces, so the wall renders each name in its real voice.
 import "~/lib/editor/fonts";
@@ -200,7 +201,7 @@ export function LandingV2() {
       {/* ── Nav ── */}
       <nav className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/85 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-          <Wordmark size={20} />
+          <Logo height={26} darkHeight={36} priority />
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/login" className="px-3 py-2 font-sans text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
               {t("lp.nav.login")}

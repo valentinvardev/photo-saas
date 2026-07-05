@@ -495,5 +495,59 @@
       "language": "Idioma",
       "rights": "Todos os direitos reservados."
     }
+  },
+
+  "authp": {
+    "login": {
+      "quote": "A fotografia é a história que não consigo pôr em palavras.",
+      "title": "Bem-vindo de volta.",
+      "sub": "Entre na sua conta Portapic.",
+      "email": "E-mail",
+      "emailPh": "voce@exemplo.com",
+      "password": "Senha",
+      "forgot": "Esqueceu?",
+      "signIn": "Entrar",
+      "signingIn": "Entrando…",
+      "or": "ou",
+      "google": "Continuar com o Google",
+      "noAccount": "Não tem conta?",
+      "createOne": "Crie uma"
+    },
+    "reg": {
+      "quote": "Seu trabalho merece uma casa que cresce com você.",
+      "title": "Crie sua conta.",
+      "sub": "Junte-se a mais de 12.000 fotógrafos no Portapic.",
+      "checkTitle": "Verifique seu e-mail",
+      "checkBefore": "Enviamos um link de confirmação para",
+      "checkAfter": "Clique nele para ativar sua conta e depois entre.",
+      "firstName": "Nome",
+      "lastName": "Sobrenome",
+      "username": "Usuário",
+      "email": "E-mail",
+      "emailPh": "sofia@exemplo.com",
+      "password": "Senha",
+      "confirm": "Confirmar senha",
+      "errName": "Mínimo de 2 caracteres",
+      "errUserMin": "Mínimo de 3 caracteres",
+      "errUserMax": "Máximo de 20 caracteres",
+      "errUserChars": "Apenas minúsculas, números, . _ -",
+      "errUserHint": "3–20 caracteres, sem espaços",
+      "errEmail": "Digite um e-mail válido",
+      "errPass": "Mínimo de 8 caracteres",
+      "errMatch": "As senhas não coincidem",
+      "strength1": "Senha fraca",
+      "strength2": "Senha razoável",
+      "strength3": "Senha forte",
+      "creating": "Criando conta…",
+      "create": "Criar conta",
+      "or": "ou",
+      "google": "Continuar com o Google",
+      "haveAccount": "Já tem conta?",
+      "signIn": "Entrar",
+      "agree": "Ao criar uma conta você concorda com nossos",
+      "terms": "Termos",
+      "and": "e a",
+      "privacy": "Política de Privacidade"
+    }
   }
 }

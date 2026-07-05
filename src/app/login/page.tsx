@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Logo } from "~/components/ui/Logo";
 import { createClient } from "~/lib/supabase/client";
+import { useT } from "~/components/providers/LangProvider";
 
 const quotes = [
   {
@@ -35,6 +36,7 @@ function FrameLogo() {
 
 /* ── Left image panel ── */
 function ImagePanel() {
+  const { t } = useT();
   return (
     <div className="hidden lg:flex relative w-1/2 min-h-screen flex-col overflow-hidden">
       {/* Photo */}
@@ -77,7 +79,7 @@ function ImagePanel() {
             </svg>
           </div>
           <p className="font-serif text-white/90 text-xl leading-relaxed mb-4">
-            {quote.text}
+            {t("authp.login.quote")}
           </p>
           <p className="font-mono text-xs text-white/40 tracking-widest uppercase">
             — {quote.author}
@@ -91,6 +93,7 @@ function ImagePanel() {
 /* ── Auth form ── */
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useT();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -151,10 +154,10 @@ export default function LoginPage() {
             transition={{ duration: 0.25 }}
           >
             <h1 className="font-sans font-black text-[var(--fg)] text-3xl mb-1">
-              Welcome back.
+              {t("authp.login.title")}
             </h1>
             <p className="font-serif text-[var(--fg-muted)] text-base mb-8">
-              Sign in to your Portapic account.
+              {t("authp.login.sub")}
             </p>
           </motion.div>
 
@@ -162,13 +165,13 @@ export default function LoginPage() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="block font-mono text-[13px] text-[var(--fg-muted)] tracking-widest uppercase mb-1.5">
-                Email
+                {t("authp.login.email")}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder={t("authp.login.emailPh")}
                 className="w-full rounded-xl px-4 py-3 font-sans text-sm text-[var(--fg)] bg-[var(--bg-card)] border border-[var(--border)] placeholder:text-[var(--fg-muted)] focus:outline-none focus:border-yellow transition-colors duration-200"
               />
             </div>
@@ -176,13 +179,13 @@ export default function LoginPage() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block font-mono text-[13px] text-[var(--fg-muted)] tracking-widest uppercase">
-                  Password
+                  {t("authp.login.password")}
                 </label>
                 <Link
                   href="/forgot-password"
                   className="font-mono text-[13px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
                 >
-                  Forgot?
+                  {t("authp.login.forgot")}
                 </Link>
               </div>
               <input
@@ -205,7 +208,7 @@ export default function LoginPage() {
               disabled={loading}
               className="btn-primary w-full rounded-xl py-3.5 font-sans font-bold text-sm mt-2 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {loading ? "Signing in…" : "Sign in"}
+              {loading ? t("authp.login.signingIn") : t("authp.login.signIn")}
             </button>
           </form>
 
@@ -213,7 +216,7 @@ export default function LoginPage() {
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-[var(--border)]" />
             <span className="font-mono text-[12px] text-[var(--fg-muted)] tracking-widest uppercase">
-              or
+              {t("authp.login.or")}
             </span>
             <div className="flex-1 h-px bg-[var(--border)]" />
           </div>
@@ -242,17 +245,17 @@ export default function LoginPage() {
                 fill="#EA4335"
               />
             </svg>
-            Continue with Google
+            {t("authp.login.google")}
           </button>
 
           {/* Sign up link */}
           <p className="mt-8 text-center font-sans text-sm text-[var(--fg-muted)]">
-            No account?{" "}
+            {t("authp.login.noAccount")}{" "}
             <Link
               href="/register"
               className="font-semibold text-[var(--fg)] hover:text-yellow transition-colors"
             >
-              Create one
+              {t("authp.login.createOne")}
             </Link>
           </p>
         </div>

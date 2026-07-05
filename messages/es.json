@@ -1259,5 +1259,59 @@
       "language": "Idioma",
       "rights": "Todos los derechos reservados."
     }
+  },
+
+  "authp": {
+    "login": {
+      "quote": "La fotografía es la historia que no logro poner en palabras.",
+      "title": "Bienvenido de nuevo.",
+      "sub": "Iniciá sesión en tu cuenta de Portapic.",
+      "email": "Email",
+      "emailPh": "vos@ejemplo.com",
+      "password": "Contraseña",
+      "forgot": "¿La olvidaste?",
+      "signIn": "Iniciar sesión",
+      "signingIn": "Iniciando…",
+      "or": "o",
+      "google": "Continuar con Google",
+      "noAccount": "¿No tenés cuenta?",
+      "createOne": "Creá una"
+    },
+    "reg": {
+      "quote": "Tu trabajo merece un hogar que crezca con vos.",
+      "title": "Creá tu cuenta.",
+      "sub": "Sumate a más de 12.000 fotógrafos en Portapic.",
+      "checkTitle": "Revisá tu correo",
+      "checkBefore": "Te enviamos un link de confirmación a",
+      "checkAfter": "Hacé click para activar tu cuenta y después iniciá sesión.",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "username": "Usuario",
+      "email": "Email",
+      "emailPh": "sofia@ejemplo.com",
+      "password": "Contraseña",
+      "confirm": "Confirmar contraseña",
+      "errName": "Mínimo 2 caracteres",
+      "errUserMin": "Mínimo 3 caracteres",
+      "errUserMax": "Máximo 20 caracteres",
+      "errUserChars": "Solo minúsculas, números, . _ -",
+      "errUserHint": "3–20 caracteres, sin espacios",
+      "errEmail": "Ingresá un email válido",
+      "errPass": "Mínimo 8 caracteres",
+      "errMatch": "Las contraseñas no coinciden",
+      "strength1": "Contraseña débil",
+      "strength2": "Contraseña aceptable",
+      "strength3": "Contraseña fuerte",
+      "creating": "Creando cuenta…",
+      "create": "Crear cuenta",
+      "or": "o",
+      "google": "Continuar con Google",
+      "haveAccount": "¿Ya tenés cuenta?",
+      "signIn": "Iniciar sesión",
+      "agree": "Al crear una cuenta aceptás nuestros",
+      "terms": "Términos",
+      "and": "y la",
+      "privacy": "Política de Privacidad"
+    }
   }
 }

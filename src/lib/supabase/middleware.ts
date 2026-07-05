@@ -7,8 +7,10 @@ const ES_COUNTRIES = new Set(["AR","MX","CO","CL","PE","VE","EC","GT","CU","BO",
 const PT_COUNTRIES = new Set(["BR","PT","MZ","AO","CV","GW","ST","TL"]);
 
 function detectLocale(request: NextRequest): Locale | null {
-  // Vercel injects x-vercel-ip-country on every edge request (Next.js 15+).
-  const country = request.headers.get("x-vercel-ip-country") ?? undefined;
+  // Country headers: Vercel injects x-vercel-ip-country; Cloudflare (if it
+  // proxies the VPS) injects cf-ipcountry. Self-hosted without a proxy has
+  // neither and falls back to Accept-Language below (browser language).
+  const country = request.headers.get("x-vercel-ip-country") ?? request.headers.get("cf-ipcountry") ?? undefined;
   if (country) {
     if (ES_COUNTRIES.has(country)) return "es";
     if (PT_COUNTRIES.has(country)) return "pt";

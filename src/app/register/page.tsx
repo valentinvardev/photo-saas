@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "~/components/ui/Logo";
 import { createClient } from "~/lib/supabase/client";
+import { useT } from "~/components/providers/LangProvider";
 
 /* ── Icons ── */
 function EyeIcon({ off = false }: { off?: boolean }) {
@@ -36,7 +37,6 @@ function passwordStrength(v: string): 0 | 1 | 2 | 3 {
   if (/[^A-Za-z0-9]/.test(v)) score++;
   return score as 0 | 1 | 2 | 3;
 }
-const strengthLabel = ["", "Weak", "Fair", "Strong"] as const;
 const strengthColor = ["", "#ef4444", "#facc15", "#22c55e"] as const;
 
 /* ── Border helper ──
@@ -90,6 +90,7 @@ function Field({
 
 /* ── Left image panel ── */
 function ImagePanel() {
+  const { t } = useT();
   return (
     <div className="hidden lg:flex relative w-1/2 min-h-screen flex-col overflow-hidden">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -119,7 +120,7 @@ function ImagePanel() {
             </svg>
           </div>
           <p className="font-serif text-white/90 text-xl leading-relaxed mb-4">
-            Your work deserves a home that grows with you.
+            {t("authp.reg.quote")}
           </p>
           <p className="font-mono text-xs text-white/40 tracking-widest uppercase">— Portapic</p>
         </div>
@@ -134,6 +135,7 @@ const inputBase =
 
 /* ── Page ── */
 export default function RegisterPage() {
+  const { t } = useT();
   const [firstName, setFirstName]       = useState("");
   const [lastName, setLastName]         = useState("");
   const [username, setUsername]         = useState("");
@@ -209,12 +211,12 @@ export default function RegisterPage() {
 
   const usernameError =
     username.length > 0 && username.length < 3
-      ? "At least 3 characters"
+      ? t("authp.reg.errUserMin")
       : username.length > 20
-        ? "Max 20 characters"
+        ? t("authp.reg.errUserMax")
         : !/^[a-z0-9._-]*$/.test(username) && username.length > 0
-          ? "Only lowercase letters, numbers, . _ -"
-          : "3–20 characters, no spaces";
+          ? t("authp.reg.errUserChars")
+          : t("authp.reg.errUserHint");
 
   return (
     <div className="min-h-screen flex bg-[var(--bg)]">
@@ -232,18 +234,17 @@ export default function RegisterPage() {
           </div>
 
           <h1 className="font-sans font-black text-[var(--fg)] text-3xl mb-1">
-            Create your account.
+            {t("authp.reg.title")}
           </h1>
           <p className="font-serif text-[var(--fg-muted)] text-base mb-8">
-            Join 12,000+ photographers on Portapic.
+            {t("authp.reg.sub")}
           </p>
 
           {checkEmail && (
             <div className="mb-6 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3">
-              <p className="font-sans text-sm font-semibold text-[var(--fg)]">Check your inbox</p>
+              <p className="font-sans text-sm font-semibold text-[var(--fg)]">{t("authp.reg.checkTitle")}</p>
               <p className="font-sans text-xs text-[var(--fg-muted)] mt-1">
-                We sent a confirmation link to <span className="font-mono">{email}</span>. Click it to
-                activate your account, then sign in.
+                {t("authp.reg.checkBefore")} <span className="font-mono">{email}</span>. {t("authp.reg.checkAfter")}
               </p>
             </div>
           )}
@@ -253,8 +254,8 @@ export default function RegisterPage() {
             {/* First + Last name */}
             <div className="grid grid-cols-2 gap-3">
               <Field
-                label="First name"
-                error="At least 2 characters"
+                label={t("authp.reg.firstName")}
+                error={t("authp.reg.errName")}
                 showError={touched.firstName && !firstValid && firstName.length > 0}
               >
                 <input
@@ -268,8 +269,8 @@ export default function RegisterPage() {
               </Field>
 
               <Field
-                label="Last name"
-                error="At least 2 characters"
+                label={t("authp.reg.lastName")}
+                error={t("authp.reg.errName")}
                 showError={touched.lastName && !lastValid && lastName.length > 0}
               >
                 <input
@@ -285,7 +286,7 @@ export default function RegisterPage() {
 
             {/* Username */}
             <Field
-              label="Username"
+              label={t("authp.reg.username")}
               error={usernameError}
               showError={touched.username && !userValid && username.length > 0}
             >
@@ -306,8 +307,8 @@ export default function RegisterPage() {
 
             {/* Email */}
             <Field
-              label="Email"
-              error="Enter a valid email address"
+              label={t("authp.reg.email")}
+              error={t("authp.reg.errEmail")}
               showError={touched.email && !emailValid && email.length > 0}
             >
               <input
@@ -315,15 +316,15 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={() => touch("email")}
-                placeholder="sofia@example.com"
+                placeholder={t("authp.reg.emailPh")}
                 className={`${inputBase} ${inputBorder(emailValid, !!touched.email, email.length > 0)}`}
               />
             </Field>
 
             {/* Password */}
             <Field
-              label="Password"
-              error="Minimum 8 characters"
+              label={t("authp.reg.password")}
+              error={t("authp.reg.errPass")}
               showError={touched.password && !passValid && password.length > 0}
             >
               <div className="relative">
@@ -371,7 +372,7 @@ export default function RegisterPage() {
                       className="font-mono text-[12px] transition-colors duration-300"
                       style={{ color: strengthColor[strength] }}
                     >
-                      {strengthLabel[strength]} password
+                      {t(`authp.reg.strength${strength}`)}
                     </p>
                   </motion.div>
                 )}
@@ -390,8 +391,8 @@ export default function RegisterPage() {
                   className="overflow-hidden"
                 >
                   <Field
-                    label="Confirm password"
-                    error="Passwords don't match"
+                    label={t("authp.reg.confirm")}
+                    error={t("authp.reg.errMatch")}
                     showError={touched.confirm && !confirmValid && confirm.length > 0}
                   >
                     <div className="relative">
@@ -430,14 +431,14 @@ export default function RegisterPage() {
               whileTap={formValid && !submitting ? { scale: 0.98 } : {}}
               className="btn-primary w-full rounded-xl py-3.5 font-sans font-bold text-sm mt-2 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-200"
             >
-              {submitting ? "Creating account…" : "Create account"}
+              {submitting ? t("authp.reg.creating") : t("authp.reg.create")}
             </motion.button>
           </form>
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-[var(--border)]" />
-            <span className="font-mono text-[12px] text-[var(--fg-muted)] tracking-widest uppercase">or</span>
+            <span className="font-mono text-[12px] text-[var(--fg-muted)] tracking-widest uppercase">{t("authp.reg.or")}</span>
             <div className="flex-1 h-px bg-[var(--border)]" />
           </div>
 
@@ -453,22 +454,22 @@ export default function RegisterPage() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
             </svg>
-            Continue with Google
+            {t("authp.reg.google")}
           </button>
 
           {/* Sign in link */}
           <p className="mt-8 text-center font-sans text-sm text-[var(--fg-muted)]">
-            Already have an account?{" "}
+            {t("authp.reg.haveAccount")}{" "}
             <Link href="/login" className="font-semibold text-[var(--fg)] hover:text-yellow transition-colors">
-              Sign in
+              {t("authp.reg.signIn")}
             </Link>
           </p>
 
           <p className="mt-4 text-center font-mono text-[12px] text-[var(--fg-muted)] leading-relaxed">
-            By creating an account you agree to our{" "}
-            <Link href="/terms" className="underline hover:text-[var(--fg)] transition-colors">Terms</Link>{" "}
-            and{" "}
-            <Link href="/privacy" className="underline hover:text-[var(--fg)] transition-colors">Privacy Policy</Link>.
+            {t("authp.reg.agree")}{" "}
+            <Link href="/terms" className="underline hover:text-[var(--fg)] transition-colors">{t("authp.reg.terms")}</Link>{" "}
+            {t("authp.reg.and")}{" "}
+            <Link href="/privacy" className="underline hover:text-[var(--fg)] transition-colors">{t("authp.reg.privacy")}</Link>.
           </p>
         </div>
       </div>
