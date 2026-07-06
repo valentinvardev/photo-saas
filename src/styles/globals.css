@@ -443,14 +443,20 @@ body {
 }
 
 /* ── Light theme: yellow-filled buttons read low-contrast on white ──────────
-   Deepen the fill to the darker gold for actual interactive elements only
-   (buttons / links / toggles), leaving progress bars, status dots, badges and
-   the brand logo on the vibrant yellow. Dark theme is unchanged. */
+   Interactive elements (buttons / links / toggles) go BLACK in the light
+   theme — the darkened gold read greyish and cheap. Progress bars, status
+   dots, badges and the brand logo keep the vibrant yellow. The descendant
+   rule flips the buttons' dark text/icons (text-[#111] etc.) to white so
+   they stay legible on the black fill. Dark theme is unchanged. */
 :root:not(.dark) :is(button, a, label, [role="button"]).bg-yellow {
-  background-color: var(--color-yellow-dark);
+  background-color: #111111;
+  color: #ffffff;
+}
+:root:not(.dark) :is(button, a, label, [role="button"]).bg-yellow * {
+  color: #ffffff;
 }
 :root:not(.dark) :is(button, a, label, [role="button"]).bg-yellow:hover {
-  background-color: color-mix(in srgb, var(--color-yellow-dark) 88%, #000);
+  background-color: #333333;
 }
 
 /* ── Horizontal rule ── */
