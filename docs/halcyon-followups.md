@@ -1,8 +1,14 @@
 # Halcyon — web-builder follow-ups
 
+> **Status (2026-07): ✅ ALL RESOLVED.** Every item below shipped in the
+> "fix(editor): Halcyon editability + readOnly preview/public render" commit
+> and its follow-ups (grid-panel layouts, tap-to-edit, Tiptap `<p>` unwrap).
+> Kept as a historical record — the general rules extracted from these
+> failures are hard requirements in `docs/template-adapter-guide.md`
+> ("Pitfalls & required behaviours", items 1–12).
+
 Issues found after the first Halcyon → web-builder integration. Each maps a
-reported problem to its root cause and the fix. General rules extracted from
-these live in `docs/template-adapter-guide.md` ("Pitfalls & required behaviours").
+reported problem to its root cause and the fix.
 
 Source files:
 - `src/components/editor/canvas/HalcyonTemplate.tsx` (editable fork)
