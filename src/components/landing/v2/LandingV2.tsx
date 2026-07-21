@@ -14,10 +14,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useT } from "~/components/providers/LangProvider";
 import { LOCALES, type Locale } from "~/lib/i18n";
-import { TEMPLATE_CATALOG } from "~/lib/templates/catalog";
 import { Logo } from "~/components/ui/Logo";
+import { TemplateShowcase } from "./TemplateShowcase";
 
-// Template display faces, so the wall renders each name in its real voice.
+// Template display faces, so the miniatures render in each template's voice.
 import "~/lib/editor/fonts";
 
 const YELLOW = "#fad502";
@@ -57,42 +57,12 @@ const fadeUp = {
   transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
 };
 
-/* ── template wall — six author templates in their own voices ── */
-function TemplateWall() {
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {TEMPLATE_CATALOG.map((tpl, i) => (
-        <motion.div
-          key={tpl.id}
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.45, delay: i * 0.07 }}
-          className="relative overflow-hidden rounded-xl border border-[var(--border)] aspect-[4/5] flex flex-col items-center justify-center gap-2"
-          style={{ background: tpl.palette.bg }}
-        >
-          <span style={{ fontFamily: tpl.serif, fontSize: "clamp(20px, 3.2vw, 30px)", lineHeight: 1.1, color: tpl.palette.fg, letterSpacing: "-0.01em", textAlign: "center", padding: "0 8%" }}>
-            {tpl.name}
-            <span style={{ color: tpl.palette.accent }}>.</span>
-          </span>
-          <span className="font-mono text-[12px] uppercase tracking-[0.18em]" style={{ color: tpl.palette.muted }}>
-            0{i + 1}
-          </span>
-          <div className="absolute left-0 right-0 bottom-0 flex h-1.5">
-            <div className="flex-1" style={{ background: tpl.palette.accent }} />
-            <div className="flex-1" style={{ background: tpl.palette.fg }} />
-            <div className="flex-1" style={{ background: tpl.palette.muted }} />
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
 /* ── pricing ──────────────────────────────────────────────────── */
 function PricingSection() {
   const { t } = useT();
-  const [cycle, setCycle] = useState<"monthly" | "yearly">("yearly");
+  /* Monthly is the default view — the lower number is the honest entry
+     point; the annual saving is offered, not assumed. */
+  const [cycle, setCycle] = useState<"monthly" | "yearly">("monthly");
   const yearly = cycle === "yearly";
 
   return (
@@ -248,16 +218,14 @@ export function LandingV2() {
         </div>
       </section>
 
-      {/* ── Template wall ── */}
-      <section id="templates" className="max-w-5xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
-        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-10 items-center">
-          <motion.div {...fadeUp}>
-            <SectionLabel>{t("lp.templates.label")}</SectionLabel>
-            <h2 className="font-sans font-black text-[var(--fg)] text-3xl sm:text-4xl tracking-tight leading-tight">{t("lp.templates.title")}</h2>
-            <p className="font-sans text-sm sm:text-base text-[var(--fg-muted)] leading-relaxed mt-4">{t("lp.templates.sub")}</p>
-          </motion.div>
-          <TemplateWall />
-        </div>
+      {/* ── Templates ── */}
+      <section id="templates" className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
+        <motion.div {...fadeUp} className="max-w-2xl mb-10">
+          <SectionLabel>{t("lp.templates.label")}</SectionLabel>
+          <h2 className="font-sans font-black text-[var(--fg)] text-3xl sm:text-4xl tracking-tight leading-tight">{t("lp.templates.title")}</h2>
+          <p className="font-sans text-sm sm:text-base text-[var(--fg-muted)] leading-relaxed mt-4">{t("lp.templates.sub")}</p>
+        </motion.div>
+        <TemplateShowcase />
       </section>
 
       {/* ── Features ── */}

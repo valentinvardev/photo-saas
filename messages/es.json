@@ -1195,7 +1195,11 @@
     "templates": {
       "label": "Plantillas",
       "title": "Diseños con firma, no páginas genéricas.",
-      "sub": "Seis plantillas diseñadas como sitios de autor: una galería nocturna en 3D, un álbum de boda que pasa sus páginas, editoriales que respiran. Tu trabajo nunca se ve igual al del resto."
+      "sub": "Seis plantillas diseñadas como sitios de autor: una galería nocturna en 3D, un álbum de boda que pasa sus páginas, editoriales que respiran. Tu trabajo nunca se ve igual al del resto.",
+      "preview": "Vista previa",
+      "previewSub": "Así se ve con contenido de ejemplo.",
+      "mockWork": "Trabajos",
+      "mockAbout": "Sobre mí"
     },
     "features": {
       "label": "Lo que resuelve",

@@ -1195,7 +1195,11 @@
     "templates": {
       "label": "Templates",
       "title": "Signature designs, not generic pages.",
-      "sub": "Six templates designed like author sites: a night gallery in 3D, a wedding album that turns its pages, editorials that breathe. Your work never looks like everyone else's."
+      "sub": "Six templates designed like author sites: a night gallery in 3D, a wedding album that turns its pages, editorials that breathe. Your work never looks like everyone else's.",
+      "preview": "Preview",
+      "previewSub": "How it looks with sample content.",
+      "mockWork": "Work",
+      "mockAbout": "About"
     },
     "features": {
       "label": "What it solves",

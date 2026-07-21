@@ -431,7 +431,11 @@
     "templates": {
       "label": "Templates",
       "title": "Design de autor, nada de páginas genéricas.",
-      "sub": "Seis templates desenhados como sites autorais: uma galeria noturna em 3D, um álbum de casamento que vira as páginas, editoriais que respiram. Seu trabalho nunca parece igual ao dos outros."
+      "sub": "Seis templates desenhados como sites autorais: uma galeria noturna em 3D, um álbum de casamento que vira as páginas, editoriais que respiram. Seu trabalho nunca parece igual ao dos outros.",
+      "preview": "Pré-visualizar",
+      "previewSub": "Como fica com conteúdo de exemplo.",
+      "mockWork": "Trabalhos",
+      "mockAbout": "Sobre"
     },
     "features": {
       "label": "O que resolve",
